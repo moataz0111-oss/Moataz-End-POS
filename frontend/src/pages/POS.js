@@ -538,12 +538,12 @@ export default function POS() {
               </div>
               
               {/* تطبيق التوصيل */}
-              <Select value={deliveryApp} onValueChange={setDeliveryApp}>
+              <Select value={deliveryApp || "direct"} onValueChange={(v) => setDeliveryApp(v === "direct" ? "" : v)}>
                 <SelectTrigger className="h-10">
                   <SelectValue placeholder="اختر تطبيق التوصيل (اختياري)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">طلب مباشر</SelectItem>
+                  <SelectItem value="direct">طلب مباشر</SelectItem>
                   {deliveryApps.map(app => (
                     <SelectItem key={app.id} value={app.id}>{app.name}</SelectItem>
                   ))}
