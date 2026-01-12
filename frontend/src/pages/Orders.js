@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { formatPrice } from '../utils/currency';
+import { playNewOrderNotification, playKitchenBell } from '../utils/sound';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { ScrollArea } from '../components/ui/scroll-area';
+import { Switch } from '../components/ui/switch';
+import { Label } from '../components/ui/label';
 import {
   ArrowRight,
   Search,
@@ -19,7 +22,10 @@ import {
   Truck,
   Eye,
   Printer,
-  RefreshCw
+  RefreshCw,
+  Volume2,
+  VolumeX,
+  Bell
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -49,11 +55,24 @@ export default function Orders() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  
+  // Sound notification state
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    const saved = localStorage.getItem('maestro_sound_enabled');
+    return saved !== null ? saved === 'true' : true;
+  });
+  const lastOrderCountRef = useRef(0);
+  const isFirstLoadRef = useRef(true);
+
+  // Save sound preference
+  useEffect(() => {
+    localStorage.setItem('maestro_sound_enabled', soundEnabled.toString());
+  }, [soundEnabled]);
 
   useEffect(() => {
     fetchData();
-    // Poll for updates every 30 seconds
-    const interval = setInterval(fetchData, 30000);
+    // Poll for updates every 15 seconds
+    const interval = setInterval(fetchData, 15000);
     return () => clearInterval(interval);
   }, [selectedBranch, statusFilter]);
 
@@ -69,7 +88,30 @@ export default function Orders() {
         axios.get(`${API}/branches`)
       ]);
 
-      setOrders(ordersRes.data);
+      const newOrders = ordersRes.data;
+      
+      // Check for new orders and play notification
+      if (!isFirstLoadRef.current && soundEnabled) {
+        const pendingOrders = newOrders.filter(o => o.status === 'pending');
+        const previousPending = lastOrderCountRef.current;
+        
+        if (pendingOrders.length > previousPending) {
+          // New order arrived!
+          playNewOrderNotification();
+          toast.success('🔔 طلب جديد!', {
+            description: `تم استلام ${pendingOrders.length - previousPending} طلب جديد`,
+            duration: 5000,
+          });
+        }
+        
+        lastOrderCountRef.current = pendingOrders.length;
+      } else {
+        // First load, just set the count without notification
+        lastOrderCountRef.current = newOrders.filter(o => o.status === 'pending').length;
+        isFirstLoadRef.current = false;
+      }
+      
+      setOrders(newOrders);
       setBranches(branchesRes.data);
 
       if (!selectedBranch && branchesRes.data.length > 0) {
@@ -86,10 +128,21 @@ export default function Orders() {
     try {
       await axios.put(`${API}/orders/${orderId}/status?status=${status}`);
       toast.success('تم تحديث حالة الطلب');
+      
+      // Play kitchen bell when order is ready
+      if (status === 'ready' && soundEnabled) {
+        playKitchenBell();
+      }
+      
       fetchData();
     } catch (error) {
       toast.error('فشل في تحديث الحالة');
     }
+  };
+
+  const testNotificationSound = () => {
+    playNewOrderNotification();
+    toast.info('🔔 اختبار صوت الإشعار');
   };
 
   const getStatusColor = (status) => {
