@@ -1165,6 +1165,35 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
     await db.orders.insert_one(order_doc)
     del order_doc["_id"]
     
+    # تحديث معلومات العميل إذا كان موجوداً
+    if order.customer_phone:
+        customer = await db.customers.find_one({"$or": [{"phone": order.customer_phone}, {"phone2": order.customer_phone}]})
+        if customer:
+            await db.customers.update_one(
+                {"id": customer["id"]},
+                {
+                    "$inc": {"total_orders": 1, "total_spent": total},
+                    "$set": {"last_order_date": datetime.now(timezone.utc).isoformat()}
+                }
+            )
+        elif order.customer_name:
+            # إنشاء عميل جديد تلقائياً
+            new_customer = {
+                "id": str(uuid.uuid4()),
+                "name": order.customer_name,
+                "phone": order.customer_phone,
+                "phone2": None,
+                "address": order.delivery_address,
+                "area": None,
+                "notes": None,
+                "is_blocked": False,
+                "total_orders": 1,
+                "total_spent": total,
+                "last_order_date": datetime.now(timezone.utc).isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.customers.insert_one(new_customer)
+    
     # Update table status if dine-in
     if order.table_id:
         await db.tables.update_one(
