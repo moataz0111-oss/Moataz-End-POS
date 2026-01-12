@@ -181,22 +181,6 @@ export default function Settings() {
       setLoading(false);
     }
   };
-        axios.get(`${API}/products`)
-      ]);
-
-      setUsers(usersRes.data);
-      setBranches(branchesRes.data);
-      setPrinters(printersRes.data);
-      setEmailRecipients(settingsRes.data.email_recipients?.emails || []);
-      setDeliveryApps(appsRes.data);
-      setCategories(categoriesRes.data);
-      setProducts(productsRes.data);
-    } catch (error) {
-      console.error('Failed to fetch settings:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
