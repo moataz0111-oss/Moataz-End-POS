@@ -272,7 +272,11 @@ export default function Tables() {
                   className={`border-border/50 overflow-hidden cursor-pointer transition-all hover:shadow-lg ${
                     table.status === 'occupied' ? 'ring-2 ring-red-500' : ''
                   }`}
-                  onClick={() => table.status === 'available' && navigate('/pos')}
+                  onClick={() => {
+                    if (table.status === 'available') {
+                      navigate(`/pos?table=${table.id}`);
+                    }
+                  }}
                   data-testid={`table-card-${table.number}`}
                 >
                   <div className={`h-2 ${getStatusColor(table.status)}`} />
