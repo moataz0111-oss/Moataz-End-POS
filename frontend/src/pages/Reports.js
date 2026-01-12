@@ -618,8 +618,8 @@ export default function Reports() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <StatCard
-                    title="إجمالي المستحقات"
-                    value={formatPrice(deliveryCreditsReport.total_credit)}
+                    title="إجمالي المبيعات"
+                    value={formatPrice(deliveryCreditsReport.total_sales || deliveryCreditsReport.total_credit)}
                     icon={DollarSign}
                     color="blue-500"
                   />
@@ -645,25 +645,58 @@ export default function Reports() {
 
                 <Card className="border-border/50 bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg text-foreground">حسب شركة التوصيل</CardTitle>
+                    <CardTitle className="text-lg text-foreground">تفاصيل كل شركة توصيل</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {Object.entries(deliveryCreditsReport.by_delivery_app || {}).map(([app, data]) => (
-                        <div key={app} className="p-4 bg-muted/30 rounded-lg">
-                          <div className="flex justify-between items-start mb-3">
+                      {Object.entries(deliveryCreditsReport.by_delivery_app || {}).map(([appName, data]) => (
+                        <div key={appName} className="p-4 bg-muted/30 rounded-lg border border-border/50">
+                          <div className="flex justify-between items-start mb-4">
                             <div>
-                              <h4 className="font-bold text-foreground capitalize">{app}</h4>
-                              <p className="text-sm text-muted-foreground">{data.count} طلب</p>
+                              <h4 className="font-bold text-lg text-foreground flex items-center gap-2">
+                                <Truck className="h-5 w-5 text-primary" />
+                                {appName}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                نسبة العمولة: {data.commission_rate || 0}%
+                              </p>
                             </div>
-                            <div className="text-left">
+                            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">
+                              {data.count} طلب
+                            </span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="text-center p-3 bg-background rounded-lg">
+                              <p className="text-xs text-muted-foreground">إجمالي المبيعات</p>
                               <p className="text-lg font-bold text-foreground tabular-nums">{formatPrice(data.total)}</p>
-                              <p className="text-sm text-red-500">عمولة: {formatPrice(data.commission)}</p>
-                              <p className="text-sm text-green-500">صافي: {formatPrice(data.net_amount)}</p>
+                            </div>
+                            <div className="text-center p-3 bg-red-500/10 rounded-lg">
+                              <p className="text-xs text-red-500">العمولة المستقطعة</p>
+                              <p className="text-lg font-bold text-red-500 tabular-nums">-{formatPrice(data.commission)}</p>
+                            </div>
+                            <div className="text-center p-3 bg-green-500/10 rounded-lg">
+                              <p className="text-xs text-green-500">الصافي</p>
+                              <p className="text-lg font-bold text-green-500 tabular-nums">{formatPrice(data.net_amount)}</p>
+                            </div>
+                            <div className="text-center p-3 bg-background rounded-lg">
+                              <p className="text-xs text-muted-foreground">مدفوع / آجل</p>
+                              <p className="text-sm font-bold">
+                                <span className="text-green-500">{data.paid_count || 0}</span>
+                                {' / '}
+                                <span className="text-orange-500">{data.credit_count || 0}</span>
+                              </p>
                             </div>
                           </div>
                         </div>
                       ))}
+                      
+                      {Object.keys(deliveryCreditsReport.by_delivery_app || {}).length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>لا توجد طلبات توصيل في هذه الفترة</p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
