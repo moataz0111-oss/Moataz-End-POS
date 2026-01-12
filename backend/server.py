@@ -64,6 +64,7 @@ class PaymentMethod:
     CASH = "cash"
     CARD = "card"
     CREDIT = "credit"
+    PENDING = "pending"  # معلق - للطلبات المرسلة للمطبخ قبل الدفع
 
 # User Models
 class UserCreate(BaseModel):
