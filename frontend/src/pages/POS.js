@@ -560,6 +560,20 @@ export default function POS() {
             </div>
           </div>
 
+          {/* رقم جهاز التنبيه للسفري */}
+          {orderType === 'takeaway' && (
+            <div className="relative">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-lg">🔔</div>
+              <Input
+                placeholder="رقم جهاز التنبيه (اختياري)"
+                value={buzzerNumber}
+                onChange={(e) => setBuzzerNumber(e.target.value)}
+                className="pr-10 h-10 text-sm"
+                data-testid="buzzer-number"
+              />
+            </div>
+          )}
+
           {orderType === 'delivery' && (
             <>
               <div className="relative">
