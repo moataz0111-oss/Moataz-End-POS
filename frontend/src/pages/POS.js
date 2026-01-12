@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -33,7 +33,12 @@ import {
   History,
   UserCheck,
   Edit,
-  Receipt
+  Receipt,
+  List,
+  RefreshCw,
+  AlertCircle,
+  Bell,
+  Eye
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -49,6 +54,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '../components/ui/tabs';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -80,18 +91,25 @@ export default function POS() {
   const [currentShift, setCurrentShift] = useState(null);
   const [kitchenDialogOpen, setKitchenDialogOpen] = useState(false);
   const [orderNotes, setOrderNotes] = useState('');
-  const [pendingOrders, setPendingOrders] = useState([]);
   
-  // حالات جديدة للعملاء والطلبات المعلقة
+  // حالات جديدة للطلبات المعلقة والعملاء
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [pendingOrdersDialogOpen, setPendingOrdersDialogOpen] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null); // الطلب الحالي الذي يتم تعديله
+  const [customerSearchPhone, setCustomerSearchPhone] = useState('');
   const [customerData, setCustomerData] = useState(null);
   const [customerHistory, setCustomerHistory] = useState([]);
-  const [showCustomerHistory, setShowCustomerHistory] = useState(false);
-  const [pendingTakeawayOrders, setPendingTakeawayOrders] = useState([]);
-  const [selectedPendingOrder, setSelectedPendingOrder] = useState(null);
-  const [editingOrder, setEditingOrder] = useState(null);
+  const [showCustomerInfo, setShowCustomerInfo] = useState(false);
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
+  
+  // إشعارات الطلبات الجديدة
+  const prevOrdersCount = useRef(0);
 
   useEffect(() => {
     fetchData();
+    // تحديث الطلبات المعلقة كل 30 ثانية
+    const interval = setInterval(fetchPendingOrders, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   // قراءة الطاولة من URL
@@ -102,33 +120,34 @@ export default function POS() {
       if (table) {
         setSelectedTable(tableId);
         setOrderType('dine_in');
+        // إذا كانت الطاولة مشغولة، جلب طلبها
+        if (table.status === 'occupied' && table.current_order_id) {
+          loadOrderForEditing(table.current_order_id);
+        }
       }
     }
   }, [searchParams, tables]);
 
   const fetchData = async () => {
     try {
-      const [catRes, prodRes, appsRes, shiftRes, ordersRes] = await Promise.all([
+      const [catRes, prodRes, appsRes, shiftRes] = await Promise.all([
         axios.get(`${API}/categories`),
         axios.get(`${API}/products`),
         axios.get(`${API}/delivery-apps`),
-        axios.get(`${API}/shifts/current`).catch(() => ({ data: null })),
-        axios.get(`${API}/orders`, { params: { status: 'pending' } }).catch(() => ({ data: [] }))
+        axios.get(`${API}/shifts/current`).catch(() => ({ data: null }))
       ]);
 
       setCategories(catRes.data);
       setProducts(prodRes.data);
       setDeliveryApps(appsRes.data);
       setCurrentShift(shiftRes.data);
-      setPendingOrders(ordersRes.data);
 
-      // جلب الطاولات - أولاً حسب فرع المستخدم، ثم كل الطاولات إذا لم تكن موجودة
+      // جلب الطاولات
       let tablesData = [];
       if (user?.branch_id) {
         const tablesRes = await axios.get(`${API}/tables`, { params: { branch_id: user.branch_id } });
         tablesData = tablesRes.data;
       }
-      // إذا لم تكن هناك طاولات في فرع المستخدم، اجلب كل الطاولات
       if (tablesData.length === 0) {
         const allTablesRes = await axios.get(`${API}/tables`);
         tablesData = allTablesRes.data;
@@ -143,11 +162,97 @@ export default function POS() {
       if (catRes.data.length > 0) {
         setSelectedCategory(catRes.data[0].id);
       }
+
+      // جلب الطلبات المعلقة
+      await fetchPendingOrders();
     } catch (error) {
       console.error('Failed to fetch data:', error);
       toast.error('فشل في تحميل البيانات');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPendingOrders = async () => {
+    try {
+      const res = await axios.get(`${API}/orders`, { 
+        params: { status: 'pending' } 
+      });
+      const orders = res.data;
+      
+      // إشعار صوتي للطلبات الجديدة
+      if (prevOrdersCount.current > 0 && orders.length > prevOrdersCount.current) {
+        playSuccess();
+        toast.success('طلب جديد!', { duration: 5000 });
+      }
+      prevOrdersCount.current = orders.length;
+      
+      setPendingOrders(orders);
+    } catch (error) {
+      console.error('Failed to fetch pending orders:', error);
+    }
+  };
+
+  // تحميل طلب موجود للتعديل
+  const loadOrderForEditing = async (orderId) => {
+    try {
+      const res = await axios.get(`${API}/orders/${orderId}`);
+      const order = res.data;
+      
+      setEditingOrder(order);
+      setOrderType(order.order_type);
+      setSelectedTable(order.table_id);
+      setCustomerName(order.customer_name || '');
+      setCustomerPhone(order.customer_phone || '');
+      setDeliveryAddress(order.delivery_address || '');
+      setBuzzerNumber(order.buzzer_number || '');
+      setDiscount(order.discount || 0);
+      setDeliveryApp(order.delivery_app || '');
+      setOrderNotes(order.notes || '');
+      
+      // تحويل عناصر الطلب إلى سلة
+      const cartItems = order.items.map(item => ({
+        product_id: item.product_id,
+        product_name: item.product_name,
+        price: item.price,
+        quantity: item.quantity,
+        notes: item.notes || ''
+      }));
+      setCart(cartItems);
+      
+      toast.info(`تم تحميل الطلب #${order.order_number} للتعديل`);
+    } catch (error) {
+      console.error('Failed to load order:', error);
+      toast.error('فشل في تحميل الطلب');
+    }
+  };
+
+  // البحث عن عميل بالهاتف
+  const handleSearchCustomer = async () => {
+    if (!customerSearchPhone || customerSearchPhone.length < 4) {
+      toast.error('أدخل رقم هاتف صحيح');
+      return;
+    }
+    
+    try {
+      const res = await axios.get(`${API}/customers/by-phone/${customerSearchPhone}`);
+      if (res.data) {
+        setCustomerData(res.data);
+        setCustomerName(res.data.name);
+        setCustomerPhone(res.data.phone);
+        setDeliveryAddress(res.data.address || '');
+        setCustomerHistory(res.data.recent_orders || []);
+        setShowCustomerInfo(true);
+        toast.success(`تم العثور على العميل: ${res.data.name}`);
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        toast.info('عميل جديد - يمكنك إضافة بياناته');
+        setCustomerPhone(customerSearchPhone);
+        setCustomerData(null);
+      } else {
+        toast.error('فشل في البحث عن العميل');
+      }
     }
   };
 
@@ -202,12 +307,15 @@ export default function POS() {
     setCustomerName('');
     setCustomerPhone('');
     setDeliveryAddress('');
-    setBuzzerNumber(''); // إعادة تعيين رقم جهاز التنبيه
+    setBuzzerNumber('');
     setDiscount(0);
     setSelectedTable(null);
     setDeliveryApp('');
     setSelectedDriver('');
     setOrderNotes('');
+    setEditingOrder(null);
+    setCustomerData(null);
+    setCustomerSearchPhone('');
   }, []);
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -219,7 +327,7 @@ export default function POS() {
   
   // المجموع بعد الخصم والعمولة
   const totalBeforeCommission = subtotal - discount;
-  const netTotal = totalBeforeCommission - commissionAmount; // المبلغ الصافي بعد خصم العمولة
+  const netTotal = totalBeforeCommission - commissionAmount;
 
   // حفظ الطلب وإرسال للمطبخ (بدون دفع)
   const handleSaveAndSendToKitchen = async () => {
@@ -240,41 +348,50 @@ export default function POS() {
 
     setSubmitting(true);
     try {
-      const orderData = {
-        order_type: orderType,
-        table_id: orderType === 'dine_in' ? selectedTable : null,
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        delivery_address: orderType === 'delivery' ? deliveryAddress : null,
-        buzzer_number: orderType === 'takeaway' ? buzzerNumber : null, // رقم جهاز التنبيه
-        items: cart,
-        branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
-        payment_method: 'pending', // معلق - لم يتم الدفع بعد
-        discount: discount,
-        delivery_app: orderType === 'delivery' ? deliveryApp : null,
-        notes: orderNotes
-      };
-
-      const response = await axios.post(`${API}/orders`, orderData);
-      
-      // تعيين السائق إذا تم اختياره
-      if (orderType === 'delivery' && selectedDriver) {
-        await axios.put(`${API}/drivers/${selectedDriver}/assign?order_id=${response.data.id}`);
+      // إذا كنا نعدل طلب موجود - إضافة العناصر الجديدة فقط
+      if (editingOrder) {
+        const existingProductIds = editingOrder.items.map(i => i.product_id);
+        const newItems = cart.filter(item => !existingProductIds.includes(item.product_id));
+        const updatedItems = cart.filter(item => existingProductIds.includes(item.product_id));
+        
+        // تحقق إذا كانت هناك عناصر جديدة
+        if (newItems.length > 0) {
+          await axios.put(`${API}/orders/${editingOrder.id}/add-items`, newItems);
+        }
+        
+        // يمكن تحديث الكميات للعناصر الموجودة لاحقاً
+        toast.success('تم تحديث الطلب وإرساله للمطبخ');
+      } else {
+        // طلب جديد
+        const orderData = {
+          order_type: orderType,
+          table_id: orderType === 'dine_in' ? selectedTable : null,
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          delivery_address: orderType === 'delivery' ? deliveryAddress : null,
+          buzzer_number: orderType === 'takeaway' ? buzzerNumber : null,
+          items: cart,
+          branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
+          payment_method: 'pending',
+          discount: discount,
+          delivery_app: orderType === 'delivery' ? deliveryApp : null,
+          notes: orderNotes
+        };
+        
+        await axios.post(`${API}/orders`, orderData);
+        playSuccess();
+        toast.success('تم حفظ الطلب وإرساله للمطبخ');
       }
       
-      playSuccess();
-      toast.success(`تم حفظ الطلب #${response.data.order_number} وإرساله للمطبخ`);
-      clearCart();
       setKitchenDialogOpen(false);
+      clearCart();
+      await fetchPendingOrders();
       
-      // Refresh tables and pending orders
-      const [tablesRes, ordersRes] = await Promise.all([
-        axios.get(`${API}/tables`, { params: { branch_id: user?.branch_id } }),
-        axios.get(`${API}/orders`, { params: { status: 'pending' } })
-      ]);
-      setTables(tablesRes.data);
-      setPendingOrders(ordersRes.data);
-      
+      // تحديث الطاولات إذا كان طلب داخلي
+      if (orderType === 'dine_in') {
+        const tablesRes = await axios.get(`${API}/tables`);
+        setTables(tablesRes.data);
+      }
     } catch (error) {
       console.error('Failed to save order:', error);
       toast.error(error.response?.data?.detail || 'فشل في حفظ الطلب');
@@ -283,33 +400,14 @@ export default function POS() {
     }
   };
 
-  // إغلاق الطلب مع الدفع
-  const handleCloseOrderWithPayment = async (orderId, paymentType) => {
-    try {
-      // تحديث طريقة الدفع وحالة الطلب
-      await axios.put(`${API}/orders/${orderId}/status?status=preparing`);
-      
-      // إذا كان آجل وعلى تطبيق توصيل - ترحيل للشركة
-      if (paymentType === 'credit') {
-        toast.success('تم ترحيل الطلب للحساب الآجل');
-      } else {
-        toast.success('تم تأكيد الدفع');
-      }
-      
-      fetchData();
-    } catch (error) {
-      toast.error('فشل في تحديث الطلب');
-    }
-  };
-
-  // تأكيد الطلب مع الدفع المباشر
+  // تأكيد الطلب مع الدفع
   const handleSubmitOrder = async () => {
     if (cart.length === 0) {
       toast.error('السلة فارغة');
       return;
     }
 
-    if (orderType === 'dine_in' && !selectedTable) {
+    if (orderType === 'dine_in' && !selectedTable && !editingOrder) {
       toast.error('يرجى اختيار طاولة');
       return;
     }
@@ -321,66 +419,84 @@ export default function POS() {
 
     setSubmitting(true);
     try {
-      const orderData = {
-        order_type: orderType,
-        table_id: orderType === 'dine_in' ? selectedTable : null,
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        delivery_address: orderType === 'delivery' ? deliveryAddress : null,
-        buzzer_number: orderType === 'takeaway' ? buzzerNumber : null, // رقم جهاز التنبيه
-        items: cart,
-        branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
-        payment_method: paymentMethod,
-        discount: discount,
-        delivery_app: orderType === 'delivery' ? deliveryApp : null,
-        notes: orderNotes
-      };
-
-      const response = await axios.post(`${API}/orders`, orderData);
-      
-      // تعيين السائق إذا تم اختياره
-      if (orderType === 'delivery' && selectedDriver) {
-        await axios.put(`${API}/drivers/${selectedDriver}/assign?order_id=${response.data.id}`);
-      }
-
-      // إذا آجل على تطبيق توصيل - ترحيل تلقائي
-      if (paymentMethod === 'credit' && deliveryApp) {
-        toast.success(`تم ترحيل الطلب #${response.data.order_number} لحساب ${deliveryApp}`);
-      } else {
+      if (editingOrder) {
+        // تحديث الطلب الموجود مع الدفع
+        // أولاً: إضافة أي عناصر جديدة
+        const existingProductIds = editingOrder.items.map(i => i.product_id);
+        const newItems = cart.filter(item => !existingProductIds.includes(item.product_id));
+        
+        if (newItems.length > 0) {
+          await axios.put(`${API}/orders/${editingOrder.id}/add-items`, newItems);
+        }
+        
+        // ثانياً: تحديث طريقة الدفع والحالة
+        await axios.put(`${API}/orders/${editingOrder.id}/payment?payment_method=${paymentMethod}`);
+        await axios.put(`${API}/orders/${editingOrder.id}/status?status=delivered`);
+        
         playSuccess();
-        toast.success(`تم إنشاء الطلب #${response.data.order_number} بنجاح`);
+        toast.success(`تم إتمام الطلب #${editingOrder.order_number}`);
+      } else {
+        // طلب جديد مع دفع مباشر
+        const orderData = {
+          order_type: orderType,
+          table_id: orderType === 'dine_in' ? selectedTable : null,
+          customer_name: customerName,
+          customer_phone: customerPhone,
+          delivery_address: orderType === 'delivery' ? deliveryAddress : null,
+          buzzer_number: orderType === 'takeaway' ? buzzerNumber : null,
+          items: cart,
+          branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
+          payment_method: paymentMethod,
+          discount: discount,
+          delivery_app: orderType === 'delivery' ? deliveryApp : null,
+          driver_id: selectedDriver || null,
+          notes: orderNotes
+        };
+        
+        const res = await axios.post(`${API}/orders`, orderData);
+        playSuccess();
+        toast.success(`تم إنشاء الطلب #${res.data.order_number} بنجاح`);
       }
       
       clearCart();
+      await fetchPendingOrders();
       
-      // Refresh tables
-      const tablesRes = await axios.get(`${API}/tables`, { params: { branch_id: user?.branch_id } });
+      // تحديث الطاولات
+      const tablesRes = await axios.get(`${API}/tables`);
       setTables(tablesRes.data);
-      
     } catch (error) {
       console.error('Failed to submit order:', error);
-      toast.error(error.response?.data?.detail || 'فشل في إنشاء الطلب');
+      toast.error(error.response?.data?.detail || 'فشل في إرسال الطلب');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const getCategoryIcon = (iconName) => {
-    const icons = {
-      Beef: '🍔',
-      Pizza: '🍕',
-      Coffee: '☕',
-      Cake: '🍰',
-      Salad: '🥗',
-    };
-    return icons[iconName] || '📦';
+  // فلترة الطلبات المعلقة حسب النوع
+  const pendingTakeawayOrders = pendingOrders.filter(o => o.order_type === 'takeaway');
+  const pendingDeliveryOrders = pendingOrders.filter(o => o.order_type === 'delivery');
+  const pendingDineInOrders = pendingOrders.filter(o => o.order_type === 'dine_in');
+
+  // طباعة الفاتورة (معاينة)
+  const handlePrintBill = () => {
+    if (cart.length === 0) {
+      toast.error('السلة فارغة');
+      return;
+    }
+    setPrintDialogOpen(true);
+  };
+
+  // إلغاء تعديل الطلب
+  const cancelEditing = () => {
+    clearCart();
+    navigate('/pos');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-muted-foreground">جاري التحميل...</p>
         </div>
       </div>
@@ -388,78 +504,172 @@ export default function POS() {
   }
 
   return (
-    <div className="h-screen flex bg-background overflow-hidden" dir="rtl" data-testid="pos-screen">
-      {/* Right Sidebar - Categories */}
-      <div className="w-24 bg-card border-l border-border flex flex-col">
-        <Button
-          variant="ghost"
-          className="h-16 rounded-none border-b border-border"
-          onClick={() => navigate('/')}
-          data-testid="pos-back-btn"
-        >
-          <ArrowRight className="h-5 w-5" />
-        </Button>
-        
-        <ScrollArea className="flex-1">
-          <div className="py-2">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => { setSelectedCategory(cat.id); playClick(); }}
-                className={`w-full py-4 px-2 flex flex-col items-center gap-2 transition-colors ${
-                  selectedCategory === cat.id 
-                    ? 'bg-primary/10 border-r-2 border-primary' 
-                    : 'hover:bg-muted'
-                }`}
-                data-testid={`category-${cat.id}`}
+    <div className="min-h-screen bg-background flex" dir="rtl">
+      {/* Main Content - Products */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/dashboard')}>
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold font-cairo text-foreground">نقاط البيع</h1>
+            
+            {/* مؤشر الطلبات المعلقة */}
+            <Button 
+              variant="outline" 
+              className="relative"
+              onClick={() => setPendingOrdersDialogOpen(true)}
+              data-testid="pending-orders-btn"
+            >
+              <List className="h-4 w-4 ml-2" />
+              الطلبات المعلقة
+              {pendingOrders.length > 0 && (
+                <span className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {pendingOrders.length}
+                </span>
+              )}
+            </Button>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            {/* حالة التعديل */}
+            {editingOrder && (
+              <div className="flex items-center gap-2 bg-amber-500/10 px-3 py-1.5 rounded-lg">
+                <Edit className="h-4 w-4 text-amber-500" />
+                <span className="text-sm text-amber-500 font-medium">
+                  تعديل طلب #{editingOrder.order_number}
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-6 w-6 p-0 text-amber-500 hover:bg-amber-500/20"
+                  onClick={cancelEditing}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+            
+            {/* البحث عن عميل */}
+            <div className="flex items-center gap-2">
+              <Input
+                placeholder="رقم هاتف العميل..."
+                value={customerSearchPhone}
+                onChange={(e) => setCustomerSearchPhone(e.target.value)}
+                className="w-40 h-9"
+                onKeyDown={(e) => e.key === 'Enter' && handleSearchCustomer()}
+                data-testid="customer-search-input"
+              />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleSearchCustomer}
+                data-testid="customer-search-btn"
               >
-                <span className="text-2xl">{getCategoryIcon(cat.icon)}</span>
-                <span className="text-xs font-medium text-foreground text-center leading-tight">{cat.name}</span>
-              </button>
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            {currentShift ? (
+              <div className="text-sm text-muted-foreground">
+                <span className="text-green-500">● </span>
+                وردية مفتوحة
+              </div>
+            ) : (
+              <div className="text-sm text-red-500">
+                <span>● </span>
+                لا يوجد وردية
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* Categories */}
+        <div className="p-4 border-b border-border bg-card/50">
+          <ScrollArea className="w-full whitespace-nowrap">
+            <div className="flex gap-2">
+              {categories.map(cat => (
+                <Button
+                  key={cat.id}
+                  variant={selectedCategory === cat.id ? 'default' : 'outline'}
+                  className={`shrink-0 ${selectedCategory === cat.id ? 'bg-primary text-primary-foreground' : ''}`}
+                  onClick={() => { setSelectedCategory(cat.id); playClick(); }}
+                  data-testid={`category-${cat.id}`}
+                >
+                  <span className="ml-2">{cat.icon}</span>
+                  {cat.name}
+                </Button>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+
+        {/* Search */}
+        <div className="p-4 bg-card/30">
+          <div className="relative max-w-md">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="بحث عن منتج..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pr-10 bg-background"
+              data-testid="product-search"
+            />
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <ScrollArea className="flex-1 p-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+            {filteredProducts.map(product => (
+              <Card
+                key={product.id}
+                className="cursor-pointer transition-all hover:scale-105 hover:shadow-lg border-border/50 bg-card overflow-hidden"
+                onClick={() => addToCart(product)}
+                data-testid={`product-${product.id}`}
+              >
+                <CardContent className="p-3">
+                  {product.image ? (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-24 object-cover rounded-lg mb-2"
+                    />
+                  ) : (
+                    <div className="w-full h-24 bg-muted rounded-lg mb-2 flex items-center justify-center">
+                      <Package className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                  )}
+                  <h3 className="font-medium text-sm text-foreground line-clamp-2">{product.name}</h3>
+                  <p className="text-primary font-bold mt-1 tabular-nums">{formatPrice(product.price)}</p>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </ScrollArea>
-
-        {/* Pending Orders Count */}
-        {pendingOrders.length > 0 && (
-          <div className="p-2 border-t border-border">
-            <div className="bg-orange-500/10 rounded-lg p-2 text-center">
-              <p className="text-xs text-orange-500">طلبات معلقة</p>
-              <p className="text-lg font-bold text-orange-500">{pendingOrders.length}</p>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Center - Products Grid */}
-      <div className="flex-1 flex flex-col">
-        {/* Search & Order Type */}
-        <div className="p-4 border-b border-border bg-card/50">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex-1 relative">
-              <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="بحث عن منتج..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 h-12 bg-background"
-                data-testid="pos-search"
-              />
-            </div>
-          </div>
-          
-          {/* Order Type Tabs */}
-          <div className="flex gap-2">
+      {/* Cart Sidebar */}
+      <div className="w-96 border-r border-border bg-card flex flex-col">
+        {/* Order Type Tabs */}
+        <div className="p-4 border-b border-border">
+          <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'dine_in', label: 'داخلي', icon: UtensilsCrossed },
+              { id: 'dine_in', label: 'محلي', icon: UtensilsCrossed },
               { id: 'takeaway', label: 'سفري', icon: Package },
               { id: 'delivery', label: 'توصيل', icon: Truck },
             ].map(type => (
               <Button
                 key={type.id}
                 variant={orderType === type.id ? 'default' : 'outline'}
-                className={`flex-1 h-12 ${orderType === type.id ? 'bg-primary text-primary-foreground' : ''}`}
-                onClick={() => { setOrderType(type.id); playClick(); }}
+                className={`h-12 ${orderType === type.id ? 'bg-primary text-primary-foreground' : ''}`}
+                onClick={() => { 
+                  setOrderType(type.id); 
+                  playClick();
+                  if (type.id !== 'dine_in') setSelectedTable(null);
+                }}
+                disabled={editingOrder && editingOrder.order_type !== type.id}
                 data-testid={`order-type-${type.id}`}
               >
                 <type.icon className="h-5 w-5 ml-2" />
@@ -469,182 +679,123 @@ export default function POS() {
           </div>
         </div>
 
-        {/* Products Grid */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-            {filteredProducts.map(product => (
-              <button
-                key={product.id}
-                onClick={() => addToCart(product)}
-                className="pos-item-button group"
-                data-testid={`product-${product.id}`}
-              >
-                <div className="aspect-square relative overflow-hidden rounded-t-xl">
-                  {product.image ? (
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <Package className="h-8 w-8 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                </div>
-                <div className="p-3">
-                  <h3 className="font-medium text-sm text-foreground truncate">{product.name}</h3>
-                  <p className="text-primary font-bold mt-1 tabular-nums">{formatPrice(product.price)}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-          
-          {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">لا توجد منتجات</p>
-            </div>
-          )}
-        </ScrollArea>
-      </div>
-
-      {/* Left Sidebar - Order Summary */}
-      <div className="w-96 bg-card border-r border-border flex flex-col">
-        {/* Header */}
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold font-cairo text-foreground">الطلب الحالي</h2>
-            <div className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5 text-primary" />
-              <span className="bg-primary text-primary-foreground text-sm font-bold px-2 py-0.5 rounded-full">
-                {cart.reduce((sum, item) => sum + item.quantity, 0)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Customer Info */}
+        {/* Table/Customer Info */}
         <div className="p-4 border-b border-border space-y-3">
-          {orderType === 'dine_in' && (
-            <div>
-              <label className="text-sm text-muted-foreground mb-2 block">اختر طاولة</label>
-              <div className="grid grid-cols-5 gap-2">
-                {tables.filter(t => t.status === 'available' || t.id === selectedTable).map(table => (
-                  <button
-                    key={table.id}
-                    onClick={() => { setSelectedTable(table.id); playClick(); }}
-                    className={`p-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedTable === table.id
-                        ? 'bg-primary text-primary-foreground'
-                        : table.status === 'occupied'
-                        ? 'bg-destructive/20 text-destructive cursor-not-allowed'
-                        : 'bg-muted hover:bg-muted/80 text-foreground'
-                    }`}
-                    disabled={table.status === 'occupied' && table.id !== selectedTable}
-                    data-testid={`table-${table.number}`}
-                  >
-                    {table.number}
-                  </button>
-                ))}
+          {/* معلومات العميل */}
+          {customerData && (
+            <div className="bg-green-500/10 p-3 rounded-lg space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-4 w-4 text-green-500" />
+                  <span className="font-medium text-green-600">{customerData.name}</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowCustomerInfo(!showCustomerInfo)}
+                >
+                  <History className="h-4 w-4" />
+                </Button>
               </div>
+              <p className="text-xs text-muted-foreground">
+                {customerData.total_orders} طلب سابق | {formatPrice(customerData.total_spent)}
+              </p>
+              {customerData.is_blocked && (
+                <div className="flex items-center gap-1 text-red-500 text-xs">
+                  <AlertCircle className="h-3 w-3" />
+                  عميل محظور
+                </div>
+              )}
             </div>
           )}
+          
+          {orderType === 'dine_in' && (
+            <Select value={selectedTable || ''} onValueChange={setSelectedTable} disabled={!!editingOrder?.table_id}>
+              <SelectTrigger data-testid="table-select">
+                <SelectValue placeholder="اختر طاولة" />
+              </SelectTrigger>
+              <SelectContent>
+                {tables.filter(t => t.status === 'available' || t.id === selectedTable).map(table => (
+                  <SelectItem key={table.id} value={table.id}>
+                    طاولة {table.number} ({table.capacity} أشخاص)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="relative">
-              <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          {orderType === 'takeaway' && (
+            <div className="space-y-2">
               <Input
-                placeholder="اسم الزبون"
+                placeholder="اسم العميل"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
-                className="pr-9 h-10 text-sm"
                 data-testid="customer-name"
               />
-            </div>
-            <div className="relative">
-              <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="رقم الهاتف"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
-                className="pr-9 h-10 text-sm"
                 data-testid="customer-phone"
               />
-            </div>
-          </div>
-
-          {/* رقم جهاز التنبيه للسفري */}
-          {orderType === 'takeaway' && (
-            <div className="relative">
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-lg">🔔</div>
               <Input
                 placeholder="رقم جهاز التنبيه (اختياري)"
                 value={buzzerNumber}
                 onChange={(e) => setBuzzerNumber(e.target.value)}
-                className="pr-10 h-10 text-sm"
                 data-testid="buzzer-number"
               />
             </div>
           )}
 
           {orderType === 'delivery' && (
-            <>
-              <div className="relative">
-                <MapPin className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="عنوان التوصيل"
-                  value={deliveryAddress}
-                  onChange={(e) => setDeliveryAddress(e.target.value)}
-                  className="pr-9 h-10 text-sm"
-                  data-testid="delivery-address"
-                />
-              </div>
-              
-              {/* تطبيق التوصيل */}
-              <div className="space-y-2">
-                <Select value={deliveryApp || "direct"} onValueChange={(v) => setDeliveryApp(v === "direct" ? "" : v)}>
-                  <SelectTrigger className="h-10">
-                    <SelectValue placeholder="اختر شركة التوصيل" />
+            <div className="space-y-2">
+              <Input
+                placeholder="اسم العميل"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                data-testid="delivery-name"
+              />
+              <Input
+                placeholder="رقم الهاتف"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                data-testid="delivery-phone"
+              />
+              <Input
+                placeholder="عنوان التوصيل"
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
+                data-testid="delivery-address"
+              />
+              <Select value={deliveryApp} onValueChange={setDeliveryApp}>
+                <SelectTrigger data-testid="delivery-app-select">
+                  <SelectValue placeholder="شركة التوصيل (اختياري)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">بدون شركة</SelectItem>
+                  {deliveryApps.map(app => (
+                    <SelectItem key={app.id} value={app.id}>
+                      {app.name} {app.commission_rate > 0 && `(${app.commission_rate}%)`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {drivers.length > 0 && (
+                <Select value={selectedDriver} onValueChange={setSelectedDriver}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="اختر سائق (اختياري)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="direct">طلب مباشر (بدون عمولة)</SelectItem>
-                    {deliveryApps.map(app => (
-                      <SelectItem key={app.id} value={app.id}>
-                        {app.name} - عمولة {app.commission_rate}%
+                    <SelectItem value="">بدون سائق</SelectItem>
+                    {drivers.filter(d => d.is_available).map(driver => (
+                      <SelectItem key={driver.id} value={driver.id}>
+                        {driver.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                
-                {deliveryApp && deliveryApps.find(a => a.id === deliveryApp) && (
-                  <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/30">
-                    <p className="text-sm text-amber-600 flex items-center gap-2">
-                      <Truck className="h-4 w-4" />
-                      <span>
-                        عمولة {deliveryApps.find(a => a.id === deliveryApp)?.name}: {' '}
-                        <strong>{deliveryApps.find(a => a.id === deliveryApp)?.commission_rate}%</strong>
-                        {' '}({formatPrice(subtotal * (deliveryApps.find(a => a.id === deliveryApp)?.commission_rate || 0) / 100)})
-                      </span>
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* اختيار السائق */}
-              <Select value={selectedDriver || "none"} onValueChange={(v) => setSelectedDriver(v === "none" ? "" : v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="اختر السائق (اختياري)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">بدون سائق</SelectItem>
-                  {drivers.filter(d => d.is_available).map(driver => (
-                    <SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </>
+              )}
+            </div>
           )}
         </div>
 
@@ -652,22 +803,21 @@ export default function POS() {
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-2">
             {cart.length === 0 ? (
-              <div className="text-center py-8">
-                <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">السلة فارغة</p>
+              <div className="text-center py-12 text-muted-foreground">
+                <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>السلة فارغة</p>
               </div>
             ) : (
-              cart.map(item => (
-                <div 
-                  key={item.product_id}
-                  className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg"
-                  data-testid={`cart-item-${item.product_id}`}
+              cart.map((item, index) => (
+                <div
+                  key={`${item.product_id}-${index}`}
+                  className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                 >
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm text-foreground truncate">{item.product_name}</h4>
-                    <p className="text-primary text-sm tabular-nums">{formatPrice(item.price)}</p>
+                    <p className="font-medium text-sm text-foreground truncate">{item.product_name}</p>
+                    <p className="text-primary text-sm tabular-nums">{formatPrice(item.price * item.quantity)}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <Button
                       variant="outline"
                       size="icon"
@@ -765,8 +915,8 @@ export default function POS() {
             ))}
           </div>
 
-          {/* Action Buttons - 3 buttons now */}
-          <div className="grid grid-cols-3 gap-2">
+          {/* Action Buttons - 4 buttons */}
+          <div className="grid grid-cols-4 gap-2">
             <Button
               variant="outline"
               className="h-12"
@@ -777,6 +927,17 @@ export default function POS() {
               <X className="h-5 w-5" />
             </Button>
             
+            {/* زر طباعة الفاتورة */}
+            <Button
+              variant="outline"
+              className="h-12 border-blue-500 text-blue-500 hover:bg-blue-500/10"
+              onClick={handlePrintBill}
+              disabled={cart.length === 0}
+              data-testid="print-bill-btn"
+            >
+              <Printer className="h-5 w-5" />
+            </Button>
+            
             {/* حفظ وإرسال للمطبخ */}
             <Button
               variant="outline"
@@ -785,8 +946,7 @@ export default function POS() {
               disabled={cart.length === 0}
               data-testid="save-to-kitchen"
             >
-              <ChefHat className="h-5 w-5 ml-1" />
-              مطبخ
+              <ChefHat className="h-5 w-5" />
             </Button>
             
             {/* تأكيد مع الدفع */}
@@ -802,15 +962,124 @@ export default function POS() {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
               ) : (
-                <>
-                  <Check className="h-5 w-5 ml-1" />
-                  دفع
-                </>
+                <Check className="h-5 w-5" />
               )}
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Pending Orders Dialog */}
+      <Dialog open={pendingOrdersDialogOpen} onOpenChange={setPendingOrdersDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <List className="h-5 w-5 text-primary" />
+              الطلبات المعلقة ({pendingOrders.length})
+              <Button variant="ghost" size="sm" onClick={fetchPendingOrders}>
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+          
+          <Tabs defaultValue="takeaway" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="takeaway" className="relative">
+                سفري
+                {pendingTakeawayOrders.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {pendingTakeawayOrders.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="delivery" className="relative">
+                توصيل
+                {pendingDeliveryOrders.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {pendingDeliveryOrders.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="dine_in" className="relative">
+                محلي
+                {pendingDineInOrders.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                    {pendingDineInOrders.length}
+                  </span>
+                )}
+              </TabsTrigger>
+            </TabsList>
+            
+            <ScrollArea className="h-[50vh] mt-4">
+              <TabsContent value="takeaway" className="mt-0">
+                {pendingTakeawayOrders.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>لا توجد طلبات سفري معلقة</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pendingTakeawayOrders.map(order => (
+                      <OrderCard 
+                        key={order.id} 
+                        order={order} 
+                        onSelect={() => {
+                          loadOrderForEditing(order.id);
+                          setPendingOrdersDialogOpen(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="delivery" className="mt-0">
+                {pendingDeliveryOrders.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>لا توجد طلبات توصيل معلقة</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pendingDeliveryOrders.map(order => (
+                      <OrderCard 
+                        key={order.id} 
+                        order={order} 
+                        onSelect={() => {
+                          loadOrderForEditing(order.id);
+                          setPendingOrdersDialogOpen(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="dine_in" className="mt-0">
+                {pendingDineInOrders.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>لا توجد طلبات محلية معلقة</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {pendingDineInOrders.map(order => (
+                      <OrderCard 
+                        key={order.id} 
+                        order={order} 
+                        onSelect={() => {
+                          loadOrderForEditing(order.id);
+                          setPendingOrdersDialogOpen(false);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </ScrollArea>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
 
       {/* Kitchen Dialog - حفظ وإرسال للمطبخ */}
       <Dialog open={kitchenDialogOpen} onOpenChange={setKitchenDialogOpen}>
@@ -818,7 +1087,7 @@ export default function POS() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-foreground">
               <ChefHat className="h-5 w-5 text-orange-500" />
-              حفظ وإرسال للمطبخ
+              {editingOrder ? 'تحديث الطلب وإرسال للمطبخ' : 'حفظ وإرسال للمطبخ'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
@@ -879,6 +1148,262 @@ export default function POS() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Print Bill Dialog - معاينة الفاتورة */}
+      <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <Receipt className="h-5 w-5 text-blue-500" />
+              معاينة الفاتورة
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="bg-white text-black p-4 rounded-lg font-mono text-sm" dir="rtl">
+            <div className="text-center mb-4">
+              <h2 className="text-lg font-bold">Maestro EGP</h2>
+              <p className="text-xs text-gray-500">
+                {new Date().toLocaleDateString('ar-IQ')} {new Date().toLocaleTimeString('ar-IQ')}
+              </p>
+              {editingOrder && (
+                <p className="text-xs">طلب #{editingOrder.order_number}</p>
+              )}
+            </div>
+            
+            <div className="border-t border-dashed border-gray-300 pt-2 mb-2">
+              {orderType === 'dine_in' && selectedTable && (
+                <p className="text-xs">طاولة: {tables.find(t => t.id === selectedTable)?.number}</p>
+              )}
+              {customerName && <p className="text-xs">العميل: {customerName}</p>}
+              {customerPhone && <p className="text-xs">الهاتف: {customerPhone}</p>}
+              {buzzerNumber && <p className="text-xs">رقم التنبيه: {buzzerNumber}</p>}
+            </div>
+            
+            <div className="border-t border-dashed border-gray-300 py-2">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-gray-300">
+                    <th className="text-right py-1">الصنف</th>
+                    <th className="text-center py-1">الكمية</th>
+                    <th className="text-left py-1">السعر</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cart.map((item, i) => (
+                    <tr key={i}>
+                      <td className="py-1">{item.product_name}</td>
+                      <td className="text-center">{item.quantity}</td>
+                      <td className="text-left tabular-nums">{formatPrice(item.price * item.quantity)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            
+            <div className="border-t border-dashed border-gray-300 pt-2 space-y-1">
+              <div className="flex justify-between">
+                <span>المجموع الفرعي:</span>
+                <span className="tabular-nums">{formatPrice(subtotal)}</span>
+              </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-red-600">
+                  <span>الخصم:</span>
+                  <span className="tabular-nums">-{formatPrice(discount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-base border-t border-gray-300 pt-1">
+                <span>الإجمالي:</span>
+                <span className="tabular-nums">{formatPrice(totalBeforeCommission)}</span>
+              </div>
+            </div>
+            
+            <div className="text-center mt-4 text-xs text-gray-500">
+              <p>شكراً لزيارتكم</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setPrintDialogOpen(false)} className="flex-1">
+              إغلاق
+            </Button>
+            <Button 
+              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+              onClick={() => {
+                window.print();
+                toast.info('جاري الطباعة...');
+              }}
+            >
+              <Printer className="h-4 w-4 ml-2" />
+              طباعة
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Customer History Dialog */}
+      <Dialog open={showCustomerInfo} onOpenChange={setShowCustomerInfo}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <History className="h-5 w-5 text-primary" />
+              سجل العميل
+            </DialogTitle>
+          </DialogHeader>
+          
+          {customerData && (
+            <div className="space-y-4">
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-foreground">{customerData.name}</h3>
+                    <p className="text-sm text-muted-foreground">{customerData.phone}</p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="bg-background p-2 rounded">
+                    <p className="text-muted-foreground">إجمالي الطلبات</p>
+                    <p className="font-bold text-foreground">{customerData.total_orders}</p>
+                  </div>
+                  <div className="bg-background p-2 rounded">
+                    <p className="text-muted-foreground">إجمالي المصروف</p>
+                    <p className="font-bold text-primary">{formatPrice(customerData.total_spent)}</p>
+                  </div>
+                </div>
+                
+                {customerData.address && (
+                  <div className="mt-3 flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                    <p className="text-sm text-foreground">{customerData.address}</p>
+                  </div>
+                )}
+                
+                {customerData.notes && (
+                  <div className="mt-2 p-2 bg-amber-500/10 rounded text-sm text-amber-600">
+                    ملاحظات: {customerData.notes}
+                  </div>
+                )}
+              </div>
+              
+              {customerHistory.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-foreground mb-2">آخر الطلبات:</h4>
+                  <ScrollArea className="h-40">
+                    <div className="space-y-2">
+                      {customerHistory.map((order, i) => (
+                        <div key={i} className="p-2 bg-muted/30 rounded text-sm">
+                          <div className="flex justify-between">
+                            <span>#{order.order_number}</span>
+                            <span className="text-primary tabular-nums">{formatPrice(order.total)}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{order.created_at}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// مكون بطاقة الطلب المعلق
+function OrderCard({ order, onSelect }) {
+  const getOrderTypeIcon = (type) => {
+    switch (type) {
+      case 'takeaway': return <Package className="h-4 w-4" />;
+      case 'delivery': return <Truck className="h-4 w-4" />;
+      default: return <UtensilsCrossed className="h-4 w-4" />;
+    }
+  };
+  
+  const getOrderTypeLabel = (type) => {
+    switch (type) {
+      case 'takeaway': return 'سفري';
+      case 'delivery': return 'توصيل';
+      default: return 'محلي';
+    }
+  };
+  
+  const timeAgo = (dateStr) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'الآن';
+    if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
+    return `منذ ${Math.floor(diffHours / 24)} يوم`;
+  };
+
+  return (
+    <Card 
+      className="cursor-pointer hover:bg-muted/50 transition-colors border-border/50"
+      onClick={onSelect}
+      data-testid={`pending-order-${order.id}`}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              {getOrderTypeIcon(order.order_type)}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-foreground">#{order.order_number}</span>
+                <span className="text-xs px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded">
+                  {getOrderTypeLabel(order.order_type)}
+                </span>
+              </div>
+              {order.customer_name && (
+                <p className="text-sm text-muted-foreground">{order.customer_name}</p>
+              )}
+              {order.buzzer_number && (
+                <p className="text-xs text-blue-500 flex items-center gap-1">
+                  <Bell className="h-3 w-3" />
+                  جهاز #{order.buzzer_number}
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <div className="text-left">
+            <p className="font-bold text-primary tabular-nums">{formatPrice(order.total)}</p>
+            <p className="text-xs text-muted-foreground">{timeAgo(order.created_at)}</p>
+          </div>
+        </div>
+        
+        <div className="mt-3 pt-3 border-t border-border/50">
+          <div className="flex flex-wrap gap-1">
+            {order.items.slice(0, 3).map((item, i) => (
+              <span key={i} className="text-xs bg-muted px-2 py-1 rounded">
+                {item.product_name} x{item.quantity}
+              </span>
+            ))}
+            {order.items.length > 3 && (
+              <span className="text-xs bg-muted px-2 py-1 rounded">
+                +{order.items.length - 3} أخرى
+              </span>
+            )}
+          </div>
+        </div>
+        
+        <div className="mt-2 flex justify-end">
+          <Button size="sm" variant="outline" className="h-8">
+            <Eye className="h-3 w-3 ml-1" />
+            فتح للتعديل
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
