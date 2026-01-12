@@ -670,10 +670,22 @@ export default function POS() {
                 <span className="tabular-nums">-{formatPrice(discount)}</span>
               </div>
             )}
+            {commissionAmount > 0 && (
+              <div className="flex justify-between text-sm text-amber-500">
+                <span>عمولة {selectedDeliveryApp?.name} ({commissionRate}%):</span>
+                <span className="tabular-nums">-{formatPrice(commissionAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-lg font-bold pt-2 border-t border-border">
               <span className="text-foreground">الإجمالي:</span>
-              <span className="text-primary tabular-nums">{formatPrice(total)}</span>
+              <span className="text-primary tabular-nums">{formatPrice(totalBeforeCommission)}</span>
             </div>
+            {commissionAmount > 0 && (
+              <div className="flex justify-between text-base font-bold bg-green-500/10 p-2 rounded-lg">
+                <span className="text-green-600">الصافي بعد العمولة:</span>
+                <span className="text-green-600 tabular-nums">{formatPrice(netTotal)}</span>
+              </div>
+            )}
           </div>
 
           {/* Payment Method */}
