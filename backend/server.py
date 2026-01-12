@@ -284,6 +284,7 @@ class OrderCreate(BaseModel):
     customer_name: Optional[str] = None
     customer_phone: Optional[str] = None
     delivery_address: Optional[str] = None
+    buzzer_number: Optional[str] = None  # رقم جهاز التنبيه للسفري
     items: List[OrderItemCreate]
     branch_id: str
     payment_method: str = PaymentMethod.CASH
@@ -301,6 +302,7 @@ class OrderResponse(BaseModel):
     customer_name: Optional[str] = None
     customer_phone: Optional[str] = None
     delivery_address: Optional[str] = None
+    buzzer_number: Optional[str] = None  # رقم جهاز التنبيه
     items: List[Dict[str, Any]]
     subtotal: float
     discount: float
@@ -314,6 +316,7 @@ class OrderResponse(BaseModel):
     payment_method: str
     payment_status: str
     delivery_app: Optional[str] = None
+    delivery_app_name: Optional[str] = None  # اسم شركة التوصيل
     delivery_commission: float = 0.0
     driver_id: Optional[str] = None
     notes: Optional[str] = None
