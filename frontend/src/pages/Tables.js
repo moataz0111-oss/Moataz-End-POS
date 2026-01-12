@@ -312,7 +312,16 @@ export default function Tables() {
                         <Button
                           size="sm"
                           className="w-full bg-blue-500 text-white hover:bg-blue-600"
-                          onClick={(e) => { e.stopPropagation(); navigate(`/pos?table=${table.id}`); }}
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            // تمرير order_id إذا كان موجوداً
+                            if (table.current_order_id) {
+                              navigate(`/pos?table=${table.id}&order=${table.current_order_id}`);
+                            } else {
+                              navigate(`/pos?table=${table.id}`);
+                            }
+                          }}
+                          data-testid={`continue-order-${table.id}`}
                         >
                           متابعة الطلب
                         </Button>
@@ -321,6 +330,7 @@ export default function Tables() {
                           variant="outline"
                           className="w-full"
                           onClick={(e) => { e.stopPropagation(); updateTableStatus(table.id, 'available'); }}
+                          data-testid={`free-table-${table.id}`}
                         >
                           تحرير الطاولة
                         </Button>
