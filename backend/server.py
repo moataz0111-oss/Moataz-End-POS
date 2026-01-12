@@ -1405,6 +1405,10 @@ async def get_sales_report(
     
     orders = await db.orders.find(query, {"_id": 0}).to_list(10000)
     
+    # جلب أسماء شركات التوصيل
+    delivery_apps = await db.delivery_apps.find({}, {"_id": 0}).to_list(100)
+    app_names = {app["id"]: app["name"] for app in delivery_apps}
+    
     total_sales = sum(o["total"] for o in orders)
     total_cost = sum(o.get("total_cost", 0) for o in orders)
     total_profit = sum(o.get("profit", 0) for o in orders)
@@ -1413,7 +1417,7 @@ async def get_sales_report(
     
     by_payment = {}
     by_type = {}
-    by_app = {}
+    by_app = {}  # تفاصيل كل شركة توصيل
     by_date = {}
     by_product = {}
     
@@ -1426,10 +1430,27 @@ async def get_sales_report(
         ot = o["order_type"]
         by_type[ot] = by_type.get(ot, 0) + o["total"]
         
-        # By delivery app
+        # By delivery app - تفصيل كامل لكل شركة
         if o.get("delivery_app"):
-            app = o["delivery_app"]
-            by_app[app] = by_app.get(app, 0) + o["total"]
+            app_id = o["delivery_app"]
+            app_name = o.get("delivery_app_name") or app_names.get(app_id, app_id)
+            if app_name not in by_app:
+                by_app[app_name] = {
+                    "total_sales": 0,
+                    "total_commission": 0,
+                    "net_amount": 0,
+                    "orders_count": 0,
+                    "paid_orders": 0,
+                    "credit_orders": 0
+                }
+            by_app[app_name]["total_sales"] += o["total"]
+            by_app[app_name]["total_commission"] += o.get("delivery_commission", 0)
+            by_app[app_name]["net_amount"] += o["total"] - o.get("delivery_commission", 0)
+            by_app[app_name]["orders_count"] += 1
+            if o.get("payment_status") == "paid":
+                by_app[app_name]["paid_orders"] += 1
+            else:
+                by_app[app_name]["credit_orders"] += 1
         
         # By date
         date = o["created_at"][:10]
@@ -1447,6 +1468,11 @@ async def get_sales_report(
             by_product[pid]["quantity"] += item.get("quantity", 0)
             by_product[pid]["revenue"] += item.get("price", 0) * item.get("quantity", 0)
     
+    # حساب إجماليات التوصيل
+    total_delivery_sales = sum(app["total_sales"] for app in by_app.values())
+    total_delivery_commission = sum(app["total_commission"] for app in by_app.values())
+    total_delivery_net = sum(app["net_amount"] for app in by_app.values())
+    
     return {
         "total_sales": total_sales,
         "total_cost": total_cost,
@@ -1456,7 +1482,12 @@ async def get_sales_report(
         "average_order_value": avg_order_value,
         "by_payment_method": by_payment,
         "by_order_type": by_type,
-        "by_delivery_app": by_app,
+        "by_delivery_app": by_app,  # تفاصيل كل شركة توصيل
+        "delivery_summary": {
+            "total_sales": total_delivery_sales,
+            "total_commission": total_delivery_commission,
+            "net_amount": total_delivery_net
+        },
         "by_date": by_date,
         "top_products": dict(sorted(by_product.items(), key=lambda x: x[1]["revenue"], reverse=True)[:10])
     }
