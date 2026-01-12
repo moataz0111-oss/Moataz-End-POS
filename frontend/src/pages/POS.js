@@ -29,7 +29,11 @@ import {
   X,
   ChefHat,
   Save,
-  Send
+  Send,
+  History,
+  UserCheck,
+  Edit,
+  Receipt
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
