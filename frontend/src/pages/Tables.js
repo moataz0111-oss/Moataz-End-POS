@@ -315,7 +315,7 @@ export default function Tables() {
             <CardContent className="py-12 text-center">
               <LayoutGrid className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">لا توجد طاولات</p>
-              {hasRole(['admin', 'manager']) && (
+              {(hasRole(['admin', 'manager']) || hasPermission('tables')) && (
                 <Button className="mt-4 bg-primary text-primary-foreground" onClick={() => setDialogOpen(true)}>
                   <Plus className="h-4 w-4 ml-2" />
                   إضافة طاولة
