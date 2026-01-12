@@ -1245,6 +1245,52 @@ async def get_order(order_id: str):
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
     return order
 
+@api_router.put("/orders/{order_id}/add-items")
+async def add_items_to_order(order_id: str, items: List[OrderItemCreate], current_user: dict = Depends(get_current_user)):
+    """إضافة عناصر جديدة لطلب موجود"""
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # إضافة العناصر الجديدة
+    new_items = []
+    for item in items:
+        product = await db.products.find_one({"id": item.product_id})
+        new_items.append({
+            "product_id": item.product_id,
+            "product_name": item.product_name,
+            "quantity": item.quantity,
+            "price": item.price,
+            "cost": product.get("cost", 0) if product else 0,
+            "notes": item.notes
+        })
+    
+    # دمج العناصر الجديدة مع القديمة
+    existing_items = order.get("items", [])
+    all_items = existing_items + new_items
+    
+    # إعادة حساب المجاميع
+    subtotal = sum(i["price"] * i["quantity"] for i in all_items)
+    total_cost = sum(i.get("cost", 0) * i["quantity"] for i in all_items)
+    discount = order.get("discount", 0)
+    tax = 0
+    total = subtotal - discount + tax
+    profit = total - total_cost - order.get("delivery_commission", 0)
+    
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "items": all_items,
+            "subtotal": subtotal,
+            "total_cost": total_cost,
+            "total": total,
+            "profit": profit,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return await db.orders.find_one({"id": order_id}, {"_id": 0})
+
 @api_router.put("/orders/{order_id}/status")
 async def update_order_status(order_id: str, status: str, current_user: dict = Depends(get_current_user)):
     order = await db.orders.find_one({"id": order_id})
