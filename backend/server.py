@@ -34,7 +34,7 @@ JWT_EXPIRATION_HOURS = 24
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '')
 SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'noreply@maestroegp.com')
 
-app = FastAPI(title="Maestro EGP API", version="1.0.0")
+app = FastAPI(title="Maestro EGP API", version="2.0.0")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
@@ -66,7 +66,7 @@ class PaymentMethod:
     CASH = "cash"
     CARD = "card"
     CREDIT = "credit"
-    PENDING = "pending"  # معلق - للطلبات المرسلة للمطبخ قبل الدفع
+    PENDING = "pending"
 
 # User Models
 class UserCreate(BaseModel):
@@ -136,17 +136,19 @@ class CategoryResponse(BaseModel):
     sort_order: int = 0
     is_active: bool = True
 
-# Product Models
+# Product Models with Pre-Manufacturing Cost
 class ProductCreate(BaseModel):
     name: str
     name_en: Optional[str] = None
     category_id: str
     price: float
-    cost: float = 0.0
+    cost: float = 0.0  # تكلفة ما قبل التصنيع
+    operating_cost: float = 0.0  # تكلفة تشغيلية
     image: Optional[str] = None
     description: Optional[str] = None
     is_available: bool = True
     ingredients: List[Dict[str, Any]] = []
+    barcode: Optional[str] = None
 
 class ProductResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -156,10 +158,13 @@ class ProductResponse(BaseModel):
     category_id: str
     price: float
     cost: float = 0.0
+    operating_cost: float = 0.0
+    profit: float = 0.0  # حقل محسوب
     image: Optional[str] = None
     description: Optional[str] = None
     is_available: bool = True
     ingredients: List[Dict[str, Any]] = []
+    barcode: Optional[str] = None
 
 # Inventory Models
 class InventoryItemCreate(BaseModel):
@@ -191,6 +196,62 @@ class InventoryTransaction(BaseModel):
     quantity: float
     notes: Optional[str] = None
 
+# Purchase Models - المشتريات
+class PurchaseCreate(BaseModel):
+    supplier_name: str
+    invoice_number: Optional[str] = None
+    items: List[Dict[str, Any]]  # [{inventory_id, quantity, cost_per_unit}]
+    total_amount: float
+    payment_method: str = "cash"
+    payment_status: str = "paid"  # paid, pending, partial
+    notes: Optional[str] = None
+    branch_id: str
+
+class PurchaseResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    supplier_name: str
+    invoice_number: Optional[str] = None
+    items: List[Dict[str, Any]]
+    total_amount: float
+    payment_method: str
+    payment_status: str
+    notes: Optional[str] = None
+    branch_id: str
+    created_by: str
+    created_at: str
+
+# Expense Models - المصاريف اليومية
+class ExpenseCreate(BaseModel):
+    category: str  # rent, utilities, salaries, maintenance, supplies, other
+    description: str
+    amount: float
+    payment_method: str = "cash"
+    reference_number: Optional[str] = None
+    branch_id: str
+    date: Optional[str] = None
+
+class ExpenseResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    category: str
+    description: str
+    amount: float
+    payment_method: str
+    reference_number: Optional[str] = None
+    branch_id: str
+    created_by: str
+    date: str
+    created_at: str
+
+# Operating Cost Models - التكاليف التشغيلية
+class OperatingCostCreate(BaseModel):
+    name: str
+    cost_type: str  # fixed or variable
+    amount: float
+    frequency: str  # daily, weekly, monthly
+    branch_id: str
+
 # Table Models
 class TableCreate(BaseModel):
     number: int
@@ -205,7 +266,7 @@ class TableResponse(BaseModel):
     capacity: int
     branch_id: str
     section: Optional[str] = None
-    status: str = "available"  # available, occupied, reserved
+    status: str = "available"
     current_order_id: Optional[str] = None
 
 # Order Models
@@ -214,6 +275,7 @@ class OrderItemCreate(BaseModel):
     product_name: str
     quantity: int
     price: float
+    cost: float = 0.0
     notes: Optional[str] = None
 
 class OrderCreate(BaseModel):
@@ -227,8 +289,8 @@ class OrderCreate(BaseModel):
     payment_method: str = PaymentMethod.CASH
     discount: float = 0.0
     notes: Optional[str] = None
-    delivery_app: Optional[str] = None  # toters, talabat, baly, etc.
-    driver_id: Optional[str] = None  # السائق المعين
+    delivery_app: Optional[str] = None
+    driver_id: Optional[str] = None
 
 class OrderResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -244,12 +306,15 @@ class OrderResponse(BaseModel):
     discount: float
     tax: float
     total: float
+    total_cost: float = 0.0
+    profit: float = 0.0
     branch_id: str
     cashier_id: str
     status: str
     payment_method: str
     payment_status: str
     delivery_app: Optional[str] = None
+    delivery_commission: float = 0.0
     driver_id: Optional[str] = None
     notes: Optional[str] = None
     created_at: str
@@ -276,13 +341,18 @@ class ShiftResponse(BaseModel):
     expected_cash: Optional[float] = None
     cash_difference: Optional[float] = None
     total_sales: float = 0.0
+    total_cost: float = 0.0
+    gross_profit: float = 0.0
     total_orders: int = 0
     card_sales: float = 0.0
     cash_sales: float = 0.0
     credit_sales: float = 0.0
+    delivery_app_sales: Dict[str, float] = {}
+    total_expenses: float = 0.0
+    net_profit: float = 0.0
     started_at: str
     ended_at: Optional[str] = None
-    status: str  # open or closed
+    status: str
 
 # Delivery Driver Models
 class DriverCreate(BaseModel):
@@ -300,12 +370,23 @@ class DriverResponse(BaseModel):
     current_order_id: Optional[str] = None
     total_deliveries: int = 0
 
+# Delivery App Settings - إعدادات شركات التوصيل
+class DeliveryAppSettingCreate(BaseModel):
+    app_id: str
+    name: str
+    name_en: Optional[str] = None
+    commission_type: str = "percentage"  # percentage or fixed
+    commission_rate: float = 0.0  # نسبة الاستقطاع
+    is_active: bool = True
+    payment_terms: str = "weekly"  # daily, weekly, monthly
+    contact_info: Optional[str] = None
+
 # Currency Models
 class Currency(BaseModel):
     code: str
     name: str
     symbol: str
-    exchange_rate: float  # Rate to IQD
+    exchange_rate: float
 
 # ==================== AUTH HELPERS ====================
 
@@ -357,9 +438,11 @@ async def send_shift_report_email(shift_data: dict, recipient_emails: List[str])
                 <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>تاريخ البدء:</strong></td><td>{shift_data.get('started_at', 'N/A')}</td></tr>
                 <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>تاريخ الإنتهاء:</strong></td><td>{shift_data.get('ended_at', 'N/A')}</td></tr>
                 <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>إجمالي المبيعات:</strong></td><td style="color: #10B981; font-weight: bold;">{shift_data.get('total_sales', 0):,.0f} د.ع</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>إجمالي التكاليف:</strong></td><td>{shift_data.get('total_cost', 0):,.0f} د.ع</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>الربح الإجمالي:</strong></td><td style="color: #10B981;">{shift_data.get('gross_profit', 0):,.0f} د.ع</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>المصاريف:</strong></td><td style="color: #EF4444;">{shift_data.get('total_expenses', 0):,.0f} د.ع</td></tr>
+                <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>صافي الربح:</strong></td><td style="color: {'#10B981' if shift_data.get('net_profit', 0) >= 0 else '#EF4444'}; font-weight: bold;">{shift_data.get('net_profit', 0):,.0f} د.ع</td></tr>
                 <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>عدد الطلبات:</strong></td><td>{shift_data.get('total_orders', 0)}</td></tr>
-                <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>مبيعات نقدية:</strong></td><td>{shift_data.get('cash_sales', 0):,.0f} د.ع</td></tr>
-                <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>مبيعات بطاقة:</strong></td><td>{shift_data.get('card_sales', 0):,.0f} د.ع</td></tr>
                 <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>النقد المتوقع:</strong></td><td>{shift_data.get('expected_cash', 0):,.0f} د.ع</td></tr>
                 <tr><td style="padding: 10px; border-bottom: 1px solid #eee;"><strong>النقد الفعلي:</strong></td><td>{shift_data.get('closing_cash', 0):,.0f} د.ع</td></tr>
                 <tr><td style="padding: 10px;"><strong>الفرق:</strong></td><td style="color: {'#EF4444' if shift_data.get('cash_difference', 0) < 0 else '#10B981'}; font-weight: bold;">{shift_data.get('cash_difference', 0):,.0f} د.ع</td></tr>
@@ -385,6 +468,25 @@ async def send_shift_report_email(shift_data: dict, recipient_emails: List[str])
         logger.info(f"Shift report email sent to {recipient_emails}")
     except Exception as e:
         logger.error(f"Failed to send email: {e}")
+
+# ==================== HELPER FUNCTIONS ====================
+
+async def get_delivery_app_commission(app_id: str) -> float:
+    """Get commission rate for delivery app"""
+    setting = await db.delivery_app_settings.find_one({"app_id": app_id}, {"_id": 0})
+    if setting:
+        return setting.get("commission_rate", 0)
+    return 0
+
+async def calculate_order_cost(items: List[Dict]) -> float:
+    """Calculate total cost for order items"""
+    total_cost = 0
+    for item in items:
+        product = await db.products.find_one({"id": item.get("product_id")}, {"_id": 0})
+        if product:
+            item_cost = (product.get("cost", 0) + product.get("operating_cost", 0)) * item.get("quantity", 1)
+            total_cost += item_cost
+    return total_cost
 
 # ==================== AUTH ROUTES ====================
 
@@ -530,9 +632,13 @@ async def create_product(product: ProductCreate, current_user: dict = Depends(ge
     if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    # Calculate profit
+    profit = product.price - product.cost - product.operating_cost
+    
     prod_doc = {
         "id": str(uuid.uuid4()),
-        **product.model_dump()
+        **product.model_dump(),
+        "profit": profit
     }
     await db.products.insert_one(prod_doc)
     del prod_doc["_id"]
@@ -542,13 +648,28 @@ async def create_product(product: ProductCreate, current_user: dict = Depends(ge
 async def get_products(category_id: Optional[str] = None):
     query = {"category_id": category_id} if category_id else {}
     products = await db.products.find(query, {"_id": 0}).to_list(1000)
+    # Calculate profit for each product
+    for p in products:
+        p["profit"] = p.get("price", 0) - p.get("cost", 0) - p.get("operating_cost", 0)
     return products
+
+@api_router.get("/products/{product_id}")
+async def get_product(product_id: str):
+    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="المنتج غير موجود")
+    product["profit"] = product.get("price", 0) - product.get("cost", 0) - product.get("operating_cost", 0)
+    return product
 
 @api_router.put("/products/{product_id}")
 async def update_product(product_id: str, product: ProductCreate, current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
         raise HTTPException(status_code=403, detail="غير مصرح")
-    await db.products.update_one({"id": product_id}, {"$set": product.model_dump()})
+    
+    profit = product.price - product.cost - product.operating_cost
+    update_data = {**product.model_dump(), "profit": profit}
+    
+    await db.products.update_one({"id": product_id}, {"$set": update_data})
     return await db.products.find_one({"id": product_id}, {"_id": 0})
 
 @api_router.delete("/products/{product_id}")
@@ -617,6 +738,129 @@ async def inventory_transaction(transaction: InventoryTransaction, current_user:
     
     return {"message": "تمت العملية بنجاح", "new_quantity": new_qty}
 
+# ==================== PURCHASE ROUTES - المشتريات ====================
+
+@api_router.post("/purchases")
+async def create_purchase(purchase: PurchaseCreate, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    purchase_doc = {
+        "id": str(uuid.uuid4()),
+        **purchase.model_dump(),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.purchases.insert_one(purchase_doc)
+    
+    # Update inventory quantities
+    for item in purchase.items:
+        await db.inventory.update_one(
+            {"id": item.get("inventory_id")},
+            {
+                "$inc": {"quantity": item.get("quantity", 0)},
+                "$set": {
+                    "cost_per_unit": item.get("cost_per_unit", 0),
+                    "last_updated": datetime.now(timezone.utc).isoformat()
+                }
+            }
+        )
+    
+    del purchase_doc["_id"]
+    return purchase_doc
+
+@api_router.get("/purchases")
+async def get_purchases(
+    branch_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    query = {}
+    if branch_id:
+        query["branch_id"] = branch_id
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("created_at", {})["$lte"] = end_date + "T23:59:59"
+    
+    purchases = await db.purchases.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return purchases
+
+# ==================== EXPENSE ROUTES - المصاريف ====================
+
+@api_router.post("/expenses")
+async def create_expense(expense: ExpenseCreate, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    expense_doc = {
+        "id": str(uuid.uuid4()),
+        **expense.model_dump(),
+        "date": expense.date or datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.expenses.insert_one(expense_doc)
+    del expense_doc["_id"]
+    return expense_doc
+
+@api_router.get("/expenses")
+async def get_expenses(
+    branch_id: Optional[str] = None,
+    category: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    query = {}
+    if branch_id:
+        query["branch_id"] = branch_id
+    if category:
+        query["category"] = category
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("date", {})["$lte"] = end_date
+    
+    expenses = await db.expenses.find(query, {"_id": 0}).sort("date", -1).to_list(500)
+    return expenses
+
+@api_router.get("/expenses/categories")
+async def get_expense_categories():
+    return [
+        {"id": "rent", "name": "إيجار"},
+        {"id": "utilities", "name": "كهرباء وماء"},
+        {"id": "salaries", "name": "رواتب"},
+        {"id": "maintenance", "name": "صيانة"},
+        {"id": "supplies", "name": "مستلزمات"},
+        {"id": "marketing", "name": "تسويق"},
+        {"id": "transport", "name": "نقل"},
+        {"id": "other", "name": "أخرى"}
+    ]
+
+# ==================== OPERATING COST ROUTES - التكاليف التشغيلية ====================
+
+@api_router.post("/operating-costs")
+async def create_operating_cost(cost: OperatingCostCreate, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    cost_doc = {
+        "id": str(uuid.uuid4()),
+        **cost.model_dump(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.operating_costs.insert_one(cost_doc)
+    del cost_doc["_id"]
+    return cost_doc
+
+@api_router.get("/operating-costs")
+async def get_operating_costs(branch_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {"branch_id": branch_id} if branch_id else {}
+    costs = await db.operating_costs.find(query, {"_id": 0}).to_list(100)
+    return costs
+
 # ==================== TABLE ROUTES ====================
 
 @api_router.post("/tables", response_model=TableResponse)
@@ -665,13 +909,35 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
     tax = subtotal * 0.0  # No tax for Iraq
     total = subtotal - order.discount + tax
     
-    # تحديد حالة الدفع
+    # Calculate total cost
+    total_cost = 0
+    items_with_cost = []
+    for item in order.items:
+        product = await db.products.find_one({"id": item.product_id}, {"_id": 0})
+        item_cost = 0
+        if product:
+            item_cost = (product.get("cost", 0) + product.get("operating_cost", 0)) * item.quantity
+        total_cost += item_cost
+        item_dict = item.model_dump()
+        item_dict["cost"] = item_cost
+        items_with_cost.append(item_dict)
+    
+    # Calculate delivery commission if applicable
+    delivery_commission = 0
+    if order.delivery_app:
+        commission_rate = await get_delivery_app_commission(order.delivery_app)
+        delivery_commission = total * (commission_rate / 100)
+    
+    # Calculate profit
+    profit = total - total_cost - delivery_commission
+    
+    # Determine payment status
     if order.payment_method == PaymentMethod.PENDING:
         payment_status = "pending"
-        order_status = OrderStatus.PENDING  # معلق للمطبخ
+        order_status = OrderStatus.PENDING
     elif order.payment_method == PaymentMethod.CREDIT:
         payment_status = "credit"
-        order_status = OrderStatus.PREPARING  # آجل
+        order_status = OrderStatus.PREPARING
     else:
         payment_status = "paid"
         order_status = OrderStatus.PREPARING
@@ -684,20 +950,23 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
         "customer_name": order.customer_name,
         "customer_phone": order.customer_phone,
         "delivery_address": order.delivery_address,
-        "items": [item.model_dump() for item in order.items],
+        "items": items_with_cost,
         "subtotal": subtotal,
         "discount": order.discount,
         "tax": tax,
         "total": total,
+        "total_cost": total_cost,
+        "profit": profit,
         "branch_id": order.branch_id,
         "cashier_id": current_user["id"],
         "status": order_status,
         "payment_method": order.payment_method,
         "payment_status": payment_status,
         "delivery_app": order.delivery_app,
+        "delivery_commission": delivery_commission,
         "driver_id": order.driver_id,
         "notes": order.notes,
-        "credit_transferred": False,  # هل تم ترحيل الآجل
+        "credit_transferred": False,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
@@ -712,14 +981,14 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
             {"$set": {"status": "occupied", "current_order_id": order_doc["id"]}}
         )
     
-    # تعيين السائق إذا موجود
+    # Assign driver if specified
     if order.driver_id:
         await db.drivers.update_one(
             {"id": order.driver_id},
             {"$set": {"is_available": False, "current_order_id": order_doc["id"]}}
         )
     
-    # Deduct inventory (simplified)
+    # Deduct inventory
     for item in order.items:
         product = await db.products.find_one({"id": item.product_id})
         if product and product.get("ingredients"):
@@ -776,7 +1045,6 @@ async def update_order_status(order_id: str, status: str, current_user: dict = D
     
     return {"message": "تم التحديث"}
 
-# تحديث طريقة الدفع للطلب المعلق
 @api_router.put("/orders/{order_id}/payment")
 async def update_order_payment(order_id: str, payment_method: str, current_user: dict = Depends(get_current_user)):
     order = await db.orders.find_one({"id": order_id})
@@ -790,7 +1058,6 @@ async def update_order_payment(order_id: str, payment_method: str, current_user:
     
     if payment_method == PaymentMethod.CREDIT:
         update_data["payment_status"] = "credit"
-        # إذا كان على تطبيق توصيل - ترحيل للحساب الآجل
         if order.get("delivery_app"):
             update_data["credit_transferred"] = True
     elif payment_method in [PaymentMethod.CASH, PaymentMethod.CARD]:
@@ -799,76 +1066,6 @@ async def update_order_payment(order_id: str, payment_method: str, current_user:
     await db.orders.update_one({"id": order_id}, {"$set": update_data})
     
     return {"message": "تم تحديث طريقة الدفع"}
-
-# ترحيل الطلب الآجل لشركة التوصيل
-@api_router.put("/orders/{order_id}/transfer-credit")
-async def transfer_order_credit(order_id: str, current_user: dict = Depends(get_current_user)):
-    order = await db.orders.find_one({"id": order_id})
-    if not order:
-        raise HTTPException(status_code=404, detail="الطلب غير موجود")
-    
-    if order.get("payment_method") != PaymentMethod.CREDIT:
-        raise HTTPException(status_code=400, detail="الطلب ليس آجل")
-    
-    if not order.get("delivery_app"):
-        raise HTTPException(status_code=400, detail="الطلب ليس على تطبيق توصيل")
-    
-    await db.orders.update_one(
-        {"id": order_id},
-        {"$set": {
-            "credit_transferred": True,
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }}
-    )
-    
-    # يمكن إضافة سجل في جدول منفصل لحسابات شركات التوصيل
-    credit_record = {
-        "id": str(uuid.uuid4()),
-        "order_id": order_id,
-        "delivery_app": order["delivery_app"],
-        "amount": order["total"],
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
-    await db.delivery_app_credits.insert_one(credit_record)
-    
-    return {"message": f"تم ترحيل الطلب لحساب {order['delivery_app']}"}
-
-# تقرير حسابات شركات التوصيل الآجلة
-@api_router.get("/reports/delivery-credits")
-async def get_delivery_credits_report(
-    delivery_app: Optional[str] = None,
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None,
-    current_user: dict = Depends(get_current_user)
-):
-    query = {"payment_method": PaymentMethod.CREDIT, "credit_transferred": True}
-    if delivery_app:
-        query["delivery_app"] = delivery_app
-    if start_date:
-        query["created_at"] = {"$gte": start_date}
-    if end_date:
-        query.setdefault("created_at", {})["$lte"] = end_date + "T23:59:59"
-    
-    orders = await db.orders.find(query, {"_id": 0}).to_list(10000)
-    
-    by_app = {}
-    for o in orders:
-        app = o.get("delivery_app", "مباشر")
-        if app not in by_app:
-            by_app[app] = {"count": 0, "total": 0, "orders": []}
-        by_app[app]["count"] += 1
-        by_app[app]["total"] += o["total"]
-        by_app[app]["orders"].append({
-            "order_number": o["order_number"],
-            "total": o["total"],
-            "created_at": o["created_at"]
-        })
-    
-    return {
-        "total_credit": sum(o["total"] for o in orders),
-        "total_orders": len(orders),
-        "by_delivery_app": by_app
-    }
 
 # ==================== SHIFT ROUTES ====================
 
@@ -893,10 +1090,15 @@ async def open_shift(shift: ShiftCreate, current_user: dict = Depends(get_curren
         "expected_cash": shift.opening_cash,
         "cash_difference": None,
         "total_sales": 0.0,
+        "total_cost": 0.0,
+        "gross_profit": 0.0,
         "total_orders": 0,
         "card_sales": 0.0,
         "cash_sales": 0.0,
         "credit_sales": 0.0,
+        "delivery_app_sales": {},
+        "total_expenses": 0.0,
+        "net_profit": 0.0,
         "started_at": datetime.now(timezone.utc).isoformat(),
         "ended_at": None,
         "status": "open"
@@ -929,10 +1131,32 @@ async def close_shift(shift_id: str, close_data: ShiftClose, background_tasks: B
     }).to_list(1000)
     
     total_sales = sum(o["total"] for o in orders)
+    total_cost = sum(o.get("total_cost", 0) for o in orders)
+    gross_profit = total_sales - total_cost
     cash_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CASH)
     card_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CARD)
     credit_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CREDIT)
-    expected_cash = shift["opening_cash"] + cash_sales
+    
+    # Calculate delivery app sales
+    delivery_app_sales = {}
+    for o in orders:
+        if o.get("delivery_app"):
+            app = o["delivery_app"]
+            if app not in delivery_app_sales:
+                delivery_app_sales[app] = 0
+            delivery_app_sales[app] += o["total"]
+    
+    # Get expenses during shift
+    expenses = await db.expenses.find({
+        "branch_id": shift["branch_id"],
+        "created_at": {"$gte": shift["started_at"]}
+    }).to_list(100)
+    total_expenses = sum(e["amount"] for e in expenses)
+    
+    # Calculate net profit
+    net_profit = gross_profit - total_expenses
+    
+    expected_cash = shift["opening_cash"] + cash_sales - total_expenses
     cash_difference = close_data.closing_cash - expected_cash
     
     update_data = {
@@ -940,10 +1164,15 @@ async def close_shift(shift_id: str, close_data: ShiftClose, background_tasks: B
         "expected_cash": expected_cash,
         "cash_difference": cash_difference,
         "total_sales": total_sales,
+        "total_cost": total_cost,
+        "gross_profit": gross_profit,
         "total_orders": len(orders),
         "cash_sales": cash_sales,
         "card_sales": card_sales,
         "credit_sales": credit_sales,
+        "delivery_app_sales": delivery_app_sales,
+        "total_expenses": total_expenses,
+        "net_profit": net_profit,
         "ended_at": datetime.now(timezone.utc).isoformat(),
         "status": "closed",
         "notes": close_data.notes
@@ -1023,7 +1252,51 @@ async def complete_delivery(driver_id: str, current_user: dict = Depends(get_cur
     )
     return {"message": "تم التوصيل"}
 
-# ==================== REPORTS ROUTES ====================
+# ==================== DELIVERY APP SETTINGS ====================
+
+@api_router.post("/delivery-app-settings")
+async def create_delivery_app_setting(setting: DeliveryAppSettingCreate, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    # Check if exists
+    existing = await db.delivery_app_settings.find_one({"app_id": setting.app_id})
+    if existing:
+        await db.delivery_app_settings.update_one({"app_id": setting.app_id}, {"$set": setting.model_dump()})
+    else:
+        await db.delivery_app_settings.insert_one(setting.model_dump())
+    
+    return {"message": "تم الحفظ"}
+
+@api_router.get("/delivery-app-settings")
+async def get_delivery_app_settings():
+    settings = await db.delivery_app_settings.find({}, {"_id": 0}).to_list(20)
+    return settings
+
+@api_router.get("/delivery-apps")
+async def get_delivery_apps():
+    # Get default apps with their settings
+    default_apps = [
+        {"id": "toters", "name": "توترز", "name_en": "Toters", "icon": "Truck"},
+        {"id": "talabat", "name": "طلبات", "name_en": "Talabat", "icon": "ShoppingBag"},
+        {"id": "baly", "name": "بالي", "name_en": "Baly", "icon": "Package"},
+        {"id": "alsaree3", "name": "عالسريع", "name_en": "Al-Sari3", "icon": "Zap"},
+        {"id": "talabati", "name": "طلباتي", "name_en": "Talabati", "icon": "Box"},
+    ]
+    
+    # Get settings for each app
+    for app in default_apps:
+        setting = await db.delivery_app_settings.find_one({"app_id": app["id"]}, {"_id": 0})
+        if setting:
+            app["commission_rate"] = setting.get("commission_rate", 0)
+            app["is_active"] = setting.get("is_active", True)
+        else:
+            app["commission_rate"] = 0
+            app["is_active"] = True
+    
+    return default_apps
+
+# ==================== COMPREHENSIVE REPORTS ====================
 
 @api_router.get("/reports/sales")
 async def get_sales_report(
@@ -1043,31 +1316,102 @@ async def get_sales_report(
     orders = await db.orders.find(query, {"_id": 0}).to_list(10000)
     
     total_sales = sum(o["total"] for o in orders)
+    total_cost = sum(o.get("total_cost", 0) for o in orders)
+    total_profit = sum(o.get("profit", 0) for o in orders)
     total_orders = len(orders)
     avg_order_value = total_sales / total_orders if total_orders > 0 else 0
     
     by_payment = {}
     by_type = {}
     by_app = {}
+    by_date = {}
+    by_product = {}
     
     for o in orders:
+        # By payment method
         pm = o["payment_method"]
         by_payment[pm] = by_payment.get(pm, 0) + o["total"]
         
+        # By order type
         ot = o["order_type"]
         by_type[ot] = by_type.get(ot, 0) + o["total"]
         
+        # By delivery app
         if o.get("delivery_app"):
             app = o["delivery_app"]
             by_app[app] = by_app.get(app, 0) + o["total"]
+        
+        # By date
+        date = o["created_at"][:10]
+        if date not in by_date:
+            by_date[date] = {"sales": 0, "orders": 0, "profit": 0}
+        by_date[date]["sales"] += o["total"]
+        by_date[date]["orders"] += 1
+        by_date[date]["profit"] += o.get("profit", 0)
+        
+        # By product
+        for item in o.get("items", []):
+            pid = item.get("product_name", "Unknown")
+            if pid not in by_product:
+                by_product[pid] = {"quantity": 0, "revenue": 0}
+            by_product[pid]["quantity"] += item.get("quantity", 0)
+            by_product[pid]["revenue"] += item.get("price", 0) * item.get("quantity", 0)
     
     return {
         "total_sales": total_sales,
+        "total_cost": total_cost,
+        "total_profit": total_profit,
+        "profit_margin": (total_profit / total_sales * 100) if total_sales > 0 else 0,
         "total_orders": total_orders,
         "average_order_value": avg_order_value,
         "by_payment_method": by_payment,
         "by_order_type": by_type,
-        "by_delivery_app": by_app
+        "by_delivery_app": by_app,
+        "by_date": by_date,
+        "top_products": dict(sorted(by_product.items(), key=lambda x: x[1]["revenue"], reverse=True)[:10])
+    }
+
+@api_router.get("/reports/purchases")
+async def get_purchases_report(
+    branch_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    query = {}
+    if branch_id:
+        query["branch_id"] = branch_id
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("created_at", {})["$lte"] = end_date + "T23:59:59"
+    
+    purchases = await db.purchases.find(query, {"_id": 0}).to_list(1000)
+    
+    total_purchases = sum(p["total_amount"] for p in purchases)
+    by_supplier = {}
+    by_date = {}
+    by_payment_status = {"paid": 0, "pending": 0, "partial": 0}
+    
+    for p in purchases:
+        # By supplier
+        supplier = p.get("supplier_name", "Unknown")
+        by_supplier[supplier] = by_supplier.get(supplier, 0) + p["total_amount"]
+        
+        # By date
+        date = p["created_at"][:10]
+        by_date[date] = by_date.get(date, 0) + p["total_amount"]
+        
+        # By payment status
+        status = p.get("payment_status", "paid")
+        by_payment_status[status] = by_payment_status.get(status, 0) + p["total_amount"]
+    
+    return {
+        "total_purchases": total_purchases,
+        "total_transactions": len(purchases),
+        "by_supplier": by_supplier,
+        "by_date": by_date,
+        "by_payment_status": by_payment_status
     }
 
 @api_router.get("/reports/inventory")
@@ -1076,13 +1420,236 @@ async def get_inventory_report(branch_id: Optional[str] = None, current_user: di
     items = await db.inventory.find(query, {"_id": 0}).to_list(1000)
     
     low_stock = [i for i in items if i["quantity"] <= i["min_quantity"]]
+    raw_materials = [i for i in items if i.get("item_type") == "raw"]
+    finished_products = [i for i in items if i.get("item_type") == "finished"]
+    
     total_value = sum(i["quantity"] * i["cost_per_unit"] for i in items)
+    raw_value = sum(i["quantity"] * i["cost_per_unit"] for i in raw_materials)
+    finished_value = sum(i["quantity"] * i["cost_per_unit"] for i in finished_products)
     
     return {
         "total_items": len(items),
+        "raw_materials_count": len(raw_materials),
+        "finished_products_count": len(finished_products),
+        "low_stock_count": len(low_stock),
         "low_stock_items": low_stock,
         "total_inventory_value": total_value,
+        "raw_materials_value": raw_value,
+        "finished_products_value": finished_value,
         "items": items
+    }
+
+@api_router.get("/reports/expenses")
+async def get_expenses_report(
+    branch_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    query = {}
+    if branch_id:
+        query["branch_id"] = branch_id
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("date", {})["$lte"] = end_date
+    
+    expenses = await db.expenses.find(query, {"_id": 0}).to_list(1000)
+    
+    total_expenses = sum(e["amount"] for e in expenses)
+    by_category = {}
+    by_date = {}
+    
+    for e in expenses:
+        # By category
+        cat = e.get("category", "other")
+        by_category[cat] = by_category.get(cat, 0) + e["amount"]
+        
+        # By date
+        date = e.get("date", e["created_at"][:10])
+        by_date[date] = by_date.get(date, 0) + e["amount"]
+    
+    return {
+        "total_expenses": total_expenses,
+        "total_transactions": len(expenses),
+        "by_category": by_category,
+        "by_date": by_date,
+        "expenses": expenses
+    }
+
+@api_router.get("/reports/profit-loss")
+async def get_profit_loss_report(
+    branch_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    # Get sales data
+    sales_query = {"status": {"$ne": OrderStatus.CANCELLED}}
+    if branch_id:
+        sales_query["branch_id"] = branch_id
+    if start_date:
+        sales_query["created_at"] = {"$gte": start_date}
+    if end_date:
+        sales_query.setdefault("created_at", {})["$lte"] = end_date + "T23:59:59"
+    
+    orders = await db.orders.find(sales_query, {"_id": 0}).to_list(10000)
+    
+    total_revenue = sum(o["total"] for o in orders)
+    total_cost_of_goods = sum(o.get("total_cost", 0) for o in orders)
+    delivery_commissions = sum(o.get("delivery_commission", 0) for o in orders)
+    gross_profit = total_revenue - total_cost_of_goods - delivery_commissions
+    
+    # Get expenses
+    expense_query = {}
+    if branch_id:
+        expense_query["branch_id"] = branch_id
+    if start_date:
+        expense_query["date"] = {"$gte": start_date}
+    if end_date:
+        expense_query.setdefault("date", {})["$lte"] = end_date
+    
+    expenses = await db.expenses.find(expense_query, {"_id": 0}).to_list(1000)
+    total_expenses = sum(e["amount"] for e in expenses)
+    
+    # Calculate net profit
+    net_profit = gross_profit - total_expenses
+    
+    return {
+        "revenue": {
+            "total_sales": total_revenue,
+            "order_count": len(orders)
+        },
+        "cost_of_goods_sold": {
+            "total": total_cost_of_goods,
+            "percentage": (total_cost_of_goods / total_revenue * 100) if total_revenue > 0 else 0
+        },
+        "delivery_commissions": delivery_commissions,
+        "gross_profit": {
+            "amount": gross_profit,
+            "margin": (gross_profit / total_revenue * 100) if total_revenue > 0 else 0
+        },
+        "operating_expenses": {
+            "total": total_expenses,
+            "breakdown": {}
+        },
+        "net_profit": {
+            "amount": net_profit,
+            "margin": (net_profit / total_revenue * 100) if total_revenue > 0 else 0
+        }
+    }
+
+@api_router.get("/reports/delivery-credits")
+async def get_delivery_credits_report(
+    delivery_app: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    query = {"payment_method": PaymentMethod.CREDIT, "delivery_app": {"$ne": None}}
+    if delivery_app:
+        query["delivery_app"] = delivery_app
+    if start_date:
+        query["created_at"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("created_at", {})["$lte"] = end_date + "T23:59:59"
+    
+    orders = await db.orders.find(query, {"_id": 0}).to_list(10000)
+    
+    by_app = {}
+    for o in orders:
+        app = o.get("delivery_app", "مباشر")
+        if app not in by_app:
+            by_app[app] = {
+                "count": 0, 
+                "total": 0, 
+                "commission": 0,
+                "net_amount": 0,
+                "orders": []
+            }
+        by_app[app]["count"] += 1
+        by_app[app]["total"] += o["total"]
+        by_app[app]["commission"] += o.get("delivery_commission", 0)
+        by_app[app]["net_amount"] += o["total"] - o.get("delivery_commission", 0)
+        by_app[app]["orders"].append({
+            "order_number": o["order_number"],
+            "total": o["total"],
+            "commission": o.get("delivery_commission", 0),
+            "created_at": o["created_at"]
+        })
+    
+    return {
+        "total_credit": sum(o["total"] for o in orders),
+        "total_commission": sum(o.get("delivery_commission", 0) for o in orders),
+        "net_receivable": sum(o["total"] - o.get("delivery_commission", 0) for o in orders),
+        "total_orders": len(orders),
+        "by_delivery_app": by_app
+    }
+
+@api_router.get("/reports/products")
+async def get_products_report(
+    branch_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    # Get all products
+    products = await db.products.find({}, {"_id": 0}).to_list(1000)
+    
+    # Get orders for sales data
+    order_query = {"status": {"$ne": OrderStatus.CANCELLED}}
+    if branch_id:
+        order_query["branch_id"] = branch_id
+    if start_date:
+        order_query["created_at"] = {"$gte": start_date}
+    if end_date:
+        order_query.setdefault("created_at", {})["$lte"] = end_date + "T23:59:59"
+    
+    orders = await db.orders.find(order_query, {"_id": 0}).to_list(10000)
+    
+    # Calculate sales by product
+    product_sales = {}
+    for o in orders:
+        for item in o.get("items", []):
+            pid = item.get("product_id")
+            if pid not in product_sales:
+                product_sales[pid] = {
+                    "quantity_sold": 0,
+                    "revenue": 0,
+                    "cost": 0,
+                    "profit": 0
+                }
+            qty = item.get("quantity", 0)
+            product_sales[pid]["quantity_sold"] += qty
+            product_sales[pid]["revenue"] += item.get("price", 0) * qty
+            product_sales[pid]["cost"] += item.get("cost", 0)
+    
+    # Combine product info with sales
+    result = []
+    for p in products:
+        sales = product_sales.get(p["id"], {})
+        result.append({
+            "id": p["id"],
+            "name": p["name"],
+            "category_id": p.get("category_id"),
+            "price": p.get("price", 0),
+            "cost": p.get("cost", 0),
+            "operating_cost": p.get("operating_cost", 0),
+            "profit_per_unit": p.get("price", 0) - p.get("cost", 0) - p.get("operating_cost", 0),
+            "quantity_sold": sales.get("quantity_sold", 0),
+            "total_revenue": sales.get("revenue", 0),
+            "total_cost": sales.get("cost", 0),
+            "total_profit": sales.get("revenue", 0) - sales.get("cost", 0)
+        })
+    
+    # Sort by revenue
+    result.sort(key=lambda x: x["total_revenue"], reverse=True)
+    
+    return {
+        "products": result,
+        "total_products": len(products),
+        "top_selling": result[:10],
+        "low_selling": sorted(result, key=lambda x: x["quantity_sold"])[:10]
     }
 
 # ==================== SETTINGS ROUTES ====================
@@ -1116,6 +1683,23 @@ async def set_currencies(currencies: List[Currency], current_user: dict = Depend
     )
     return {"message": "تم الحفظ"}
 
+@api_router.post("/settings/general")
+async def set_general_settings(settings: Dict[str, Any], current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.settings.update_one(
+        {"type": "general"},
+        {"$set": {"type": "general", "value": settings}},
+        upsert=True
+    )
+    return {"message": "تم الحفظ"}
+
+@api_router.get("/settings/general")
+async def get_general_settings():
+    settings = await db.settings.find_one({"type": "general"}, {"_id": 0})
+    return settings.get("value", {}) if settings else {}
+
 # ==================== PRINTER ROUTES ====================
 
 class PrinterCreate(BaseModel):
@@ -1123,7 +1707,7 @@ class PrinterCreate(BaseModel):
     ip_address: str
     port: int = 9100
     branch_id: str
-    printer_type: str = "receipt"  # receipt or kitchen
+    printer_type: str = "receipt"
 
 @api_router.post("/printers")
 async def create_printer(printer: PrinterCreate, current_user: dict = Depends(get_current_user)):
@@ -1144,20 +1728,6 @@ async def get_printers(branch_id: Optional[str] = None):
     query = {"branch_id": branch_id} if branch_id else {}
     printers = await db.printers.find(query, {"_id": 0}).to_list(50)
     return printers
-
-# ==================== DELIVERY APPS ====================
-
-DELIVERY_APPS = [
-    {"id": "toters", "name": "توترز", "name_en": "Toters", "icon": "Truck"},
-    {"id": "talabat", "name": "طلبات", "name_en": "Talabat", "icon": "ShoppingBag"},
-    {"id": "baly", "name": "بالي", "name_en": "Baly", "icon": "Package"},
-    {"id": "alsaree3", "name": "عالسريع", "name_en": "Al-Sari3", "icon": "Zap"},
-    {"id": "talabati", "name": "طلباتي", "name_en": "Talabati", "icon": "Box"},
-]
-
-@api_router.get("/delivery-apps")
-async def get_delivery_apps():
-    return DELIVERY_APPS
 
 # ==================== SEED DATA ====================
 
@@ -1211,20 +1781,21 @@ async def seed_data():
         await db.categories.insert_one(cat_doc)
         cat_ids[cat["name_en"]] = cat_doc["id"]
     
-    # Create products
+    # Create products with costs
     products = [
-        {"name": "برغر كلاسيك", "name_en": "Classic Burger", "category_id": cat_ids["Burgers"], "price": 12000, "cost": 5000, "image": "https://images.pexels.com/photos/18796078/pexels-photo-18796078.jpeg"},
-        {"name": "برغر دبل", "name_en": "Double Burger", "category_id": cat_ids["Burgers"], "price": 18000, "cost": 8000, "image": "https://images.pexels.com/photos/5672397/pexels-photo-5672397.jpeg"},
-        {"name": "بيتزا مارغريتا", "name_en": "Margherita Pizza", "category_id": cat_ids["Pizza"], "price": 15000, "cost": 6000, "image": "https://images.pexels.com/photos/35532821/pexels-photo-35532821.jpeg"},
-        {"name": "بيتزا خضار", "name_en": "Veggie Pizza", "category_id": cat_ids["Pizza"], "price": 14000, "cost": 5500, "image": "https://images.pexels.com/photos/34956178/pexels-photo-34956178.jpeg"},
-        {"name": "قهوة عربية", "name_en": "Arabic Coffee", "category_id": cat_ids["Drinks"], "price": 3000, "cost": 500, "image": "https://images.pexels.com/photos/29799615/pexels-photo-29799615.jpeg"},
-        {"name": "لاتيه", "name_en": "Latte", "category_id": cat_ids["Drinks"], "price": 5000, "cost": 1500, "image": "https://images.pexels.com/photos/15800375/pexels-photo-15800375.jpeg"},
-        {"name": "كيكة شوكولاتة", "name_en": "Chocolate Cake", "category_id": cat_ids["Desserts"], "price": 8000, "cost": 3000, "image": "https://images.pexels.com/photos/29538417/pexels-photo-29538417.jpeg"},
-        {"name": "تشيز كيك", "name_en": "Cheesecake", "category_id": cat_ids["Desserts"], "price": 9000, "cost": 3500, "image": "https://images.pexels.com/photos/15564368/pexels-photo-15564368.jpeg"},
+        {"name": "برغر كلاسيك", "name_en": "Classic Burger", "category_id": cat_ids["Burgers"], "price": 12000, "cost": 4000, "operating_cost": 1000, "image": "https://images.pexels.com/photos/18796078/pexels-photo-18796078.jpeg"},
+        {"name": "برغر دبل", "name_en": "Double Burger", "category_id": cat_ids["Burgers"], "price": 18000, "cost": 7000, "operating_cost": 1500, "image": "https://images.pexels.com/photos/5672397/pexels-photo-5672397.jpeg"},
+        {"name": "بيتزا مارغريتا", "name_en": "Margherita Pizza", "category_id": cat_ids["Pizza"], "price": 15000, "cost": 5000, "operating_cost": 1200, "image": "https://images.pexels.com/photos/35532821/pexels-photo-35532821.jpeg"},
+        {"name": "بيتزا خضار", "name_en": "Veggie Pizza", "category_id": cat_ids["Pizza"], "price": 14000, "cost": 4500, "operating_cost": 1100, "image": "https://images.pexels.com/photos/34956178/pexels-photo-34956178.jpeg"},
+        {"name": "قهوة عربية", "name_en": "Arabic Coffee", "category_id": cat_ids["Drinks"], "price": 3000, "cost": 500, "operating_cost": 200, "image": "https://images.pexels.com/photos/29799615/pexels-photo-29799615.jpeg"},
+        {"name": "لاتيه", "name_en": "Latte", "category_id": cat_ids["Drinks"], "price": 5000, "cost": 1200, "operating_cost": 300, "image": "https://images.pexels.com/photos/15800375/pexels-photo-15800375.jpeg"},
+        {"name": "كيكة شوكولاتة", "name_en": "Chocolate Cake", "category_id": cat_ids["Desserts"], "price": 8000, "cost": 2500, "operating_cost": 500, "image": "https://images.pexels.com/photos/29538417/pexels-photo-29538417.jpeg"},
+        {"name": "تشيز كيك", "name_en": "Cheesecake", "category_id": cat_ids["Desserts"], "price": 9000, "cost": 3000, "operating_cost": 500, "image": "https://images.pexels.com/photos/15564368/pexels-photo-15564368.jpeg"},
     ]
     
     for prod in products:
-        prod_doc = {"id": str(uuid.uuid4()), **prod, "is_available": True, "ingredients": []}
+        profit = prod["price"] - prod["cost"] - prod["operating_cost"]
+        prod_doc = {"id": str(uuid.uuid4()), **prod, "profit": profit, "is_available": True, "ingredients": []}
         await db.products.insert_one(prod_doc)
     
     # Create tables
@@ -1262,13 +1833,24 @@ async def seed_data():
     ]
     await db.settings.insert_one({"type": "currencies", "value": currencies})
     
+    # Set default delivery app settings
+    delivery_apps = [
+        {"app_id": "toters", "name": "توترز", "name_en": "Toters", "commission_type": "percentage", "commission_rate": 15, "is_active": True, "payment_terms": "weekly"},
+        {"app_id": "talabat", "name": "طلبات", "name_en": "Talabat", "commission_type": "percentage", "commission_rate": 18, "is_active": True, "payment_terms": "weekly"},
+        {"app_id": "baly", "name": "بالي", "name_en": "Baly", "commission_type": "percentage", "commission_rate": 12, "is_active": True, "payment_terms": "weekly"},
+        {"app_id": "alsaree3", "name": "عالسريع", "name_en": "Al-Sari3", "commission_type": "percentage", "commission_rate": 10, "is_active": True, "payment_terms": "weekly"},
+        {"app_id": "talabati", "name": "طلباتي", "name_en": "Talabati", "commission_type": "percentage", "commission_rate": 14, "is_active": True, "payment_terms": "weekly"},
+    ]
+    for app in delivery_apps:
+        await db.delivery_app_settings.insert_one(app)
+    
     return {"message": "تم إنشاء البيانات الأولية بنجاح"}
 
 # ==================== ROOT ====================
 
 @api_router.get("/")
 async def root():
-    return {"message": "Maestro EGP API", "version": "1.0.0"}
+    return {"message": "Maestro EGP API", "version": "2.0.0"}
 
 # Include router and middleware
 app.include_router(api_router)
