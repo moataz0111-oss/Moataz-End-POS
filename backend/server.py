@@ -590,6 +590,82 @@ async def get_branch(branch_id: str):
         raise HTTPException(status_code=404, detail="الفرع غير موجود")
     return branch
 
+@api_router.put("/branches/{branch_id}")
+async def update_branch(branch_id: str, branch: BranchCreate, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    await db.branches.update_one({"id": branch_id}, {"$set": branch.model_dump()})
+    return await db.branches.find_one({"id": branch_id}, {"_id": 0})
+
+@api_router.delete("/branches/{branch_id}")
+async def delete_branch(branch_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    # Check if branch has users or orders
+    users_count = await db.users.count_documents({"branch_id": branch_id})
+    if users_count > 0:
+        raise HTTPException(status_code=400, detail="لا يمكن حذف الفرع - يوجد مستخدمين مرتبطين به")
+    await db.branches.update_one({"id": branch_id}, {"$set": {"is_active": False}})
+    return {"message": "تم تعطيل الفرع"}
+
+# ==================== KITCHEN SECTIONS ROUTES ====================
+
+@api_router.post("/kitchen-sections")
+async def create_kitchen_section(section: dict, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    section_doc = {
+        "id": str(uuid.uuid4()),
+        "name": section.get("name"),
+        "name_en": section.get("name_en"),
+        "color": section.get("color", "#D4AF37"),
+        "icon": section.get("icon", "🍳"),
+        "printer_id": section.get("printer_id"),
+        "branch_id": section.get("branch_id"),
+        "sort_order": section.get("sort_order", 0),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.kitchen_sections.insert_one(section_doc)
+    del section_doc["_id"]
+    return section_doc
+
+@api_router.get("/kitchen-sections")
+async def get_kitchen_sections(branch_id: Optional[str] = None):
+    query = {"branch_id": branch_id} if branch_id else {}
+    sections = await db.kitchen_sections.find(query, {"_id": 0}).sort("sort_order", 1).to_list(100)
+    return sections
+
+@api_router.put("/kitchen-sections/{section_id}")
+async def update_kitchen_section(section_id: str, section: dict, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    update_data = {k: v for k, v in section.items() if k != "id"}
+    await db.kitchen_sections.update_one({"id": section_id}, {"$set": update_data})
+    return await db.kitchen_sections.find_one({"id": section_id}, {"_id": 0})
+
+@api_router.delete("/kitchen-sections/{section_id}")
+async def delete_kitchen_section(section_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    await db.kitchen_sections.delete_one({"id": section_id})
+    return {"message": "تم الحذف"}
+
+@api_router.put("/categories/{category_id}/kitchen-section")
+async def assign_category_to_kitchen_section(category_id: str, data: dict, current_user: dict = Depends(get_current_user)):
+    """Assign a category to a kitchen section"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    kitchen_section_id = data.get("kitchen_section_id")
+    await db.categories.update_one(
+        {"id": category_id}, 
+        {"$set": {"kitchen_section_id": kitchen_section_id}}
+    )
+    return await db.categories.find_one({"id": category_id}, {"_id": 0})
+
 # ==================== CATEGORY ROUTES ====================
 
 @api_router.post("/categories", response_model=CategoryResponse)
