@@ -128,6 +128,8 @@ export default function Settings() {
   const [editProductDialogOpen, setEditProductDialogOpen] = useState(false);
   const [kitchenSectionDialogOpen, setKitchenSectionDialogOpen] = useState(false);
   const [editKitchenSectionDialogOpen, setEditKitchenSectionDialogOpen] = useState(false);
+  const [customerDialogOpen, setCustomerDialogOpen] = useState(false);
+  const [editCustomerDialogOpen, setEditCustomerDialogOpen] = useState(false);
   
   // Form data
   const [userForm, setUserForm] = useState({
