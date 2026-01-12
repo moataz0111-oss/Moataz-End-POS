@@ -817,6 +817,439 @@ export default function Settings() {
             </TabsContent>
           )}
 
+          {/* Categories */}
+          {hasRole(['admin', 'manager']) && (
+            <TabsContent value="categories">
+              <Card className="border-border/50 bg-card">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <Tag className="h-5 w-5" />
+                    إدارة الفئات
+                  </CardTitle>
+                  <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-primary text-primary-foreground">
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة فئة
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle className="text-foreground">إضافة فئة جديدة</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleCreateCategory} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-foreground">اسم الفئة (عربي)</Label>
+                            <Input
+                              value={categoryForm.name}
+                              onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                              placeholder="مشروبات ساخنة"
+                              required
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">اسم الفئة (إنجليزي)</Label>
+                            <Input
+                              value={categoryForm.name_en}
+                              onChange={(e) => setCategoryForm({ ...categoryForm, name_en: e.target.value })}
+                              placeholder="Hot Drinks"
+                              className="mt-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                          <div>
+                            <Label className="text-foreground">الأيقونة</Label>
+                            <Input
+                              value={categoryForm.icon}
+                              onChange={(e) => setCategoryForm({ ...categoryForm, icon: e.target.value })}
+                              placeholder="☕"
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">اللون</Label>
+                            <Input
+                              type="color"
+                              value={categoryForm.color}
+                              onChange={(e) => setCategoryForm({ ...categoryForm, color: e.target.value })}
+                              className="mt-1 h-10"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">الترتيب</Label>
+                            <Input
+                              type="number"
+                              value={categoryForm.sort_order}
+                              onChange={(e) => setCategoryForm({ ...categoryForm, sort_order: parseInt(e.target.value) || 0 })}
+                              className="mt-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-2 pt-4">
+                          <Button type="button" variant="outline" onClick={() => setCategoryDialogOpen(false)} className="flex-1">
+                            إلغاء
+                          </Button>
+                          <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                            إنشاء
+                          </Button>
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </CardHeader>
+                <CardContent>
+                  {categories.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">لا توجد فئات. قم بإضافة فئة جديدة</p>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      {categories.map(cat => (
+                        <div key={cat.id} className="relative p-4 bg-muted/30 rounded-lg border border-border/50">
+                          <div className="flex items-center gap-3">
+                            <div 
+                              className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                              style={{ backgroundColor: `${cat.color}20` }}
+                            >
+                              {cat.icon || '📦'}
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground">{cat.name}</p>
+                              {cat.name_en && <p className="text-xs text-muted-foreground">{cat.name_en}</p>}
+                            </div>
+                          </div>
+                          <div className="absolute top-2 left-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                              onClick={() => handleDeleteCategory(cat.id)}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            {products.filter(p => p.category_id === cat.id).length} منتج
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
+          {/* Products */}
+          {hasRole(['admin', 'manager']) && (
+            <TabsContent value="products">
+              <Card className="border-border/50 bg-card">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <Package className="h-5 w-5" />
+                    إدارة المنتجات
+                  </CardTitle>
+                  <Dialog open={productDialogOpen} onOpenChange={setProductDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-primary text-primary-foreground">
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة منتج
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="text-foreground">إضافة منتج جديد</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleCreateProduct} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-foreground">اسم المنتج (عربي)</Label>
+                            <Input
+                              value={productForm.name}
+                              onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                              placeholder="قهوة أمريكية"
+                              required
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">اسم المنتج (إنجليزي)</Label>
+                            <Input
+                              value={productForm.name_en}
+                              onChange={(e) => setProductForm({ ...productForm, name_en: e.target.value })}
+                              placeholder="Americano"
+                              className="mt-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label className="text-foreground">الفئة</Label>
+                            <Select value={productForm.category_id} onValueChange={(v) => setProductForm({ ...productForm, category_id: v })}>
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="اختر فئة" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {categories.map(cat => (
+                                  <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-foreground">الباركود</Label>
+                            <Input
+                              value={productForm.barcode}
+                              onChange={(e) => setProductForm({ ...productForm, barcode: e.target.value })}
+                              placeholder="اختياري"
+                              className="mt-1"
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                          <div>
+                            <Label className="text-foreground">سعر البيع (د.ع)</Label>
+                            <Input
+                              type="number"
+                              value={productForm.price}
+                              onChange={(e) => setProductForm({ ...productForm, price: e.target.value })}
+                              placeholder="5000"
+                              required
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">تكلفة المواد الخام</Label>
+                            <Input
+                              type="number"
+                              value={productForm.cost}
+                              onChange={(e) => setProductForm({ ...productForm, cost: e.target.value })}
+                              placeholder="2000"
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">التكلفة التشغيلية</Label>
+                            <Input
+                              type="number"
+                              value={productForm.operating_cost}
+                              onChange={(e) => setProductForm({ ...productForm, operating_cost: e.target.value })}
+                              placeholder="500"
+                              className="mt-1"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-foreground">رابط الصورة</Label>
+                          <Input
+                            value={productForm.image}
+                            onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                            placeholder="https://example.com/image.jpg"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">الوصف</Label>
+                          <Textarea
+                            value={productForm.description}
+                            onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+                            placeholder="وصف المنتج..."
+                            className="mt-1"
+                            rows={2}
+                          />
+                        </div>
+                        {productForm.price && productForm.cost && (
+                          <div className="p-3 bg-green-500/10 rounded-lg">
+                            <p className="text-sm text-green-600">
+                              الربح المتوقع: {formatPrice((parseFloat(productForm.price) || 0) - (parseFloat(productForm.cost) || 0) - (parseFloat(productForm.operating_cost) || 0))} لكل وحدة
+                            </p>
+                          </div>
+                        )}
+                        <div className="flex gap-2 pt-4">
+                          <Button type="button" variant="outline" onClick={() => setProductDialogOpen(false)} className="flex-1">
+                            إلغاء
+                          </Button>
+                          <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                            إنشاء
+                          </Button>
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </CardHeader>
+                <CardContent>
+                  {products.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">لا توجد منتجات. قم بإضافة منتج جديد</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {products.map(p => (
+                        <div key={p.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-4">
+                            {p.image ? (
+                              <img src={p.image} alt={p.name} className="w-12 h-12 rounded-lg object-cover" />
+                            ) : (
+                              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <Package className="h-6 w-6 text-primary" />
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-medium text-foreground">{p.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {categories.find(c => c.id === p.category_id)?.name || '-'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-left">
+                              <p className="font-bold text-foreground tabular-nums">{formatPrice(p.price)}</p>
+                              <p className="text-xs text-green-500">ربح: {formatPrice(p.profit || (p.price - p.cost - (p.operating_cost || 0)))}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-blue-500 hover:bg-blue-500/10"
+                                onClick={() => handleEditProduct(p)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-destructive hover:bg-destructive/10"
+                                onClick={() => handleDeleteProduct(p.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Edit Product Dialog */}
+              <Dialog open={editProductDialogOpen} onOpenChange={setEditProductDialogOpen}>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-foreground">تعديل المنتج</DialogTitle>
+                  </DialogHeader>
+                  {editProductForm && (
+                    <form onSubmit={handleUpdateProduct} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-foreground">اسم المنتج (عربي)</Label>
+                          <Input
+                            value={editProductForm.name}
+                            onChange={(e) => setEditProductForm({ ...editProductForm, name: e.target.value })}
+                            required
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">اسم المنتج (إنجليزي)</Label>
+                          <Input
+                            value={editProductForm.name_en}
+                            onChange={(e) => setEditProductForm({ ...editProductForm, name_en: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-foreground">الفئة</Label>
+                          <Select value={editProductForm.category_id} onValueChange={(v) => setEditProductForm({ ...editProductForm, category_id: v })}>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="اختر فئة" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categories.map(cat => (
+                                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="text-foreground">الباركود</Label>
+                          <Input
+                            value={editProductForm.barcode}
+                            onChange={(e) => setEditProductForm({ ...editProductForm, barcode: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-foreground">سعر البيع (د.ع)</Label>
+                          <Input
+                            type="number"
+                            value={editProductForm.price}
+                            onChange={(e) => setEditProductForm({ ...editProductForm, price: e.target.value })}
+                            required
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">تكلفة المواد الخام</Label>
+                          <Input
+                            type="number"
+                            value={editProductForm.cost}
+                            onChange={(e) => setEditProductForm({ ...editProductForm, cost: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">التكلفة التشغيلية</Label>
+                          <Input
+                            type="number"
+                            value={editProductForm.operating_cost}
+                            onChange={(e) => setEditProductForm({ ...editProductForm, operating_cost: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-foreground">رابط الصورة</Label>
+                        <Input
+                          value={editProductForm.image}
+                          onChange={(e) => setEditProductForm({ ...editProductForm, image: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-foreground">الوصف</Label>
+                        <Textarea
+                          value={editProductForm.description}
+                          onChange={(e) => setEditProductForm({ ...editProductForm, description: e.target.value })}
+                          className="mt-1"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={editProductForm.is_available !== false}
+                          onCheckedChange={(checked) => setEditProductForm({ ...editProductForm, is_available: checked })}
+                        />
+                        <Label className="text-foreground">متاح للبيع</Label>
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setEditProductDialogOpen(false)} className="flex-1">
+                          إلغاء
+                        </Button>
+                        <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                          حفظ التعديلات
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </DialogContent>
+              </Dialog>
+            </TabsContent>
+          )}
+
           {/* Printers */}
           {hasRole(['admin', 'manager']) && (
             <TabsContent value="printers">
