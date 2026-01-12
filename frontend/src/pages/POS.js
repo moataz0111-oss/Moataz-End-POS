@@ -772,8 +772,14 @@ export default function POS() {
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">الإجمالي:</span>
-                <span className="font-bold text-primary">{formatPrice(total)}</span>
+                <span className="font-bold text-primary">{formatPrice(totalBeforeCommission)}</span>
               </div>
+              {commissionAmount > 0 && (
+                <div className="flex justify-between text-amber-500">
+                  <span>عمولة التوصيل:</span>
+                  <span className="font-bold">-{formatPrice(commissionAmount)}</span>
+                </div>
+              )}
             </div>
 
             <div>
