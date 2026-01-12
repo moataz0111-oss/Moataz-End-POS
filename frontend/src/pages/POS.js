@@ -538,17 +538,34 @@ export default function POS() {
               </div>
               
               {/* تطبيق التوصيل */}
-              <Select value={deliveryApp || "direct"} onValueChange={(v) => setDeliveryApp(v === "direct" ? "" : v)}>
-                <SelectTrigger className="h-10">
-                  <SelectValue placeholder="اختر تطبيق التوصيل (اختياري)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="direct">طلب مباشر</SelectItem>
-                  {deliveryApps.map(app => (
-                    <SelectItem key={app.id} value={app.id}>{app.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Select value={deliveryApp || "direct"} onValueChange={(v) => setDeliveryApp(v === "direct" ? "" : v)}>
+                  <SelectTrigger className="h-10">
+                    <SelectValue placeholder="اختر شركة التوصيل" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="direct">طلب مباشر (بدون عمولة)</SelectItem>
+                    {deliveryApps.map(app => (
+                      <SelectItem key={app.id} value={app.id}>
+                        {app.name} - عمولة {app.commission_rate}%
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                {deliveryApp && deliveryApps.find(a => a.id === deliveryApp) && (
+                  <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/30">
+                    <p className="text-sm text-amber-600 flex items-center gap-2">
+                      <Truck className="h-4 w-4" />
+                      <span>
+                        عمولة {deliveryApps.find(a => a.id === deliveryApp)?.name}: {' '}
+                        <strong>{deliveryApps.find(a => a.id === deliveryApp)?.commission_rate}%</strong>
+                        {' '}({formatPrice(subtotal * (deliveryApps.find(a => a.id === deliveryApp)?.commission_rate || 0) / 100)})
+                      </span>
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* اختيار السائق */}
               <Select value={selectedDriver || "none"} onValueChange={(v) => setSelectedDriver(v === "none" ? "" : v)}>
