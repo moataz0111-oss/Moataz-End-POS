@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { formatPrice } from '../utils/currency';
@@ -51,6 +51,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 export default function POS() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
