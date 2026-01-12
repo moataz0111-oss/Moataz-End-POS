@@ -819,29 +819,54 @@ export default function Settings() {
                         </div>
                       </div>
 
-                      {/* Permissions */}
+                      {/* Permissions - Grouped */}
                       <div>
                         <Label className="text-foreground mb-3 block">الصلاحيات المخصصة</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {AVAILABLE_PERMISSIONS.map(perm => (
-                            <div
-                              key={perm.id}
-                              className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                                editUserForm.permissions?.includes(perm.id)
-                                  ? 'border-primary bg-primary/10'
-                                  : 'border-border hover:border-primary/50'
-                              }`}
-                              onClick={() => toggleUserPermission(perm.id)}
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium text-sm text-foreground">{perm.name}</span>
-                                {editUserForm.permissions?.includes(perm.id) && (
-                                  <Check className="h-4 w-4 text-primary" />
-                                )}
+                        <div className="max-h-[300px] overflow-y-auto space-y-4 pr-2">
+                          {PERMISSION_GROUPS.map(group => (
+                            <div key={group}>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">{group}</p>
+                              <div className="grid grid-cols-2 gap-2">
+                                {AVAILABLE_PERMISSIONS.filter(p => p.group === group).map(perm => (
+                                  <div
+                                    key={perm.id}
+                                    className={`p-2 rounded-lg border cursor-pointer transition-all ${
+                                      editUserForm.permissions?.includes(perm.id)
+                                        ? 'border-primary bg-primary/10'
+                                        : 'border-border hover:border-primary/50'
+                                    }`}
+                                    onClick={() => toggleUserPermission(perm.id)}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="font-medium text-xs text-foreground">{perm.name}</span>
+                                      {editUserForm.permissions?.includes(perm.id) && (
+                                        <Check className="h-3 w-3 text-primary" />
+                                      )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mt-0.5">{perm.description}</p>
+                                  </div>
+                                ))}
                               </div>
-                              <p className="text-xs text-muted-foreground mt-1">{perm.description}</p>
                             </div>
                           ))}
+                        </div>
+                        <div className="flex gap-2 mt-3">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditUserForm({ ...editUserForm, permissions: AVAILABLE_PERMISSIONS.map(p => p.id) })}
+                          >
+                            تحديد الكل
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditUserForm({ ...editUserForm, permissions: [] })}
+                          >
+                            إلغاء التحديد
+                          </Button>
                         </div>
                       </div>
 
