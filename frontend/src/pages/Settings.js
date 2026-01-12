@@ -1731,6 +1731,326 @@ export default function Settings() {
               </Card>
             </TabsContent>
           )}
+
+          {/* Customers - إدارة العملاء */}
+          {hasRole(['admin', 'manager']) && (
+            <TabsContent value="customers">
+              <Card className="border-border/50 bg-card">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <UserCheck className="h-5 w-5" />
+                    إدارة العملاء
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="بحث بالاسم أو الهاتف..."
+                        value={customerSearchQuery}
+                        onChange={(e) => setCustomerSearchQuery(e.target.value)}
+                        className="w-48 pr-9"
+                        data-testid="customer-search-settings"
+                      />
+                    </div>
+                    <Dialog open={customerDialogOpen} onOpenChange={setCustomerDialogOpen}>
+                      <Button className="bg-primary text-primary-foreground" onClick={() => setCustomerDialogOpen(true)}>
+                        <Plus className="h-4 w-4 ml-2" />
+                        إضافة عميل
+                      </Button>
+                      <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                          <DialogTitle className="text-foreground">إضافة عميل جديد</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={async (e) => {
+                          e.preventDefault();
+                          try {
+                            await axios.post(`${API}/customers`, customerForm);
+                            toast.success('تم إضافة العميل');
+                            setCustomerDialogOpen(false);
+                            setCustomerForm({ name: '', phone: '', phone2: '', address: '', area: '', notes: '', is_blocked: false });
+                            fetchData();
+                          } catch (error) {
+                            toast.error(error.response?.data?.detail || 'فشل في إضافة العميل');
+                          }
+                        }} className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-foreground">اسم العميل *</Label>
+                              <Input
+                                value={customerForm.name}
+                                onChange={(e) => setCustomerForm({ ...customerForm, name: e.target.value })}
+                                placeholder="أحمد محمد"
+                                required
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-foreground">رقم الهاتف *</Label>
+                              <Input
+                                value={customerForm.phone}
+                                onChange={(e) => setCustomerForm({ ...customerForm, phone: e.target.value })}
+                                placeholder="07xxxxxxxxx"
+                                required
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label className="text-foreground">رقم هاتف إضافي</Label>
+                              <Input
+                                value={customerForm.phone2}
+                                onChange={(e) => setCustomerForm({ ...customerForm, phone2: e.target.value })}
+                                placeholder="اختياري"
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label className="text-foreground">المنطقة</Label>
+                              <Input
+                                value={customerForm.area}
+                                onChange={(e) => setCustomerForm({ ...customerForm, area: e.target.value })}
+                                placeholder="المنصور، الكرادة..."
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <Label className="text-foreground">العنوان الكامل</Label>
+                            <Input
+                              value={customerForm.address}
+                              onChange={(e) => setCustomerForm({ ...customerForm, address: e.target.value })}
+                              placeholder="العنوان بالتفصيل..."
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">ملاحظات</Label>
+                            <Textarea
+                              value={customerForm.notes}
+                              onChange={(e) => setCustomerForm({ ...customerForm, notes: e.target.value })}
+                              placeholder="ملاحظات خاصة بالعميل..."
+                              className="mt-1"
+                              rows={2}
+                            />
+                          </div>
+                          <div className="flex gap-2 pt-4">
+                            <Button type="button" variant="outline" onClick={() => setCustomerDialogOpen(false)} className="flex-1">
+                              إلغاء
+                            </Button>
+                            <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                              إضافة
+                            </Button>
+                          </div>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {customers.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <UserCheck className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>لا يوجد عملاء مسجلين</p>
+                      <p className="text-sm">يتم إضافة العملاء تلقائياً عند إنشاء الطلبات</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {customers
+                        .filter(c => 
+                          !customerSearchQuery || 
+                          c.name.toLowerCase().includes(customerSearchQuery.toLowerCase()) ||
+                          c.phone.includes(customerSearchQuery) ||
+                          (c.phone2 && c.phone2.includes(customerSearchQuery))
+                        )
+                        .map(customer => (
+                        <div key={customer.id} className={`flex items-center justify-between p-4 rounded-lg ${customer.is_blocked ? 'bg-red-500/10 border border-red-500/30' : 'bg-muted/30'}`}>
+                          <div className="flex items-center gap-4">
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${customer.is_blocked ? 'bg-red-500/20' : 'bg-primary/10'}`}>
+                              {customer.is_blocked ? (
+                                <Ban className="h-6 w-6 text-red-500" />
+                              ) : (
+                                <UserCheck className="h-6 w-6 text-primary" />
+                              )}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium text-foreground">{customer.name}</p>
+                                {customer.is_blocked && (
+                                  <span className="text-xs px-2 py-0.5 bg-red-500/20 text-red-500 rounded">محظور</span>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Phone className="h-3 w-3" />
+                                  {customer.phone}
+                                </span>
+                                {customer.area && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" />
+                                    {customer.area}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {customer.total_orders || 0} طلب | إجمالي: {(customer.total_spent || 0).toLocaleString()} د.ع
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-blue-500 hover:bg-blue-500/10"
+                              onClick={() => {
+                                setEditCustomerForm({
+                                  id: customer.id,
+                                  name: customer.name,
+                                  phone: customer.phone,
+                                  phone2: customer.phone2 || '',
+                                  address: customer.address || '',
+                                  area: customer.area || '',
+                                  notes: customer.notes || '',
+                                  is_blocked: customer.is_blocked || false
+                                });
+                                setEditCustomerDialogOpen(true);
+                              }}
+                              data-testid={`edit-customer-${customer.id}`}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:bg-destructive/10"
+                              onClick={async () => {
+                                if (!confirm('هل أنت متأكد من حذف هذا العميل؟')) return;
+                                try {
+                                  await axios.delete(`${API}/customers/${customer.id}`);
+                                  toast.success('تم حذف العميل');
+                                  fetchData();
+                                } catch (error) {
+                                  toast.error('فشل في حذف العميل');
+                                }
+                              }}
+                              data-testid={`delete-customer-${customer.id}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Edit Customer Dialog */}
+              <Dialog open={editCustomerDialogOpen} onOpenChange={setEditCustomerDialogOpen}>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle className="text-foreground">تعديل بيانات العميل</DialogTitle>
+                  </DialogHeader>
+                  {editCustomerForm && (
+                    <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        await axios.put(`${API}/customers/${editCustomerForm.id}`, {
+                          name: editCustomerForm.name,
+                          phone: editCustomerForm.phone,
+                          phone2: editCustomerForm.phone2 || null,
+                          address: editCustomerForm.address || null,
+                          area: editCustomerForm.area || null,
+                          notes: editCustomerForm.notes || null,
+                          is_blocked: editCustomerForm.is_blocked
+                        });
+                        toast.success('تم تحديث بيانات العميل');
+                        setEditCustomerDialogOpen(false);
+                        setEditCustomerForm(null);
+                        fetchData();
+                      } catch (error) {
+                        toast.error(error.response?.data?.detail || 'فشل في تحديث العميل');
+                      }
+                    }} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-foreground">اسم العميل *</Label>
+                          <Input
+                            value={editCustomerForm.name}
+                            onChange={(e) => setEditCustomerForm({ ...editCustomerForm, name: e.target.value })}
+                            required
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">رقم الهاتف *</Label>
+                          <Input
+                            value={editCustomerForm.phone}
+                            onChange={(e) => setEditCustomerForm({ ...editCustomerForm, phone: e.target.value })}
+                            required
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-foreground">رقم هاتف إضافي</Label>
+                          <Input
+                            value={editCustomerForm.phone2}
+                            onChange={(e) => setEditCustomerForm({ ...editCustomerForm, phone2: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">المنطقة</Label>
+                          <Input
+                            value={editCustomerForm.area}
+                            onChange={(e) => setEditCustomerForm({ ...editCustomerForm, area: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-foreground">العنوان الكامل</Label>
+                        <Input
+                          value={editCustomerForm.address}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, address: e.target.value })}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-foreground">ملاحظات</Label>
+                        <Textarea
+                          value={editCustomerForm.notes}
+                          onChange={(e) => setEditCustomerForm({ ...editCustomerForm, notes: e.target.value })}
+                          className="mt-1"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div>
+                          <Label className="text-foreground">حظر العميل</Label>
+                          <p className="text-xs text-muted-foreground">منع العميل من الطلب</p>
+                        </div>
+                        <Switch
+                          checked={editCustomerForm.is_blocked}
+                          onCheckedChange={(checked) => setEditCustomerForm({ ...editCustomerForm, is_blocked: checked })}
+                        />
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setEditCustomerDialogOpen(false)} className="flex-1">
+                          إلغاء
+                        </Button>
+                        <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                          حفظ التغييرات
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </DialogContent>
+              </Dialog>
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
