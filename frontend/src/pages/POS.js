@@ -81,6 +81,18 @@ export default function POS() {
     fetchData();
   }, []);
 
+  // قراءة الطاولة من URL
+  useEffect(() => {
+    const tableId = searchParams.get('table');
+    if (tableId && tables.length > 0) {
+      const table = tables.find(t => t.id === tableId);
+      if (table) {
+        setSelectedTable(tableId);
+        setOrderType('dine_in');
+      }
+    }
+  }, [searchParams, tables]);
+
   const fetchData = async () => {
     try {
       const [catRes, prodRes, tablesRes, appsRes, driversRes, shiftRes, ordersRes] = await Promise.all([
