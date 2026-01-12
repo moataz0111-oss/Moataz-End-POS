@@ -572,31 +572,52 @@ export default function Settings() {
                     {users.map(u => (
                       <div key={u.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
                         <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                            <span className="font-bold text-primary">{u.full_name[0]}</span>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${u.is_active !== false ? 'bg-primary/10' : 'bg-red-500/10'}`}>
+                            <span className={`font-bold ${u.is_active !== false ? 'text-primary' : 'text-red-500'}`}>{u.full_name[0]}</span>
                           </div>
                           <div>
                             <p className="font-medium text-foreground">{u.full_name}</p>
                             <p className="text-sm text-muted-foreground">{u.email}</p>
+                            {u.branch_id && (
+                              <p className="text-xs text-muted-foreground">
+                                فرع: {branches.find(b => b.id === u.branch_id)?.name || '-'}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className={`text-xs px-2 py-1 rounded-full ${
                             u.role === 'admin' ? 'bg-primary/10 text-primary' :
                             u.role === 'manager' ? 'bg-blue-500/10 text-blue-500' :
+                            u.role === 'supervisor' ? 'bg-purple-500/10 text-purple-500' :
                             'bg-muted text-muted-foreground'
                           }`}>
                             {getRoleText(u.role)}
                           </span>
-                          {u.id !== user.id && hasRole(['admin']) && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="text-destructive hover:bg-destructive/10"
-                              onClick={() => handleDeleteUser(u.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                          {u.is_active === false && (
+                            <span className="text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500">معطل</span>
+                          )}
+                          {hasRole(['admin']) && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-blue-500 hover:bg-blue-500/10"
+                                onClick={() => handleEditUser(u)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              {u.id !== user.id && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-destructive hover:bg-destructive/10"
+                                  onClick={() => handleDeleteUser(u.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -604,6 +625,102 @@ export default function Settings() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Edit User Dialog */}
+              <Dialog open={editUserDialogOpen} onOpenChange={setEditUserDialogOpen}>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-foreground">تعديل المستخدم</DialogTitle>
+                  </DialogHeader>
+                  {editUserForm && (
+                    <form onSubmit={handleUpdateUser} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-foreground">الاسم الكامل</Label>
+                          <Input
+                            value={editUserForm.full_name}
+                            onChange={(e) => setEditUserForm({ ...editUserForm, full_name: e.target.value })}
+                            required
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">الصلاحية</Label>
+                          <Select value={editUserForm.role} onValueChange={(v) => setEditUserForm({ ...editUserForm, role: v })}>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="admin">مدير النظام</SelectItem>
+                              <SelectItem value="manager">مدير</SelectItem>
+                              <SelectItem value="supervisor">مشرف</SelectItem>
+                              <SelectItem value="cashier">كاشير</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-foreground">الفرع</Label>
+                          <Select value={editUserForm.branch_id || 'none'} onValueChange={(v) => setEditUserForm({ ...editUserForm, branch_id: v === 'none' ? '' : v })}>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="اختر فرع" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">بدون فرع</SelectItem>
+                              {branches.map(branch => (
+                                <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex items-center gap-3 mt-6">
+                          <Switch
+                            checked={editUserForm.is_active}
+                            onCheckedChange={(checked) => setEditUserForm({ ...editUserForm, is_active: checked })}
+                          />
+                          <Label className="text-foreground">الحساب مفعل</Label>
+                        </div>
+                      </div>
+
+                      {/* Permissions */}
+                      <div>
+                        <Label className="text-foreground mb-3 block">الصلاحيات المخصصة</Label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {AVAILABLE_PERMISSIONS.map(perm => (
+                            <div
+                              key={perm.id}
+                              className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                                editUserForm.permissions?.includes(perm.id)
+                                  ? 'border-primary bg-primary/10'
+                                  : 'border-border hover:border-primary/50'
+                              }`}
+                              onClick={() => toggleUserPermission(perm.id)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-sm text-foreground">{perm.name}</span>
+                                {editUserForm.permissions?.includes(perm.id) && (
+                                  <Check className="h-4 w-4 text-primary" />
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">{perm.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setEditUserDialogOpen(false)} className="flex-1">
+                          إلغاء
+                        </Button>
+                        <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                          حفظ التعديلات
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </DialogContent>
+              </Dialog>
             </TabsContent>
           )}
 
