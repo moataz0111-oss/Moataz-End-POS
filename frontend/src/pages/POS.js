@@ -190,6 +190,7 @@ export default function POS() {
     setCustomerName('');
     setCustomerPhone('');
     setDeliveryAddress('');
+    setBuzzerNumber(''); // إعادة تعيين رقم جهاز التنبيه
     setDiscount(0);
     setSelectedTable(null);
     setDeliveryApp('');
