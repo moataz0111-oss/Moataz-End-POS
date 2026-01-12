@@ -83,24 +83,38 @@ export default function Settings() {
   const [printers, setPrinters] = useState([]);
   const [emailRecipients, setEmailRecipients] = useState([]);
   const [deliveryApps, setDeliveryApps] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [newEmail, setNewEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
   // Dialog states
   const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
   const [branchDialogOpen, setBranchDialogOpen] = useState(false);
   const [printerDialogOpen, setPrinterDialogOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [productDialogOpen, setProductDialogOpen] = useState(false);
+  const [editProductDialogOpen, setEditProductDialogOpen] = useState(false);
   
   // Form data
   const [userForm, setUserForm] = useState({
     username: '', email: '', password: '', full_name: '', role: 'cashier', branch_id: '', permissions: []
   });
+  const [editUserForm, setEditUserForm] = useState(null);
   const [branchForm, setBranchForm] = useState({
     name: '', address: '', phone: '', email: ''
   });
   const [printerForm, setPrinterForm] = useState({
     name: '', ip_address: '', port: 9100, branch_id: '', printer_type: 'receipt'
   });
+  const [categoryForm, setCategoryForm] = useState({
+    name: '', name_en: '', icon: '', color: '#D4AF37', sort_order: 0
+  });
+  const [productForm, setProductForm] = useState({
+    name: '', name_en: '', category_id: '', price: '', cost: '', operating_cost: '', image: '', description: '', barcode: ''
+  });
+  const [editProductForm, setEditProductForm] = useState(null);
 
   useEffect(() => {
     if (hasRole(['admin', 'manager'])) {
