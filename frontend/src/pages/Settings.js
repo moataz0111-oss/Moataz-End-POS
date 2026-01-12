@@ -208,6 +208,47 @@ export default function Settings() {
     }
   };
 
+  const handleEditBranch = (b) => {
+    setEditBranchForm({
+      id: b.id,
+      name: b.name,
+      address: b.address,
+      phone: b.phone,
+      email: b.email || '',
+      is_active: b.is_active !== false
+    });
+    setEditBranchDialogOpen(true);
+  };
+
+  const handleUpdateBranch = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API}/branches/${editBranchForm.id}`, {
+        name: editBranchForm.name,
+        address: editBranchForm.address,
+        phone: editBranchForm.phone,
+        email: editBranchForm.email || null
+      });
+      toast.success('تم تحديث الفرع');
+      setEditBranchDialogOpen(false);
+      setEditBranchForm(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في تحديث الفرع');
+    }
+  };
+
+  const handleDeleteBranch = async (branchId) => {
+    if (!confirm('هل أنت متأكد من حذف هذا الفرع؟')) return;
+    try {
+      await axios.delete(`${API}/branches/${branchId}`);
+      toast.success('تم تعطيل الفرع');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في حذف الفرع');
+    }
+  };
+
   const handleCreatePrinter = async (e) => {
     e.preventDefault();
     try {
