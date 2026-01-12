@@ -124,15 +124,6 @@ export default function Login() {
               )}
             </Button>
           </form>
-
-          {/* Demo credentials hint */}
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-            <p className="text-sm text-muted-foreground text-center mb-2">بيانات تجريبية:</p>
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p><strong>مدير:</strong> admin@maestroegp.com / admin123</p>
-              <p><strong>كاشير:</strong> cashier@maestroegp.com / cashier123</p>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
