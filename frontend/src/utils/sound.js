@@ -124,8 +124,132 @@ export const playError = () => {
   }
 };
 
+/**
+ * Play new order notification sound - للمطبخ
+ * صوت تنبيه مميز للطلبات الجديدة
+ */
+export const playNewOrderNotification = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Play a sequence of tones for attention
+    const playTone = (frequency, startTime, duration) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.frequency.value = frequency;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.15, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+    };
+    
+    // Play ascending notes: C5, E5, G5 (major chord arpeggio)
+    playTone(523.25, ctx.currentTime, 0.15);        // C5
+    playTone(659.25, ctx.currentTime + 0.15, 0.15); // E5
+    playTone(783.99, ctx.currentTime + 0.3, 0.25);  // G5
+    
+    // Optional: Add a final high note
+    playTone(1046.50, ctx.currentTime + 0.55, 0.3); // C6
+    
+  } catch (error) {
+    console.warn('Notification sound playback failed:', error);
+  }
+};
+
+/**
+ * Play kitchen bell sound - جرس المطبخ
+ * صوت جرس مطبخ تقليدي
+ */
+export const playKitchenBell = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Create a bell-like sound
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    // Bell frequency
+    oscillator.frequency.value = 1200;
+    oscillator.type = 'sine';
+    
+    // Quick attack, longer decay (bell-like)
+    gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+    
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.8);
+    
+    // Add harmonics for richer bell sound
+    const harmonic = ctx.createOscillator();
+    const harmonicGain = ctx.createGain();
+    
+    harmonic.connect(harmonicGain);
+    harmonicGain.connect(ctx.destination);
+    
+    harmonic.frequency.value = 2400; // 2x frequency
+    harmonic.type = 'sine';
+    
+    harmonicGain.gain.setValueAtTime(0.1, ctx.currentTime);
+    harmonicGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    
+    harmonic.start(ctx.currentTime);
+    harmonic.stop(ctx.currentTime + 0.4);
+    
+  } catch (error) {
+    console.warn('Kitchen bell sound failed:', error);
+  }
+};
+
+/**
+ * Play urgent notification - تنبيه عاجل
+ * للطلبات المستعجلة أو المتأخرة
+ */
+export const playUrgentAlert = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    const playBeep = (startTime) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.frequency.value = 1000;
+      oscillator.type = 'square';
+      
+      gainNode.gain.setValueAtTime(0.15, startTime);
+      gainNode.gain.setValueAtTime(0, startTime + 0.1);
+      
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 0.1);
+    };
+    
+    // Play 3 rapid beeps
+    playBeep(ctx.currentTime);
+    playBeep(ctx.currentTime + 0.15);
+    playBeep(ctx.currentTime + 0.3);
+    
+  } catch (error) {
+    console.warn('Urgent alert sound failed:', error);
+  }
+};
+
 export default {
   playClick,
   playSuccess,
   playError,
+  playNewOrderNotification,
+  playKitchenBell,
+  playUrgentAlert,
 };
