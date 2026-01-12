@@ -95,27 +95,37 @@ export default function POS() {
 
   const fetchData = async () => {
     try {
-      // جلب الطاولات بدون فلتر الفرع إذا لم يكن محدداً
-      const tablesParams = user?.branch_id ? { branch_id: user.branch_id } : {};
-      const driversParams = user?.branch_id ? { branch_id: user.branch_id } : {};
-      
-      const [catRes, prodRes, tablesRes, appsRes, driversRes, shiftRes, ordersRes] = await Promise.all([
+      const [catRes, prodRes, appsRes, shiftRes, ordersRes] = await Promise.all([
         axios.get(`${API}/categories`),
         axios.get(`${API}/products`),
-        axios.get(`${API}/tables`, { params: tablesParams }),
         axios.get(`${API}/delivery-apps`),
-        axios.get(`${API}/drivers`, { params: driversParams }),
         axios.get(`${API}/shifts/current`).catch(() => ({ data: null })),
         axios.get(`${API}/orders`, { params: { status: 'pending' } }).catch(() => ({ data: [] }))
       ]);
 
       setCategories(catRes.data);
       setProducts(prodRes.data);
-      setTables(tablesRes.data);
       setDeliveryApps(appsRes.data);
-      setDrivers(driversRes.data);
       setCurrentShift(shiftRes.data);
       setPendingOrders(ordersRes.data);
+
+      // جلب الطاولات - أولاً حسب فرع المستخدم، ثم كل الطاولات إذا لم تكن موجودة
+      let tablesData = [];
+      if (user?.branch_id) {
+        const tablesRes = await axios.get(`${API}/tables`, { params: { branch_id: user.branch_id } });
+        tablesData = tablesRes.data;
+      }
+      // إذا لم تكن هناك طاولات في فرع المستخدم، اجلب كل الطاولات
+      if (tablesData.length === 0) {
+        const allTablesRes = await axios.get(`${API}/tables`);
+        tablesData = allTablesRes.data;
+      }
+      setTables(tablesData);
+
+      // جلب السائقين
+      const driversParams = user?.branch_id ? { branch_id: user.branch_id } : {};
+      const driversRes = await axios.get(`${API}/drivers`, { params: driversParams });
+      setDrivers(driversRes.data);
 
       if (catRes.data.length > 0) {
         setSelectedCategory(catRes.data[0].id);
