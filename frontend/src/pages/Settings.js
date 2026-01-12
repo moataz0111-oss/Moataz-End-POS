@@ -154,6 +154,10 @@ export default function Settings() {
     name: '', name_en: '', color: '#D4AF37', icon: '🍳', printer_id: '', branch_id: '', sort_order: 0
   });
   const [editKitchenSectionForm, setEditKitchenSectionForm] = useState(null);
+  const [customerForm, setCustomerForm] = useState({
+    name: '', phone: '', phone2: '', address: '', area: '', notes: '', is_blocked: false
+  });
+  const [editCustomerForm, setEditCustomerForm] = useState(null);
 
   useEffect(() => {
     if (hasRole(['admin', 'manager'])) {
