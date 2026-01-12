@@ -1,99 +1,99 @@
 <analysis>**original_problem_statement:**
 المستخدم يريد بناء نظام شامل لإدارة المطاعم والكافيهات باسم Maestro EGP. المتطلبات الأساسية تشمل:
 - **PRODUCT REQUIREMENTS:**
-    - **نظام المستخدمين:** أدوار وصلاحيات مختلفة (مدير، كاشير، مشرف، إلخ).
+    - **نظام المستخدمين:** أدوار وصلاحيات مختلفة ومفصلة (مدير، كاشير، مشرف، إلخ).
     - **إدارة المخزون:** تتبع المواد الخام، المنتجات قبل وبعد التصنيع، وحساب التكاليف.
     - **نقاط البيع (POS):** واجهة لإدارة الطلبات، الطاولات، والدفع.
-    - **الطلبات:** دعم الطلبات الداخلية، السفري، والتوصيل.
+    - **الطلبات:** دعم الطلبات الداخلية، السفري، والتوصيل مع قائمة انتظار للطلبات المعلقة.
     - **الدفع:** نقدي، بطاقات بنكية (فيزا/ماستر كارد)، ودفع آجل.
     - **التقارير:** تقارير يومية تلقائية عبر البريد الإلكتروني، تقارير مالية ومخزون مفصلة.
     - **إدارة الفروع:** التحكم في فروع متعددة.
-    - **إدارة الورديات (Shifts):** تسجيل دخول وخروج أمين الصندوق، وإغلاق الصندوق مع حصر العجز/الفائض.
-    - **واجهة المستخدم (UI):** تصميم احترافي مع وضع ليلي/نهاري تلقائي، وأصوات نقر على الأزرار.
-    - **تكاملات:** ربط مع طابعات المطاعم وتطبيقات التوصيل (مثل طلبات، توترز) مع إدارة نسب الاستقطاع.
+    - **إدارة الورديات (Shifts):** تسجيل دخول وخروج أمين الصندوق، وإغلاق الصندوق.
+    - **إدارة العملاء:** قاعدة بيانات للعملاء مع سجل طلباتهم للبحث السريع عند الطلب الهاتفي.
+    - **واجهة المستخدم (UI):** تصميم احترافي مع وضع ليلي/نهاري، وأصوات تفاعلية.
+    - **تكاملات:** ربط مع طابعات المطاعم، تطبيقات التوصيل (مثل طلبات)، ونظام هاتف لإظهار هوية المتصل.
     - **إدارة التوصيل:** تتبع السائقين والفواتير التي بذمتهم.
     - **إدارة المصاريف:** تسجيل المصاريف اليومية.
-    - **دعم العملات:** العملة الأساسية هي الدينار العراقي (IQD) مع دعم عملات أخرى.
+    - **دعم العملات:** العملة الأساسية هي الدينار العراقي (IQD).
 
 **User's preferred language**: Arabic (العربية)
 
 **what currently exists?**
-تم بناء تطبيق ويب أساسي كامل (FastAPI + React). يحتوي التطبيق على نظام تسجيل دخول (JWT)، صفحات رئيسية (لوحة تحكم، نقاط بيع، طاولات، مخزون، إعدادات)، ونماذج بيانات أولية. تم تنفيذ ميزات مثل الوضع الليلي/النهاري، وإضافة المنتجات إلى السلة، وحفظ الطلب وإرساله إلى المطبخ قبل الدفع. الواجهة الأمامية تعمل وتعرض البيانات الأساسية بشكل صحيح.
+تطبيق ويب كامل (FastAPI + React) مع نظام مصادقة JWT. الواجهة تحتوي على لوحة تحكم، نقاط بيع، طاولات، إعدادات، وتقارير. تم تنفيذ ميزات رئيسية مثل:
+- نظام صلاحيات مفصل للمستخدمين.
+- إدارة كاملة للمنتجات، الفئات، والفروع من صفحة الإعدادات.
+- صفحة تقارير متقدمة تعرض تفاصيل المبيعات والأرباح ومبيعات شركات التوصيل.
+- في شاشة نقاط البيع، يتم حساب وعرض عمولة شركة التوصيل تلقائياً وخصمها من الإجمالي.
+- تم إصلاح صلاحيات الطاولات للسماح للمستخدمين غير المسؤولين بفتح الطلبات عليها.
+- تم إضافة حقل رقم جهاز التنبيه للطلبات الخارجية (السفري).
+- تمت إضافة إشعارات صوتية للطلبات الجديدة.
 
 **Last working item**:
-- **Last item agent was working**: The agent started implementing a large set of new features requested by the user. This includes comprehensive reports (sales, purchases, inventory), expense tracking, profit calculation, and managing delivery company commissions. The agent began by overwriting  and , and creating new pages for  and .
+- **Last item agent was working**: The agent began implementing a complex, multi-part user request involving several critical workflow improvements and bug fixes:
+    1.  **Customer Management & Caller ID:** Started building a customer database to store phone, name, and address. This is the first step towards a caller ID feature where customer info pops up on an incoming call. The agent added backend models and APIs for customers.
+    2.  **Pending Takeaway Orders Queue:** The user reported that takeaway orders disappear after being saved. The agent started work to create a visible queue for these pending takeaway orders on the POS screen, allowing them to be modified or paid later.
+    3.  **Table Re-opening/Modification:** The user cannot add new items to an already occupied table. The agent started adding backend APIs to allow adding items to existing orders.
+    4.  **Print Bill Before Payment:** The user wants a button to print an invoice for the customer before finalizing the payment.
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
 - **Which testing method agent to use?**: both
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1:** (P0) The agent used  with  on  and  instead of . This is a critical error that may have erased previously implemented logic.
+- **Issue 1:** (P0) Takeaway orders are not visible after being saved with the Save and Send to Kitchen button, making them impossible to retrieve, modify, or complete payment for.
+- **Issue 2:** (P0) It is not possible to add new items to an order that has already been saved to a table. The UI only allows editing the table's status, not the order itself.
 
-  - **Issues Detail:**
-    - **Issue 1:** Agent overwrote critical files instead of editing them.
-      - **Attempted fixes:** None. This was the last action.
-      - **Next debug checklist:**
-        1. View the content of .
-        2. View the content of .
-        3. Compare their current state with the functionality that was working before (e.g., login, adding products, creating pending orders). The screenshot history can be used as a reference for previously working UI.
-        4. If logic is missing, it must be restored from previous agent turns or reimplemented.
-      - **Why fix this issue and what will be achieved with the fix?**: To prevent regression and loss of completed work. Fixing this is essential before adding any new features.
-      - **Status**: NOT STARTED
-      - **Is recurring issue?**: N
-      - **Should Test frontend/backend/both after fix?**: both
-      - **Blocked on other issue**: None. This is the highest priority blocker.
+  **Issues Detail:**
+  - **Issue 1 & 2 (Combined as a single workflow problem):**
+     - **Attempted fixes:** The agent has already implemented the necessary backend infrastructure.
+        - New endpoints in :  and .
+        - New customer models and API in .
+        - Started modifying  by adding new state variables (, , ) and functions to fetch data (, ).
+     - **Next debug checklist:**
+        1.  Complete the UI in  to display a list/queue of .
+        2.  Implement logic in  so that clicking a pending takeaway order or an occupied table loads its contents back into the cart for modification.
+        3.  Ensure the Add Item functionality calls the new  endpoint for existing orders.
+        4.  Add a Print Bill button to the POS screen that generates an invoice preview for the current order in the cart without finalizing payment.
+        5.  Add a UI section in  for managing customer information.
+     - **Why fix this issue and what will be achieved with the fix?**: This is a critical bug in the core POS workflow. Fixing it will allow cashiers to manage multiple pending orders (both takeaway and dine-in), which is essential for a real-world restaurant environment.
+     - **Status**: IN PROGRESS
+     - **Is recurring issue?**: N
+     - **Should Test frontend/backend/both after fix?**: both
+     - **Blocked on other issue**: None. This is the highest priority.
 
 **In progress Task List**:
-- **Task 1**: (P0) Implement comprehensive reporting and advanced management features.
-  - **Task Detail:**
-    - **Where to resume**: After verifying and fixing the overwritten files (Issue 1), the agent needs to continue building the new features.
-      1.  **Backend ():**
-          - Add models and API endpoints for daily expenses ().
-          - Add models and API endpoints for delivery companies () including their commission rates.
-          - Create complex aggregation endpoints for generating reports on sales, purchases, inventory, operational costs, and profit.
-          - Implement logic for cashier shift management (opening/closing shifts, cash reconciliation).
-      2.  **Frontend:**
-          - Implement the UI for the  page to display the new reports.
-          - Implement the UI for  to allow users to log daily expenses.
-          - Update  to include a section for managing delivery companies and their commission percentages.
-          - Update  to add routes for the new pages (, ).
-          - Add UI for shift management.
-    - **What will be achieved with this?**: This will fulfill the user's latest and most detailed feature request, making the application much more powerful and aligned with their business needs.
-    - **Status**: IN PROGRESS
-    - **Should Test frontend/backend/both after fix?**: both
-    - **Blocked on something**: Issue 1 (Overwritten files).
+- **Task 1**: (P0) Complete the POS workflow overhaul.
+  - **Where to resume**: . The agent must build the UI components for the features described in Pending/In progress Issue list and connect them to the already-created backend APIs and frontend state.
+  - **What will be achieved with this?**: A fully functional and flexible POS system that correctly handles pending dine-in and takeaway orders.
+  - **Status**: IN PROGRESS
+  - **Should Test frontend/backend/both after fix?**: both
+  - **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-  - **(P1) Email Reports:** Implement the functionality to send daily summary reports via email using the installed SendGrid library. This was in the original request but hasn't been implemented.
-  - **(P2) Printer Integration:** Research and implement a method for the web application to communicate with local network receipt printers. This is a core requirement that has not been addressed.
+    - **(P1) Caller ID Integration:** The user wants customer details to pop up automatically on an incoming call. The backend customer database is ready, but the core technical challenge (getting the call event into the web app from a phone) has not been addressed. This requires research into third-party telephony APIs (like Twilio) or a custom companion app, followed by a discussion with the user about the options.
+    - **(P1) Email Reports:** Implement functionality to send daily summary reports via email using the installed SendGrid library.
+    - **(P2) Printer Integration:** Research and implement a method for the web application to print receipts on local network printers.
 - **Future Tasks:**
-  - **(P2) Click Sounds:** The file  was created, but the feature needs to be implemented across all interactive UI elements as requested.
-  - **(P2) Multi-Currency Support:** The file  exists, but the backend and frontend logic needs to be expanded to fully support managing and converting different currencies beyond just displaying the IQD symbol.
-  - **(P2) Backend Refactoring:** The agent put all backend logic into a single  file, contrary to its own plan of using a  and  structure. The file should be refactored into smaller, more manageable modules for better maintainability.
+    - **(P2) Click Sounds:** Implement click sounds on all interactive UI elements as originally requested.
+    - **(P2) Multi-Currency Support:** Fully integrate multi-currency logic into the backend and frontend.
+    - **(P2) Backend Refactoring:** The  file is now over 2000 lines long and urgently needs to be refactored into a structured project with separate files/folders for routes, models, and services to ensure future maintainability.
 
 **Completed work in this session**
 - **Recently completed:**
-  - **Initial Scaffolding:** Created a full-stack FastAPI/React application structure.
-  - **User Authentication:** Implemented JWT-based login for users.
-  - **Core UI Pages:** Created and designed pages for Login, Dashboard, POS, Tables, Inventory, and Settings.
-  - **Theming:** Implemented automatic light/dark mode switching.
-  - **Basic POS Flow:**
-    - Added products to a shopping cart.
-    - Implemented a Save and Send to Kitchen feature to create pending orders before payment.
-    - Displayed pending orders in the UI.
-  - **Bug Fix:** Resolved an issue where payment buttons were not displaying on the POS screen.
+  - **Advanced User/Product Management:** Overhauled the Settings page to allow detailed management of users (with granular permissions), products (edit/delete/add), and categories.
+  - **Table Permissions & Workflow:** Fixed permissions to allow non-admin users to open orders on tables and added a button to directly Open Order from the tables screen.
+  - **POS Commission Calculation:** Implemented automatic calculation and display of delivery company commissions on the POS screen, showing the final net amount.
+  - **Detailed Delivery Reports:** The Reports page now shows a breakdown of sales, commissions, and net income for each delivery company.
+  - **Takeaway Pager Number:** Added an optional field for a Pager Number for takeaway orders.
+  - **UI/UX Fixes:** Removed test credentials from the login page, added sound notifications for new orders, and implemented the user's request to remove the Kitchen Sections feature.
+  - **Branch Management:** Fulfilled the user request to disable the Main Branch.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1:** Deployment readiness was declared prematurely. The deployment agent initially failed, citing hardcoded secrets. While the agent made a code change to address this, a thorough re-verification with the deployment agent was not completed.
-  - **Debug checklist:** Rerun the  to get a current, accurate assessment of deployment readiness after all new features are stable.
-  - **Why to solve this issue and what will be achieved with this?**: To ensure the application can be deployed successfully without runtime errors related to configuration.
-  - **Should Test frontend/backend/both after fix?**: N/A (This is a configuration/deployment issue).
-  - **Is recurring issue?**: N
+- **Issue 1:** Deployment readiness was declared prematurely in a past session. This was never re-verified with the  after subsequent changes.
 
 **Known issue recurrence from previous fork**
-- None
+- None.
 
 **Code Architecture**
 
@@ -103,83 +103,82 @@
 - **Frontend:** React.js
 - **Database:** MongoDB
 - **Styling:** TailwindCSS with shadcn/ui components.
-- **Authentication:** JWT (JSON Web Tokens)
+- **Authentication:** JWT (JSON Web Tokens) with a detailed custom permissions system.
 
 **key DB schema**
-While not explicitly defined in separate model files, the logic within  implies the following collections:
-- **users:** {username, password_hash, role, branch_id}
+- **users:** {username, password_hash, role, branch_id, permissions: List[str]}
 - **products:** {name, price, category, cost, stock_quantity, image_url}
-- **categories:** {name}
-- **orders:** {items, total, status ('pending', 'completed', 'cancelled'), payment_method, table_id, driver_id, created_at}
-- **branches:** {name, location}
-- **tables:** {name, capacity, status ('available', 'occupied')}
+- **orders:** {items, total, status, payment_method, order_type, **pager_number**, **delivery_app_name**, customer_phone, customer_name, commission_amount}
+- **branches:** {name, location, is_active}
+- **tables:** {name, capacity, status}
+- **customers:** {phone, name, address, order_history: List[str]} (New)
 
 **changes in tech stack**
 - None.
 
 **All files of reference**
-- : **CRITICAL**. Contains all backend logic. Was recently overwritten and needs immediate verification.
-- : The main user interaction screen for creating orders.
-- : The main React component that defines routing. Needs to be updated for new pages.
-- : **CRITICAL**. Controls application settings. Was recently overwritten and needs verification before adding new features.
-- : A new, empty file intended for the reporting feature.
-- : A new, empty file for logging expenses.
-- : Contains the product requirements document generated by the agent.
+- : Critical. Contains all backend logic, including new endpoints for customers and order modifications.
+- : Critical. Contains incomplete frontend logic for the new POS workflow.
+- : Important. Recently modified to allow opening orders; may need further changes for the new workflow.
+- : Contains the new UI for managing users, products, etc. May need a new section for Customer Management.
+- : Defines the  and  logic used throughout the app.
 
 **Areas that need refactoring**:
-- The entire backend is in a single file, . It should be broken down into separate files for models, routes, and utilities to improve maintainability, as was originally planned by the agent.
+- **CRITICAL:** The  file must be broken down. Its monolithic structure makes it extremely difficult to maintain and debug. This is the biggest source of technical debt in the project.
 
 **key api endpoints**
--  (POST): Initializes the database with default data.
--  (POST): Authenticates a user and returns a JWT.
--  (GET): Fetches all product categories.
--  (GET): Fetches all products, filterable by category.
--  (GET): Fetches all branches.
--  (POST): Creates a new order (including pending orders).
--  (PUT): Updates the payment status of an order.
+-  (POST)
+-  (GET)
+-  (POST)
+-  (PUT)
+-  (GET)
+-  (GET)
+- **New Endpoints:**
+  -  (GET): Search for a customer by phone number.
+  -  (POST): Add items to an existing order.
+  -  (PUT): Recalculate totals for an existing order.
 
 **Critical Info for New Agent**
-- **PRIORITY 1:** You MUST immediately check the contents of  and . The previous agent overwrote them instead of editing, potentially deleting all prior work in those files. Verify their integrity before proceeding.
-- The user is impatient and has requested a large number of features. You should focus on implementing the In progress Task List to show progress quickly.
-- Do not use  with  on existing files. Use  for all edits.
-- The application architecture for the backend is currently monolithic (). While refactoring is a future task, be aware that this file is large and complex.
+- Your immediate priority is to finish the complex POS workflow enhancement started by the previous agent. The backend APIs are mostly done, but the frontend (, ) is in an incomplete state. You must pick up there.
+- Address the two main bugs: hidden takeaway orders and the inability to add items to occupied tables.
+- The Caller ID feature is complex. Before writing more code, you must research the technical feasibility of getting a phone's incoming call data into a web browser and present the options (and their costs/complexity) to the user. Do not assume this is simple.
+- The backend  file is a major liability. Plan to refactor it as soon as the current critical POS task is complete and stable.
 
 **documents and test reports created in this job**
-- 
+-  (updated multiple times)
 - 
 
 **Last 10 User Messages and any pending HUMAN messages**
-10.  - (User repeats a large feature request, indicating impatience) - **Status: In Progress**
-9.  - (Where are the edits?) - **Status: Addressed** (Agent continued working)
-8.  - (User's second major feature request) - **Status: In Progress**
-7.  - **Status: Completed** (Agent ran checks and declared app ready)
-6.  - (User clarifying the order flow: save to kitchen before payment) - **Status: Completed**
-5.  - (User provides detailed feedback and additional requirements on the initial plan) - **Status: Completed** (Agent incorporated feedback)
+10.  - User provides detailed requirements: wants Caller ID for a standard Android/iOS phone line, a list of previous orders for the customer, and a customer management section. Also reports two critical bugs: takeaway orders are hidden after being saved, and it's impossible to add items to an existing table order. They also want a print bill before payment button. **Status: IN PROGRESS**
+9.  - User requests a Caller ID feature to auto-populate customer info on incoming calls. **Status: In Progress**
+8.  - User asks to delete the Main Branch. **Status: Completed** (Agent disabled it).
+7.  - User reports that only admins can use tables and wants access for cashiers/captains. **Status: Completed**.
+6.  - User wants the delivery commission to be automatically deducted from the final total shown on screen. **Status: Completed**.
+5.  - User asks to remove the Kitchen Sections feature and confirms that delivery app commissions should be calculated automatically. **Status: Completed**.
+4.  - User requests more granular user permissions, the ability to edit branches, and kitchen sections. **Status: Completed** (Kitchen sections were added then removed).
+3.  - User asks to remove the demo user credentials from the login screen. **Status: Completed**.
+2.  - User confirms they want sound notifications and asks for the user credentials. **Status: Completed**.
+1.  - User confirms the agent's plan and provides a new set of priorities focusing on user management, settings customization, and comprehensive reports. **Status: Completed**.
 
 **Project Health Check:**
-- **Broken:** The integrity of  and  is unknown due to being overwritten. This is a critical risk.
+- **Broken:** The core POS workflow is partially broken. Pending takeaway orders are lost, and dine-in orders cannot be modified after creation.
 - **Mocked:** None.
 
 **3rd Party Integrations**
-- **Stripe (Payments):** Planned. Uses a User API Key (though a test key is available in the environment).
-- **SendGrid (Email):** Planned. Requires User API Key.
+- **Stripe (Payments):** Planned.
+- **SendGrid (Email):** Planned.
+- **Telephony/Caller ID Service:** Needed for the caller ID feature, but no specific service has been chosen. Research is required.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES (after the initial build).
+- **Testing agent used after significant changes:** YES, for the Settings page overhaul.
 - **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** None.
-- **Known regressions:** Possible regression in all backend logic and settings UI due to file overwrites.
+- **Test files created:** Some tests were generated by the testing agent in , but no new manual test files were created.
+- **Known regressions:** The POS workflow for pending/existing orders is currently broken due to the in-progress feature implementation.
 
 **Credentials to test flow:**
-Login credentials were seeded into the database. The default admin user is:
-- **Email:** 
-- **Password:** 
+- **Email:**  | **Password:** 
+- **Email:**  | **Password:** 
 
 **What agent forgot to execute**
-- The agent used  on existing files (, ) after the initial build phase, which violates a critical instruction in the system prompt.
-- The agent has not yet implemented several features from the original request:
-    - Email reports.
-    - Integration with receipt printers.
-    - UI click sounds.
-    - Full multi-currency support.
-- The agent did not follow its own plan to structure the backend into  and  directories, instead putting all code in .</analysis>
+- The agent has not yet implemented a definitive solution for local network printer integration, which is a core requirement.
+- The agent has not fully addressed the technical complexity of the Caller ID feature, which cannot be solved with a web-only stack. More research and user communication are needed.</analysis>
