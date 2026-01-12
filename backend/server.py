@@ -1667,7 +1667,8 @@ async def get_delivery_credits_report(
     end_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
-    query = {"payment_method": PaymentMethod.CREDIT, "delivery_app": {"$ne": None}}
+    # جلب جميع الطلبات التي لها شركة توصيل (وليس فقط الآجل)
+    query = {"delivery_app": {"$ne": None, "$exists": True}}
     if delivery_app:
         query["delivery_app"] = delivery_app
     if start_date:
@@ -1677,32 +1678,64 @@ async def get_delivery_credits_report(
     
     orders = await db.orders.find(query, {"_id": 0}).to_list(10000)
     
+    # جلب أسماء شركات التوصيل
+    delivery_apps = await db.delivery_apps.find({}, {"_id": 0}).to_list(100)
+    app_names = {app["id"]: app["name"] for app in delivery_apps}
+    app_rates = {app["id"]: app["commission_rate"] for app in delivery_apps}
+    
     by_app = {}
     for o in orders:
-        app = o.get("delivery_app", "مباشر")
-        if app not in by_app:
-            by_app[app] = {
+        app_id = o.get("delivery_app")
+        # استخدام اسم الشركة بدلاً من الـ ID
+        app_name = o.get("delivery_app_name") or app_names.get(app_id, app_id)
+        
+        if app_name not in by_app:
+            by_app[app_name] = {
+                "id": app_id,
+                "commission_rate": app_rates.get(app_id, 0),
                 "count": 0, 
                 "total": 0, 
                 "commission": 0,
                 "net_amount": 0,
+                "paid_count": 0,
+                "credit_count": 0,
+                "paid_amount": 0,
+                "credit_amount": 0,
                 "orders": []
             }
-        by_app[app]["count"] += 1
-        by_app[app]["total"] += o["total"]
-        by_app[app]["commission"] += o.get("delivery_commission", 0)
-        by_app[app]["net_amount"] += o["total"] - o.get("delivery_commission", 0)
-        by_app[app]["orders"].append({
+        
+        by_app[app_name]["count"] += 1
+        by_app[app_name]["total"] += o["total"]
+        by_app[app_name]["commission"] += o.get("delivery_commission", 0)
+        by_app[app_name]["net_amount"] += o["total"] - o.get("delivery_commission", 0)
+        
+        # تصنيف حسب حالة الدفع
+        if o.get("payment_status") == "paid" or o.get("payment_method") != "credit":
+            by_app[app_name]["paid_count"] += 1
+            by_app[app_name]["paid_amount"] += o["total"]
+        else:
+            by_app[app_name]["credit_count"] += 1
+            by_app[app_name]["credit_amount"] += o["total"]
+        
+        by_app[app_name]["orders"].append({
             "order_number": o["order_number"],
             "total": o["total"],
             "commission": o.get("delivery_commission", 0),
+            "net": o["total"] - o.get("delivery_commission", 0),
+            "payment_status": o.get("payment_status", "pending"),
             "created_at": o["created_at"]
         })
     
+    # إجماليات
+    total_all = sum(o["total"] for o in orders)
+    total_commission = sum(o.get("delivery_commission", 0) for o in orders)
+    total_credit = sum(o["total"] for o in orders if o.get("payment_method") == "credit")
+    
     return {
-        "total_credit": sum(o["total"] for o in orders),
-        "total_commission": sum(o.get("delivery_commission", 0) for o in orders),
-        "net_receivable": sum(o["total"] - o.get("delivery_commission", 0) for o in orders),
+        "total_sales": total_all,
+        "total_credit": total_credit,
+        "total_commission": total_commission,
+        "net_receivable": total_all - total_commission,
         "total_orders": len(orders),
         "by_delivery_app": by_app
     }
