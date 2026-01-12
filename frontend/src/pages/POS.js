@@ -26,9 +26,25 @@ import {
   Package,
   Printer,
   Check,
-  X
+  X,
+  ChefHat,
+  Save,
+  Send
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -51,9 +67,14 @@ export default function POS() {
   const [discount, setDiscount] = useState(0);
   const [deliveryApp, setDeliveryApp] = useState('');
   const [deliveryApps, setDeliveryApps] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [currentShift, setCurrentShift] = useState(null);
+  const [kitchenDialogOpen, setKitchenDialogOpen] = useState(false);
+  const [orderNotes, setOrderNotes] = useState('');
+  const [pendingOrders, setPendingOrders] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -61,19 +82,23 @@ export default function POS() {
 
   const fetchData = async () => {
     try {
-      const [catRes, prodRes, tablesRes, appsRes, shiftRes] = await Promise.all([
+      const [catRes, prodRes, tablesRes, appsRes, driversRes, shiftRes, ordersRes] = await Promise.all([
         axios.get(`${API}/categories`),
         axios.get(`${API}/products`),
         axios.get(`${API}/tables`, { params: { branch_id: user?.branch_id } }),
         axios.get(`${API}/delivery-apps`),
-        axios.get(`${API}/shifts/current`).catch(() => ({ data: null }))
+        axios.get(`${API}/drivers`, { params: { branch_id: user?.branch_id } }),
+        axios.get(`${API}/shifts/current`).catch(() => ({ data: null })),
+        axios.get(`${API}/orders`, { params: { status: 'pending' } }).catch(() => ({ data: [] }))
       ]);
 
       setCategories(catRes.data);
       setProducts(prodRes.data);
       setTables(tablesRes.data);
       setDeliveryApps(appsRes.data);
+      setDrivers(driversRes.data);
       setCurrentShift(shiftRes.data);
+      setPendingOrders(ordersRes.data);
 
       if (catRes.data.length > 0) {
         setSelectedCategory(catRes.data[0].id);
@@ -140,11 +165,94 @@ export default function POS() {
     setDiscount(0);
     setSelectedTable(null);
     setDeliveryApp('');
+    setSelectedDriver('');
+    setOrderNotes('');
   }, []);
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const total = subtotal - discount;
 
+  // حفظ الطلب وإرسال للمطبخ (بدون دفع)
+  const handleSaveAndSendToKitchen = async () => {
+    if (cart.length === 0) {
+      toast.error('السلة فارغة');
+      return;
+    }
+
+    if (orderType === 'dine_in' && !selectedTable) {
+      toast.error('يرجى اختيار طاولة');
+      return;
+    }
+
+    if (orderType === 'delivery' && !deliveryAddress) {
+      toast.error('يرجى إدخال عنوان التوصيل');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const orderData = {
+        order_type: orderType,
+        table_id: orderType === 'dine_in' ? selectedTable : null,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        delivery_address: orderType === 'delivery' ? deliveryAddress : null,
+        items: cart,
+        branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
+        payment_method: 'pending', // معلق - لم يتم الدفع بعد
+        discount: discount,
+        delivery_app: orderType === 'delivery' ? deliveryApp : null,
+        notes: orderNotes
+      };
+
+      const response = await axios.post(`${API}/orders`, orderData);
+      
+      // تعيين السائق إذا تم اختياره
+      if (orderType === 'delivery' && selectedDriver) {
+        await axios.put(`${API}/drivers/${selectedDriver}/assign?order_id=${response.data.id}`);
+      }
+      
+      playSuccess();
+      toast.success(`تم حفظ الطلب #${response.data.order_number} وإرساله للمطبخ`);
+      clearCart();
+      setKitchenDialogOpen(false);
+      
+      // Refresh tables and pending orders
+      const [tablesRes, ordersRes] = await Promise.all([
+        axios.get(`${API}/tables`, { params: { branch_id: user?.branch_id } }),
+        axios.get(`${API}/orders`, { params: { status: 'pending' } })
+      ]);
+      setTables(tablesRes.data);
+      setPendingOrders(ordersRes.data);
+      
+    } catch (error) {
+      console.error('Failed to save order:', error);
+      toast.error(error.response?.data?.detail || 'فشل في حفظ الطلب');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // إغلاق الطلب مع الدفع
+  const handleCloseOrderWithPayment = async (orderId, paymentType) => {
+    try {
+      // تحديث طريقة الدفع وحالة الطلب
+      await axios.put(`${API}/orders/${orderId}/status?status=preparing`);
+      
+      // إذا كان آجل وعلى تطبيق توصيل - ترحيل للشركة
+      if (paymentType === 'credit') {
+        toast.success('تم ترحيل الطلب للحساب الآجل');
+      } else {
+        toast.success('تم تأكيد الدفع');
+      }
+      
+      fetchData();
+    } catch (error) {
+      toast.error('فشل في تحديث الطلب');
+    }
+  };
+
+  // تأكيد الطلب مع الدفع المباشر
   const handleSubmitOrder = async () => {
     if (cart.length === 0) {
       toast.error('السلة فارغة');
@@ -173,13 +281,25 @@ export default function POS() {
         branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
         payment_method: paymentMethod,
         discount: discount,
-        delivery_app: orderType === 'delivery' ? deliveryApp : null
+        delivery_app: orderType === 'delivery' ? deliveryApp : null,
+        notes: orderNotes
       };
 
       const response = await axios.post(`${API}/orders`, orderData);
       
-      playSuccess();
-      toast.success(`تم إنشاء الطلب #${response.data.order_number} بنجاح`);
+      // تعيين السائق إذا تم اختياره
+      if (orderType === 'delivery' && selectedDriver) {
+        await axios.put(`${API}/drivers/${selectedDriver}/assign?order_id=${response.data.id}`);
+      }
+
+      // إذا آجل على تطبيق توصيل - ترحيل تلقائي
+      if (paymentMethod === 'credit' && deliveryApp) {
+        toast.success(`تم ترحيل الطلب #${response.data.order_number} لحساب ${deliveryApp}`);
+      } else {
+        playSuccess();
+        toast.success(`تم إنشاء الطلب #${response.data.order_number} بنجاح`);
+      }
+      
       clearCart();
       
       // Refresh tables
@@ -248,6 +368,16 @@ export default function POS() {
             ))}
           </div>
         </ScrollArea>
+
+        {/* Pending Orders Count */}
+        {pendingOrders.length > 0 && (
+          <div className="p-2 border-t border-border">
+            <div className="bg-orange-500/10 rounded-lg p-2 text-center">
+              <p className="text-xs text-orange-500">طلبات معلقة</p>
+              <p className="text-lg font-bold text-orange-500">{pendingOrders.length}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Center - Products Grid */}
@@ -406,17 +536,32 @@ export default function POS() {
                   data-testid="delivery-address"
                 />
               </div>
-              <select
-                value={deliveryApp}
-                onChange={(e) => setDeliveryApp(e.target.value)}
-                className="w-full h-10 px-3 rounded-lg border border-input bg-background text-sm text-foreground"
-                data-testid="delivery-app"
-              >
-                <option value="">طلب مباشر</option>
-                {deliveryApps.map(app => (
-                  <option key={app.id} value={app.id}>{app.name}</option>
-                ))}
-              </select>
+              
+              {/* تطبيق التوصيل */}
+              <Select value={deliveryApp} onValueChange={setDeliveryApp}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="اختر تطبيق التوصيل (اختياري)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">طلب مباشر</SelectItem>
+                  {deliveryApps.map(app => (
+                    <SelectItem key={app.id} value={app.id}>{app.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* اختيار السائق */}
+              <Select value={selectedDriver} onValueChange={setSelectedDriver}>
+                <SelectTrigger className="h-10">
+                  <SelectValue placeholder="اختر السائق (اختياري)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">بدون سائق</SelectItem>
+                  {drivers.filter(d => d.is_available).map(driver => (
+                    <SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </>
           )}
         </div>
@@ -526,42 +671,114 @@ export default function POS() {
             ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
+          {/* Action Buttons - 3 buttons now */}
+          <div className="grid grid-cols-3 gap-2">
             <Button
               variant="outline"
-              className="flex-1 h-12"
+              className="h-12"
               onClick={clearCart}
               disabled={cart.length === 0}
               data-testid="clear-cart"
             >
-              <X className="h-5 w-5 ml-2" />
-              إلغاء
+              <X className="h-5 w-5" />
             </Button>
+            
+            {/* حفظ وإرسال للمطبخ */}
             <Button
-              className="flex-1 h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
+              variant="outline"
+              className="h-12 border-orange-500 text-orange-500 hover:bg-orange-500/10"
+              onClick={() => setKitchenDialogOpen(true)}
+              disabled={cart.length === 0}
+              data-testid="save-to-kitchen"
+            >
+              <ChefHat className="h-5 w-5 ml-1" />
+              مطبخ
+            </Button>
+            
+            {/* تأكيد مع الدفع */}
+            <Button
+              className="h-12 bg-primary text-primary-foreground hover:bg-primary/90 font-bold"
               onClick={handleSubmitOrder}
               disabled={cart.length === 0 || submitting}
               data-testid="submit-order"
             >
               {submitting ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin h-5 w-5 ml-2" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  جاري...
-                </span>
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
               ) : (
                 <>
-                  <Check className="h-5 w-5 ml-2" />
-                  تأكيد الطلب
+                  <Check className="h-5 w-5 ml-1" />
+                  دفع
                 </>
               )}
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Kitchen Dialog - حفظ وإرسال للمطبخ */}
+      <Dialog open={kitchenDialogOpen} onOpenChange={setKitchenDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <ChefHat className="h-5 w-5 text-orange-500" />
+              حفظ وإرسال للمطبخ
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <div className="flex justify-between mb-2">
+                <span className="text-muted-foreground">عدد العناصر:</span>
+                <span className="font-bold text-foreground">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">الإجمالي:</span>
+                <span className="font-bold text-primary">{formatPrice(total)}</span>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm text-muted-foreground mb-2 block">ملاحظات للمطبخ:</label>
+              <Input
+                value={orderNotes}
+                onChange={(e) => setOrderNotes(e.target.value)}
+                placeholder="ملاحظات خاصة..."
+                className="h-12"
+              />
+            </div>
+
+            <div className="bg-orange-500/10 p-3 rounded-lg text-sm text-orange-600">
+              <p>سيتم حفظ الطلب وإرساله للمطبخ للتحضير</p>
+              <p>الدفع سيتم لاحقاً عند التسليم</p>
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <Button variant="outline" onClick={() => setKitchenDialogOpen(false)} className="flex-1">
+                إلغاء
+              </Button>
+              <Button
+                onClick={handleSaveAndSendToKitchen}
+                disabled={submitting}
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+              >
+                {submitting ? (
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 ml-2" />
+                    حفظ وإرسال
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
