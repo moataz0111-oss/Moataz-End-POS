@@ -663,6 +663,17 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
     tax = subtotal * 0.0  # No tax for Iraq
     total = subtotal - order.discount + tax
     
+    # تحديد حالة الدفع
+    if order.payment_method == PaymentMethod.PENDING:
+        payment_status = "pending"
+        order_status = OrderStatus.PENDING  # معلق للمطبخ
+    elif order.payment_method == PaymentMethod.CREDIT:
+        payment_status = "credit"
+        order_status = OrderStatus.PREPARING  # آجل
+    else:
+        payment_status = "paid"
+        order_status = OrderStatus.PREPARING
+    
     order_doc = {
         "id": str(uuid.uuid4()),
         "order_number": order_number,
@@ -678,12 +689,13 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
         "total": total,
         "branch_id": order.branch_id,
         "cashier_id": current_user["id"],
-        "status": OrderStatus.PENDING,
+        "status": order_status,
         "payment_method": order.payment_method,
-        "payment_status": "paid" if order.payment_method == PaymentMethod.CASH else "pending",
+        "payment_status": payment_status,
         "delivery_app": order.delivery_app,
-        "driver_id": None,
+        "driver_id": order.driver_id,
         "notes": order.notes,
+        "credit_transferred": False,  # هل تم ترحيل الآجل
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat()
     }
@@ -696,6 +708,13 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
         await db.tables.update_one(
             {"id": order.table_id},
             {"$set": {"status": "occupied", "current_order_id": order_doc["id"]}}
+        )
+    
+    # تعيين السائق إذا موجود
+    if order.driver_id:
+        await db.drivers.update_one(
+            {"id": order.driver_id},
+            {"$set": {"is_available": False, "current_order_id": order_doc["id"]}}
         )
     
     # Deduct inventory (simplified)
