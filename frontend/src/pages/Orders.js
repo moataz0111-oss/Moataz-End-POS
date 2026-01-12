@@ -226,6 +226,29 @@ export default function Orders() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Sound Toggle */}
+            <div className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-1.5">
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`h-8 w-8 ${soundEnabled ? 'text-primary' : 'text-muted-foreground'}`}
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                data-testid="sound-toggle"
+              >
+                {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-primary"
+                onClick={testNotificationSound}
+                data-testid="test-sound-btn"
+                title="اختبار الصوت"
+              >
+                <Bell className="h-4 w-4" />
+              </Button>
+            </div>
+            
             <Button variant="outline" size="icon" onClick={fetchData} data-testid="refresh-btn">
               <RefreshCw className="h-4 w-4" />
             </Button>
