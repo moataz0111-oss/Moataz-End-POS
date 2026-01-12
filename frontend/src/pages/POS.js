@@ -64,6 +64,7 @@ export default function POS() {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [buzzerNumber, setBuzzerNumber] = useState(''); // رقم جهاز التنبيه للسفري
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [discount, setDiscount] = useState(0);
   const [deliveryApp, setDeliveryApp] = useState('');
