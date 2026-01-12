@@ -112,6 +112,8 @@ export default function Settings() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [kitchenSections, setKitchenSections] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [customerSearchQuery, setCustomerSearchQuery] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
