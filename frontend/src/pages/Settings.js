@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Switch } from '../components/ui/switch';
+import { Textarea } from '../components/ui/textarea';
 import {
   ArrowRight,
   Settings as SettingsIcon,
@@ -26,7 +27,12 @@ import {
   Monitor,
   Truck,
   Percent,
-  Save
+  Save,
+  Package,
+  Image,
+  Tag,
+  Check,
+  X
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -51,6 +57,21 @@ import {
 } from '../components/ui/select';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// قائمة الصلاحيات المتاحة
+const AVAILABLE_PERMISSIONS = [
+  { id: 'pos', name: 'نقاط البيع', description: 'إنشاء وإدارة الطلبات' },
+  { id: 'orders', name: 'الطلبات', description: 'عرض وتعديل الطلبات' },
+  { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات' },
+  { id: 'inventory', name: 'المخزون', description: 'إدارة المخزون' },
+  { id: 'reports', name: 'التقارير', description: 'عرض التقارير' },
+  { id: 'expenses', name: 'المصاريف', description: 'إدارة المصاريف' },
+  { id: 'delivery', name: 'التوصيل', description: 'إدارة التوصيل' },
+  { id: 'products', name: 'المنتجات', description: 'إضافة وتعديل المنتجات' },
+  { id: 'categories', name: 'الفئات', description: 'إدارة الفئات' },
+  { id: 'users', name: 'المستخدمين', description: 'إدارة المستخدمين' },
+  { id: 'settings', name: 'الإعدادات', description: 'الوصول للإعدادات' },
+];
 
 export default function Settings() {
   const { user, hasRole, logout } = useAuth();
