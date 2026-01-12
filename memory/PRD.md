@@ -18,37 +18,51 @@
 
 ---
 
-## User Personas
+## What's Been Implemented (as of Jan 12, 2026)
 
-### 1. مدير النظام (Admin)
-- إدارة كاملة للنظام
-- إضافة وتعديل المستخدمين والفروع
-- عرض جميع التقارير
-- إعدادات النظام
+### الميزات الجديدة في هذه الجلسة:
 
-### 2. مدير الفرع (Manager)
-- إدارة موظفي فرعه
-- عرض تقارير الفرع
-- إدارة المخزون والمنتجات
+#### 1. نظام الصلاحيات الموسع (26 صلاحية مخصصة)
+مجموعات الصلاحيات:
+- **المبيعات:** نقاط البيع، إعطاء خصومات، إلغاء الطلبات، الطلبات، تعديل الطلبات، الطاولات
+- **المطبخ:** شاشة المطبخ
+- **المخزون:** عرض المخزون، تعديل المخزون، نقل المخزون
+- **التقارير:** التقارير الأساسية، التقارير المالية، تصدير التقارير
+- **المالية:** المصاريف، إضافة مصاريف، المشتريات
+- **التوصيل:** التوصيل، السائقين
+- **الإعدادات:** المنتجات، تعديل المنتجات، تعديل الأسعار، الفئات
+- **الإدارة:** المستخدمين، الفروع، الإعدادات، الورديات، إغلاق الصندوق
 
-### 3. المشرف (Supervisor)
-- مراقبة العمليات
-- إدارة المخزون
-- عرض التقارير
+#### 2. أقسام المطبخ (Kitchen Sections)
+- إنشاء أقسام مطبخ متعددة (المطبخ الساخن، المطبخ البارد، المشروبات، الحلويات)
+- ربط كل قسم بطابعة مخصصة
+- ربط الفئات بأقسام المطبخ لتوجيه الطلبات تلقائياً
+- تعديل وحذف الأقسام
 
-### 4. الكاشير (Cashier)
-- استخدام نقاط البيع
-- إنشاء الطلبات
-- إغلاق الشفت
+#### 3. تعديل الفروع
+- إضافة زر تعديل للفروع
+- إمكانية تعديل اسم الفرع، العنوان، الهاتف، البريد
+- إمكانية تعطيل الفرع
+
+#### 4. إشعارات صوتية للطلبات الجديدة
+- صوت تنبيه عند وصول طلب جديد
+- صوت جرس المطبخ عند جاهزية الطلب
+- زر تفعيل/تعطيل الصوت
+- زر اختبار الصوت
+
+#### 5. تحسينات أخرى
+- إزالة بيانات المستخدمين من صفحة تسجيل الدخول
+- نافذة تعديل المستخدم تفتح بالبيانات الحالية
+- أزرار "تحديد الكل" و "إلغاء التحديد" للصلاحيات
 
 ---
 
-## What's Been Implemented (as of Jan 12, 2026)
+### الميزات المنجزة سابقاً:
 
-### Backend (FastAPI + MongoDB)
+#### Backend (FastAPI + MongoDB)
 - ✅ نظام المصادقة JWT
 - ✅ CRUD للمستخدمين مع الصلاحيات والفروع
-- ✅ CRUD للفروع
+- ✅ CRUD للفروع (مع تعديل وحذف)
 - ✅ CRUD للفئات والمنتجات (مع التكاليف والربح)
 - ✅ CRUD للمخزون مع transactions
 - ✅ CRUD للطاولات
@@ -57,83 +71,60 @@
 - ✅ إدارة السائقين
 - ✅ إدارة المصاريف اليومية
 - ✅ إدارة المشتريات
-- ✅ التقارير الشاملة (7 أنواع):
-  - تقرير المبيعات
-  - تقرير المشتريات
-  - تقرير المخزون
-  - تقرير المصاريف
-  - تقرير الأرباح والخسائر
-  - تقرير الأصناف
-  - تقرير شركات التوصيل (الآجل)
+- ✅ التقارير الشاملة (7 أنواع)
 - ✅ إعدادات شركات التوصيل مع نسب الاستقطاع
 - ✅ إعدادات الطابعات
-- ✅ إعدادات البريد الإلكتروني
-- ✅ Seed data للبيانات الأولية
+- ✅ أقسام المطبخ (جديد)
 
-### Frontend (React + Tailwind + Shadcn)
-- ✅ صفحة تسجيل الدخول
+#### Frontend (React + Tailwind + Shadcn)
+- ✅ صفحة تسجيل الدخول (بدون بيانات تجريبية)
 - ✅ لوحة التحكم الرئيسية مع 8 إجراءات سريعة
 - ✅ شاشة نقاط البيع (POS) كاملة
 - ✅ صفحة الطاولات
-- ✅ صفحة الطلبات
+- ✅ صفحة الطلبات مع إشعارات صوتية
 - ✅ صفحة المخزون
 - ✅ صفحة التوصيل والسائقين
 - ✅ صفحة المصاريف اليومية
 - ✅ صفحة التقارير الشاملة (7 تبويبات)
-- ✅ صفحة الإعدادات مع 8 تبويبات:
-  - المظهر (فاتح/داكن/تلقائي)
-  - المستخدمين (إضافة/تعديل/حذف/صلاحيات)
-  - الفروع
-  - الفئات (إضافة/تعديل/حذف)
-  - المنتجات (إضافة/تعديل/حذف مع التكاليف والربح)
+- ✅ صفحة الإعدادات مع 9 تبويبات:
+  - المظهر
+  - المستخدمين (مع 26 صلاحية مخصصة)
+  - الفروع (مع تعديل وحذف)
+  - أقسام المطبخ (جديد)
+  - الفئات
+  - المنتجات
   - الطابعات
-  - شركات التوصيل (نسب الاستقطاع)
-  - الإشعارات (البريد الإلكتروني)
-- ✅ الوضع الليلي/النهاري التلقائي
-- ✅ واجهة عربية RTL
+  - شركات التوصيل
+  - الإشعارات
 
 ---
 
 ## Prioritized Backlog
 
-### P0 - Critical (Must Have) ✅ COMPLETED
+### P0 - Critical ✅ COMPLETED
 - [x] Authentication
 - [x] POS Core
 - [x] Orders
 - [x] Tables
-- [x] User Management with Permissions
+- [x] User Management with Permissions (26 permissions)
 - [x] Categories/Products Management
 - [x] Reports (7 types)
 - [x] Expenses Management
+- [x] Kitchen Sections
+- [x] Branch Edit/Delete
 
 ### P1 - High Priority
 - [x] Inventory Management
 - [x] Shift Management
 - [x] Delivery Tracking
-- [ ] Receipt Printing (Hardware Integration) - requires network printer
+- [x] Sound Notifications
+- [ ] Receipt Printing (Hardware Integration)
 
 ### P2 - Medium Priority
-- [x] Email Reports (SendGrid configured - requires API key)
+- [ ] Email Reports (SendGrid configured)
 - [ ] Stripe Payment Integration
-- [ ] Real-time Kitchen Display
+- [ ] Real-time Kitchen Display Screen
 - [ ] Customer Loyalty Program
-
-### P3 - Low Priority
-- [ ] Mobile App
-- [ ] Analytics Dashboard with Charts
-- [ ] Multi-language Support
-- [ ] API for Third-party Integration
-
----
-
-## Technical Stack
-
-- **Backend:** FastAPI (Python)
-- **Database:** MongoDB
-- **Frontend:** React 18 + Tailwind CSS + Shadcn/UI
-- **Authentication:** JWT
-- **Email:** SendGrid (ready for API key)
-- **Payment:** Stripe (ready for integration)
 
 ---
 
@@ -149,49 +140,18 @@
 
 ---
 
-## API Reference
+## API Reference - New Endpoints
 
-### Authentication
-- `POST /api/auth/login` - تسجيل الدخول
-- `POST /api/auth/register` - إنشاء مستخدم
-- `GET /api/auth/me` - معلومات المستخدم الحالي
+### Kitchen Sections
+- `GET /api/kitchen-sections` - قائمة أقسام المطبخ
+- `POST /api/kitchen-sections` - إنشاء قسم
+- `PUT /api/kitchen-sections/{id}` - تعديل قسم
+- `DELETE /api/kitchen-sections/{id}` - حذف قسم
+- `PUT /api/categories/{id}/kitchen-section` - ربط فئة بقسم مطبخ
 
-### Users
-- `GET /api/users` - قائمة المستخدمين
-- `PUT /api/users/{id}` - تعديل مستخدم
-- `DELETE /api/users/{id}` - حذف مستخدم
-
-### Categories
-- `GET /api/categories` - قائمة الفئات
-- `POST /api/categories` - إضافة فئة
-- `PUT /api/categories/{id}` - تعديل فئة
-- `DELETE /api/categories/{id}` - حذف فئة
-
-### Products
-- `GET /api/products` - قائمة المنتجات
-- `POST /api/products` - إضافة منتج
-- `PUT /api/products/{id}` - تعديل منتج
-- `DELETE /api/products/{id}` - حذف منتج
-
-### Orders
-- `GET /api/orders` - قائمة الطلبات
-- `POST /api/orders` - إنشاء طلب
-- `PUT /api/orders/{id}/status` - تحديث حالة الطلب
-- `PUT /api/orders/{id}/payment` - تحديث طريقة الدفع
-
-### Reports
-- `GET /api/reports/sales` - تقرير المبيعات
-- `GET /api/reports/purchases` - تقرير المشتريات
-- `GET /api/reports/inventory` - تقرير المخزون
-- `GET /api/reports/expenses` - تقرير المصاريف
-- `GET /api/reports/profit-loss` - تقرير الأرباح والخسائر
-- `GET /api/reports/products` - تقرير الأصناف
-- `GET /api/reports/delivery-credits` - تقرير شركات التوصيل
-
-### Shifts
-- `POST /api/shifts` - فتح شفت
-- `POST /api/shifts/{id}/close` - إغلاق شفت
-- `GET /api/shifts/current` - الشفت الحالي
+### Branches (Updated)
+- `PUT /api/branches/{id}` - تعديل فرع
+- `DELETE /api/branches/{id}` - تعطيل فرع
 
 ---
 
