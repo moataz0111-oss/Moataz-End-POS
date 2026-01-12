@@ -233,6 +233,7 @@ export default function POS() {
         customer_name: customerName,
         customer_phone: customerPhone,
         delivery_address: orderType === 'delivery' ? deliveryAddress : null,
+        buzzer_number: orderType === 'takeaway' ? buzzerNumber : null, // رقم جهاز التنبيه
         items: cart,
         branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
         payment_method: 'pending', // معلق - لم يتم الدفع بعد
