@@ -119,6 +119,22 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      <Route 
+        path="/reports" 
+        element={
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/expenses" 
+        element={
+          <ProtectedRoute>
+            <Expenses />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
