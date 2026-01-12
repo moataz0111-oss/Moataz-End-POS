@@ -31,7 +31,7 @@ import { Label } from '../components/ui/label';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Tables() {
-  const { user, hasRole } = useAuth();
+  const { user, hasRole, hasPermission } = useAuth();
   const navigate = useNavigate();
   
   const [tables, setTables] = useState([]);
