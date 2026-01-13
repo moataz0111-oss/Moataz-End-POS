@@ -276,18 +276,26 @@ export default function POS() {
     
     try {
       const res = await axios.get(`${API}/customers/by-phone/${phone}`);
-      if (res.data) {
-        setCustomerData(res.data);
-        setCustomerName(res.data.name);
-        setDeliveryAddress(res.data.address || '');
-        setCustomerHistory(res.data.recent_orders || []);
+      if (res.data && res.data.found && res.data.customer) {
+        const customer = res.data.customer;
+        setCustomerData(customer);
+        setCustomerName(customer.name || '');
+        setDeliveryAddress(customer.address || '');
+        setCustomerHistory(res.data.orders || []);
         setShowCustomerInfo(true);
-      }
-    } catch (error) {
-      if (error.response?.status === 404) {
+        toast.success(`عميل موجود: ${customer.name}`, {
+          description: customer.address ? `العنوان: ${customer.address}` : 'لا يوجد عنوان محفوظ'
+        });
+      } else {
         // عميل جديد
         setCustomerData(null);
+        setShowCustomerInfo(false);
+        toast.info('عميل جديد - يمكنك إضافة بياناته');
       }
+    } catch (error) {
+      console.error('Error searching customer:', error);
+      setCustomerData(null);
+      setShowCustomerInfo(false);
     }
   };
 
@@ -300,23 +308,26 @@ export default function POS() {
     
     try {
       const res = await axios.get(`${API}/customers/by-phone/${customerSearchPhone}`);
-      if (res.data) {
-        setCustomerData(res.data);
-        setCustomerName(res.data.name);
-        setCustomerPhone(res.data.phone);
-        setDeliveryAddress(res.data.address || '');
-        setCustomerHistory(res.data.recent_orders || []);
+      if (res.data && res.data.found && res.data.customer) {
+        const customer = res.data.customer;
+        setCustomerData(customer);
+        setCustomerName(customer.name || '');
+        setCustomerPhone(customer.phone || customerSearchPhone);
+        setDeliveryAddress(customer.address || '');
+        setCustomerHistory(res.data.orders || []);
         setShowCustomerInfo(true);
-        toast.success(`تم العثور على العميل: ${res.data.name}`);
-      }
-    } catch (error) {
-      if (error.response?.status === 404) {
+        toast.success(`تم العثور على العميل: ${customer.name}`);
+      } else {
         toast.info('عميل جديد - يمكنك إضافة بياناته');
         setCustomerPhone(customerSearchPhone);
         setCustomerData(null);
-      } else {
-        toast.error('فشل في البحث عن العميل');
+        setShowCustomerInfo(false);
       }
+    } catch (error) {
+      console.error('Error searching customer:', error);
+      toast.error('فشل في البحث عن العميل');
+      setCustomerPhone(customerSearchPhone);
+      setCustomerData(null);
     }
   };
 
