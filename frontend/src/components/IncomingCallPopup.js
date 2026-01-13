@@ -131,16 +131,29 @@ export default function IncomingCallPopup({ onClose, onAnswer, onCreateOrder }) 
 
   // إنشاء طلب للمتصل
   const handleCreateOrder = (call) => {
-    // إنهاء المكالمة أولاً
-    handleEndCall(call.call_id);
+    // إيقاف الرنين
+    stopRingSound();
+    setIsRinging(false);
     
-    // فتح صفحة POS مع بيانات العميل
-    if (onCreateOrder) {
-      onCreateOrder(call);
-    } else {
-      // التنقل لصفحة POS مع رقم الهاتف
-      window.location.href = `/pos?phone=${call.phone}&name=${encodeURIComponent(call.caller_name || '')}`;
-    }
+    // إضافة للمكالمات المنتهية
+    setDismissed(prev => ({...prev, [call.call_id]: true}));
+    setActiveCalls(prev => prev.filter(c => c.call_id !== call.call_id));
+    
+    // إنهاء المكالمة في الخلفية
+    const token = localStorage.getItem('token');
+    fetch(`${API}/callcenter/calls/${call.call_id}/end`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).catch(() => {});
+    
+    // التنقل لصفحة POS مع بيانات العميل ونوع التوصيل
+    const params = new URLSearchParams({
+      phone: call.phone || '',
+      name: call.caller_name || '',
+      from_call: 'true'
+    });
+    
+    window.location.href = `/pos?${params.toString()}`;
   };
 
   useEffect(() => {
