@@ -145,7 +145,10 @@ export default function IncomingCallPopup({ onClose, onAnswer, onCreateOrder }) 
 
   useEffect(() => {
     // جلب المكالمات فوراً
-    fetchActiveCalls();
+    const initialFetch = async () => {
+      await fetchActiveCalls();
+    };
+    initialFetch();
     
     // جلب كل 3 ثواني (بدلاً من ثانيتين)
     pollIntervalRef.current = setInterval(fetchActiveCalls, 3000);
