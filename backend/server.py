@@ -501,6 +501,22 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="رمز غير صالح")
 
+# دالة مساعدة للحصول على tenant_id للمستخدم
+def get_user_tenant_id(user: dict) -> Optional[str]:
+    """الحصول على tenant_id للمستخدم - Super Admin لا يحتاج tenant_id"""
+    if user.get("role") == UserRole.SUPER_ADMIN:
+        return None
+    return user.get("tenant_id")
+
+# دالة مساعدة لبناء query مع tenant_id
+def build_tenant_query(user: dict, base_query: dict = None) -> dict:
+    """بناء query مع فلترة tenant_id"""
+    query = base_query.copy() if base_query else {}
+    tenant_id = get_user_tenant_id(user)
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    return query
+
 # ==================== EMAIL SERVICE ====================
 
 async def send_shift_report_email(shift_data: dict, recipient_emails: List[str]):
