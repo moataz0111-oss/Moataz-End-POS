@@ -63,7 +63,7 @@ import { toast, Toaster } from 'sonner';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // مفتاح Super Admin السري
-const SUPER_ADMIN_SECRET = "maestro_super_2024_secret";
+const SUPER_ADMIN_SECRET = "271018";
 
 export default function SuperAdmin() {
   const navigate = useNavigate();

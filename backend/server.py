@@ -3090,7 +3090,7 @@ async def get_printers(branch_id: Optional[str] = None):
 # نظام إدارة المستأجرين - لوحة تحكم المالك الرئيسي
 
 # كلمة سر خاصة للـ Super Admin
-SUPER_ADMIN_SECRET = "maestro_super_2024_secret"
+SUPER_ADMIN_SECRET = "271018"
 
 # التحقق من صلاحية Super Admin
 async def verify_super_admin(current_user: dict = Depends(get_current_user)):
