@@ -1257,6 +1257,8 @@ async def get_orders(
     branch_id: Optional[str] = None,
     status: Optional[str] = None,
     date: Optional[str] = None,
+    payment_status: Optional[str] = None,
+    order_type: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
     query = {}
@@ -1266,6 +1268,10 @@ async def get_orders(
         query["status"] = status
     if date:
         query["created_at"] = {"$regex": f"^{date}"}
+    if payment_status:
+        query["payment_status"] = payment_status
+    if order_type:
+        query["order_type"] = order_type
     
     orders = await db.orders.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
     return orders
