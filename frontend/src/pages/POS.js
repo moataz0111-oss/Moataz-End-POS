@@ -128,6 +128,37 @@ export default function POS() {
     }
   }, [searchParams, tables]);
 
+  // قراءة بيانات المكالمة من URL (للكول سنتر)
+  useEffect(() => {
+    const phone = searchParams.get('phone');
+    const name = searchParams.get('name');
+    const fromCall = searchParams.get('from_call');
+    
+    if (phone) {
+      // تعيين نوع الطلب إلى توصيل
+      setOrderType('delivery');
+      
+      // تعيين رقم الهاتف
+      setCustomerPhone(phone);
+      setCustomerSearchPhone(phone);
+      
+      // تعيين اسم العميل إذا موجود
+      if (name) {
+        setCustomerName(decodeURIComponent(name));
+      }
+      
+      // البحث عن بيانات العميل
+      searchCustomerByPhone(phone);
+      
+      // إظهار رسالة
+      if (fromCall === 'true') {
+        toast.success(`تم استلام مكالمة من: ${phone}`, {
+          description: 'تم تعيين نوع الطلب إلى توصيل'
+        });
+      }
+    }
+  }, [searchParams]);
+
   const fetchData = async () => {
     try {
       const [catRes, prodRes, appsRes, shiftRes] = await Promise.all([
