@@ -210,6 +210,11 @@ export default function Settings() {
       setKitchenSections(sectionsRes.data);
       setCustomers(customersRes.data);
       
+      // تعيين الفرع الافتراضي لنموذج المستخدم الجديد
+      if (branchesRes.data.length > 0) {
+        setUserForm(prev => ({...prev, branch_id: prev.branch_id || branchesRes.data[0].id}));
+      }
+      
       // جلب إعدادات الصفحة الرئيسية
       if (settingsRes.data.dashboard_settings) {
         setDashboardSettings(settingsRes.data.dashboard_settings);
