@@ -519,6 +519,123 @@ export default function Delivery() {
             </div>
           </TabsContent>
 
+          {/* خريطة تتبع السائقين */}
+          <TabsContent value="map">
+            <Card className="border-border/50 bg-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center justify-between text-foreground">
+                  <div className="flex items-center gap-2">
+                    <Map className="h-5 w-5 text-primary" />
+                    تتبع السائقين على الخريطة
+                  </div>
+                  <Button variant="outline" size="sm" onClick={fetchDriverLocations}>
+                    <RefreshCw className="h-4 w-4 ml-1" />
+                    تحديث المواقع
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* قائمة السائقين مع حالتهم */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                  {driverLocations.map(driver => (
+                    <div 
+                      key={driver.id}
+                      className={`p-3 rounded-lg border ${
+                        driver.location_lat && driver.location_lng 
+                          ? 'border-green-500/30 bg-green-500/10' 
+                          : 'border-gray-500/30 bg-gray-500/10'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${
+                          driver.location_lat ? 'bg-green-500 animate-pulse' : 'bg-gray-500'
+                        }`} />
+                        <span className="font-medium text-sm text-foreground">{driver.name}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {driver.location_lat && driver.location_lng ? (
+                          <>
+                            <Locate className="h-3 w-3 inline ml-1" />
+                            {driver.location_updated_at ? (
+                              `آخر تحديث: ${new Date(driver.location_updated_at).toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })}`
+                            ) : 'موقع متاح'}
+                          </>
+                        ) : (
+                          'لا يوجد موقع'
+                        )}
+                      </p>
+                      {driver.current_order && (
+                        <div className="mt-2 pt-2 border-t border-border text-xs">
+                          <span className="text-orange-500">طلب #{driver.current_order.order_number}</span>
+                          {driver.current_order.delivery_address && (
+                            <p className="text-muted-foreground truncate">
+                              {driver.current_order.delivery_address}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* الخريطة */}
+                <div className="relative rounded-lg overflow-hidden border border-border" style={{ height: '500px' }}>
+                  {driverLocations.filter(d => d.location_lat && d.location_lng).length === 0 ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+                      <div className="text-center">
+                        <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground text-lg">لا توجد مواقع متاحة للسائقين</p>
+                        <p className="text-sm text-muted-foreground mt-2">
+                          يجب على السائقين تفعيل GPS من تطبيقهم
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <iframe
+                      title="خريطة السائقين"
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      style={{ border: 0 }}
+                      src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${
+                        driverLocations.find(d => d.location_lat)?.location_lat || 33.3
+                      },${
+                        driverLocations.find(d => d.location_lng)?.location_lng || 44.4
+                      }&zoom=12&maptype=roadmap`}
+                      allowFullScreen
+                    />
+                  )}
+                  
+                  {/* علامات السائقين فوق الخريطة */}
+                  <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-sm rounded-lg p-3 max-w-xs shadow-lg">
+                    <p className="text-xs font-medium text-foreground mb-2">السائقين النشطين:</p>
+                    <div className="space-y-1">
+                      {driverLocations.filter(d => d.location_lat).map(driver => (
+                        <div key={driver.id} className="flex items-center gap-2 text-xs">
+                          <div className={`w-2 h-2 rounded-full ${
+                            driver.is_available ? 'bg-green-500' : 'bg-orange-500'
+                          }`} />
+                          <span className="text-foreground">{driver.name}</span>
+                          {driver.current_order && (
+                            <span className="text-orange-400">#{driver.current_order.order_number}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* تعليمات */}
+                <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
+                  <p className="text-sm text-blue-400 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4" />
+                    لتتبع السائقين: يجب على كل سائق فتح تطبيقه والسماح بالوصول للموقع
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* طلبات جاهزة للتوصيل */}
           <TabsContent value="pending">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
