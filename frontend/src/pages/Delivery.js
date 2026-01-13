@@ -79,10 +79,36 @@ export default function Delivery() {
 
   useEffect(() => {
     fetchData();
+    fetchDriverLocations();
     // Poll for updates
-    const interval = setInterval(fetchData, 30000);
+    const interval = setInterval(() => {
+      fetchData();
+      fetchDriverLocations();
+    }, 30000);
     return () => clearInterval(interval);
   }, [selectedBranch]);
+
+  // تحميل Leaflet CSS
+  useEffect(() => {
+    if (!document.getElementById('leaflet-css')) {
+      const link = document.createElement('link');
+      link.id = 'leaflet-css';
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
+  }, []);
+
+  const fetchDriverLocations = async () => {
+    try {
+      const res = await axios.get(`${API}/drivers/locations`, { 
+        params: { branch_id: selectedBranch } 
+      });
+      setDriverLocations(res.data);
+    } catch (error) {
+      console.error('Failed to fetch driver locations:', error);
+    }
+  };
 
   const fetchData = async () => {
     try {
