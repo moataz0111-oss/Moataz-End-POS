@@ -207,6 +207,11 @@ export default function Settings() {
       setProducts(productsRes.data);
       setKitchenSections(sectionsRes.data);
       setCustomers(customersRes.data);
+      
+      // جلب إعدادات الصفحة الرئيسية
+      if (settingsRes.data.dashboard_settings) {
+        setDashboardSettings(settingsRes.data.dashboard_settings);
+      }
     } catch (error) {
       console.error('Failed to fetch settings:', error);
     } finally {
