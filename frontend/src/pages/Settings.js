@@ -385,10 +385,31 @@ export default function Settings() {
       await axios.post(`${API}/categories`, categoryForm);
       toast.success('تم إنشاء الفئة');
       setCategoryDialogOpen(false);
-      setCategoryForm({ name: '', name_en: '', icon: '', color: '#D4AF37', sort_order: 0 });
+      setCategoryForm({ name: '', name_en: '', icon: '', image: '', color: '#D4AF37', sort_order: 0 });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل في إنشاء الفئة');
+    }
+  };
+
+  const handleUpdateCategory = async (e) => {
+    e.preventDefault();
+    if (!editCategoryForm) return;
+    try {
+      await axios.put(`${API}/categories/${editCategoryForm.id}`, {
+        name: editCategoryForm.name,
+        name_en: editCategoryForm.name_en,
+        icon: editCategoryForm.icon,
+        image: editCategoryForm.image,
+        color: editCategoryForm.color,
+        sort_order: editCategoryForm.sort_order
+      });
+      toast.success('تم تحديث الفئة');
+      setEditCategoryDialogOpen(false);
+      setEditCategoryForm(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في تحديث الفئة');
     }
   };
 
@@ -400,6 +421,16 @@ export default function Settings() {
       fetchData();
     } catch (error) {
       toast.error('فشل في حذف الفئة');
+    }
+  };
+
+  // حفظ إعدادات الصفحة الرئيسية
+  const handleSaveDashboardSettings = async () => {
+    try {
+      await axios.put(`${API}/settings/dashboard`, dashboardSettings);
+      toast.success('تم حفظ إعدادات الصفحة الرئيسية');
+    } catch (error) {
+      toast.error('فشل في حفظ الإعدادات');
     }
   };
 
