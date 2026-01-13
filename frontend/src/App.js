@@ -15,6 +15,7 @@ import Delivery from "./pages/Delivery";
 import Settings from "./pages/Settings";
 import Reports from "./pages/Reports";
 import Expenses from "./pages/Expenses";
+import DriverPortal from "./pages/DriverPortal";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
