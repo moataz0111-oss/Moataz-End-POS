@@ -1341,6 +1341,48 @@ async def update_order_payment(order_id: str, payment_method: str, current_user:
     
     return {"message": "تم تحديث طريقة الدفع"}
 
+@api_router.put("/orders/{order_id}/cancel")
+async def cancel_order(order_id: str, current_user: dict = Depends(get_current_user)):
+    """إلغاء الطلب - فقط للمالك أو المدير، أو إذا كان الطلب أقل من دقيقة"""
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # حساب الفرق في الوقت
+    created_at = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00"))
+    time_diff = (datetime.now(timezone.utc) - created_at).total_seconds()
+    
+    # إذا كان الطلب أقل من 60 ثانية، يمكن لأي شخص إلغاؤه
+    is_within_minute = time_diff < 60
+    is_admin_or_manager = current_user.get("role") in ["admin", "manager"]
+    
+    if not is_within_minute and not is_admin_or_manager:
+        raise HTTPException(status_code=403, detail="فقط المالك أو المدير يمكنهم إلغاء الطلبات بعد دقيقة من إنشائها")
+    
+    # تحديث حالة الطلب
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "status": OrderStatus.CANCELLED,
+            "cancelled_at": datetime.now(timezone.utc).isoformat(),
+            "cancelled_by": current_user["id"],
+            "cancellation_reason": "إلغاء سريع" if is_within_minute else "إلغاء بواسطة المدير",
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # تحرير الطاولة إذا كان الطلب على طاولة
+    if order.get("table_id"):
+        await db.tables.update_one(
+            {"id": order["table_id"]},
+            {"$set": {"status": "available", "current_order_id": None}}
+        )
+    
+    return {
+        "message": "تم إلغاء الطلب",
+        "was_quick_cancel": is_within_minute
+    }
+
 # ==================== SHIFT ROUTES ====================
 
 @api_router.post("/shifts", response_model=ShiftResponse)
