@@ -1360,33 +1360,27 @@ async def update_order_payment(order_id: str, payment_method: str, current_user:
 
 @api_router.put("/orders/{order_id}/cancel")
 async def cancel_order(order_id: str, current_user: dict = Depends(get_current_user)):
-    """إلغاء الطلب - فقط للمالك أو المدير، أو إذا كان الطلب أقل من دقيقة"""
+    """
+    إلغاء الطلب:
+    - أقل من دقيقة: يُحذف نهائياً (لا يظهر في التقارير)
+    - أكثر من دقيقتين: يُسجل كطلب ملغي (يظهر في التقارير)
+    - بين دقيقة ودقيقتين: يُسجل كطلب ملغي فقط للمدير/المالك
+    """
     order = await db.orders.find_one({"id": order_id})
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
     
-    # حساب الفرق في الوقت
+    # حساب الفرق في الوقت بالثواني
     created_at = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00"))
     time_diff = (datetime.now(timezone.utc) - created_at).total_seconds()
     
-    # إذا كان الطلب أقل من 60 ثانية، يمكن لأي شخص إلغاؤه
-    is_within_minute = time_diff < 60
+    is_within_minute = time_diff < 60  # أقل من دقيقة
+    is_within_two_minutes = time_diff < 120  # أقل من دقيقتين
     is_admin_or_manager = current_user.get("role") in ["admin", "manager"]
     
+    # التحقق من الصلاحيات
     if not is_within_minute and not is_admin_or_manager:
         raise HTTPException(status_code=403, detail="فقط المالك أو المدير يمكنهم إلغاء الطلبات بعد دقيقة من إنشائها")
-    
-    # تحديث حالة الطلب
-    await db.orders.update_one(
-        {"id": order_id},
-        {"$set": {
-            "status": OrderStatus.CANCELLED,
-            "cancelled_at": datetime.now(timezone.utc).isoformat(),
-            "cancelled_by": current_user["id"],
-            "cancellation_reason": "إلغاء سريع" if is_within_minute else "إلغاء بواسطة المدير",
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }}
-    )
     
     # تحرير الطاولة إذا كان الطلب على طاولة
     if order.get("table_id"):
@@ -1395,9 +1389,32 @@ async def cancel_order(order_id: str, current_user: dict = Depends(get_current_u
             {"$set": {"status": "available", "current_order_id": None}}
         )
     
+    # أقل من دقيقة: حذف نهائي
+    if is_within_minute:
+        await db.orders.delete_one({"id": order_id})
+        return {
+            "message": "تم حذف الطلب نهائياً",
+            "was_quick_delete": True,
+            "in_reports": False
+        }
+    
+    # أكثر من دقيقة: تسجيل كطلب ملغي
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "status": OrderStatus.CANCELLED,
+            "cancelled_at": datetime.now(timezone.utc).isoformat(),
+            "cancelled_by": current_user["id"],
+            "cancellation_reason": "إلغاء بواسطة المدير" if is_admin_or_manager else "إلغاء",
+            "time_to_cancel_seconds": int(time_diff),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
     return {
-        "message": "تم إلغاء الطلب",
-        "was_quick_cancel": is_within_minute
+        "message": "تم إلغاء الطلب وتسجيله في التقارير",
+        "was_quick_delete": False,
+        "in_reports": True
     }
 
 # ==================== SHIFT ROUTES ====================
