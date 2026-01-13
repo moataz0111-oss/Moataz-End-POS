@@ -20,7 +20,11 @@ import {
   Download,
   RefreshCw,
   PieChart,
-  FileText
+  FileText,
+  XCircle,
+  Percent,
+  CreditCard,
+  Clock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
