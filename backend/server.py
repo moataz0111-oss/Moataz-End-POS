@@ -1121,14 +1121,19 @@ async def delete_table(table_id: str, current_user: dict = Depends(get_current_u
 
 @api_router.post("/customers", response_model=CustomerResponse)
 async def create_customer(customer: CustomerCreate, current_user: dict = Depends(get_current_user)):
-    # التحقق من عدم وجود العميل بنفس الرقم
-    existing = await db.customers.find_one({"phone": customer.phone})
+    # التحقق من عدم وجود العميل بنفس الرقم في نفس الـ tenant
+    tenant_id = get_user_tenant_id(current_user)
+    query = {"phone": customer.phone}
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    existing = await db.customers.find_one(query)
     if existing:
         raise HTTPException(status_code=400, detail="رقم الهاتف موجود مسبقاً")
     
     customer_doc = {
         "id": str(uuid.uuid4()),
         **customer.model_dump(),
+        "tenant_id": tenant_id,  # فصل البيانات
         "total_orders": 0,
         "total_spent": 0.0,
         "last_order_date": None,
@@ -1139,8 +1144,8 @@ async def create_customer(customer: CustomerCreate, current_user: dict = Depends
     return customer_doc
 
 @api_router.get("/customers", response_model=List[CustomerResponse])
-async def get_customers(search: Optional[str] = None, phone: Optional[str] = None):
-    query = {}
+async def get_customers(search: Optional[str] = None, phone: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = build_tenant_query(current_user)  # فلترة حسب tenant_id
     if phone:
         query["$or"] = [{"phone": phone}, {"phone2": phone}]
     elif search:
@@ -1154,28 +1159,26 @@ async def get_customers(search: Optional[str] = None, phone: Optional[str] = Non
     return customers
 
 @api_router.get("/customers/{customer_id}", response_model=CustomerResponse)
-async def get_customer(customer_id: str):
-    customer = await db.customers.find_one({"id": customer_id}, {"_id": 0})
+async def get_customer(customer_id: str, current_user: dict = Depends(get_current_user)):
+    query = build_tenant_query(current_user, {"id": customer_id})
+    customer = await db.customers.find_one(query, {"_id": 0})
     if not customer:
         raise HTTPException(status_code=404, detail="العميل غير موجود")
     return customer
 
 @api_router.get("/customers/by-phone/{phone}")
-async def get_customer_by_phone(phone: str):
+async def get_customer_by_phone(phone: str, current_user: dict = Depends(get_current_user)):
     """البحث عن عميل بالهاتف مع سجل الطلبات"""
-    customer = await db.customers.find_one(
-        {"$or": [{"phone": phone}, {"phone2": phone}]}, 
-        {"_id": 0}
-    )
+    query = build_tenant_query(current_user)
+    query["$or"] = [{"phone": phone}, {"phone2": phone}]
+    customer = await db.customers.find_one(query, {"_id": 0})
     
     if not customer:
         return {"found": False, "customer": None, "orders": []}
     
     # جلب آخر 10 طلبات للعميل
-    orders = await db.orders.find(
-        {"customer_phone": phone},
-        {"_id": 0}
-    ).sort("created_at", -1).limit(10).to_list(10)
+    orders_query = build_tenant_query(current_user, {"customer_phone": phone})
+    orders = await db.orders.find(orders_query, {"_id": 0}).sort("created_at", -1).limit(10).to_list(10)
     
     return {
         "found": True,
@@ -1185,7 +1188,8 @@ async def get_customer_by_phone(phone: str):
 
 @api_router.put("/customers/{customer_id}")
 async def update_customer(customer_id: str, customer: CustomerCreate, current_user: dict = Depends(get_current_user)):
-    await db.customers.update_one({"id": customer_id}, {"$set": customer.model_dump()})
+    query = build_tenant_query(current_user, {"id": customer_id})
+    await db.customers.update_one(query, {"$set": customer.model_dump()})
     return await db.customers.find_one({"id": customer_id}, {"_id": 0})
 
 @api_router.delete("/customers/{customer_id}")
