@@ -165,6 +165,16 @@ export default function Settings() {
     name: '', phone: '', phone2: '', address: '', area: '', notes: '', is_blocked: false
   });
   const [editCustomerForm, setEditCustomerForm] = useState(null);
+  const [dashboardSettings, setDashboardSettings] = useState({
+    showPOS: true,
+    showTables: true,
+    showOrders: true,
+    showExpenses: true,
+    showInventory: true,
+    showDelivery: true,
+    showReports: true,
+    showSettings: true
+  });
 
   useEffect(() => {
     if (hasRole(['admin', 'manager'])) {
