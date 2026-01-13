@@ -3592,6 +3592,38 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
 async def impersonate_tenant(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
     """الدخول كعميل - للمشاهدة والتحكم المباشر"""
     
+    # التحقق إذا كان النظام الرئيسي
+    if tenant_id == "main-system":
+        # البحث عن admin النظام الرئيسي
+        admin = await db.users.find_one({
+            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}],
+            "role": UserRole.ADMIN
+        })
+        if not admin:
+            raise HTTPException(status_code=404, detail="مدير النظام الرئيسي غير موجود")
+        
+        # إنشاء token للدخول
+        token = create_token(admin["id"], admin["role"], admin.get("branch_id"))
+        
+        return {
+            "token": token,
+            "user": {
+                "id": admin["id"],
+                "email": admin["email"],
+                "full_name": admin["full_name"],
+                "role": admin["role"],
+                "tenant_id": None
+            },
+            "tenant": {
+                "id": "main-system",
+                "name": "🏠 النظام الرئيسي",
+                "is_main_system": True
+            },
+            "impersonated": True,
+            "original_super_admin": current_user["id"]
+        }
+    
+    # للعملاء العاديين
     tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
     if not tenant:
         raise HTTPException(status_code=404, detail="العميل غير موجود")
