@@ -656,6 +656,7 @@ export default function Settings() {
             {hasRole(['admin', 'manager']) && <TabsTrigger value="products">المنتجات</TabsTrigger>}
             {hasRole(['admin', 'manager']) && <TabsTrigger value="printers">الطابعات</TabsTrigger>}
             {hasRole(['admin']) && <TabsTrigger value="delivery">شركات التوصيل</TabsTrigger>}
+            {hasRole(['admin']) && <TabsTrigger value="callcenter">الكول سنتر</TabsTrigger>}
             {hasRole(['admin']) && <TabsTrigger value="notifications">الإشعارات</TabsTrigger>}
           </TabsList>
 
