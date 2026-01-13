@@ -3603,17 +3603,25 @@ async def impersonate_tenant(tenant_id: str, current_user: dict = Depends(verify
 async def get_tenant_live_stats(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
     """إحصائيات حية للعميل"""
     
-    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
-    if not tenant:
-        raise HTTPException(status_code=404, detail="العميل غير موجود")
+    # التحقق إذا كان النظام الرئيسي
+    if tenant_id == "main-system":
+        tenant = {
+            "id": "main-system",
+            "name": "🏠 النظام الرئيسي",
+            "is_main_system": True
+        }
+        tenant_query = {"$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]}
+    else:
+        tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+        if not tenant:
+            raise HTTPException(status_code=404, detail="العميل غير موجود")
+        tenant_query = {"tenant_id": tenant_id}
     
     # إحصائيات اليوم
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     
-    today_orders = await db.orders.find({
-        "tenant_id": tenant_id,
-        "created_at": {"$gte": today}
-    }, {"_id": 0}).to_list(500)
+    today_query = {**tenant_query, "created_at": {"$gte": today}}
+    today_orders = await db.orders.find(today_query, {"_id": 0}).to_list(500)
     
     # حساب الإحصائيات
     total_today = sum(o["total"] for o in today_orders if o.get("status") != "cancelled")
