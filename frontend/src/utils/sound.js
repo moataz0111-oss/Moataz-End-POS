@@ -245,6 +245,86 @@ export const playUrgentAlert = () => {
   }
 };
 
+/**
+ * Play driver new order notification - إشعار طلب جديد للسائق
+ * صوت مميز وقوي لتنبيه السائق بوصول طلب جديد
+ */
+export const playDriverNotification = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // صوت تنبيه مميز للسائق - 3 نغمات صاعدة قوية
+    const playTone = (frequency, startTime, duration, gain = 0.2) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.frequency.value = frequency;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(gain, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+    };
+    
+    // نغمات صاعدة قوية (D5, F#5, A5, D6) - وتر ماجور
+    playTone(587.33, ctx.currentTime, 0.2, 0.25);        // D5
+    playTone(739.99, ctx.currentTime + 0.2, 0.2, 0.25);  // F#5
+    playTone(880.00, ctx.currentTime + 0.4, 0.2, 0.25);  // A5
+    playTone(1174.66, ctx.currentTime + 0.6, 0.4, 0.3);  // D6 - أطول وأقوى
+    
+    // إضافة نغمة ثانية بعد فترة قصيرة للتأكيد
+    setTimeout(() => {
+      try {
+        const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+        playTone(1174.66, ctx2.currentTime, 0.3, 0.2);
+        playTone(880.00, ctx2.currentTime + 0.15, 0.3, 0.2);
+      } catch (e) {}
+    }, 1200);
+    
+  } catch (error) {
+    console.warn('Driver notification sound failed:', error);
+  }
+};
+
+/**
+ * Play delivery complete sound - صوت إتمام التوصيل
+ */
+export const playDeliveryComplete = () => {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    const playTone = (frequency, startTime, duration) => {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      oscillator.frequency.value = frequency;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.15, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+      
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+    };
+    
+    // صوت نجاح (نغمات هابطة مريحة)
+    playTone(880, ctx.currentTime, 0.15);
+    playTone(659.25, ctx.currentTime + 0.15, 0.15);
+    playTone(523.25, ctx.currentTime + 0.3, 0.25);
+    
+  } catch (error) {
+    console.warn('Delivery complete sound failed:', error);
+  }
+};
+
 export default {
   playClick,
   playSuccess,
@@ -252,4 +332,6 @@ export default {
   playNewOrderNotification,
   playKitchenBell,
   playUrgentAlert,
+  playDriverNotification,
+  playDeliveryComplete,
 };
