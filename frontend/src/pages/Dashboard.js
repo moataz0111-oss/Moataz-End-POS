@@ -22,9 +22,23 @@ import {
   Moon,
   LayoutGrid,
   BarChart3,
-  Receipt
+  Receipt,
+  Wallet,
+  Calculator,
+  Check,
+  X
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { ScrollArea } from '../components/ui/scroll-area';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
