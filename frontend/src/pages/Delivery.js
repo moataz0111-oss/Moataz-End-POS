@@ -577,7 +577,7 @@ export default function Delivery() {
                           عرض التفاصيل
                         </Button>
                         
-                        {/* أزرار التعديل والحذف */}
+                        {/* أزرار التعديل والحذف وربط المستخدم */}
                         <div className="flex gap-2 mt-2">
                           <Button 
                             variant="outline" 
@@ -591,11 +591,19 @@ export default function Delivery() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                            className={`flex-1 ${driver.user_id ? 'text-green-500' : 'text-blue-500'}`}
+                            onClick={(e) => { e.stopPropagation(); openLinkUserDialog(driver); }}
+                          >
+                            {driver.user_id ? <UserCheck className="h-4 w-4 ml-1" /> : <Link className="h-4 w-4 ml-1" />}
+                            {driver.user_id ? 'مربوط' : 'ربط'}
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-red-500 hover:text-red-600 hover:bg-red-500/10"
                             onClick={(e) => { e.stopPropagation(); handleDeleteDriver(driver.id, driver.name); }}
                           >
-                            <Trash2 className="h-4 w-4 ml-1" />
-                            حذف
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                         
