@@ -714,25 +714,6 @@ export default function Delivery() {
                   drivers={driverLocations} 
                   mapContainerRef={mapContainerRef}
                 />
-                  
-                  {/* علامات السائقين فوق الخريطة */}
-                  <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-sm rounded-lg p-3 max-w-xs shadow-lg">
-                    <p className="text-xs font-medium text-foreground mb-2">السائقين النشطين:</p>
-                    <div className="space-y-1">
-                      {driverLocations.filter(d => d.location_lat).map(driver => (
-                        <div key={driver.id} className="flex items-center gap-2 text-xs">
-                          <div className={`w-2 h-2 rounded-full ${
-                            driver.is_available ? 'bg-green-500' : 'bg-orange-500'
-                          }`} />
-                          <span className="text-foreground">{driver.name}</span>
-                          {driver.current_order && (
-                            <span className="text-orange-400">#{driver.current_order.order_number}</span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
 
                 {/* تعليمات */}
                 <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
