@@ -1165,6 +1165,18 @@ export default function Settings() {
                             />
                           </div>
                         </div>
+                        <div>
+                          <Label className="text-foreground">رابط الصورة</Label>
+                          <Input
+                            value={categoryForm.image}
+                            onChange={(e) => setCategoryForm({ ...categoryForm, image: e.target.value })}
+                            placeholder="https://example.com/image.jpg"
+                            className="mt-1"
+                          />
+                          {categoryForm.image && (
+                            <img src={categoryForm.image} alt="معاينة" className="mt-2 h-20 w-20 object-cover rounded-lg" />
+                          )}
+                        </div>
                         <div className="grid grid-cols-3 gap-4">
                           <div>
                             <Label className="text-foreground">الأيقونة</Label>
@@ -1214,18 +1226,41 @@ export default function Settings() {
                       {categories.map(cat => (
                         <div key={cat.id} className="relative p-4 bg-muted/30 rounded-lg border border-border/50">
                           <div className="flex items-center gap-3">
-                            <div 
-                              className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
-                              style={{ backgroundColor: `${cat.color}20` }}
-                            >
-                              {cat.icon || '📦'}
-                            </div>
+                            {cat.image ? (
+                              <img src={cat.image} alt={cat.name} className="w-12 h-12 rounded-lg object-cover" />
+                            ) : (
+                              <div 
+                                className="w-12 h-12 rounded-lg flex items-center justify-center text-xl"
+                                style={{ backgroundColor: `${cat.color}20` }}
+                              >
+                                {cat.icon || '📦'}
+                              </div>
+                            )}
                             <div>
                               <p className="font-medium text-foreground">{cat.name}</p>
                               {cat.name_en && <p className="text-xs text-muted-foreground">{cat.name_en}</p>}
                             </div>
                           </div>
-                          <div className="absolute top-2 left-2">
+                          <div className="absolute top-2 left-2 flex gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-blue-500 hover:bg-blue-500/10"
+                              onClick={() => {
+                                setEditCategoryForm({
+                                  id: cat.id,
+                                  name: cat.name,
+                                  name_en: cat.name_en || '',
+                                  icon: cat.icon || '',
+                                  image: cat.image || '',
+                                  color: cat.color || '#D4AF37',
+                                  sort_order: cat.sort_order || 0
+                                });
+                                setEditCategoryDialogOpen(true);
+                              }}
+                            >
+                              <Edit className="h-3 w-3" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -1244,6 +1279,87 @@ export default function Settings() {
                   )}
                 </CardContent>
               </Card>
+
+              {/* Edit Category Dialog */}
+              <Dialog open={editCategoryDialogOpen} onOpenChange={setEditCategoryDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="text-foreground">تعديل الفئة</DialogTitle>
+                  </DialogHeader>
+                  {editCategoryForm && (
+                    <form onSubmit={handleUpdateCategory} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label className="text-foreground">اسم الفئة (عربي)</Label>
+                          <Input
+                            value={editCategoryForm.name}
+                            onChange={(e) => setEditCategoryForm({ ...editCategoryForm, name: e.target.value })}
+                            required
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">اسم الفئة (إنجليزي)</Label>
+                          <Input
+                            value={editCategoryForm.name_en}
+                            onChange={(e) => setEditCategoryForm({ ...editCategoryForm, name_en: e.target.value })}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-foreground">رابط الصورة</Label>
+                        <Input
+                          value={editCategoryForm.image}
+                          onChange={(e) => setEditCategoryForm({ ...editCategoryForm, image: e.target.value })}
+                          placeholder="https://example.com/image.jpg"
+                          className="mt-1"
+                        />
+                        {editCategoryForm.image && (
+                          <img src={editCategoryForm.image} alt="معاينة" className="mt-2 h-20 w-20 object-cover rounded-lg" />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label className="text-foreground">الأيقونة</Label>
+                          <Input
+                            value={editCategoryForm.icon}
+                            onChange={(e) => setEditCategoryForm({ ...editCategoryForm, icon: e.target.value })}
+                            placeholder="☕"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">اللون</Label>
+                          <Input
+                            type="color"
+                            value={editCategoryForm.color}
+                            onChange={(e) => setEditCategoryForm({ ...editCategoryForm, color: e.target.value })}
+                            className="mt-1 h-10"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">الترتيب</Label>
+                          <Input
+                            type="number"
+                            value={editCategoryForm.sort_order}
+                            onChange={(e) => setEditCategoryForm({ ...editCategoryForm, sort_order: parseInt(e.target.value) || 0 })}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setEditCategoryDialogOpen(false)} className="flex-1">
+                          إلغاء
+                        </Button>
+                        <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                          حفظ التغييرات
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </DialogContent>
+              </Dialog>
             </TabsContent>
           )}
 
