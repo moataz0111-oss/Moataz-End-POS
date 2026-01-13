@@ -211,22 +211,35 @@ export default function POS() {
 
   const fetchPendingOrders = async () => {
     try {
-      // جلب الطلبات المعلقة (pending) والطلبات غير المدفوعة للطاولات
-      const [pendingRes, unpaidDineInRes] = await Promise.all([
-        axios.get(`${API}/orders`, { params: { status: 'pending' } }),
-        axios.get(`${API}/orders`, { params: { payment_status: 'pending', order_type: 'dine_in' } })
+      // جلب جميع الطلبات غير المكتملة:
+      // 1. طلبات بحالة pending أو preparing أو ready
+      // 2. طلبات غير مدفوعة (payment_status = pending) لأي نوع
+      const [activeRes, unpaidRes] = await Promise.all([
+        axios.get(`${API}/orders`, { params: { status: 'pending,preparing,ready' } }),
+        axios.get(`${API}/orders`, { params: { payment_status: 'pending' } })
       ]);
       
       // دمج الطلبات وإزالة التكرارات
-      const allOrders = [...pendingRes.data];
-      const pendingIds = new Set(pendingRes.data.map(o => o.id));
+      const ordersMap = new Map();
       
-      // إضافة طلبات الطاولات غير المدفوعة التي ليست في القائمة
-      for (const order of unpaidDineInRes.data) {
-        if (!pendingIds.has(order.id) && order.status !== 'delivered' && order.status !== 'cancelled') {
-          allOrders.push(order);
+      // إضافة الطلبات النشطة
+      for (const order of activeRes.data) {
+        if (order.status !== 'cancelled') {
+          ordersMap.set(order.id, order);
         }
       }
+      
+      // إضافة الطلبات غير المدفوعة (التي لم تُسلم ولم تُلغَ)
+      for (const order of unpaidRes.data) {
+        if (order.status !== 'delivered' && order.status !== 'cancelled') {
+          ordersMap.set(order.id, order);
+        }
+      }
+      
+      const allOrders = Array.from(ordersMap.values());
+      
+      // ترتيب حسب تاريخ الإنشاء (الأحدث أولاً)
+      allOrders.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       
       // إشعار صوتي للطلبات الجديدة
       if (prevOrdersCount.current > 0 && allOrders.length > prevOrdersCount.current) {
