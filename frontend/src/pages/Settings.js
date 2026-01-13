@@ -44,7 +44,9 @@ import {
   Eye,
   EyeOff,
   Upload,
-  ImageIcon
+  ImageIcon,
+  BarChart,
+  ShoppingCart
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
