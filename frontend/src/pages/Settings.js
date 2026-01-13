@@ -670,6 +670,139 @@ export default function Settings() {
             </Card>
           </TabsContent>
 
+          {/* Dashboard Settings - إعدادات الصفحة الرئيسية */}
+          {hasRole(['admin', 'manager']) && (
+            <TabsContent value="dashboard">
+              <Card className="border-border/50 bg-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <LayoutGrid className="h-5 w-5" />
+                    إعدادات الصفحة الرئيسية
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <p className="text-sm text-muted-foreground">
+                    تحكم في الصفحات والأقسام التي تظهر في الصفحة الرئيسية للمستخدمين
+                  </p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                          <ShoppingCart className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <span className="font-medium text-foreground">نقاط البيع</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showPOS}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showPOS: checked})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                          <LayoutGrid className="h-5 w-5 text-green-500" />
+                        </div>
+                        <span className="font-medium text-foreground">الطاولات</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showTables}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showTables: checked})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                          <Package className="h-5 w-5 text-purple-500" />
+                        </div>
+                        <span className="font-medium text-foreground">الطلبات</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showOrders}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showOrders: checked})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center">
+                          <DollarSign className="h-5 w-5 text-red-500" />
+                        </div>
+                        <span className="font-medium text-foreground">المصاريف</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showExpenses}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showExpenses: checked})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center">
+                          <Package className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <span className="font-medium text-foreground">المخزون</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showInventory}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showInventory: checked})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center">
+                          <Truck className="h-5 w-5 text-cyan-500" />
+                        </div>
+                        <span className="font-medium text-foreground">التوصيل</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showDelivery}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showDelivery: checked})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-indigo-500/10 rounded-lg flex items-center justify-center">
+                          <BarChart className="h-5 w-5 text-indigo-500" />
+                        </div>
+                        <span className="font-medium text-foreground">التقارير</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showReports}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showReports: checked})}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gray-500/10 rounded-lg flex items-center justify-center">
+                          <SettingsIcon className="h-5 w-5 text-gray-500" />
+                        </div>
+                        <span className="font-medium text-foreground">الإعدادات</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showSettings}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showSettings: checked})}
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleSaveDashboardSettings}
+                    className="w-full bg-primary text-primary-foreground"
+                  >
+                    <Save className="h-4 w-4 ml-2" />
+                    حفظ الإعدادات
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
           {/* Users */}
           {hasRole(['admin', 'manager']) && (
             <TabsContent value="users">
