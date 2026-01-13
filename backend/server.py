@@ -1714,6 +1714,95 @@ async def collect_driver_payment(driver_id: str, amount: float = 0, current_user
         "orders_updated": result.modified_count
     }
 
+# ==================== DRIVER PORTAL APIs - صفحة السائق على الهاتف ====================
+
+@api_router.get("/drivers/portal/{driver_id}")
+async def get_driver_portal_data(driver_id: str):
+    """جلب بيانات السائق لصفحة الهاتف - بدون مصادقة"""
+    driver = await db.drivers.find_one({"id": driver_id}, {"_id": 0})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    # جلب طلبات السائق
+    orders = await db.orders.find({
+        "driver_id": driver_id,
+        "status": {"$in": [OrderStatus.PENDING, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.DELIVERED]}
+    }, {"_id": 0}).sort("created_at", -1).to_list(50)
+    
+    # حساب الإحصائيات
+    today = datetime.now(timezone.utc).date().isoformat()
+    unpaid_total = sum(o.get("total", 0) for o in orders if o.get("driver_payment_status") != "paid" and o.get("status") == OrderStatus.DELIVERED)
+    paid_today = sum(
+        o.get("total", 0) for o in orders 
+        if o.get("driver_payment_status") == "paid" and o.get("driver_paid_at", "").startswith(today)
+    )
+    pending_orders = len([o for o in orders if o.get("status") in [OrderStatus.PENDING, OrderStatus.PREPARING, OrderStatus.READY]])
+    
+    return {
+        "driver": driver,
+        "orders": orders,
+        "stats": {
+            "unpaid_total": unpaid_total,
+            "paid_today": paid_today,
+            "pending_orders": pending_orders
+        }
+    }
+
+@api_router.get("/drivers/portal/by-phone/{phone}")
+async def get_driver_by_phone(phone: str):
+    """جلب بيانات السائق برقم الهاتف"""
+    driver = await db.drivers.find_one({"phone": phone}, {"_id": 0})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    # استخدام نفس المنطق
+    orders = await db.orders.find({
+        "driver_id": driver["id"],
+        "status": {"$in": [OrderStatus.PENDING, OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.DELIVERED]}
+    }, {"_id": 0}).sort("created_at", -1).to_list(50)
+    
+    today = datetime.now(timezone.utc).date().isoformat()
+    unpaid_total = sum(o.get("total", 0) for o in orders if o.get("driver_payment_status") != "paid" and o.get("status") == OrderStatus.DELIVERED)
+    paid_today = sum(
+        o.get("total", 0) for o in orders 
+        if o.get("driver_payment_status") == "paid" and o.get("driver_paid_at", "").startswith(today)
+    )
+    pending_orders = len([o for o in orders if o.get("status") in [OrderStatus.PENDING, OrderStatus.PREPARING, OrderStatus.READY]])
+    
+    return {
+        "driver": driver,
+        "orders": orders,
+        "stats": {
+            "unpaid_total": unpaid_total,
+            "paid_today": paid_today,
+            "pending_orders": pending_orders
+        }
+    }
+
+@api_router.put("/drivers/portal/{driver_id}/complete")
+async def complete_delivery_portal(driver_id: str, order_id: Optional[str] = None):
+    """تأكيد التوصيل من صفحة السائق - بدون مصادقة"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    target_order_id = order_id or driver.get("current_order_id")
+    
+    if target_order_id:
+        await db.orders.update_one(
+            {"id": target_order_id},
+            {"$set": {
+                "status": OrderStatus.DELIVERED,
+                "delivered_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+    
+    await db.drivers.update_one(
+        {"id": driver_id},
+        {"$set": {"is_available": True, "current_order_id": None}, "$inc": {"total_deliveries": 1}}
+    )
+    return {"message": "تم التوصيل"}
+
 # ==================== DELIVERY APP SETTINGS ====================
 
 @api_router.post("/delivery-app-settings")
