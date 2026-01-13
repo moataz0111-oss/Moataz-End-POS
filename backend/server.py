@@ -1299,6 +1299,12 @@ async def update_order_status(order_id: str, status: str, current_user: dict = D
     if not order:
         raise HTTPException(status_code=404, detail="الطلب غير موجود")
     
+    # التحقق من صلاحية الإلغاء
+    if status == OrderStatus.CANCELLED:
+        # فقط المالك أو المدير يمكنهم الإلغاء
+        if current_user.get("role") not in ["admin", "manager"]:
+            raise HTTPException(status_code=403, detail="ليس لديك صلاحية إلغاء الطلبات")
+    
     await db.orders.update_one(
         {"id": order_id},
         {"$set": {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}}
