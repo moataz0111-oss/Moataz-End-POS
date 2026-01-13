@@ -725,6 +725,259 @@ export default function Reports() {
               </div>
             )}
           </TabsContent>
+
+          {/* Cancellations Report */}
+          <TabsContent value="cancellations">
+            {cancellationsReport && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <StatCard
+                    title="إجمالي الإلغاءات"
+                    value={cancellationsReport.total_cancelled}
+                    icon={XCircle}
+                    color="red-500"
+                  />
+                  <StatCard
+                    title="قيمة الإلغاءات"
+                    value={formatPrice(cancellationsReport.total_value)}
+                    icon={DollarSign}
+                    color="red-500"
+                  />
+                  <StatCard
+                    title="نسبة الإلغاء"
+                    value={`${cancellationsReport.cancellation_rate?.toFixed(1) || 0}%`}
+                    icon={Percent}
+                    color="orange-500"
+                  />
+                  <StatCard
+                    title="إلغاءات اليوم"
+                    value={cancellationsReport.today_cancelled || 0}
+                    icon={Clock}
+                    color="blue-500"
+                  />
+                </div>
+
+                <Card className="border-border/50 bg-card">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-foreground flex items-center gap-2">
+                      <XCircle className="h-5 w-5 text-red-500" />
+                      الطلبات الملغاة
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="text-right p-3 text-muted-foreground">#</th>
+                            <th className="text-right p-3 text-muted-foreground">التاريخ</th>
+                            <th className="text-right p-3 text-muted-foreground">النوع</th>
+                            <th className="text-right p-3 text-muted-foreground">العميل</th>
+                            <th className="text-right p-3 text-muted-foreground">القيمة</th>
+                            <th className="text-right p-3 text-muted-foreground">سبب الإلغاء</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {cancellationsReport.orders?.map(order => (
+                            <tr key={order.id} className="border-b border-border/50 hover:bg-red-500/5">
+                              <td className="p-3 font-medium text-foreground">#{order.order_number}</td>
+                              <td className="p-3 text-muted-foreground">
+                                {new Date(order.cancelled_at || order.created_at).toLocaleDateString('ar-IQ')}
+                              </td>
+                              <td className="p-3">
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  order.order_type === 'dine_in' ? 'bg-blue-500/10 text-blue-500' :
+                                  order.order_type === 'takeaway' ? 'bg-green-500/10 text-green-500' :
+                                  'bg-orange-500/10 text-orange-500'
+                                }`}>
+                                  {order.order_type === 'dine_in' ? 'محلي' : order.order_type === 'takeaway' ? 'سفري' : 'توصيل'}
+                                </span>
+                              </td>
+                              <td className="p-3 text-foreground">{order.customer_name || '-'}</td>
+                              <td className="p-3 tabular-nums text-red-500">{formatPrice(order.total)}</td>
+                              <td className="p-3 text-muted-foreground">{order.cancellation_reason || 'غير محدد'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {(!cancellationsReport.orders || cancellationsReport.orders.length === 0) && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <XCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>لا توجد طلبات ملغاة في هذه الفترة</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Discounts Report */}
+          <TabsContent value="discounts">
+            {discountsReport && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <StatCard
+                    title="إجمالي الخصومات"
+                    value={formatPrice(discountsReport.total_discounts)}
+                    icon={Percent}
+                    color="orange-500"
+                  />
+                  <StatCard
+                    title="عدد الطلبات"
+                    value={discountsReport.orders_with_discount}
+                    icon={ShoppingCart}
+                    color="blue-500"
+                  />
+                  <StatCard
+                    title="متوسط الخصم"
+                    value={formatPrice(discountsReport.average_discount)}
+                    icon={TrendingDown}
+                    color="purple-500"
+                  />
+                  <StatCard
+                    title="نسبة من المبيعات"
+                    value={`${discountsReport.discount_percentage?.toFixed(1) || 0}%`}
+                    icon={PieChart}
+                    color="red-500"
+                  />
+                </div>
+
+                <Card className="border-border/50 bg-card">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-foreground flex items-center gap-2">
+                      <Percent className="h-5 w-5 text-orange-500" />
+                      الطلبات مع خصومات
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="text-right p-3 text-muted-foreground">#</th>
+                            <th className="text-right p-3 text-muted-foreground">التاريخ</th>
+                            <th className="text-right p-3 text-muted-foreground">العميل</th>
+                            <th className="text-right p-3 text-muted-foreground">المبلغ الأصلي</th>
+                            <th className="text-right p-3 text-muted-foreground">الخصم</th>
+                            <th className="text-right p-3 text-muted-foreground">المبلغ النهائي</th>
+                            <th className="text-right p-3 text-muted-foreground">الكاشير</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {discountsReport.orders?.map(order => (
+                            <tr key={order.id} className="border-b border-border/50 hover:bg-orange-500/5">
+                              <td className="p-3 font-medium text-foreground">#{order.order_number}</td>
+                              <td className="p-3 text-muted-foreground">
+                                {new Date(order.created_at).toLocaleDateString('ar-IQ')}
+                              </td>
+                              <td className="p-3 text-foreground">{order.customer_name || '-'}</td>
+                              <td className="p-3 tabular-nums text-foreground">{formatPrice(order.subtotal)}</td>
+                              <td className="p-3 tabular-nums text-orange-500">-{formatPrice(order.discount)}</td>
+                              <td className="p-3 tabular-nums text-green-500">{formatPrice(order.total)}</td>
+                              <td className="p-3 text-muted-foreground">{order.cashier_name || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {(!discountsReport.orders || discountsReport.orders.length === 0) && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Percent className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>لا توجد طلبات بخصومات في هذه الفترة</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Credit Report (الآجل) */}
+          <TabsContent value="credit">
+            {creditReport && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <StatCard
+                    title="إجمالي الآجل"
+                    value={formatPrice(creditReport.total_credit)}
+                    icon={CreditCard}
+                    color="blue-500"
+                  />
+                  <StatCard
+                    title="عدد الطلبات"
+                    value={creditReport.total_orders}
+                    icon={ShoppingCart}
+                    color="purple-500"
+                  />
+                  <StatCard
+                    title="تم التحصيل"
+                    value={formatPrice(creditReport.collected_amount)}
+                    icon={TrendingUp}
+                    color="green-500"
+                  />
+                  <StatCard
+                    title="المتبقي"
+                    value={formatPrice(creditReport.remaining_amount)}
+                    icon={TrendingDown}
+                    color="red-500"
+                  />
+                </div>
+
+                <Card className="border-border/50 bg-card">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-foreground flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-blue-500" />
+                      الطلبات الآجلة
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="text-right p-3 text-muted-foreground">#</th>
+                            <th className="text-right p-3 text-muted-foreground">التاريخ</th>
+                            <th className="text-right p-3 text-muted-foreground">العميل</th>
+                            <th className="text-right p-3 text-muted-foreground">الهاتف</th>
+                            <th className="text-right p-3 text-muted-foreground">المبلغ</th>
+                            <th className="text-right p-3 text-muted-foreground">الحالة</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {creditReport.orders?.map(order => (
+                            <tr key={order.id} className="border-b border-border/50 hover:bg-blue-500/5">
+                              <td className="p-3 font-medium text-foreground">#{order.order_number}</td>
+                              <td className="p-3 text-muted-foreground">
+                                {new Date(order.created_at).toLocaleDateString('ar-IQ')}
+                              </td>
+                              <td className="p-3 text-foreground">{order.customer_name || '-'}</td>
+                              <td className="p-3 text-muted-foreground">{order.customer_phone || '-'}</td>
+                              <td className="p-3 tabular-nums text-blue-500">{formatPrice(order.total)}</td>
+                              <td className="p-3">
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  order.credit_collected ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+                                }`}>
+                                  {order.credit_collected ? 'تم التحصيل' : 'لم يحصل'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {(!creditReport.orders || creditReport.orders.length === 0) && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <CreditCard className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                          <p>لا توجد طلبات آجلة في هذه الفترة</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
         </Tabs>
       </main>
     </div>
