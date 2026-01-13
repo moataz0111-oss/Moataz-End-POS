@@ -1136,13 +1136,14 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
     # Determine payment status
     if order.payment_method == PaymentMethod.PENDING:
         payment_status = "pending"
-        order_status = OrderStatus.PENDING
+        # الطلب جاهز تلقائياً إذا تم تحديده
+        order_status = OrderStatus.READY if order.auto_ready else OrderStatus.PENDING
     elif order.payment_method == PaymentMethod.CREDIT:
         payment_status = "credit"
-        order_status = OrderStatus.PREPARING
+        order_status = OrderStatus.READY if order.auto_ready else OrderStatus.PREPARING
     else:
         payment_status = "paid"
-        order_status = OrderStatus.PREPARING
+        order_status = OrderStatus.READY if order.auto_ready else OrderStatus.PREPARING
     
     # الحصول على اسم شركة التوصيل
     delivery_app_name = None
