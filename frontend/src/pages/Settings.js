@@ -47,7 +47,17 @@ import {
   ImageIcon,
   BarChart,
   ShoppingCart,
-  Key
+  Key,
+  Headphones,
+  Webhook,
+  Link,
+  TestTube,
+  Copy,
+  RefreshCw,
+  PhoneCall,
+  PhoneIncoming,
+  PhoneOutgoing,
+  Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
