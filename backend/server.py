@@ -2470,7 +2470,17 @@ async def get_sales_report(
     end_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
+    tenant_id = get_user_tenant_id(current_user)
+    
     query = {"status": {"$ne": OrderStatus.CANCELLED}}
+    
+    # فلترة حسب tenant_id
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    else:
+        # المستخدم الرئيسي يرى فقط الطلبات بدون tenant_id
+        query["$or"] = [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    
     if branch_id:
         query["branch_id"] = branch_id
     if start_date:
