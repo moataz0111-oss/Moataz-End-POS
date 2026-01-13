@@ -1,99 +1,78 @@
 <analysis>**original_problem_statement:**
-المستخدم يريد بناء نظام شامل لإدارة المطاعم والكافيهات باسم Maestro EGP. المتطلبات الأساسية تشمل:
-- **PRODUCT REQUIREMENTS:**
-    - **نظام المستخدمين:** أدوار وصلاحيات مختلفة ومفصلة (مدير، كاشير، مشرف، إلخ).
-    - **إدارة المخزون:** تتبع المواد الخام، المنتجات قبل وبعد التصنيع، وحساب التكاليف.
-    - **نقاط البيع (POS):** واجهة لإدارة الطلبات، الطاولات، والدفع.
-    - **الطلبات:** دعم الطلبات الداخلية، السفري، والتوصيل مع قائمة انتظار للطلبات المعلقة.
-    - **الدفع:** نقدي، بطاقات بنكية (فيزا/ماستر كارد)، ودفع آجل.
-    - **التقارير:** تقارير يومية تلقائية عبر البريد الإلكتروني، تقارير مالية ومخزون مفصلة.
-    - **إدارة الفروع:** التحكم في فروع متعددة.
-    - **إدارة الورديات (Shifts):** تسجيل دخول وخروج أمين الصندوق، وإغلاق الصندوق.
-    - **إدارة العملاء:** قاعدة بيانات للعملاء مع سجل طلباتهم للبحث السريع عند الطلب الهاتفي.
-    - **واجهة المستخدم (UI):** تصميم احترافي مع وضع ليلي/نهاري، وأصوات تفاعلية.
-    - **تكاملات:** ربط مع طابعات المطاعم، تطبيقات التوصيل (مثل طلبات)، ونظام هاتف لإظهار هوية المتصل.
-    - **إدارة التوصيل:** تتبع السائقين والفواتير التي بذمتهم.
-    - **إدارة المصاريف:** تسجيل المصاريف اليومية.
-    - **دعم العملات:** العملة الأساسية هي الدينار العراقي (IQD).
+المستخدم يريد بناء نظام شامل لإدارة المطاعم والكافيهات باسم Maestro EGP. المتطلبات تشمل نظام مستخدمين، إدارة المخزون، نقاط بيع (POS)، إدارة الطلبات (داخلي، سفري، توصيل)، طرق دفع متنوعة، تقارير مفصلة (مع إرسال يومي بالبريد الإلكتروني)، إدارة فروع، ورديات، عملاء، وتكاملات مع طابعات وتطبيقات توصيل.
 
 **User's preferred language**: Arabic (العربية)
 
 **what currently exists?**
 تطبيق ويب كامل (FastAPI + React) مع نظام مصادقة JWT. الواجهة تحتوي على لوحة تحكم، نقاط بيع، طاولات، إعدادات، وتقارير. تم تنفيذ ميزات رئيسية مثل:
 - نظام صلاحيات مفصل للمستخدمين.
-- إدارة كاملة للمنتجات، الفئات، والفروع من صفحة الإعدادات.
-- صفحة تقارير متقدمة تعرض تفاصيل المبيعات والأرباح ومبيعات شركات التوصيل.
-- في شاشة نقاط البيع، يتم حساب وعرض عمولة شركة التوصيل تلقائياً وخصمها من الإجمالي.
-- تم إصلاح صلاحيات الطاولات للسماح للمستخدمين غير المسؤولين بفتح الطلبات عليها.
-- تم إضافة حقل رقم جهاز التنبيه للطلبات الخارجية (السفري).
-- تمت إضافة إشعارات صوتية للطلبات الجديدة.
+- إدارة المنتجات، الفئات، والفروع من صفحة الإعدادات، مع إمكانية تعديل الفئات وإضافة صور لها.
+- واجهة نقاط بيع (POS) متقدمة تدعم الطلبات المحلية (مع عرض الطاولات كمربعات)، السفري، والتوصيل (مع اختيار إلزامي للسائق).
+- قائمة للطلبات المعلقة (Pending Orders) لاسترجاع وتعديل الطلبات المحفوظة.
+- منطق لإلغاء الطلبات (أقل من دقيقة يتم الحذف، أكثر من دقيقة يتم تسجيله كملغي).
+- صفحة متقدمة لمتابعة سائقي التوصيل، تعرض المبالغ المدفوعة وغير المدفوعة، مع رابط خاص لكل سائق لعرض طلباته على هاتفه.
+- إمكانية التحكم في الصفحات التي تظهر في لوحة التحكم الرئيسية من الإعدادات.
+- تم تحسين واجهة المستخدم بعرض الفئات مع صور وأيقونات.
 
 **Last working item**:
-- **Last item agent was working**: The agent began implementing a complex, multi-part user request involving several critical workflow improvements and bug fixes:
-    1.  **Customer Management & Caller ID:** Started building a customer database to store phone, name, and address. This is the first step towards a caller ID feature where customer info pops up on an incoming call. The agent added backend models and APIs for customers.
-    2.  **Pending Takeaway Orders Queue:** The user reported that takeaway orders disappear after being saved. The agent started work to create a visible queue for these pending takeaway orders on the POS screen, allowing them to be modified or paid later.
-    3.  **Table Re-opening/Modification:** The user cannot add new items to an already occupied table. The agent started adding backend APIs to allow adding items to existing orders.
-    4.  **Print Bill Before Payment:** The user wants a button to print an invoice for the customer before finalizing the payment.
+- **Last item agent was working**: The agent was addressing the user's request to activate pending orders for takeaway and tables. The agent identified that while a Pending Orders modal exists, orders saved via the Save and Send to Kitchen button are getting the status  instead of , so they don't appear in the pending list. The goal is to correct this workflow.
 - **Status**: IN PROGRESS
 - **Agent Testing Done**: N
 - **Which testing method agent to use?**: both
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1:** (P0) Takeaway orders are not visible after being saved with the Save and Send to Kitchen button, making them impossible to retrieve, modify, or complete payment for.
-- **Issue 2:** (P0) It is not possible to add new items to an order that has already been saved to a table. The UI only allows editing the table's status, not the order itself.
+- **Issue 1:** (P0) Takeaway and Dine-in orders are not appearing in the Pending Orders list after being saved.
 
   **Issues Detail:**
-  - **Issue 1 & 2 (Combined as a single workflow problem):**
-     - **Attempted fixes:** The agent has already implemented the necessary backend infrastructure.
-        - New endpoints in :  and .
-        - New customer models and API in .
-        - Started modifying  by adding new state variables (, , ) and functions to fetch data (, ).
+  - **Issue 1:**
+     - **Attempted fixes:** The agent created a Pending Orders modal and backend logic to fetch pending orders. However, the  function in  for Save and Send to Kitchen assigns the  status, which is incorrect for this workflow. The fix is to ensure these orders are saved with a  status.
      - **Next debug checklist:**
-        1.  Complete the UI in  to display a list/queue of .
-        2.  Implement logic in  so that clicking a pending takeaway order or an occupied table loads its contents back into the cart for modification.
-        3.  Ensure the Add Item functionality calls the new  endpoint for existing orders.
-        4.  Add a Print Bill button to the POS screen that generates an invoice preview for the current order in the cart without finalizing payment.
-        5.  Add a UI section in  for managing customer information.
-     - **Why fix this issue and what will be achieved with the fix?**: This is a critical bug in the core POS workflow. Fixing it will allow cashiers to manage multiple pending orders (both takeaway and dine-in), which is essential for a real-world restaurant environment.
+        1.  In , locate the  function.
+        2.  Modify the logic for the Save and Send to Kitchen action ().
+        3.  Ensure that when saving a Takeaway or Dine-in order this way, the  in the payload sent to the  endpoint is set to .
+        4.  Verify that clicking Pending Orders now shows these newly saved orders.
+     - **Why fix this issue and what will be achieved with the fix?**: This is a critical bug in the core POS workflow. Fixing it will allow cashiers to save and later retrieve dine-in and takeaway orders, which is essential for managing a busy restaurant floor.
      - **Status**: IN PROGRESS
-     - **Is recurring issue?**: N
+     - **Is recurring issue?**: Y
      - **Should Test frontend/backend/both after fix?**: both
      - **Blocked on other issue**: None. This is the highest priority.
 
 **In progress Task List**:
-- **Task 1**: (P0) Complete the POS workflow overhaul.
-  - **Where to resume**: . The agent must build the UI components for the features described in Pending/In progress Issue list and connect them to the already-created backend APIs and frontend state.
-  - **What will be achieved with this?**: A fully functional and flexible POS system that correctly handles pending dine-in and takeaway orders.
+- **Task 1:** (P0) Fix the Pending Orders workflow.
+  - **Where to resume**: , inside the  function.
+  - **What will be achieved with this?**: A fully functional POS where cashiers can save takeaway and dine-in orders and retrieve them later for modification or payment.
   - **Status**: IN PROGRESS
   - **Should Test frontend/backend/both after fix?**: both
   - **Blocked on something**: None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **(P1) Caller ID Integration:** The user wants customer details to pop up automatically on an incoming call. The backend customer database is ready, but the core technical challenge (getting the call event into the web app from a phone) has not been addressed. This requires research into third-party telephony APIs (like Twilio) or a custom companion app, followed by a discussion with the user about the options.
-    - **(P1) Email Reports:** Implement functionality to send daily summary reports via email using the installed SendGrid library.
+    - **(P1) Caller ID Integration:** Research and present options (e.g., third-party telephony APIs) to the user for implementing a caller ID feature that displays customer info on incoming calls. The backend database for customers is already in place.
+    - **(P1) Email Reports:** Implement functionality to send daily summary reports via email using a service like SendGrid.
     - **(P2) Printer Integration:** Research and implement a method for the web application to print receipts on local network printers.
 - **Future Tasks:**
     - **(P2) Click Sounds:** Implement click sounds on all interactive UI elements as originally requested.
-    - **(P2) Multi-Currency Support:** Fully integrate multi-currency logic into the backend and frontend.
-    - **(P2) Backend Refactoring:** The  file is now over 2000 lines long and urgently needs to be refactored into a structured project with separate files/folders for routes, models, and services to ensure future maintainability.
+    - **(P2) Backend Refactoring:** The  file is now over 2100 lines and urgently needs to be refactored into a structured project with separate files/folders for routes, models, and services to ensure future maintainability.
 
 **Completed work in this session**
 - **Recently completed:**
-  - **Advanced User/Product Management:** Overhauled the Settings page to allow detailed management of users (with granular permissions), products (edit/delete/add), and categories.
-  - **Table Permissions & Workflow:** Fixed permissions to allow non-admin users to open orders on tables and added a button to directly Open Order from the tables screen.
-  - **POS Commission Calculation:** Implemented automatic calculation and display of delivery company commissions on the POS screen, showing the final net amount.
-  - **Detailed Delivery Reports:** The Reports page now shows a breakdown of sales, commissions, and net income for each delivery company.
-  - **Takeaway Pager Number:** Added an optional field for a Pager Number for takeaway orders.
-  - **UI/UX Fixes:** Removed test credentials from the login page, added sound notifications for new orders, and implemented the user's request to remove the Kitchen Sections feature.
-  - **Branch Management:** Fulfilled the user request to disable the Main Branch.
+  - **Driver Tracking & Portal:** Created a comprehensive delivery management page to track drivers' earnings (paid/unpaid) and a separate mobile-friendly portal for drivers to view their assigned orders.
+  - **Advanced POS Customization:** Implemented an admin setting to control which pages (POS, Tables, etc.) are visible on the main dashboard, and restricted cashier view to only essential pages.
+  - **Category Management with Images:** Added the ability to edit categories and upload images for them in the Settings page. These images are now displayed on the POS screen.
+  - **Order Cancellation Logic:** Implemented a time-based cancellation rule: orders cancelled in <1 min are deleted, while those >2 mins are marked as cancelled for reporting.
+  - **UI/UX Enhancements:**
+      - Replaced dropdowns for Tables and Delivery Companies in POS with button grids for faster selection.
+      - Implemented clear color-coding for table status (Available, Occupied).
+      - Moved product categories to the right sidebar in the POS view.
+      - Removed the test table (#99).
+  - **Delivery Workflow Fix:** Made driver selection mandatory for delivery orders in the POS and automated the process of assigning the order to the selected driver.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1:** Deployment readiness was declared prematurely in a past session. This was never re-verified with the  after subsequent changes.
+- None in this session.
 
 **Known issue recurrence from previous fork**
-- None.
+- The core issue of hidden takeaway orders from the previous fork was partially addressed by creating a Pending Orders modal, but the workflow of saving orders into that list was not completed, leading to its recurrence as the main pending issue now.
 
 **Code Architecture**
 
@@ -108,77 +87,76 @@
 **key DB schema**
 - **users:** {username, password_hash, role, branch_id, permissions: List[str]}
 - **products:** {name, price, category, cost, stock_quantity, image_url}
-- **orders:** {items, total, status, payment_method, order_type, **pager_number**, **delivery_app_name**, customer_phone, customer_name, commission_amount}
-- **branches:** {name, location, is_active}
+- **categories:** {name, icon, color, sort_order, image_url} (New: )
+- **orders:** {..., status: ('pending', 'preparing', 'ready', 'delivered', 'cancelled'), driver_id, auto_ready}
 - **tables:** {name, capacity, status}
-- **customers:** {phone, name, address, order_history: List[str]} (New)
+- **customers:** {phone, name, address}
+- **drivers:** {name, phone, branch_id, is_active} (New)
+- **settings:** {key: 'dashboard_items', value: {showPOS: true, ...}} (New)
 
 **changes in tech stack**
 - None.
 
 **All files of reference**
-- : Critical. Contains all backend logic, including new endpoints for customers and order modifications.
-- : Critical. Contains incomplete frontend logic for the new POS workflow.
-- : Important. Recently modified to allow opening orders; may need further changes for the new workflow.
-- : Contains the new UI for managing users, products, etc. May need a new section for Customer Management.
-- : Defines the  and  logic used throughout the app.
+- : Contains all backend logic, including new endpoints for drivers, dashboard settings, and modified order logic.
+- : The most heavily modified file, contains logic for all order types, pending orders, and UI changes. **This is where the next fix is needed.**
+- : Contains new UI for managing categories with images and controlling dashboard visibility.
+- : Completely overhauled to be a driver management dashboard.
+- : New page for drivers to view their orders.
+- : Updated to respect visibility settings.
+- : Updated with the new route for the Driver Portal.
 
 **Areas that need refactoring**:
-- **CRITICAL:** The  file must be broken down. Its monolithic structure makes it extremely difficult to maintain and debug. This is the biggest source of technical debt in the project.
+- **CRITICAL:** The  file must be broken down. Its monolithic structure is a significant source of technical debt, making maintenance and debugging increasingly difficult. This should be the highest priority task after fixing the current POS workflow bug.
 
 **key api endpoints**
--  (POST)
--  (GET)
--  (POST)
--  (PUT)
--  (GET)
--  (GET)
-- **New Endpoints:**
-  -  (GET): Search for a customer by phone number.
-  -  (POST): Add items to an existing order.
-  -  (PUT): Recalculate totals for an existing order.
+-  (POST): Logic modified to handle  and assign .
+-  (POST): New endpoint for time-based cancellation.
+-  (GET, POST): New endpoints to manage drivers.
+-  (GET): New endpoint for the driver portal.
+-  (GET, POST): New endpoints to manage main page visibility.
+-  (PUT): Modified to accept .
+-  (DELETE): New endpoint to delete tables.
 
 **Critical Info for New Agent**
-- Your immediate priority is to finish the complex POS workflow enhancement started by the previous agent. The backend APIs are mostly done, but the frontend (, ) is in an incomplete state. You must pick up there.
-- Address the two main bugs: hidden takeaway orders and the inability to add items to occupied tables.
-- The Caller ID feature is complex. Before writing more code, you must research the technical feasibility of getting a phone's incoming call data into a web browser and present the options (and their costs/complexity) to the user. Do not assume this is simple.
-- The backend  file is a major liability. Plan to refactor it as soon as the current critical POS task is complete and stable.
+- Your immediate and highest priority is to fix the pending order workflow. When a user clicks Save and Send to Kitchen for a takeaway or dine-in order, it must be saved with  and appear in the Pending Orders modal in .
+- The backend  file is dangerously large. After fixing the pending order bug, you must prioritize and plan the refactoring of this file into a proper project structure (e.g., , , ). Propose this to the user as the next major step for system stability.
+- The user has repeatedly requested features that require more complex integrations (Caller ID, Local Printers). Do not attempt to implement these without first researching the technical options and discussing the feasibility, complexity, and potential costs with the user.
 
 **documents and test reports created in this job**
--  (updated multiple times)
+- 
 - 
 
 **Last 10 User Messages and any pending HUMAN messages**
-10.  - User provides detailed requirements: wants Caller ID for a standard Android/iOS phone line, a list of previous orders for the customer, and a customer management section. Also reports two critical bugs: takeaway orders are hidden after being saved, and it's impossible to add items to an existing table order. They also want a print bill before payment button. **Status: IN PROGRESS**
-9.  - User requests a Caller ID feature to auto-populate customer info on incoming calls. **Status: In Progress**
-8.  - User asks to delete the Main Branch. **Status: Completed** (Agent disabled it).
-7.  - User reports that only admins can use tables and wants access for cashiers/captains. **Status: Completed**.
-6.  - User wants the delivery commission to be automatically deducted from the final total shown on screen. **Status: Completed**.
-5.  - User asks to remove the Kitchen Sections feature and confirms that delivery app commissions should be calculated automatically. **Status: Completed**.
-4.  - User requests more granular user permissions, the ability to edit branches, and kitchen sections. **Status: Completed** (Kitchen sections were added then removed).
-3.  - User asks to remove the demo user credentials from the login screen. **Status: Completed**.
-2.  - User confirms they want sound notifications and asks for the user credentials. **Status: Completed**.
-1.  - User confirms the agent's plan and provides a new set of priorities focusing on user management, settings customization, and comprehensive reports. **Status: Completed**.
+10.  - User requests to activate pending orders. **Status: IN PROGRESS**
+9.  - User wants to see the pending orders working. **Status: IN PROGRESS**
+8.  - User requests to remove the Orders page, auto-ready orders, fix driver assignment, and create a mobile portal for drivers. **Status: Completed**
+7.  - User requests a new feature to track delivery drivers and their paid/unpaid orders. **Status: Completed**
+6.  - User confirms to change the  account's role to 'cashier'. **Status: Completed**
+5.  - User states that the agent has completed what was asked. **Status: Acknowledged**
+4.  - User requests category editing with images, new order cancellation logic, and visibility controls for dashboard pages based on user role. **Status: Completed**
+3.  - User asks for category icons/images, table to be freed on order completion, deletion of table 99, and new cancellation logic. **Status: Completed**
+2.  - User reports issues with delivery and wants the old table design (squares, red for occupied) back. **Status: Completed**
+1.  - User wants the category list moved to the right side of the POS screen. **Status: Completed**
 
 **Project Health Check:**
-- **Broken:** The core POS workflow is partially broken. Pending takeaway orders are lost, and dine-in orders cannot be modified after creation.
+- **Broken:** The core workflow for saving and retrieving pending takeaway/dine-in orders is broken.
 - **Mocked:** None.
 
 **3rd Party Integrations**
+- **SendGrid (Email):** Planned for email reports.
+- **Telephony/Caller ID Service:** Research required for this feature.
 - **Stripe (Payments):** Planned.
-- **SendGrid (Email):** Planned.
-- **Telephony/Caller ID Service:** Needed for the caller ID feature, but no specific service has been chosen. Research is required.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES, for the Settings page overhaul.
+- **Testing agent used after significant changes:** YES, after the initial POS overhaul.
 - **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** Some tests were generated by the testing agent in , but no new manual test files were created.
-- **Known regressions:** The POS workflow for pending/existing orders is currently broken due to the in-progress feature implementation.
+- **Test files created:** Test files were updated by the testing agent in .
+- **Known regressions:** The pending order workflow for takeaway/dine-in is a regression, as the user cannot retrieve saved orders.
 
 **Credentials to test flow:**
-- **Email:**  | **Password:** 
-- **Email:**  | **Password:** 
+- **Admin:**  | **Password:** 
+- **Cashier:**  | **Password:**  (Role is now correctly )
 
 **What agent forgot to execute**
-- The agent has not yet implemented a definitive solution for local network printer integration, which is a core requirement.
-- The agent has not fully addressed the technical complexity of the Caller ID feature, which cannot be solved with a web-only stack. More research and user communication are needed.</analysis>
+- The agent built the UI for pending orders but missed connecting the Save button's action to actually create an order with the  status, which was the original intent of the feature.</analysis>
