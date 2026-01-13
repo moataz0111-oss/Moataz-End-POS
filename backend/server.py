@@ -2097,6 +2097,34 @@ async def get_general_settings():
     settings = await db.settings.find_one({"type": "general"}, {"_id": 0})
     return settings.get("value", {}) if settings else {}
 
+@api_router.put("/settings/dashboard")
+async def set_dashboard_settings(settings: Dict[str, Any], current_user: dict = Depends(get_current_user)):
+    """حفظ إعدادات الصفحة الرئيسية - التحكم في الصفحات الظاهرة"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.settings.update_one(
+        {"type": "dashboard_settings"},
+        {"$set": {"type": "dashboard_settings", "value": settings}},
+        upsert=True
+    )
+    return {"message": "تم حفظ إعدادات الصفحة الرئيسية"}
+
+@api_router.get("/settings/dashboard")
+async def get_dashboard_settings():
+    """جلب إعدادات الصفحة الرئيسية"""
+    settings = await db.settings.find_one({"type": "dashboard_settings"}, {"_id": 0})
+    return settings.get("value", {
+        "showPOS": True,
+        "showTables": True,
+        "showOrders": True,
+        "showExpenses": True,
+        "showInventory": True,
+        "showDelivery": True,
+        "showReports": True,
+        "showSettings": True
+    }) if settings else {}
+
 # ==================== PRINTER ROUTES ====================
 
 class PrinterCreate(BaseModel):
