@@ -1726,11 +1726,17 @@ async def get_shifts(branch_id: Optional[str] = None, date: Optional[str] = None
 async def get_cash_register_summary(current_user: dict = Depends(get_current_user)):
     """جلب ملخص الصندوق الحالي للكاشير - قبل إغلاقه"""
     
+    tenant_id = get_user_tenant_id(current_user)
+    
     # Get current open shift for cashier
-    shift = await db.shifts.find_one({
+    shift_query = {
         "cashier_id": current_user["id"],
         "status": "open"
-    }, {"_id": 0})
+    }
+    if tenant_id:
+        shift_query["tenant_id"] = tenant_id
+    
+    shift = await db.shifts.find_one(shift_query, {"_id": 0})
     
     if not shift:
         raise HTTPException(status_code=404, detail="لا يوجد وردية مفتوحة")
@@ -1738,19 +1744,48 @@ async def get_cash_register_summary(current_user: dict = Depends(get_current_use
     # Get branch info
     branch = await db.branches.find_one({"id": shift["branch_id"]}, {"_id": 0, "name": 1})
     
-    # Calculate totals from orders during this shift
-    orders = await db.orders.find({
-        "cashier_id": shift["cashier_id"],
-        "created_at": {"$gte": shift["started_at"]},
+    # Build order query with tenant_id filtering
+    order_query = {
+        "shift_id": shift["id"],  # ربط الطلبات بالوردية مباشرة
         "status": {"$ne": OrderStatus.CANCELLED}
-    }).to_list(1000)
+    }
+    if tenant_id:
+        order_query["tenant_id"] = tenant_id
+    
+    # إذا لم يكن هناك طلبات مرتبطة بالوردية، نستخدم الفلترة القديمة
+    orders = await db.orders.find(order_query).to_list(1000)
+    
+    # إذا لم نجد طلبات بالـ shift_id، نبحث بالـ cashier_id وتاريخ الوردية
+    if not orders:
+        fallback_query = {
+            "cashier_id": shift["cashier_id"],
+            "created_at": {"$gte": shift["started_at"]},
+            "status": {"$ne": OrderStatus.CANCELLED}
+        }
+        if tenant_id:
+            fallback_query["tenant_id"] = tenant_id
+        orders = await db.orders.find(fallback_query).to_list(1000)
     
     # Cancelled orders
-    cancelled_orders = await db.orders.find({
-        "cashier_id": shift["cashier_id"],
-        "created_at": {"$gte": shift["started_at"]},
+    cancelled_query = {
+        "shift_id": shift["id"],
         "status": OrderStatus.CANCELLED
-    }).to_list(1000)
+    }
+    if tenant_id:
+        cancelled_query["tenant_id"] = tenant_id
+    
+    cancelled_orders = await db.orders.find(cancelled_query).to_list(1000)
+    
+    # Fallback for cancelled orders
+    if not cancelled_orders:
+        cancelled_fallback = {
+            "cashier_id": shift["cashier_id"],
+            "created_at": {"$gte": shift["started_at"]},
+            "status": OrderStatus.CANCELLED
+        }
+        if tenant_id:
+            cancelled_fallback["tenant_id"] = tenant_id
+        cancelled_orders = await db.orders.find(cancelled_fallback).to_list(1000)
     
     total_sales = sum(o["total"] for o in orders)
     total_cost = sum(o.get("total_cost", 0) for o in orders)
