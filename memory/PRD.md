@@ -238,12 +238,16 @@
 ├── backend/
 │   ├── .env
 │   ├── requirements.txt
-│   ├── server.py (Main API - 2000+ lines, needs refactoring)
+│   ├── server.py (Main API - 2100+ lines, needs refactoring)
 │   └── tests/
-│       └── test_new_features.py
+│       └── test_iteration4_features.py (جديد)
 ├── frontend/
 │   ├── .env
 │   ├── package.json
+│   ├── public/
+│   │   ├── index.html (PWA support)
+│   │   ├── manifest.json (جديد)
+│   │   └── sw.js (جديد - Service Worker)
 │   └── src/
 │       ├── components/ui/ (Shadcn components)
 │       ├── context/
@@ -251,13 +255,15 @@
 │       │   └── ThemeContext.js
 │       ├── pages/
 │       │   ├── Dashboard.js
+│       │   ├── Delivery.js (Updated with Map tab)
+│       │   ├── DriverPortal.js (Updated with PWA & GPS)
 │       │   ├── Expenses.js
 │       │   ├── Inventory.js
 │       │   ├── Login.js
 │       │   ├── Orders.js
-│       │   ├── POS.js (Updated with new features)
+│       │   ├── POS.js (Fixed pending orders)
 │       │   ├── Reports.js
-│       │   ├── Settings.js (Updated with Customers tab)
+│       │   ├── Settings.js (Added delivery role)
 │       │   └── Tables.js
 │       └── utils/
 │           ├── currency.js
