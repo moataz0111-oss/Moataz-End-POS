@@ -936,21 +936,6 @@ export default function POS() {
               </div>
             </div>
           )}
-                  <SelectTrigger>
-                    <SelectValue placeholder="اختر سائق (اختياري)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">بدون سائق</SelectItem>
-                    {drivers.filter(d => d.is_available).map(driver => (
-                      <SelectItem key={driver.id} value={driver.id}>
-                        {driver.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Cart Items */}
