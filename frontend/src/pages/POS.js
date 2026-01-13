@@ -727,14 +727,14 @@ export default function POS() {
                     }}
                     disabled={table.status !== 'available' && table.id !== selectedTable}
                     className={`
-                      aspect-square rounded-lg font-bold text-lg transition-all
+                      aspect-square rounded-lg font-bold text-lg transition-all flex items-center justify-center
                       ${selectedTable === table.id 
                         ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2' 
                         : table.status === 'available'
-                          ? 'bg-green-500/20 text-green-500 hover:bg-green-500/30 border border-green-500/50'
+                          ? 'bg-green-500 text-white hover:bg-green-600'
                           : table.status === 'occupied'
-                            ? 'bg-red-500/20 text-red-500 border border-red-500/50 cursor-not-allowed'
-                            : 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50 cursor-not-allowed'
+                            ? 'bg-red-500 text-white cursor-not-allowed'
+                            : 'bg-yellow-500 text-white cursor-not-allowed'
                       }
                     `}
                     data-testid={`table-btn-${table.number}`}
