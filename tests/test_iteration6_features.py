@@ -357,7 +357,7 @@ class TestTenantToggleStatus:
         return response.json()["token"]
     
     def test_toggle_tenant_status_endpoint(self, super_admin_token):
-        """Test that toggle tenant status endpoint exists"""
+        """Test that toggle tenant status works via PUT endpoint"""
         # First get list of tenants
         tenants_response = requests.get(
             f"{BASE_URL}/api/super-admin/tenants",
@@ -366,11 +366,14 @@ class TestTenantToggleStatus:
         if tenants_response.status_code != 200 or len(tenants_response.json()) == 0:
             pytest.skip("No tenants available to test")
         
-        tenant_id = tenants_response.json()[0]["id"]
+        tenant = tenants_response.json()[0]
+        tenant_id = tenant["id"]
+        original_status = tenant["is_active"]
         
-        # Test toggle endpoint
+        # Toggle status using PUT endpoint (as frontend does)
         response = requests.put(
-            f"{BASE_URL}/api/super-admin/tenants/{tenant_id}/toggle-status",
+            f"{BASE_URL}/api/super-admin/tenants/{tenant_id}",
+            json={"is_active": not original_status},
             headers={"Authorization": f"Bearer {super_admin_token}"}
         )
         print(f"Toggle tenant status response: {response.status_code}")
@@ -378,11 +381,13 @@ class TestTenantToggleStatus:
         
         data = response.json()
         assert "is_active" in data, "Response should have is_active"
-        print(f"Tenant status toggled to: {data['is_active']}")
+        assert data["is_active"] == (not original_status), "Status should be toggled"
+        print(f"Tenant status toggled from {original_status} to: {data['is_active']}")
         
         # Toggle back to original state
         response2 = requests.put(
-            f"{BASE_URL}/api/super-admin/tenants/{tenant_id}/toggle-status",
+            f"{BASE_URL}/api/super-admin/tenants/{tenant_id}",
+            json={"is_active": original_status},
             headers={"Authorization": f"Bearer {super_admin_token}"}
         )
         print(f"Toggle back response: {response2.status_code}")
