@@ -19,7 +19,7 @@ import DriverPortal from "./pages/DriverPortal";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
   
   if (loading) {
     return (
@@ -32,7 +32,16 @@ const ProtectedRoute = ({ children }) => {
     );
   }
   
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+  
+  // توجيه مستخدمي الديليفري لبوابة السائق
+  if (user?.role === 'delivery') {
+    return <Navigate to={`/driver?id=${user.id}`} />;
+  }
+  
+  return children;
 };
 
 // Public Route (redirect to home if authenticated)
