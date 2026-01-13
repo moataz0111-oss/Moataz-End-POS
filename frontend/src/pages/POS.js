@@ -794,26 +794,44 @@ export default function POS() {
                 onChange={(e) => setDeliveryAddress(e.target.value)}
                 data-testid="delivery-address"
               />
-              <Select value={deliveryApp} onValueChange={setDeliveryApp}>
-                <SelectTrigger data-testid="delivery-app-select">
-                  <SelectValue placeholder="شركة التوصيل (اختياري)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">بدون شركة</SelectItem>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">شركة التوصيل:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => { setDeliveryApp(''); playClick(); }}
+                    className={`p-2 rounded-lg text-sm transition-all ${
+                      deliveryApp === '' 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                    }`}
+                  >
+                    بدون شركة
+                  </button>
                   {deliveryApps.map(app => (
-                    <SelectItem key={app.id} value={app.id}>
-                      {app.name} {app.commission_rate > 0 && `(${app.commission_rate}%)`}
-                    </SelectItem>
+                    <button
+                      key={app.id}
+                      onClick={() => { setDeliveryApp(app.id); playClick(); }}
+                      className={`p-2 rounded-lg text-sm transition-all ${
+                        deliveryApp === app.id 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'bg-muted/50 text-foreground hover:bg-muted'
+                      }`}
+                    >
+                      {app.name}
+                      {app.commission_rate > 0 && (
+                        <span className="text-xs opacity-70 block">{app.commission_rate}%</span>
+                      )}
+                    </button>
                   ))}
-                </SelectContent>
-              </Select>
+                </div>
+              </div>
               {drivers.length > 0 && (
-                <Select value={selectedDriver} onValueChange={setSelectedDriver}>
+                <Select value={selectedDriver || 'none'} onValueChange={(v) => setSelectedDriver(v === 'none' ? '' : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="اختر سائق (اختياري)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">بدون سائق</SelectItem>
+                    <SelectItem value="none">بدون سائق</SelectItem>
                     {drivers.filter(d => d.is_available).map(driver => (
                       <SelectItem key={driver.id} value={driver.id}>
                         {driver.name}
