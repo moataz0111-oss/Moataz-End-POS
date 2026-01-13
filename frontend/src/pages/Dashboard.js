@@ -91,16 +91,32 @@ export default function Dashboard() {
     }
   };
 
-  const quickActions = [
-    { label: 'نقاط البيع', icon: ShoppingCart, path: '/pos', color: 'bg-primary' },
-    { label: 'الطاولات', icon: LayoutGrid, path: '/tables', color: 'bg-blue-500' },
-    { label: 'الطلبات', icon: Package, path: '/orders', color: 'bg-green-500' },
-    { label: 'التقارير', icon: BarChart3, path: '/reports', color: 'bg-amber-500' },
-    { label: 'المصاريف', icon: Receipt, path: '/expenses', color: 'bg-red-500' },
-    { label: 'المخزون', icon: Package, path: '/inventory', color: 'bg-purple-500' },
-    { label: 'التوصيل', icon: Truck, path: '/delivery', color: 'bg-orange-500' },
-    { label: 'الإعدادات', icon: Settings, path: '/settings', color: 'bg-gray-500' },
+  // الأزرار السريعة مع التحكم بالظهور
+  const allQuickActions = [
+    { label: 'نقاط البيع', icon: ShoppingCart, path: '/pos', color: 'bg-primary', key: 'showPOS' },
+    { label: 'الطاولات', icon: LayoutGrid, path: '/tables', color: 'bg-blue-500', key: 'showTables' },
+    { label: 'الطلبات', icon: Package, path: '/orders', color: 'bg-green-500', key: 'showOrders' },
+    { label: 'التقارير', icon: BarChart3, path: '/reports', color: 'bg-amber-500', key: 'showReports' },
+    { label: 'المصاريف', icon: Receipt, path: '/expenses', color: 'bg-red-500', key: 'showExpenses' },
+    { label: 'المخزون', icon: Package, path: '/inventory', color: 'bg-purple-500', key: 'showInventory' },
+    { label: 'التوصيل', icon: Truck, path: '/delivery', color: 'bg-orange-500', key: 'showDelivery' },
+    { label: 'الإعدادات', icon: Settings, path: '/settings', color: 'bg-gray-500', key: 'showSettings' },
   ];
+  
+  // فلترة الأزرار حسب الإعدادات والصلاحيات
+  const quickActions = allQuickActions.filter(action => {
+    // التحقق من إعدادات الصفحة الرئيسية
+    if (!dashboardSettings[action.key]) return false;
+    
+    // التحقق من صلاحيات الكاشير
+    if (user?.role === 'cashier') {
+      // الكاشير يرى فقط: نقاط البيع، الطاولات، المصاريف، التوصيل
+      const allowedForCashier = ['showPOS', 'showTables', 'showExpenses', 'showDelivery'];
+      return allowedForCashier.includes(action.key);
+    }
+    
+    return true;
+  });
 
   const statCards = [
     { 
