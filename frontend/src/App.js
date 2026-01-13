@@ -136,6 +136,8 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* صفحة السائق - بدون حماية للوصول من الهاتف */}
+      <Route path="/driver" element={<DriverPortal />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
