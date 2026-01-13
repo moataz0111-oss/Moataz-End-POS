@@ -716,32 +716,52 @@ export default function POS() {
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground mb-2">اختر طاولة:</p>
               <div className="grid grid-cols-5 gap-2">
-                {tables.map(table => (
-                  <button
-                    key={table.id}
-                    onClick={() => {
-                      if (table.status === 'available' || table.id === selectedTable) {
-                        setSelectedTable(table.id);
-                        playClick();
-                      }
-                    }}
-                    disabled={table.status !== 'available' && table.id !== selectedTable}
-                    className={`
-                      aspect-square rounded-lg font-bold text-lg transition-all flex items-center justify-center
-                      ${selectedTable === table.id 
-                        ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2' 
-                        : table.status === 'available'
-                          ? 'bg-green-500 text-white hover:bg-green-600'
-                          : table.status === 'occupied'
-                            ? 'bg-red-500 text-white cursor-not-allowed'
-                            : 'bg-yellow-500 text-white cursor-not-allowed'
-                      }
-                    `}
-                    data-testid={`table-btn-${table.number}`}
-                  >
-                    {table.number}
-                  </button>
-                ))}
+                {tables.map(table => {
+                  const isOccupied = table.status === 'occupied';
+                  const isReserved = table.status === 'reserved';
+                  const isAvailable = table.status === 'available';
+                  const isSelected = selectedTable === table.id;
+                  
+                  return (
+                    <button
+                      key={table.id}
+                      onClick={() => {
+                        if (isAvailable || isSelected) {
+                          setSelectedTable(table.id);
+                          playClick();
+                        }
+                      }}
+                      disabled={!isAvailable && !isSelected}
+                      style={{
+                        backgroundColor: isSelected ? '#8b5cf6' : isOccupied ? '#ef4444' : isReserved ? '#f59e0b' : '#22c55e',
+                        color: 'white'
+                      }}
+                      className={`
+                        aspect-square rounded-lg font-bold text-lg transition-all flex items-center justify-center
+                        ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}
+                        ${isAvailable && !isSelected ? 'hover:opacity-80' : ''}
+                        ${!isAvailable && !isSelected ? 'cursor-not-allowed opacity-90' : ''}
+                      `}
+                      data-testid={`table-btn-${table.number}`}
+                    >
+                      {table.number}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex gap-4 text-xs mt-2">
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded" style={{backgroundColor: '#22c55e'}}></span>
+                  متاحة
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded" style={{backgroundColor: '#ef4444'}}></span>
+                  مشغولة
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded" style={{backgroundColor: '#f59e0b'}}></span>
+                  محجوزة
+                </span>
               </div>
               {selectedTable && (
                 <p className="text-xs text-primary mt-2">
