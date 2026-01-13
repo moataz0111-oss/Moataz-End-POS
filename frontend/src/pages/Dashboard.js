@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -26,7 +26,13 @@ import {
   Wallet,
   Calculator,
   Check,
-  X
+  X,
+  Printer,
+  Download,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Banknote
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
@@ -35,17 +41,31 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { ScrollArea } from '../components/ui/scroll-area';
+import { Separator } from '../components/ui/separator';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// فئات النقود العراقية
+const DENOMINATIONS = [
+  { value: 250, label: '250', color: 'bg-gray-400' },
+  { value: 500, label: '500', color: 'bg-blue-400' },
+  { value: 1000, label: '1,000', color: 'bg-green-400' },
+  { value: 5000, label: '5,000', color: 'bg-yellow-400' },
+  { value: 10000, label: '10,000', color: 'bg-orange-400' },
+  { value: 25000, label: '25,000', color: 'bg-red-400' },
+  { value: 50000, label: '50,000', color: 'bg-purple-400' },
+];
 
 export default function Dashboard() {
   const { user, logout, hasRole } = useAuth();
   const { theme, setTheme, isDark } = useTheme();
   const navigate = useNavigate();
+  const printRef = useRef();
   
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -65,12 +85,15 @@ export default function Dashboard() {
   
   // حالات إغلاق الصندوق
   const [cashRegisterOpen, setCashRegisterOpen] = useState(false);
-  const [cashRegisterData, setCashRegisterData] = useState(null);
+  const [cashSummary, setCashSummary] = useState(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
   const [denominations, setDenominations] = useState({
     "250": 0, "500": 0, "1000": 0, "5000": 0, "10000": 0, "25000": 0, "50000": 0
   });
   const [closeNotes, setCloseNotes] = useState('');
   const [closingResult, setClosingResult] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
+  const [showReport, setShowReport] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -112,6 +135,125 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // فتح نافذة إغلاق الصندوق وجلب الملخص
+  const openCashRegister = async () => {
+    setCashRegisterOpen(true);
+    setLoadingSummary(true);
+    setClosingResult(null);
+    setShowReport(false);
+    
+    try {
+      const res = await axios.get(`${API}/cash-register/summary`);
+      setCashSummary(res.data);
+      // إعادة تعيين الجرد
+      setDenominations({
+        "250": 0, "500": 0, "1000": 0, "5000": 0, "10000": 0, "25000": 0, "50000": 0
+      });
+      setCloseNotes('');
+    } catch (error) {
+      if (error.response?.status === 404) {
+        toast.error('لا يوجد وردية مفتوحة لك. يرجى فتح وردية أولاً من الإعدادات.');
+        setCashRegisterOpen(false);
+      } else {
+        toast.error('فشل في جلب بيانات الصندوق');
+      }
+    } finally {
+      setLoadingSummary(false);
+    }
+  };
+
+  // حساب إجمالي الجرد
+  const calculateCountedCash = () => {
+    return Object.entries(denominations).reduce((total, [denom, count]) => {
+      return total + (parseInt(denom) * count);
+    }, 0);
+  };
+
+  // تحديث عدد فئة معينة
+  const updateDenomination = (denom, value) => {
+    const numValue = Math.max(0, parseInt(value) || 0);
+    setDenominations(prev => ({ ...prev, [denom]: numValue }));
+  };
+
+  // إغلاق الصندوق
+  const handleCloseRegister = async () => {
+    const countedCash = calculateCountedCash();
+    
+    if (countedCash === 0) {
+      toast.error('يرجى إدخال جرد الصندوق');
+      return;
+    }
+    
+    setIsClosing(true);
+    
+    try {
+      const res = await axios.post(`${API}/cash-register/close`, {
+        denominations,
+        notes: closeNotes
+      });
+      
+      setClosingResult(res.data);
+      setShowReport(true);
+      toast.success('تم إغلاق الصندوق بنجاح!');
+      
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في إغلاق الصندوق');
+    } finally {
+      setIsClosing(false);
+    }
+  };
+
+  // طباعة التقرير
+  const handlePrintReport = () => {
+    const printContent = printRef.current;
+    if (!printContent) return;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl">
+      <head>
+        <title>تقرير إغلاق الصندوق</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 20px; direction: rtl; }
+          .header { text-align: center; margin-bottom: 20px; }
+          .header h1 { font-size: 24px; margin: 0; }
+          .header p { color: #666; margin: 5px 0; }
+          .section { margin-bottom: 15px; }
+          .section-title { font-weight: bold; font-size: 14px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; }
+          .row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted #eee; }
+          .row:last-child { border-bottom: none; }
+          .label { color: #666; }
+          .value { font-weight: bold; }
+          .positive { color: #10B981; }
+          .negative { color: #EF4444; }
+          .total-row { background: #f5f5f5; padding: 10px; margin: 10px 0; font-size: 16px; }
+          .footer { text-align: center; margin-top: 20px; color: #999; font-size: 12px; }
+          @media print { body { padding: 0; } }
+        </style>
+      </head>
+      <body>
+        ${printContent.innerHTML}
+        <div class="footer">
+          <p>Maestro EGP - ${new Date().toLocaleString('ar-IQ')}</p>
+        </div>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
+
+  // إغلاق وتسجيل الخروج
+  const handleCloseAndLogout = () => {
+    setCashRegisterOpen(false);
+    setClosingResult(null);
+    setShowReport(false);
+    logout();
   };
 
   // الأزرار السريعة مع التحكم بالظهور
@@ -234,6 +376,18 @@ export default function Dashboard() {
               data-testid="theme-toggle"
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+
+            {/* Close Cash Register Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={openCashRegister}
+              className="gap-2 border-orange-500 text-orange-500 hover:bg-orange-500/10"
+              data-testid="close-register-btn"
+            >
+              <Calculator className="h-4 w-4" />
+              إغلاق الصندوق
             </Button>
 
             {/* Logout */}
@@ -395,6 +549,314 @@ export default function Dashboard() {
           </Card>
         )}
       </main>
+
+      {/* Cash Register Close Dialog */}
+      <Dialog open={cashRegisterOpen} onOpenChange={setCashRegisterOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <Calculator className="h-6 w-6 text-orange-500" />
+              إغلاق الصندوق
+            </DialogTitle>
+          </DialogHeader>
+
+          <ScrollArea className="max-h-[70vh]">
+            {loadingSummary ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : showReport && closingResult ? (
+              /* تقرير إغلاق الصندوق للطباعة */
+              <div className="p-4">
+                <div ref={printRef}>
+                  <div className="header text-center mb-6">
+                    <h1 className="text-2xl font-bold">تقرير إغلاق الصندوق</h1>
+                    <p className="text-muted-foreground">{closingResult.branch_name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(closingResult.ended_at).toLocaleString('ar-IQ')}
+                    </p>
+                  </div>
+
+                  {/* بيانات الكاشير */}
+                  <div className="section mb-4 p-4 bg-muted/30 rounded-lg">
+                    <div className="section-title font-bold mb-2">بيانات الوردية</div>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div>الكاشير: <strong>{closingResult.cashier_name}</strong></div>
+                      <div>الفرع: <strong>{closingResult.branch_name}</strong></div>
+                      <div>وقت الدخول: <strong>{new Date(closingResult.started_at).toLocaleString('ar-IQ')}</strong></div>
+                      <div>وقت الإغلاق: <strong>{new Date(closingResult.ended_at).toLocaleString('ar-IQ')}</strong></div>
+                    </div>
+                  </div>
+
+                  {/* إجمالي المبيعات */}
+                  <div className="section mb-4 p-4 bg-green-500/10 rounded-lg">
+                    <div className="section-title font-bold mb-2 text-green-600">المبيعات</div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>إجمالي المبيعات:</span>
+                        <strong className="text-green-600">{formatPrice(closingResult.total_sales)}</strong>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>نقدي:</span>
+                        <span>{formatPrice(closingResult.cash_sales)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>بطاقات:</span>
+                        <span>{formatPrice(closingResult.card_sales)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>آجل:</span>
+                        <span>{formatPrice(closingResult.credit_sales)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span>عدد الطلبات:</span>
+                        <span>{closingResult.total_orders}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* تطبيقات التوصيل */}
+                  {closingResult.delivery_app_sales && Object.keys(closingResult.delivery_app_sales).length > 0 && (
+                    <div className="section mb-4 p-4 bg-blue-500/10 rounded-lg">
+                      <div className="section-title font-bold mb-2 text-blue-600">مبيعات التطبيقات</div>
+                      <div className="space-y-1">
+                        {Object.entries(closingResult.delivery_app_sales).map(([app, amount]) => (
+                          <div key={app} className="flex justify-between text-sm">
+                            <span className="capitalize">{app}:</span>
+                            <span>{formatPrice(amount)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* مبيعات السائقين */}
+                  {closingResult.driver_sales > 0 && (
+                    <div className="section mb-4 p-4 bg-orange-500/10 rounded-lg">
+                      <div className="section-title font-bold mb-2 text-orange-600">مبيعات السائقين</div>
+                      <div className="flex justify-between">
+                        <span>إجمالي السائقين:</span>
+                        <strong>{formatPrice(closingResult.driver_sales)}</strong>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* الخصومات والإلغاءات */}
+                  <div className="section mb-4 p-4 bg-red-500/10 rounded-lg">
+                    <div className="section-title font-bold mb-2 text-red-600">الخصومات والإلغاءات</div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span>إجمالي الخصومات:</span>
+                        <span className="text-red-600">{formatPrice(closingResult.discounts_total || 0)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>الطلبات الملغاة ({closingResult.cancelled_orders || 0}):</span>
+                        <span className="text-red-600">{formatPrice(closingResult.cancelled_amount || 0)}</span>
+                      </div>
+                      {closingResult.cancelled_by && closingResult.cancelled_by.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-red-200">
+                          <div className="text-xs text-red-600 mb-1">تفاصيل الإلغاء:</div>
+                          {closingResult.cancelled_by.map((item, idx) => (
+                            <div key={idx} className="flex justify-between text-xs">
+                              <span>{item.user_name} ({item.count} طلب):</span>
+                              <span>{formatPrice(item.total)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* المصاريف */}
+                  <div className="section mb-4 p-4 bg-yellow-500/10 rounded-lg">
+                    <div className="section-title font-bold mb-2 text-yellow-600">المصاريف</div>
+                    <div className="flex justify-between">
+                      <span>إجمالي المصاريف:</span>
+                      <strong className="text-yellow-600">{formatPrice(closingResult.total_expenses)}</strong>
+                    </div>
+                  </div>
+
+                  {/* جرد الصندوق */}
+                  <div className="section mb-4 p-4 bg-purple-500/10 rounded-lg">
+                    <div className="section-title font-bold mb-2 text-purple-600">جرد الصندوق</div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span>الرصيد الافتتاحي:</span>
+                        <span>{formatPrice(closingResult.opening_cash)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>المتوقع في الصندوق:</span>
+                        <span>{formatPrice(closingResult.expected_cash)}</span>
+                      </div>
+                      <div className="flex justify-between font-bold">
+                        <span>الجرد الفعلي:</span>
+                        <span>{formatPrice(closingResult.closing_cash)}</span>
+                      </div>
+                      <Separator className="my-2" />
+                      <div className={`flex justify-between font-bold text-lg ${closingResult.cash_difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <span>الفرق:</span>
+                        <span className="flex items-center gap-1">
+                          {closingResult.cash_difference >= 0 ? (
+                            <CheckCircle className="h-5 w-5" />
+                          ) : (
+                            <XCircle className="h-5 w-5" />
+                          )}
+                          {formatPrice(closingResult.cash_difference)}
+                          {closingResult.cash_difference > 0 && ' (زيادة)'}
+                          {closingResult.cash_difference < 0 && ' (نقص)'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* صافي الربح */}
+                  <div className="section p-4 bg-primary/10 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold">صافي الربح:</span>
+                      <span className={`text-2xl font-bold ${closingResult.net_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatPrice(closingResult.net_profit)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* ملاحظات */}
+                  {closingResult.notes && (
+                    <div className="section mt-4 p-4 bg-muted/30 rounded-lg">
+                      <div className="section-title font-bold mb-2">ملاحظات</div>
+                      <p className="text-sm">{closingResult.notes}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* أزرار الإجراءات */}
+                <div className="flex gap-3 mt-6">
+                  <Button onClick={handlePrintReport} className="flex-1 gap-2">
+                    <Printer className="h-4 w-4" />
+                    طباعة التقرير
+                  </Button>
+                  <Button variant="destructive" onClick={handleCloseAndLogout} className="flex-1 gap-2">
+                    <LogOut className="h-4 w-4" />
+                    تسجيل الخروج
+                  </Button>
+                </div>
+              </div>
+            ) : cashSummary ? (
+              /* نموذج إغلاق الصندوق */
+              <div className="p-4 space-y-6">
+                {/* ملخص المبيعات */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="p-3 bg-green-500/10 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">إجمالي المبيعات</p>
+                    <p className="text-lg font-bold text-green-600">{formatPrice(cashSummary.total_sales)}</p>
+                  </div>
+                  <div className="p-3 bg-blue-500/10 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">نقدي</p>
+                    <p className="text-lg font-bold text-blue-600">{formatPrice(cashSummary.cash_sales)}</p>
+                  </div>
+                  <div className="p-3 bg-yellow-500/10 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">المصاريف</p>
+                    <p className="text-lg font-bold text-yellow-600">{formatPrice(cashSummary.total_expenses)}</p>
+                  </div>
+                  <div className="p-3 bg-purple-500/10 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">المتوقع</p>
+                    <p className="text-lg font-bold text-purple-600">{formatPrice(cashSummary.expected_cash)}</p>
+                  </div>
+                </div>
+
+                {/* جرد فئات النقود */}
+                <div className="space-y-3">
+                  <h3 className="font-bold flex items-center gap-2">
+                    <Banknote className="h-5 w-5 text-green-500" />
+                    جرد الصندوق (فئات النقود)
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {DENOMINATIONS.map((denom) => (
+                      <div key={denom.value} className="flex items-center gap-2 p-2 border rounded-lg">
+                        <div className={`w-12 h-8 ${denom.color} rounded flex items-center justify-center text-white text-xs font-bold`}>
+                          {denom.label}
+                        </div>
+                        <span className="text-sm">×</span>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={denominations[denom.value.toString()]}
+                          onChange={(e) => updateDenomination(denom.value.toString(), e.target.value)}
+                          className="w-20 h-8 text-center"
+                          data-testid={`denom-${denom.value}`}
+                        />
+                        <span className="text-xs text-muted-foreground">
+                          = {formatPrice(denom.value * denominations[denom.value.toString()])}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* إجمالي الجرد */}
+                  <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg">
+                    <span className="font-bold">إجمالي الجرد:</span>
+                    <span className="text-2xl font-bold text-primary">{formatPrice(calculateCountedCash())}</span>
+                  </div>
+
+                  {/* الفرق */}
+                  {calculateCountedCash() > 0 && (
+                    <div className={`flex items-center justify-between p-4 rounded-lg ${
+                      calculateCountedCash() - cashSummary.expected_cash >= 0 
+                        ? 'bg-green-500/10' 
+                        : 'bg-red-500/10'
+                    }`}>
+                      <span className="font-bold">الفرق:</span>
+                      <span className={`text-xl font-bold flex items-center gap-2 ${
+                        calculateCountedCash() - cashSummary.expected_cash >= 0 
+                          ? 'text-green-600' 
+                          : 'text-red-600'
+                      }`}>
+                        {calculateCountedCash() - cashSummary.expected_cash >= 0 ? (
+                          <CheckCircle className="h-5 w-5" />
+                        ) : (
+                          <AlertCircle className="h-5 w-5" />
+                        )}
+                        {formatPrice(calculateCountedCash() - cashSummary.expected_cash)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* ملاحظات */}
+                <div className="space-y-2">
+                  <Label>ملاحظات (اختياري)</Label>
+                  <Input
+                    value={closeNotes}
+                    onChange={(e) => setCloseNotes(e.target.value)}
+                    placeholder="أضف ملاحظات إن وجدت..."
+                    data-testid="close-notes"
+                  />
+                </div>
+
+                {/* زر الإغلاق */}
+                <Button 
+                  onClick={handleCloseRegister} 
+                  className="w-full h-12 text-lg gap-2"
+                  disabled={isClosing || calculateCountedCash() === 0}
+                  data-testid="confirm-close-btn"
+                >
+                  {isClosing ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      جاري الإغلاق...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-5 w-5" />
+                      تأكيد إغلاق الصندوق
+                    </>
+                  )}
+                </Button>
+              </div>
+            ) : null}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
