@@ -587,7 +587,8 @@ export default function Settings() {
       admin: 'مدير النظام',
       manager: 'مدير',
       supervisor: 'مشرف',
-      cashier: 'كاشير'
+      cashier: 'كاشير',
+      delivery: 'سائق توصيل'
     };
     return roles[role] || role;
   };
