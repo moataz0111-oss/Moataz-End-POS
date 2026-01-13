@@ -360,7 +360,8 @@ export default function POS() {
         
         toast.success('تم تحديث الطلب وإرساله للمطبخ');
       } else {
-        // طلب جديد - يصبح جاهز تلقائياً
+        // طلب جديد - معلق للسفري والطاولات، جاهز للتوصيل
+        const isDeliveryOrder = orderType === 'delivery';
         const orderData = {
           order_type: orderType,
           table_id: orderType === 'dine_in' ? selectedTable : null,
@@ -375,7 +376,7 @@ export default function POS() {
           delivery_app: orderType === 'delivery' ? deliveryApp : null,
           driver_id: orderType === 'delivery' ? selectedDriver : null,
           notes: orderNotes,
-          auto_ready: true  // الطلب جاهز تلقائياً
+          auto_ready: isDeliveryOrder  // معلق للسفري والطاولات، جاهز للتوصيل فقط
         };
         
         const res = await axios.post(`${API}/orders`, orderData);
