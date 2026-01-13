@@ -1814,6 +1814,52 @@ async def complete_delivery_portal(driver_id: str, order_id: Optional[str] = Non
     )
     return {"message": "تم التوصيل"}
 
+@api_router.put("/drivers/portal/{driver_id}/location")
+async def update_driver_location(driver_id: str, location: DriverLocationUpdate):
+    """تحديث موقع السائق - GPS"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    await db.drivers.update_one(
+        {"id": driver_id},
+        {"$set": {
+            "location_lat": location.latitude,
+            "location_lng": location.longitude,
+            "location_updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "تم تحديث الموقع"}
+
+@api_router.get("/drivers/locations")
+async def get_drivers_locations(branch_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """جلب مواقع جميع السائقين للخريطة"""
+    query = {"branch_id": branch_id} if branch_id else {}
+    
+    # جلب السائقين مع مواقعهم وحالة التوفر
+    drivers = await db.drivers.find(query, {
+        "_id": 0,
+        "id": 1,
+        "name": 1,
+        "phone": 1,
+        "is_available": 1,
+        "current_order_id": 1,
+        "location_lat": 1,
+        "location_lng": 1,
+        "location_updated_at": 1
+    }).to_list(100)
+    
+    # إضافة معلومات الطلب الحالي لكل سائق
+    for driver in drivers:
+        if driver.get("current_order_id"):
+            order = await db.orders.find_one(
+                {"id": driver["current_order_id"]},
+                {"_id": 0, "order_number": 1, "customer_name": 1, "delivery_address": 1, "status": 1}
+            )
+            driver["current_order"] = order
+    
+    return drivers
+
 # ==================== DELIVERY APP SETTINGS ====================
 
 @api_router.post("/delivery-app-settings")
