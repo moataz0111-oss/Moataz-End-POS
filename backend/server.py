@@ -319,6 +319,7 @@ class OrderCreate(BaseModel):
     notes: Optional[str] = None
     delivery_app: Optional[str] = None
     driver_id: Optional[str] = None
+    auto_ready: bool = False  # الطلب جاهز تلقائياً
 
 class OrderResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
