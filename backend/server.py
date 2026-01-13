@@ -3426,11 +3426,13 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
     total_tenants = await db.tenants.count_documents({})
     active_tenants = await db.tenants.count_documents({"is_active": True})
     total_users = await db.users.count_documents({"role": {"$ne": UserRole.SUPER_ADMIN}})
-    total_orders = await db.orders.count_documents({})
     
-    # المبيعات الإجمالية
+    # حساب الطلبات فقط للعملاء (الذين لديهم tenant_id)
+    total_orders = await db.orders.count_documents({"tenant_id": {"$exists": True, "$ne": None}})
+    
+    # المبيعات الإجمالية - فقط للعملاء
     sales_cursor = db.orders.aggregate([
-        {"$match": {"status": {"$ne": "cancelled"}}},
+        {"$match": {"status": {"$ne": "cancelled"}, "tenant_id": {"$exists": True, "$ne": None}}},
         {"$group": {"_id": None, "total": {"$sum": "$total"}}}
     ])
     sales_result = await sales_cursor.to_list(1)
