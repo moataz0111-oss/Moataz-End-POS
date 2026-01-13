@@ -3086,6 +3086,306 @@ async def get_printers(branch_id: Optional[str] = None):
     printers = await db.printers.find(query, {"_id": 0}).to_list(50)
     return printers
 
+# ==================== SUPER ADMIN & TENANT MANAGEMENT ====================
+# نظام إدارة المستأجرين - لوحة تحكم المالك الرئيسي
+
+# كلمة سر خاصة للـ Super Admin
+SUPER_ADMIN_SECRET = "maestro_super_2024_secret"
+
+# التحقق من صلاحية Super Admin
+async def verify_super_admin(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != UserRole.SUPER_ADMIN:
+        raise HTTPException(status_code=403, detail="صلاحيات Super Admin مطلوبة")
+    return current_user
+
+@api_router.post("/super-admin/login")
+async def super_admin_login(email: str, password: str, secret_key: str):
+    """تسجيل دخول Super Admin"""
+    if secret_key != SUPER_ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="مفتاح السر غير صحيح")
+    
+    user = await db.users.find_one({"email": email, "role": UserRole.SUPER_ADMIN})
+    if not user:
+        raise HTTPException(status_code=401, detail="المستخدم غير موجود")
+    
+    if not verify_password(password, user["password"]):
+        raise HTTPException(status_code=401, detail="كلمة المرور غير صحيحة")
+    
+    token = create_token(user["id"])
+    
+    return {
+        "token": token,
+        "user": {
+            "id": user["id"],
+            "email": user["email"],
+            "full_name": user["full_name"],
+            "role": user["role"]
+        }
+    }
+
+@api_router.post("/super-admin/register")
+async def register_super_admin(secret_key: str, email: str, password: str, full_name: str):
+    """إنشاء حساب Super Admin (مرة واحدة فقط)"""
+    if secret_key != SUPER_ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="مفتاح السر غير صحيح")
+    
+    # التحقق من عدم وجود Super Admin
+    existing = await db.users.find_one({"role": UserRole.SUPER_ADMIN})
+    if existing:
+        raise HTTPException(status_code=400, detail="يوجد Super Admin بالفعل")
+    
+    # التحقق من عدم وجود البريد
+    email_exists = await db.users.find_one({"email": email})
+    if email_exists:
+        raise HTTPException(status_code=400, detail="البريد الإلكتروني مستخدم")
+    
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "username": "super_admin",
+        "email": email,
+        "password": hash_password(password),
+        "full_name": full_name,
+        "role": UserRole.SUPER_ADMIN,
+        "branch_id": None,
+        "tenant_id": None,
+        "permissions": ["all", "super_admin"],
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.users.insert_one(user_doc)
+    
+    token = create_token(user_doc["id"])
+    
+    return {
+        "message": "تم إنشاء حساب Super Admin بنجاح",
+        "token": token,
+        "user": {
+            "id": user_doc["id"],
+            "email": user_doc["email"],
+            "full_name": user_doc["full_name"],
+            "role": user_doc["role"]
+        }
+    }
+
+@api_router.get("/super-admin/tenants")
+async def get_all_tenants(current_user: dict = Depends(verify_super_admin)):
+    """جلب جميع المستأجرين (العملاء)"""
+    tenants = await db.tenants.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # إضافة إحصائيات لكل مستأجر
+    for tenant in tenants:
+        tenant["users_count"] = await db.users.count_documents({"tenant_id": tenant["id"]})
+        tenant["branches_count"] = await db.branches.count_documents({"tenant_id": tenant["id"]})
+        tenant["orders_count"] = await db.orders.count_documents({"tenant_id": tenant["id"]})
+    
+    return tenants
+
+@api_router.post("/super-admin/tenants")
+async def create_tenant(tenant: TenantCreate, current_user: dict = Depends(verify_super_admin)):
+    """إنشاء مستأجر جديد (عميل جديد)"""
+    
+    # التحقق من عدم وجود slug مكرر
+    existing = await db.tenants.find_one({"slug": tenant.slug})
+    if existing:
+        raise HTTPException(status_code=400, detail="الرابط المختصر مستخدم")
+    
+    # التحقق من عدم وجود البريد
+    email_exists = await db.users.find_one({"email": tenant.owner_email})
+    if email_exists:
+        raise HTTPException(status_code=400, detail="البريد الإلكتروني مستخدم")
+    
+    tenant_id = str(uuid.uuid4())
+    
+    # تحديد تاريخ انتهاء الاشتراك
+    if tenant.subscription_type == "trial":
+        expires_at = (datetime.now(timezone.utc) + timedelta(days=14)).isoformat()
+    else:
+        expires_at = (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
+    
+    tenant_doc = {
+        "id": tenant_id,
+        "name": tenant.name,
+        "slug": tenant.slug,
+        "owner_name": tenant.owner_name,
+        "owner_email": tenant.owner_email,
+        "owner_phone": tenant.owner_phone,
+        "subscription_type": tenant.subscription_type,
+        "max_branches": tenant.max_branches,
+        "max_users": tenant.max_users,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": expires_at,
+        "created_by": current_user["id"]
+    }
+    
+    await db.tenants.insert_one(tenant_doc)
+    
+    # إنشاء مستخدم admin للمستأجر
+    admin_password = f"{tenant.slug}123"  # كلمة مرور افتراضية
+    admin_doc = {
+        "id": str(uuid.uuid4()),
+        "username": f"{tenant.slug}_admin",
+        "email": tenant.owner_email,
+        "password": hash_password(admin_password),
+        "full_name": tenant.owner_name,
+        "role": UserRole.ADMIN,
+        "branch_id": None,
+        "tenant_id": tenant_id,
+        "permissions": ["all"],
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.users.insert_one(admin_doc)
+    
+    # إنشاء فرع افتراضي للمستأجر
+    branch_doc = {
+        "id": str(uuid.uuid4()),
+        "name": "الفرع الرئيسي",
+        "address": "",
+        "phone": tenant.owner_phone,
+        "email": tenant.owner_email,
+        "tenant_id": tenant_id,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.branches.insert_one(branch_doc)
+    
+    del tenant_doc["_id"]
+    
+    return {
+        "tenant": tenant_doc,
+        "admin_credentials": {
+            "email": tenant.owner_email,
+            "password": admin_password,
+            "message": "يرجى تغيير كلمة المرور فور تسجيل الدخول"
+        },
+        "access_url": f"/tenant/{tenant.slug}"
+    }
+
+@api_router.get("/super-admin/tenants/{tenant_id}")
+async def get_tenant_details(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
+    """تفاصيل مستأجر معين"""
+    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="المستأجر غير موجود")
+    
+    # إحصائيات تفصيلية
+    users = await db.users.find({"tenant_id": tenant_id}, {"_id": 0, "password": 0}).to_list(100)
+    branches = await db.branches.find({"tenant_id": tenant_id}, {"_id": 0}).to_list(50)
+    
+    # إحصائيات المبيعات
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    orders_today = await db.orders.count_documents({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": today}
+    })
+    
+    total_sales_cursor = db.orders.aggregate([
+        {"$match": {"tenant_id": tenant_id, "status": {"$ne": "cancelled"}}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ])
+    total_sales_result = await total_sales_cursor.to_list(1)
+    total_sales = total_sales_result[0]["total"] if total_sales_result else 0
+    
+    return {
+        "tenant": tenant,
+        "users": users,
+        "branches": branches,
+        "stats": {
+            "users_count": len(users),
+            "branches_count": len(branches),
+            "orders_today": orders_today,
+            "total_sales": total_sales
+        }
+    }
+
+@api_router.put("/super-admin/tenants/{tenant_id}")
+async def update_tenant(tenant_id: str, updates: dict, current_user: dict = Depends(verify_super_admin)):
+    """تحديث بيانات مستأجر"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="المستأجر غير موجود")
+    
+    allowed_updates = ["name", "subscription_type", "max_branches", "max_users", "is_active", "expires_at"]
+    update_data = {k: v for k, v in updates.items() if k in allowed_updates}
+    
+    if update_data:
+        await db.tenants.update_one({"id": tenant_id}, {"$set": update_data})
+    
+    updated = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/super-admin/tenants/{tenant_id}")
+async def delete_tenant(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
+    """حذف مستأجر (تعطيل)"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="المستأجر غير موجود")
+    
+    # تعطيل بدلاً من الحذف
+    await db.tenants.update_one({"id": tenant_id}, {"$set": {"is_active": False}})
+    await db.users.update_many({"tenant_id": tenant_id}, {"$set": {"is_active": False}})
+    
+    return {"message": "تم تعطيل المستأجر وجميع مستخدميه"}
+
+@api_router.post("/super-admin/tenants/{tenant_id}/reset-password")
+async def reset_tenant_admin_password(tenant_id: str, new_password: str, current_user: dict = Depends(verify_super_admin)):
+    """إعادة تعيين كلمة مرور مدير المستأجر"""
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="المستأجر غير موجود")
+    
+    # البحث عن admin المستأجر
+    admin = await db.users.find_one({"tenant_id": tenant_id, "role": UserRole.ADMIN})
+    if not admin:
+        raise HTTPException(status_code=404, detail="مدير المستأجر غير موجود")
+    
+    await db.users.update_one(
+        {"id": admin["id"]},
+        {"$set": {"password": hash_password(new_password)}}
+    )
+    
+    return {"message": "تم إعادة تعيين كلمة المرور", "email": admin["email"]}
+
+@api_router.get("/super-admin/stats")
+async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)):
+    """إحصائيات شاملة للـ Super Admin"""
+    
+    total_tenants = await db.tenants.count_documents({})
+    active_tenants = await db.tenants.count_documents({"is_active": True})
+    total_users = await db.users.count_documents({"role": {"$ne": UserRole.SUPER_ADMIN}})
+    total_orders = await db.orders.count_documents({})
+    
+    # المبيعات الإجمالية
+    sales_cursor = db.orders.aggregate([
+        {"$match": {"status": {"$ne": "cancelled"}}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ])
+    sales_result = await sales_cursor.to_list(1)
+    total_sales = sales_result[0]["total"] if sales_result else 0
+    
+    # المستأجرين حسب نوع الاشتراك
+    subscription_stats = await db.tenants.aggregate([
+        {"$group": {"_id": "$subscription_type", "count": {"$sum": 1}}}
+    ]).to_list(10)
+    
+    # أحدث المستأجرين
+    recent_tenants = await db.tenants.find({}, {"_id": 0}).sort("created_at", -1).limit(5).to_list(5)
+    
+    return {
+        "total_tenants": total_tenants,
+        "active_tenants": active_tenants,
+        "inactive_tenants": total_tenants - active_tenants,
+        "total_users": total_users,
+        "total_orders": total_orders,
+        "total_sales": total_sales,
+        "subscription_stats": {item["_id"]: item["count"] for item in subscription_stats},
+        "recent_tenants": recent_tenants
+    }
+
 # ==================== SEED DATA ====================
 
 @api_router.post("/seed")
