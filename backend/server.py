@@ -1213,6 +1213,19 @@ async def get_next_order_number(branch_id: str) -> int:
 async def create_order(order: OrderCreate, current_user: dict = Depends(get_current_user)):
     order_number = await get_next_order_number(order.branch_id)
     
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # البحث عن الوردية المفتوحة للكاشير
+    shift_query = {
+        "cashier_id": current_user["id"],
+        "status": "open"
+    }
+    if tenant_id:
+        shift_query["tenant_id"] = tenant_id
+    
+    current_shift = await db.shifts.find_one(shift_query, {"_id": 0, "id": 1})
+    shift_id = current_shift["id"] if current_shift else None
+    
     subtotal = sum(item.price * item.quantity for item in order.items)
     tax = subtotal * 0.0  # No tax for Iraq
     total = subtotal - order.discount + tax
