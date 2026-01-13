@@ -689,10 +689,15 @@ export default function Delivery() {
                   ))}
                 </div>
 
-                {/* الخريطة */}
-                <div className="relative rounded-lg overflow-hidden border border-border" style={{ height: '500px' }}>
+                {/* الخريطة مع Leaflet */}
+                <div 
+                  id="drivers-map" 
+                  className="relative rounded-lg overflow-hidden border border-border" 
+                  style={{ height: '500px' }}
+                  ref={mapContainerRef}
+                >
                   {driverLocations.filter(d => d.location_lat && d.location_lng).length === 0 ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-muted/50">
+                    <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-10">
                       <div className="text-center">
                         <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                         <p className="text-muted-foreground text-lg">لا توجد مواقع متاحة للسائقين</p>
@@ -701,21 +706,14 @@ export default function Delivery() {
                         </p>
                       </div>
                     </div>
-                  ) : (
-                    <iframe
-                      title="خريطة السائقين"
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      style={{ border: 0 }}
-                      src={`https://www.google.com/maps/embed/v1/view?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&center=${
-                        driverLocations.find(d => d.location_lat)?.location_lat || 33.3
-                      },${
-                        driverLocations.find(d => d.location_lng)?.location_lng || 44.4
-                      }&zoom=12&maptype=roadmap`}
-                      allowFullScreen
-                    />
-                  )}
+                  ) : null}
+                </div>
+                
+                {/* تحميل الخريطة */}
+                <DriverMap 
+                  drivers={driverLocations} 
+                  mapContainerRef={mapContainerRef}
+                />
                   
                   {/* علامات السائقين فوق الخريطة */}
                   <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-sm rounded-lg p-3 max-w-xs shadow-lg">
