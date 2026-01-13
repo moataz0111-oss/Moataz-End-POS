@@ -36,9 +36,14 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" />;
   }
   
-  // توجيه مستخدمي الديليفري لبوابة السائق
+  // توجيه مستخدمي الديليفري لبوابة السائق فقط إذا كانوا يحاولون الوصول للوحة التحكم
+  // ولكن نسمح لهم بالبقاء في صفحة تسجيل الدخول العادية
   if (user?.role === 'delivery') {
-    return <Navigate to={`/driver?id=${user.id}`} />;
+    // تسجيل الخروج من النظام الرئيسي وتوجيه للسائق
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/driver';
+    return null;
   }
   
   return children;
