@@ -352,17 +352,15 @@ export default function POS() {
       if (editingOrder) {
         const existingProductIds = editingOrder.items.map(i => i.product_id);
         const newItems = cart.filter(item => !existingProductIds.includes(item.product_id));
-        const updatedItems = cart.filter(item => existingProductIds.includes(item.product_id));
         
         // تحقق إذا كانت هناك عناصر جديدة
         if (newItems.length > 0) {
           await axios.put(`${API}/orders/${editingOrder.id}/add-items`, newItems);
         }
         
-        // يمكن تحديث الكميات للعناصر الموجودة لاحقاً
         toast.success('تم تحديث الطلب وإرساله للمطبخ');
       } else {
-        // طلب جديد
+        // طلب جديد - يصبح جاهز تلقائياً
         const orderData = {
           order_type: orderType,
           table_id: orderType === 'dine_in' ? selectedTable : null,
@@ -375,12 +373,21 @@ export default function POS() {
           payment_method: 'pending',
           discount: discount,
           delivery_app: orderType === 'delivery' ? deliveryApp : null,
-          notes: orderNotes
+          driver_id: orderType === 'delivery' ? selectedDriver : null,
+          notes: orderNotes,
+          auto_ready: true  // الطلب جاهز تلقائياً
         };
         
-        await axios.post(`${API}/orders`, orderData);
+        const res = await axios.post(`${API}/orders`, orderData);
         playSuccess();
-        toast.success('تم حفظ الطلب وإرساله للمطبخ');
+        
+        // إذا كان طلب توصيل مع سائق، نعين السائق مباشرة
+        if (orderType === 'delivery' && selectedDriver) {
+          await axios.put(`${API}/drivers/${selectedDriver}/assign?order_id=${res.data.id}`);
+          toast.success(`تم إنشاء الطلب #${res.data.order_number} وتحويله للسائق`);
+        } else {
+          toast.success(`تم إنشاء الطلب #${res.data.order_number}`);
+        }
       }
       
       setKitchenDialogOpen(false);
