@@ -112,6 +112,9 @@ export default function SuperAdmin() {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       verifyToken();
+    } else {
+      // تحقق إذا كان هناك token قديم غير صالح
+      localStorage.removeItem('super_admin_token');
     }
   }, [token]);
 
@@ -138,16 +141,31 @@ export default function SuperAdmin() {
         setUser(res.data);
         setIsAuthenticated(true);
       } else {
+        console.log('Not super admin, logging out');
         logout();
       }
     } catch (error) {
+      console.error('Token verification failed:', error);
       logout();
     }
   };
 
   const fetchData = async () => {
     try {
+      console.log('Fetching data with token:', token?.substring(0, 20) + '...');
       const [tenantsRes, statsRes] = await Promise.all([
+        axios.get(`${API}/super-admin/tenants`),
+        axios.get(`${API}/super-admin/stats`)
+      ]);
+      console.log('Tenants received:', tenantsRes.data);
+      console.log('Stats received:', statsRes.data);
+      setTenants(tenantsRes.data);
+      setStats(statsRes.data);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+      toast.error('فشل في جلب البيانات');
+    }
+  };
         axios.get(`${API}/super-admin/tenants`),
         axios.get(`${API}/super-admin/stats`)
       ]);
