@@ -16,6 +16,31 @@ export default function IncomingCallPopup({ onClose, onAnswer, onCreateOrder }) 
   const audioRef = useRef(null);
   const pollIntervalRef = useRef(null);
 
+  // تشغيل صوت الرنين
+  const playRingSound = () => {
+    try {
+      if (audioRef.current) {
+        audioRef.current.loop = true;
+        audioRef.current.volume = 0.7;
+        audioRef.current.play().catch(() => {});
+      }
+    } catch (e) {
+      console.log('Audio play error:', e);
+    }
+  };
+
+  // إيقاف صوت الرنين
+  const stopRingSound = () => {
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    } catch (e) {
+      console.log('Audio stop error:', e);
+    }
+  };
+
   // جلب المكالمات النشطة
   const fetchActiveCalls = useCallback(async () => {
     try {
@@ -48,31 +73,6 @@ export default function IncomingCallPopup({ onClose, onAnswer, onCreateOrder }) 
       console.error('Error fetching calls:', error);
     }
   }, [isRinging, dismissed]);
-
-  // تشغيل صوت الرنين
-  const playRingSound = () => {
-    try {
-      if (audioRef.current) {
-        audioRef.current.loop = true;
-        audioRef.current.volume = 0.7;
-        audioRef.current.play().catch(() => {});
-      }
-    } catch (e) {
-      console.log('Audio play error:', e);
-    }
-  };
-
-  // إيقاف صوت الرنين
-  const stopRingSound = () => {
-    try {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-    } catch (e) {
-      console.log('Audio stop error:', e);
-    }
-  };
 
   // الرد على المكالمة
   const handleAnswer = async (callId) => {
