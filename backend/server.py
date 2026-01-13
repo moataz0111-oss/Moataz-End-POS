@@ -1594,6 +1594,35 @@ async def get_drivers(branch_id: Optional[str] = None):
     drivers = await db.drivers.find(query, {"_id": 0}).to_list(100)
     return drivers
 
+@api_router.put("/drivers/{driver_id}")
+async def update_driver(driver_id: str, driver: DriverCreate, current_user: dict = Depends(get_current_user)):
+    """تعديل بيانات السائق"""
+    existing = await db.drivers.find_one({"id": driver_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    update_data = {
+        "name": driver.name,
+        "phone": driver.phone,
+    }
+    
+    await db.drivers.update_one({"id": driver_id}, {"$set": update_data})
+    return {"message": "تم تعديل السائق"}
+
+@api_router.delete("/drivers/{driver_id}")
+async def delete_driver(driver_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف السائق"""
+    existing = await db.drivers.find_one({"id": driver_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    # التحقق من عدم وجود طلبات نشطة
+    if existing.get("current_order_id"):
+        raise HTTPException(status_code=400, detail="لا يمكن حذف سائق لديه طلب نشط")
+    
+    await db.drivers.delete_one({"id": driver_id})
+    return {"message": "تم حذف السائق"}
+
 @api_router.put("/drivers/{driver_id}/assign")
 async def assign_driver(driver_id: str, order_id: str, current_user: dict = Depends(get_current_user)):
     await db.drivers.update_one(
