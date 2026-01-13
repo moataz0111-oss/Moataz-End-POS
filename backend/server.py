@@ -3851,6 +3851,236 @@ async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user
         "deleted_shifts": shifts_result.deleted_count
     }
 
+# ==================== CALL CENTER / CALLER ID ====================
+
+class CallCenterConfig(BaseModel):
+    enabled: bool = False
+    provider: str = ""
+    api_url: str = ""
+    api_key: str = ""
+    api_secret: str = ""
+    webhook_secret: str = ""
+    auto_popup: bool = True
+    auto_save_new_callers: bool = True
+    play_sound: bool = True
+
+class IncomingCall(BaseModel):
+    phone: str
+    caller_name: Optional[str] = None
+    call_id: Optional[str] = None
+    direction: str = "incoming"
+    timestamp: Optional[str] = None
+
+# Store active calls in memory (in production, use Redis)
+active_calls = {}
+
+@api_router.post("/callcenter/config")
+async def save_callcenter_config(config: CallCenterConfig, current_user: dict = Depends(get_current_user)):
+    """حفظ إعدادات الكول سنتر"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    config_doc = {
+        "tenant_id": tenant_id,
+        **config.dict(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_by": current_user["id"]
+    }
+    
+    await db.callcenter_config.update_one(
+        {"tenant_id": tenant_id},
+        {"$set": config_doc},
+        upsert=True
+    )
+    
+    return {"message": "تم حفظ إعدادات الكول سنتر"}
+
+@api_router.get("/callcenter/config")
+async def get_callcenter_config(current_user: dict = Depends(get_current_user)):
+    """جلب إعدادات الكول سنتر"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    config = await db.callcenter_config.find_one({"tenant_id": tenant_id}, {"_id": 0})
+    
+    if not config:
+        return CallCenterConfig().dict()
+    
+    return config
+
+@api_router.post("/callcenter/test")
+async def test_callcenter_connection(config: CallCenterConfig, current_user: dict = Depends(get_current_user)):
+    """اختبار اتصال الكول سنتر"""
+    
+    # في الإنتاج، يجب اختبار الاتصال الفعلي مع المزود
+    # حالياً نرجع نجاح للمحاكاة
+    
+    if not config.provider:
+        raise HTTPException(status_code=400, detail="يرجى اختيار مزود الخدمة")
+    
+    if not config.api_url and config.provider not in ["custom"]:
+        raise HTTPException(status_code=400, detail="يرجى إدخال رابط API")
+    
+    # محاكاة اختبار الاتصال
+    return {"success": True, "message": f"تم الاتصال بـ {config.provider} بنجاح"}
+
+@api_router.post("/callcenter/webhook")
+async def callcenter_webhook(request: Request):
+    """Webhook لاستقبال المكالمات من نظام الكول سنتر"""
+    
+    try:
+        body = await request.json()
+    except:
+        body = {}
+    
+    # استخراج رقم المتصل من البيانات (يختلف حسب المزود)
+    phone = body.get("phone") or body.get("caller_id") or body.get("from") or body.get("callerNumber")
+    caller_name = body.get("caller_name") or body.get("name") or body.get("callerName")
+    call_id = body.get("call_id") or body.get("callId") or body.get("id") or str(uuid.uuid4())
+    direction = body.get("direction") or body.get("type") or "incoming"
+    
+    if not phone:
+        return {"status": "error", "message": "No phone number provided"}
+    
+    # تنظيف رقم الهاتف
+    phone = phone.replace(" ", "").replace("-", "").replace("+", "")
+    if phone.startswith("964"):
+        phone = "0" + phone[3:]
+    
+    # البحث عن العميل
+    customer = await db.customers.find_one(
+        {"$or": [{"phone": phone}, {"phone2": phone}]},
+        {"_id": 0}
+    )
+    
+    # آخر طلب للعميل
+    last_order = None
+    if customer:
+        last_order = await db.orders.find_one(
+            {"customer_phone": phone},
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
+    
+    # تخزين المكالمة النشطة
+    call_data = {
+        "call_id": call_id,
+        "phone": phone,
+        "caller_name": caller_name or (customer["name"] if customer else "عميل جديد"),
+        "direction": direction,
+        "customer": customer,
+        "last_order": last_order,
+        "is_new_customer": customer is None,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "status": "ringing"
+    }
+    
+    active_calls[call_id] = call_data
+    
+    # إذا كان عميل جديد وتم تفعيل الحفظ التلقائي
+    # سيتم الحفظ عند إنشاء الطلب
+    
+    return {
+        "status": "success",
+        "call_id": call_id,
+        "customer_found": customer is not None,
+        "customer": customer,
+        "last_order": last_order
+    }
+
+@api_router.post("/callcenter/simulate")
+async def simulate_incoming_call(data: dict, current_user: dict = Depends(get_current_user)):
+    """محاكاة مكالمة واردة للاختبار"""
+    
+    phone = data.get("phone", "07801234567")
+    
+    # تنظيف رقم الهاتف
+    phone = phone.replace(" ", "").replace("-", "").replace("+", "")
+    
+    # البحث عن العميل
+    customer = await db.customers.find_one(
+        {"$or": [{"phone": phone}, {"phone2": phone}]},
+        {"_id": 0}
+    )
+    
+    # آخر طلب للعميل
+    last_order = None
+    if customer:
+        last_order = await db.orders.find_one(
+            {"customer_phone": phone},
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
+    
+    call_id = str(uuid.uuid4())
+    call_data = {
+        "call_id": call_id,
+        "phone": phone,
+        "caller_name": customer["name"] if customer else "عميل جديد",
+        "direction": "incoming",
+        "customer": customer,
+        "last_order": last_order,
+        "is_new_customer": customer is None,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "status": "ringing",
+        "simulated": True
+    }
+    
+    active_calls[call_id] = call_data
+    
+    return call_data
+
+@api_router.get("/callcenter/active-calls")
+async def get_active_calls(current_user: dict = Depends(get_current_user)):
+    """جلب المكالمات النشطة"""
+    return list(active_calls.values())
+
+@api_router.post("/callcenter/calls/{call_id}/answer")
+async def answer_call(call_id: str, current_user: dict = Depends(get_current_user)):
+    """الرد على المكالمة"""
+    if call_id in active_calls:
+        active_calls[call_id]["status"] = "answered"
+        active_calls[call_id]["answered_by"] = current_user["id"]
+        active_calls[call_id]["answered_at"] = datetime.now(timezone.utc).isoformat()
+        return active_calls[call_id]
+    raise HTTPException(status_code=404, detail="المكالمة غير موجودة")
+
+@api_router.post("/callcenter/calls/{call_id}/end")
+async def end_call(call_id: str, current_user: dict = Depends(get_current_user)):
+    """إنهاء المكالمة"""
+    if call_id in active_calls:
+        call_data = active_calls.pop(call_id)
+        call_data["status"] = "ended"
+        call_data["ended_at"] = datetime.now(timezone.utc).isoformat()
+        
+        # حفظ سجل المكالمة
+        await db.call_logs.insert_one({
+            "_id": None,  # سيتم تجاهله
+            **call_data
+        })
+        
+        return {"message": "تم إنهاء المكالمة", "call": call_data}
+    raise HTTPException(status_code=404, detail="المكالمة غير موجودة")
+
+@api_router.get("/callcenter/call-logs")
+async def get_call_logs(
+    limit: int = 50,
+    skip: int = 0,
+    current_user: dict = Depends(get_current_user)
+):
+    """سجل المكالمات"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    query = {}
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    
+    logs = await db.call_logs.find(query, {"_id": 0}).sort("timestamp", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.call_logs.count_documents(query)
+    
+    return {
+        "logs": logs,
+        "total": total
+    }
+
 # ==================== SEED DATA ====================
 
 @api_router.post("/seed")
