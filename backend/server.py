@@ -3256,7 +3256,7 @@ async def register_super_admin(secret_key: str, email: str, password: str, full_
 
 @api_router.get("/super-admin/tenants")
 async def get_all_tenants(current_user: dict = Depends(verify_super_admin)):
-    """جلب جميع المستأجرين (العملاء)"""
+    """جلب جميع المستأجرين (العملاء) بما فيهم النظام الرئيسي"""
     tenants = await db.tenants.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     
     # إضافة إحصائيات لكل مستأجر
@@ -3265,7 +3265,45 @@ async def get_all_tenants(current_user: dict = Depends(verify_super_admin)):
         tenant["branches_count"] = await db.branches.count_documents({"tenant_id": tenant["id"]})
         tenant["orders_count"] = await db.orders.count_documents({"tenant_id": tenant["id"]})
     
-    return tenants
+    # إضافة النظام الرئيسي كـ "عميل" وهمي
+    main_system_users = await db.users.count_documents({
+        "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}],
+        "role": {"$ne": UserRole.SUPER_ADMIN}
+    })
+    main_system_branches = await db.branches.count_documents({
+        "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    })
+    main_system_orders = await db.orders.count_documents({
+        "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    })
+    
+    # حساب مبيعات النظام الرئيسي
+    main_sales_cursor = db.orders.aggregate([
+        {"$match": {"$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}], "status": {"$ne": "cancelled"}}},
+        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
+    ])
+    main_sales_result = await main_sales_cursor.to_list(1)
+    main_total_sales = main_sales_result[0]["total"] if main_sales_result else 0
+    
+    main_system = {
+        "id": "main-system",
+        "name": "🏠 النظام الرئيسي",
+        "slug": "main",
+        "owner_name": "المالك",
+        "owner_email": "admin@maestroegp.com",
+        "owner_phone": "",
+        "subscription_type": "premium",
+        "is_active": True,
+        "is_main_system": True,  # علامة خاصة للنظام الرئيسي
+        "users_count": main_system_users,
+        "branches_count": main_system_branches,
+        "orders_count": main_system_orders,
+        "total_sales": main_total_sales,
+        "created_at": "2024-01-01T00:00:00"
+    }
+    
+    # إضافة النظام الرئيسي في أول القائمة
+    return [main_system] + tenants
 
 @api_router.post("/super-admin/tenants")
 async def create_tenant(tenant: TenantCreate, current_user: dict = Depends(verify_super_admin)):
