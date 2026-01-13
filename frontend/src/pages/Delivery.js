@@ -68,6 +68,12 @@ export default function Delivery() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({ id: '', name: '', phone: '', is_active: true });
   
+  // حالات ربط السائق بمستخدم
+  const [linkUserDialogOpen, setLinkUserDialogOpen] = useState(false);
+  const [deliveryUsers, setDeliveryUsers] = useState([]);
+  const [selectedDriverForLink, setSelectedDriverForLink] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState('');
+  
   // حالات جديدة لمتابعة الطلبات
   const [driverOrders, setDriverOrders] = useState([]);
   const [selectedDriver, setSelectedDriver] = useState(null);
