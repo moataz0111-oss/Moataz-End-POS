@@ -4,7 +4,7 @@
 بناء نظام شامل للتحكم بالتكاليف ونقاط البيع (Maestro EGP) للمطاعم والكافيهات.
 
 ### المتطلبات الأساسية:
-- نظام متعدد المستخدمين (Admin, Manager, Supervisor, Cashier)
+- نظام متعدد المستخدمين (Admin, Manager, Supervisor, Cashier, Delivery)
 - إدارة الفروع مع صلاحيات لكل فرع
 - إدارة المخازن (مواد خام + منتجات نهائية)
 - تتبع المبيعات والكميات بالتفصيل
@@ -22,116 +22,66 @@
 
 ### الميزات الجديدة (الإصدار الأخير - Jan 13, 2026):
 
-#### 1. إصلاح الطلبات المعلقة ✅
-- الطلبات السفري والمحلي عبر "حفظ وإرسال للمطبخ" تحفظ بحالة `pending`
-- الطلبات التوصيل تحفظ بحالة `ready` مباشرة
-- تم تصحيح استخدام `auto_ready` flag
+#### 1. إصلاح تضارب الجلسات ✅
+- بوابة السائق تستخدم مفاتيح localStorage منفصلة (`maestro_driver_session`, `maestro_driver_token`)
+- التطبيق الرئيسي يستخدم (`token`)
+- يمكن الآن استخدام كلا التطبيقين بشكل مستقل بدون تضارب
 
-#### 2. تتبع السائقين GPS ✅
-- API لتحديث موقع السائق: `PUT /api/drivers/portal/{id}/location`
-- API لجلب مواقع جميع السائقين: `GET /api/drivers/locations`
-- تخزين الإحداثيات (lat/lng) مع وقت التحديث
+#### 2. إغلاق الصندوق المتقدم ✅
+- زر "إغلاق الصندوق" في header لوحة التحكم
+- جرد فئات النقود العراقية (250، 500، 1000، 5000، 10000، 25000، 50000)
+- حساب تلقائي للفرق بين المتوقع والفعلي
+- تقرير شامل يشمل:
+  - بيانات الوردية (الكاشير، الفرع، وقت الدخول والإغلاق)
+  - إجمالي المبيعات (نقدي، بطاقات، آجل)
+  - مبيعات تطبيقات التوصيل
+  - مبيعات السائقين
+  - الخصومات والإلغاءات مع تفاصيل من قام بها
+  - المصاريف
+  - جرد الصندوق مع الفرق
+  - صافي الربح
+- إمكانية طباعة التقرير
+- تسجيل خروج تلقائي بعد إغلاق الصندوق
 
-#### 3. خريطة تتبع السائقين ✅
-- علامة تبويب جديدة "الخريطة" في صفحة التوصيل
-- عرض Google Maps مع مواقع السائقين
-- مؤشرات حالة GPS (أخضر للنشط، رمادي لغير المتاح)
-- عرض معلومات الطلب الحالي لكل سائق
+---
 
-#### 4. تطبيق السائق PWA ✅
-- بوابة موبايل للسائقين على `/driver?id={driver_id}`
-- دعم تثبيت كتطبيق (Progressive Web App)
+### الميزات السابقة (Jan 12-13, 2026):
+
+#### 1. بوابة السائق (PWA) ✅
+- بوابة موحدة للسائقين على `/driver`
+- تسجيل دخول آمن باسم المستخدم وكلمة المرور
 - تتبع GPS تلقائي كل 30 ثانية
 - عرض الطلبات النشطة والمكتملة
-- أزرار "فتح الخريطة" (Google Maps/Waze) و "تم التسليم"
+- أزرار "فتح الخريطة" و"تم التسليم"
 - إحصائيات: غير مدفوع، مدفوع اليوم، طلبات نشطة
 
-#### 5. دور "سائق توصيل" delivery ✅
-- إضافة دور جديد للمستخدمين
-- يمكن إنشاء حسابات للسائقين
-- السائقين يتم توجيههم تلقائياً لبوابة السائق
+#### 2. خريطة تتبع السائقين ✅
+- خريطة تفاعلية باستخدام Leaflet/OpenStreetMap
+- أيقونات دراجات نارية 🏍️ للسائقين
+- ألوان مختلفة (أخضر للمتاح، برتقالي للمشغول)
+- معلومات منبثقة عند النقر على السائق
+- تحديث تلقائي للمواقع
 
----
+#### 3. إدارة السائقين ✅
+- إضافة/تعديل/حذف السائقين
+- ربط السائقين بحسابات المستخدمين
+- تتبع حالة السائق (متاح/مشغول)
 
-### الميزات السابقة (Jan 12, 2026):
-- نافذة منبثقة بـ 3 تبويبات (سفري، توصيل، محلي)
-- عرض تفاصيل كل طلب (الرقم، النوع، العميل، الأصناف، السعر، الوقت)
-- زر "فتح للتعديل" لكل طلب
-- مؤشر عدد الطلبات على الزر الرئيسي
-- تحديث تلقائي كل 30 ثانية
+#### 4. إدارة المستخدمين ✅
+- إضافة دور "سائق توصيل" (delivery)
+- إعادة تعيين كلمة المرور للمستخدمين
+- صلاحيات متقدمة (26 صلاحية)
 
-#### 2. تعديل الطلبات الموجودة ✅
-- تحميل الطلب المعلق في السلة
-- مؤشر "تعديل طلب #X" في الهيدر
-- إمكانية إضافة أصناف جديدة للطلب
-- API: `PUT /api/orders/{order_id}/add-items`
+#### 5. إدارة العملاء ✅
+- قاعدة بيانات العملاء مع البحث
+- إنشاء تلقائي للعملاء من الطلبات
+- البحث بالهاتف في POS
 
-#### 3. زر طباعة الفاتورة ✅
-- معاينة الفاتورة قبل الدفع
-- تصميم إيصال احترافي
-- عرض تفاصيل الطلب والأسعار
-
-#### 4. إدارة العملاء ✅
-- قسم جديد في الإعدادات "العملاء"
-- إضافة/تعديل/حذف العملاء
-- حقول: الاسم، الهاتف، هاتف إضافي، العنوان، المنطقة، ملاحظات
-- خاصية حظر العميل
-- عرض إجمالي الطلبات والمبلغ المصروف
-- البحث بالاسم أو الهاتف
-
-#### 5. البحث عن العملاء بالهاتف ✅
-- حقل بحث في هيدر POS
-- عرض بيانات العميل عند العثور عليه
-- ملء حقول الاسم والعنوان تلقائياً
-- API: `GET /api/customers/by-phone/{phone}`
-
-#### 6. إنشاء العملاء تلقائياً ✅
-- عند إنشاء طلب برقم هاتف، يتم إنشاء العميل تلقائياً
-- تحديث إحصائيات العميل (عدد الطلبات، إجمالي المصروف)
-
----
-
-### الميزات السابقة المنفذة:
-
-#### نظام الصلاحيات (26 صلاحية)
-مجموعات الصلاحيات:
-- المبيعات: نقاط البيع، إعطاء خصومات، إلغاء الطلبات، الطلبات، تعديل الطلبات، الطاولات
-- المطبخ: شاشة المطبخ
-- المخزون: عرض المخزون، تعديل المخزون، نقل المخزون
-- التقارير: التقارير الأساسية، التقارير المالية، تصدير التقارير
-- المالية: المصاريف، إضافة مصاريف، المشتريات
-- التوصيل: التوصيل، السائقين
-- الإعدادات: المنتجات، تعديل المنتجات، تعديل الأسعار، الفئات
-- الإدارة: المستخدمين، الفروع، الإعدادات، الورديات، إغلاق الصندوق
-
-#### إعدادات شركات التوصيل
-- نسب العمولة لكل شركة
-- حساب العمولة التلقائي في POS
-- عرض الصافي بعد العمولة
-
-#### إدارة المستخدمين المتقدمة
-- إضافة مستخدمين مع كل الصلاحيات
-- تعديل الصلاحيات لكل مستخدم
-- تفعيل/تعطيل المستخدمين
-
-#### إدارة الفروع
-- إضافة/تعديل/تعطيل الفروع
-- ربط المستخدمين بالفروع
-
-#### إدارة المنتجات والفئات
-- CRUD للمنتجات والفئات
-- تحديد أسعار البيع والتكلفة
-- حساب الربح التلقائي
-
-#### صفحة التقارير المتقدمة
-- تقارير المبيعات
-- تقارير شركات التوصيل
-- تقارير المصاريف
-- فلترة بالتاريخ
-
-#### رقم جهاز التنبيه للسفري
-- حقل اختياري لرقم جهاز العميل
-- يظهر في الطلبات المعلقة
+#### 6. نقاط البيع (POS) ✅
+- الطلبات المعلقة (سفري، توصيل، محلي)
+- تعديل الطلبات الموجودة
+- معاينة وطباعة الفاتورة
+- تكامل مع تطبيقات التوصيل
 
 ---
 
@@ -140,46 +90,31 @@
 - **Frontend:** React.js with TailwindCSS + Shadcn/UI
 - **Database:** MongoDB
 - **Authentication:** JWT
+- **Maps:** Leaflet.js, OpenStreetMap
 
 ---
 
 ## API Reference - Key Endpoints
 
+### Cash Register (جديد)
+- `GET /api/cash-register/summary` - ملخص الصندوق قبل الإغلاق
+- `POST /api/cash-register/close` - إغلاق الصندوق مع جرد الفئات
+
 ### Authentication
 - `POST /api/auth/login` - تسجيل الدخول
 - `POST /api/auth/register` - تسجيل مستخدم جديد
 
-### Customers (جديد)
-- `GET /api/customers` - قائمة العملاء
-- `POST /api/customers` - إنشاء عميل
-- `GET /api/customers/by-phone/{phone}` - البحث بالهاتف
-- `PUT /api/customers/{id}` - تحديث عميل
-- `DELETE /api/customers/{id}` - حذف عميل
+### Shifts
+- `GET /api/shifts` - قائمة الورديات
+- `GET /api/shifts/current` - الوردية الحالية
+- `POST /api/shifts` - فتح وردية
+- `POST /api/shifts/{id}/close` - إغلاق وردية
 
-### Drivers Location Tracking (جديد)
-- `PUT /api/drivers/portal/{driver_id}/location` - تحديث موقع السائق GPS
-- `GET /api/drivers/locations` - جلب مواقع جميع السائقين للخريطة
-
-### Driver Portal (جديد)
-- `GET /api/drivers/portal/{driver_id}` - بيانات السائق والطلبات
-- `GET /api/drivers/portal/by-phone/{phone}` - بوابة السائق بالهاتف
-- `PUT /api/drivers/portal/{driver_id}/complete` - إكمال توصيل طلب
-
-### Orders
-- `GET /api/orders?status=pending` - الطلبات المعلقة
-- `GET /api/orders/{id}` - تفاصيل طلب
-- `POST /api/orders` - إنشاء طلب
-- `PUT /api/orders/{id}/add-items` - إضافة أصناف (جديد)
-- `PUT /api/orders/{id}/payment` - تحديث طريقة الدفع
-- `PUT /api/orders/{id}/status` - تحديث حالة الطلب
-
-### Products & Categories
-- `GET /api/products` - المنتجات
-- `GET /api/categories` - الفئات
-
-### Reports
-- `GET /api/reports/sales` - تقارير المبيعات
-- `GET /api/reports/delivery-credits` - تقارير التوصيل
+### Drivers
+- `GET /api/drivers` - قائمة السائقين
+- `GET /api/drivers/locations` - مواقع السائقين
+- `GET /api/drivers/by-user/{user_id}` - السائق بالمستخدم
+- `PUT /api/drivers/portal/{id}/location` - تحديث موقع GPS
 
 ---
 
@@ -187,33 +122,33 @@
 
 ### P0 - Completed ✅
 - [x] Authentication System
-- [x] Product Management
-- [x] Category Management
-- [x] Order Creation (Dine-in, Takeaway, Delivery)
+- [x] Product & Category Management
+- [x] Order Management (Dine-in, Takeaway, Delivery)
 - [x] Table Management
 - [x] Shift Management
-- [x] Delivery Tracking
+- [x] Delivery & Driver Tracking
 - [x] Sound Notifications
-- [x] Pending Orders Queue
-- [x] Order Editing
 - [x] Customer Management
-- [x] Print Bill Preview
-- [x] **إصلاح الطلبات المعلقة** (جديد)
-- [x] **تتبع السائقين GPS** (جديد)
-- [x] **خريطة تتبع السائقين** (جديد)
-- [x] **تطبيق السائق PWA** (جديد)
-- [x] **دور سائق التوصيل** (جديد)
+- [x] Driver Portal (PWA)
+- [x] Driver Tracking Map
+- [x] **إصلاح تضارب الجلسات** ✅
+- [x] **إغلاق الصندوق المتقدم** ✅
 
-### P1 - Upcoming
-- [ ] Caller ID Integration (يحتاج بحث تقني)
-- [ ] Email Reports (SendGrid configured)
-- [ ] Receipt Printing (Hardware Integration)
+### P1 - In Progress / Upcoming
+- [ ] تحسين خريطة التتبع الاحترافية
+- [ ] إعدادات النظام (لوجو، اسم، صلاحيات الفروع)
+- [ ] تتبع أوقات السائق بالتفصيل
+- [ ] التقارير الجديدة (ملغاة، خصومات، آجلة)
+- [ ] Caller ID Integration
+- [ ] Email Reports (SendGrid)
+- [ ] تقارير المبيعات بالأصناف + تصدير Excel
 
 ### P2 - Future
-- [ ] Stripe Payment Integration
-- [ ] Real-time Kitchen Display Screen
+- [ ] نظام Multi-tenant (بيع نسخ متعددة)
+- [ ] تخصيص الفاتورة وربط الطابعات
+- [ ] إدارة وصفات المنتجات (المواد الخام)
+- [ ] Real-time Kitchen Display
 - [ ] Customer Loyalty Program
-- [ ] Multi-Currency Full Support
 
 ---
 
@@ -227,13 +162,15 @@
 - Email: cashier@maestroegp.com
 - Password: cashier123
 
+### Default Driver
+- Email: moustafa@maestroegp.com
+- Password: driver123
+
 ---
 
 ## Test Reports
-- `/app/test_reports/iteration_1.json` - Initial build tests
-- `/app/test_reports/iteration_2.json` - Settings features
-- `/app/test_reports/iteration_3.json` - POS workflow & Customer management (100% pass)
-- `/app/test_reports/iteration_4.json` - Driver tracking & Pending orders fix (93% backend, 100% frontend)
+- `/app/test_reports/iteration_4.json` - Driver tracking & Pending orders
+- `/app/test_reports/iteration_5.json` - Session fix & Cash register (100% pass)
 
 ---
 
@@ -243,36 +180,29 @@
 ├── backend/
 │   ├── .env
 │   ├── requirements.txt
-│   ├── server.py (Main API - 2100+ lines, needs refactoring)
+│   ├── server.py (Main API - needs refactoring)
 │   └── tests/
-│       └── test_iteration4_features.py (جديد)
+│       └── test_iteration5_features.py
 ├── frontend/
 │   ├── .env
 │   ├── package.json
 │   ├── public/
 │   │   ├── index.html (PWA support)
-│   │   ├── manifest.json (جديد)
-│   │   └── sw.js (جديد - Service Worker)
+│   │   ├── manifest.json
+│   │   └── sw.js (Service Worker)
 │   └── src/
 │       ├── components/ui/ (Shadcn components)
 │       ├── context/
 │       │   ├── AuthContext.js
 │       │   └── ThemeContext.js
 │       ├── pages/
-│       │   ├── Dashboard.js
-│       │   ├── Delivery.js (Updated with Map tab)
-│       │   ├── DriverPortal.js (Updated with PWA & GPS)
-│       │   ├── Expenses.js
-│       │   ├── Inventory.js
-│       │   ├── Login.js
-│       │   ├── Orders.js
-│       │   ├── POS.js (Fixed pending orders)
+│       │   ├── Dashboard.js (+ Cash Register Close)
+│       │   ├── Delivery.js (+ Map & Driver CRUD)
+│       │   ├── DriverPortal.js (PWA with separate session)
+│       │   ├── POS.js
 │       │   ├── Reports.js
-│       │   ├── Settings.js (Added delivery role)
-│       │   └── Tables.js
+│       │   └── Settings.js
 │       └── utils/
-│           ├── currency.js
-│           └── sound.js
 └── memory/
     └── PRD.md
 ```
@@ -281,17 +211,12 @@
 
 ## Notes for Future Development
 
-### Caller ID Feature
-يحتاج بحث تقني - الخيارات المحتملة:
-1. خدمة VoIP (Twilio) - تكلفة شهرية
-2. تطبيق مساعد على الهاتف - معقد تقنياً
-3. ربط مع نظام هاتف الفرع - يحتاج hardware
-
-### Backend Refactoring Needed
-ملف `server.py` أكثر من 2000 سطر. يجب تقسيمه إلى:
-- `/routes/auth.py`
-- `/routes/orders.py`
-- `/routes/customers.py`
-- `/routes/products.py`
+### Backend Refactoring Needed (CRITICAL)
+ملف `server.py` أكثر من 2800 سطر. يجب تقسيمه إلى:
+- `/routes/` (auth, orders, customers, products, drivers, shifts)
 - `/models/` (Pydantic models)
 - `/services/` (Business logic)
+
+### localStorage Keys Reference
+- **Main App:** `token`
+- **Driver Portal:** `maestro_driver_session`, `maestro_driver_token`
