@@ -755,30 +755,34 @@ export default function SuperAdmin() {
                           <Eye className="h-4 w-4" />
                         </Button>
                         
-                        {/* إعادة تعيين كلمة المرور */}
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => {
-                            setSelectedTenant(tenant);
-                            setShowResetPassword(true);
-                          }}
-                          className="text-gray-400 hover:text-white"
-                          title="إعادة تعيين كلمة المرور"
-                        >
-                          <Key className="h-4 w-4" />
-                        </Button>
+                        {/* إعادة تعيين كلمة المرور - مخفي للنظام الرئيسي */}
+                        {!tenant.is_main_system && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => {
+                              setSelectedTenant(tenant);
+                              setShowResetPassword(true);
+                            }}
+                            className="text-gray-400 hover:text-white"
+                            title="إعادة تعيين كلمة المرور"
+                          >
+                            <Key className="h-4 w-4" />
+                          </Button>
+                        )}
                         
-                        {/* تفعيل/تعطيل */}
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => toggleTenantStatus(tenant)}
-                          className={tenant.is_active ? 'text-green-400 hover:text-red-400' : 'text-red-400 hover:text-green-400'}
-                          title={tenant.is_active ? 'تعطيل' : 'تفعيل'}
-                        >
-                          {tenant.is_active ? <Power className="h-4 w-4" /> : <PowerOff className="h-4 w-4" />}
-                        </Button>
+                        {/* تفعيل/تعطيل - مخفي للنظام الرئيسي */}
+                        {!tenant.is_main_system && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => toggleTenantStatus(tenant)}
+                            className={tenant.is_active ? 'text-green-400 hover:text-red-400' : 'text-red-400 hover:text-green-400'}
+                            title={tenant.is_active ? 'تعطيل' : 'تفعيل'}
+                          >
+                            {tenant.is_active ? <Power className="h-4 w-4" /> : <PowerOff className="h-4 w-4" />}
+                          </Button>
+                        )}
                         
                         {/* تصفير المبيعات */}
                         <Button 
@@ -794,10 +798,8 @@ export default function SuperAdmin() {
                           <RotateCcw className="h-4 w-4" />
                         </Button>
                         
-                        {/* حذف */}
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
+                        {/* حذف - مخفي للنظام الرئيسي */}
+                        {!tenant.is_main_system && (
                           onClick={() => {
                             setSelectedTenant(tenant);
                             setShowDeleteConfirm(true);
