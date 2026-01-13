@@ -334,4 +334,104 @@ export default {
   playUrgentAlert,
   playDriverNotification,
   playDeliveryComplete,
+  playIncomingCall,
+  getSoundSettings,
+  saveSoundSettings,
+};
+
+// ==================== إعدادات الصوت ====================
+
+const DEFAULT_SOUND_SETTINGS = {
+  enabled: true,
+  buttonSounds: true,
+  orderNotifications: true,
+  callRingtone: true,
+  driverNotifications: true,
+  volume: 0.7
+};
+
+/**
+ * جلب إعدادات الصوت من localStorage
+ */
+export const getSoundSettings = () => {
+  try {
+    const saved = localStorage.getItem('soundSettings');
+    if (saved) {
+      return { ...DEFAULT_SOUND_SETTINGS, ...JSON.parse(saved) };
+    }
+  } catch (e) {
+    console.warn('Failed to load sound settings:', e);
+  }
+  return DEFAULT_SOUND_SETTINGS;
+};
+
+/**
+ * حفظ إعدادات الصوت
+ */
+export const saveSoundSettings = (settings) => {
+  try {
+    localStorage.setItem('soundSettings', JSON.stringify(settings));
+    return true;
+  } catch (e) {
+    console.warn('Failed to save sound settings:', e);
+    return false;
+  }
+};
+
+/**
+ * تشغيل صوت رنين المكالمة الواردة
+ */
+export const playIncomingCall = () => {
+  const settings = getSoundSettings();
+  if (!settings.enabled || !settings.callRingtone) return;
+  
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const volume = settings.volume || 0.7;
+    
+    // نغمة رنين هاتف كلاسيكية
+    const playRingTone = (startTime) => {
+      // النغمة الأولى (عالية)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.frequency.value = 440; // A4
+      osc1.type = 'sine';
+      gain1.gain.setValueAtTime(volume * 0.2, startTime);
+      gain1.gain.setValueAtTime(0, startTime + 0.1);
+      osc1.start(startTime);
+      osc1.stop(startTime + 0.1);
+      
+      // النغمة الثانية (منخفضة)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.frequency.value = 480; // B4
+      osc2.type = 'sine';
+      gain2.gain.setValueAtTime(volume * 0.2, startTime + 0.1);
+      gain2.gain.setValueAtTime(0, startTime + 0.2);
+      osc2.start(startTime + 0.1);
+      osc2.stop(startTime + 0.2);
+    };
+    
+    // تشغيل الرنين 3 مرات
+    playRingTone(ctx.currentTime);
+    playRingTone(ctx.currentTime + 0.25);
+    playRingTone(ctx.currentTime + 0.5);
+    
+    // فترة صمت ثم رنين آخر
+    setTimeout(() => {
+      try {
+        const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+        playRingTone(ctx2.currentTime);
+        playRingTone(ctx2.currentTime + 0.25);
+        playRingTone(ctx2.currentTime + 0.5);
+      } catch (e) {}
+    }, 1000);
+    
+  } catch (error) {
+    console.warn('Incoming call sound failed:', error);
+  }
 };
