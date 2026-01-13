@@ -3560,6 +3560,69 @@ async def permanently_delete_tenant(tenant_id: str, confirm: bool = False, curre
     
     return {"message": f"تم حذف العميل '{tenant['name']}' وجميع بياناته نهائياً"}
 
+@api_router.post("/super-admin/reset-sales")
+async def reset_all_sales(confirm: bool = False, current_user: dict = Depends(verify_super_admin)):
+    """تصفير جميع المبيعات والطلبات - للتجربة"""
+    
+    if not confirm:
+        raise HTTPException(status_code=400, detail="يجب تأكيد التصفير بإرسال confirm=true")
+    
+    # حذف جميع الطلبات
+    orders_result = await db.orders.delete_many({})
+    
+    # حذف جميع الورديات
+    shifts_result = await db.shifts.delete_many({})
+    
+    # إعادة تعيين إحصائيات العملاء
+    await db.customers.update_many({}, {"$set": {
+        "total_orders": 0,
+        "total_spent": 0.0,
+        "last_order_date": None
+    }})
+    
+    # إعادة تعيين إحصائيات السائقين
+    await db.drivers.update_many({}, {"$set": {
+        "total_deliveries": 0,
+        "is_available": True,
+        "current_order_id": None
+    }})
+    
+    return {
+        "message": "تم تصفير جميع المبيعات بنجاح",
+        "deleted_orders": orders_result.deleted_count,
+        "deleted_shifts": shifts_result.deleted_count
+    }
+
+@api_router.post("/super-admin/tenants/{tenant_id}/reset-sales")
+async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user: dict = Depends(verify_super_admin)):
+    """تصفير مبيعات عميل معين - للتجربة"""
+    
+    if not confirm:
+        raise HTTPException(status_code=400, detail="يجب تأكيد التصفير بإرسال confirm=true")
+    
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="العميل غير موجود")
+    
+    # حذف طلبات العميل
+    orders_result = await db.orders.delete_many({"tenant_id": tenant_id})
+    
+    # حذف ورديات العميل
+    shifts_result = await db.shifts.delete_many({"tenant_id": tenant_id})
+    
+    # إعادة تعيين إحصائيات عملاء هذا العميل
+    await db.customers.update_many({"tenant_id": tenant_id}, {"$set": {
+        "total_orders": 0,
+        "total_spent": 0.0,
+        "last_order_date": None
+    }})
+    
+    return {
+        "message": f"تم تصفير مبيعات '{tenant['name']}' بنجاح",
+        "deleted_orders": orders_result.deleted_count,
+        "deleted_shifts": shifts_result.deleted_count
+    }
+
 # ==================== SEED DATA ====================
 
 @api_router.post("/seed")
