@@ -682,12 +682,13 @@ async def reset_user_password(user_id: str, data: PasswordReset, current_user: d
 
 @api_router.post("/branches", response_model=BranchResponse)
 async def create_branch(branch: BranchCreate, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != UserRole.ADMIN:
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
     branch_doc = {
         "id": str(uuid.uuid4()),
         **branch.model_dump(),
+        "tenant_id": get_user_tenant_id(current_user),  # فصل البيانات
         "is_active": True,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
@@ -696,27 +697,30 @@ async def create_branch(branch: BranchCreate, current_user: dict = Depends(get_c
     return branch_doc
 
 @api_router.get("/branches", response_model=List[BranchResponse])
-async def get_branches():
-    branches = await db.branches.find({}, {"_id": 0}).to_list(100)
+async def get_branches(current_user: dict = Depends(get_current_user)):
+    query = build_tenant_query(current_user)  # فلترة حسب tenant_id
+    branches = await db.branches.find(query, {"_id": 0}).to_list(100)
     return branches
 
 @api_router.get("/branches/{branch_id}", response_model=BranchResponse)
-async def get_branch(branch_id: str):
-    branch = await db.branches.find_one({"id": branch_id}, {"_id": 0})
+async def get_branch(branch_id: str, current_user: dict = Depends(get_current_user)):
+    query = build_tenant_query(current_user, {"id": branch_id})
+    branch = await db.branches.find_one(query, {"_id": 0})
     if not branch:
         raise HTTPException(status_code=404, detail="الفرع غير موجود")
     return branch
 
 @api_router.put("/branches/{branch_id}")
 async def update_branch(branch_id: str, branch: BranchCreate, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != UserRole.ADMIN:
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
         raise HTTPException(status_code=403, detail="غير مصرح")
-    await db.branches.update_one({"id": branch_id}, {"$set": branch.model_dump()})
+    query = build_tenant_query(current_user, {"id": branch_id})
+    await db.branches.update_one(query, {"$set": branch.model_dump()})
     return await db.branches.find_one({"id": branch_id}, {"_id": 0})
 
 @api_router.delete("/branches/{branch_id}")
 async def delete_branch(branch_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != UserRole.ADMIN:
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     # Check if branch has users or orders
     users_count = await db.users.count_documents({"branch_id": branch_id})
