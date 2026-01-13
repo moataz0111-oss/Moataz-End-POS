@@ -458,10 +458,3 @@ export default {
   getSoundSettings,
   saveSoundSettings,
 };
-      } catch (e) {}
-    }, 1000);
-    
-  } catch (error) {
-    console.warn('Incoming call sound failed:', error);
-  }
-};
