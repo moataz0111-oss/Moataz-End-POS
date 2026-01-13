@@ -1588,12 +1588,17 @@ async def assign_driver(driver_id: str, order_id: str, current_user: dict = Depe
     return {"message": "تم تعيين السائق"}
 
 @api_router.put("/drivers/{driver_id}/complete")
-async def complete_delivery(driver_id: str, current_user: dict = Depends(get_current_user)):
+async def complete_delivery(driver_id: str, order_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     driver = await db.drivers.find_one({"id": driver_id})
-    if driver and driver.get("current_order_id"):
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    target_order_id = order_id or driver.get("current_order_id")
+    
+    if target_order_id:
         await db.orders.update_one(
-            {"id": driver["current_order_id"]},
-            {"$set": {"status": OrderStatus.DELIVERED}}
+            {"id": target_order_id},
+            {"$set": {"status": OrderStatus.DELIVERED, "delivered_at": datetime.now(timezone.utc).isoformat()}}
         )
     
     await db.drivers.update_one(
@@ -1601,6 +1606,111 @@ async def complete_delivery(driver_id: str, current_user: dict = Depends(get_cur
         {"$set": {"is_available": True, "current_order_id": None}, "$inc": {"total_deliveries": 1}}
     )
     return {"message": "تم التوصيل"}
+
+@api_router.get("/drivers/{driver_id}/stats")
+async def get_driver_stats(driver_id: str):
+    """جلب إحصائيات السائق - المبالغ المدفوعة وغير المدفوعة"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    # جلب طلبات السائق
+    orders = await db.orders.find({
+        "driver_id": driver_id,
+        "status": {"$in": [OrderStatus.DELIVERED, OrderStatus.PENDING, OrderStatus.READY]}
+    }, {"_id": 0}).to_list(1000)
+    
+    # حساب المبالغ
+    unpaid_total = sum(o.get("total", 0) for o in orders if o.get("driver_payment_status") != "paid")
+    paid_total = sum(o.get("total", 0) for o in orders if o.get("driver_payment_status") == "paid")
+    
+    # المدفوع اليوم
+    today = datetime.now(timezone.utc).date().isoformat()
+    paid_today = sum(
+        o.get("total", 0) for o in orders 
+        if o.get("driver_payment_status") == "paid" and o.get("driver_paid_at", "").startswith(today)
+    )
+    
+    # الطلبات المعلقة
+    pending_orders = len([o for o in orders if o.get("status") in [OrderStatus.PENDING, OrderStatus.READY]])
+    
+    return {
+        "unpaid_total": unpaid_total,
+        "paid_total": paid_total,
+        "paid_today": paid_today,
+        "pending_orders": pending_orders,
+        "total_orders": len(orders)
+    }
+
+@api_router.get("/drivers/{driver_id}/orders")
+async def get_driver_orders(driver_id: str):
+    """جلب طلبات السائق - غير المدفوعة أولاً"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    # جلب الطلبات مرتبة: غير المدفوعة أولاً، ثم حسب التاريخ
+    orders = await db.orders.find({
+        "driver_id": driver_id,
+        "status": {"$in": [OrderStatus.DELIVERED, OrderStatus.PENDING, OrderStatus.READY]}
+    }, {"_id": 0}).to_list(100)
+    
+    # ترتيب: غير المدفوعة أولاً
+    orders.sort(key=lambda x: (x.get("driver_payment_status") == "paid", x.get("created_at", "")), reverse=False)
+    
+    return orders
+
+@api_router.put("/orders/{order_id}/driver-payment")
+async def update_driver_payment(order_id: str, is_paid: bool, current_user: dict = Depends(get_current_user)):
+    """تحديث حالة دفع السائق للطلب"""
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    update_data = {
+        "driver_payment_status": "paid" if is_paid else "unpaid",
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    if is_paid:
+        update_data["driver_paid_at"] = datetime.now(timezone.utc).isoformat()
+        update_data["driver_paid_by"] = current_user["id"]
+    
+    await db.orders.update_one({"id": order_id}, {"$set": update_data})
+    return {"message": "تم تحديث حالة الدفع"}
+
+@api_router.post("/drivers/{driver_id}/collect-payment")
+async def collect_driver_payment(driver_id: str, amount: float = 0, current_user: dict = Depends(get_current_user)):
+    """تحصيل مبلغ من السائق - تحديد جميع طلباته كمدفوعة"""
+    driver = await db.drivers.find_one({"id": driver_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    # تحديث جميع الطلبات غير المدفوعة للسائق
+    result = await db.orders.update_many(
+        {"driver_id": driver_id, "driver_payment_status": {"$ne": "paid"}},
+        {"$set": {
+            "driver_payment_status": "paid",
+            "driver_paid_at": datetime.now(timezone.utc).isoformat(),
+            "driver_paid_by": current_user["id"]
+        }}
+    )
+    
+    # تسجيل عملية التحصيل
+    payment_record = {
+        "id": str(uuid.uuid4()),
+        "driver_id": driver_id,
+        "amount": amount,
+        "collected_by": current_user["id"],
+        "collected_at": datetime.now(timezone.utc).isoformat(),
+        "orders_count": result.modified_count
+    }
+    await db.driver_payments.insert_one(payment_record)
+    
+    return {
+        "message": f"تم تحصيل المبلغ وتحديث {result.modified_count} طلب",
+        "orders_updated": result.modified_count
+    }
 
 # ==================== DELIVERY APP SETTINGS ====================
 
