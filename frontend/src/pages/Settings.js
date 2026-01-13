@@ -932,6 +932,7 @@ export default function Settings() {
                             u.role === 'admin' ? 'bg-primary/10 text-primary' :
                             u.role === 'manager' ? 'bg-blue-500/10 text-blue-500' :
                             u.role === 'supervisor' ? 'bg-purple-500/10 text-purple-500' :
+                            u.role === 'delivery' ? 'bg-green-500/10 text-green-500' :
                             'bg-muted text-muted-foreground'
                           }`}>
                             {getRoleText(u.role)}
