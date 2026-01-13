@@ -152,6 +152,9 @@
 - [x] Driver Tracking Map
 - [x] **إصلاح تضارب الجلسات** ✅
 - [x] **إغلاق الصندوق المتقدم** ✅
+- [x] **نظام Multi-tenant (Super Admin)** ✅
+- [x] **زر تصفير المبيعات في لوحة Super Admin** ✅ **NEW**
+- [x] **إصلاح تقرير إغلاق الصندوق (tenant_id + shift_id)** ✅ **NEW**
 
 ### P1 - In Progress / Upcoming
 - [ ] تحسين خريطة التتبع الاحترافية
@@ -162,15 +165,7 @@
 - [ ] Email Reports (SendGrid)
 - [ ] تقارير المبيعات بالأصناف + تصدير Excel
 
-### P0 - Completed ✅
-- [x] **نظام Multi-tenant (Super Admin)** ✅ - لوحة تحكم المالك لإدارة عملاء متعددين
-  - إضافة/تعديل/حذف/تعطيل العملاء
-  - عرض مباشر للإحصائيات الحية لكل عميل
-  - الدخول كعميل (Impersonate) للمشاهدة والتحكم
-  - إعادة تعيين كلمات المرور
-  - أيقونة في Dashboard للوصول السريع
-- [x] Authentication System
-- [x] Product & Category Management
+### P2 - Future
 - [ ] تخصيص الفاتورة وربط الطابعات
 - [ ] إدارة وصفات المنتجات (المواد الخام)
 - [ ] Real-time Kitchen Display
@@ -179,6 +174,12 @@
 ---
 
 ## Credentials
+
+### Super Admin (Owner)
+- Login Page: `/super-admin`
+- Email: owner@maestroegp.com
+- Password: owner123
+- Secret Key: 271018
 
 ### Default Admin
 - Email: admin@maestroegp.com
@@ -192,11 +193,17 @@
 - Email: moustafa@maestroegp.com
 - Password: driver123
 
+### Tenant Admin (مطعم البيت العراقي)
+- Login Page: `/login`
+- Email: ahmed@albait.com
+- Password: password
+
 ---
 
 ## Test Reports
 - `/app/test_reports/iteration_4.json` - Driver tracking & Pending orders
 - `/app/test_reports/iteration_5.json` - Session fix & Cash register (100% pass)
+- `/app/test_reports/iteration_6.json` - Super Admin + Reset Sales + Cash Register Fix (100% pass) **NEW**
 
 ---
 
@@ -208,7 +215,8 @@
 │   ├── requirements.txt
 │   ├── server.py (Main API - needs refactoring)
 │   └── tests/
-│       └── test_iteration5_features.py
+│       ├── test_iteration5_features.py
+│       └── test_iteration6_features.py
 ├── frontend/
 │   ├── .env
 │   ├── package.json
@@ -225,6 +233,7 @@
 │       │   ├── Dashboard.js (+ Cash Register Close)
 │       │   ├── Delivery.js (+ Map & Driver CRUD)
 │       │   ├── DriverPortal.js (PWA with separate session)
+│       │   ├── SuperAdmin.js (Multi-tenant Management)
 │       │   ├── POS.js
 │       │   ├── Reports.js
 │       │   └── Settings.js
