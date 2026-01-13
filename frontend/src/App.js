@@ -160,6 +160,15 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* سجل المكالمات */}
+      <Route 
+        path="/call-logs" 
+        element={
+          <ProtectedRoute>
+            <CallLogs />
+          </ProtectedRoute>
+        } 
+      />
       {/* صفحة السائق - بدون حماية للوصول من الهاتف */}
       <Route path="/driver" element={<DriverPortal />} />
       {/* صفحة Super Admin - لوحة تحكم المالك */}
@@ -177,6 +186,8 @@ function App() {
           <BrowserRouter>
             <AppRoutes />
             <Toaster position="top-center" richColors />
+            {/* Incoming Call Popup - يظهر في جميع الصفحات */}
+            <IncomingCallPopup />
           </BrowserRouter>
         </div>
       </AuthProvider>
