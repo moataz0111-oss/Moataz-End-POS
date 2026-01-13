@@ -344,6 +344,18 @@ export default function SuperAdmin() {
     }
   };
 
+  const resetTenantSales = async () => {
+    try {
+      await axios.post(`${API}/super-admin/tenants/${selectedTenant.id}/reset-sales?confirm=true`);
+      toast.success('تم تصفير المبيعات بنجاح');
+      setShowResetSalesConfirm(false);
+      setSelectedTenant(null);
+      fetchData();
+    } catch (error) {
+      toast.error('فشل في تصفير المبيعات');
+    }
+  };
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     toast.success('تم النسخ');
