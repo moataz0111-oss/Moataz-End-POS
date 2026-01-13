@@ -3386,6 +3386,138 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
         "recent_tenants": recent_tenants
     }
 
+@api_router.post("/super-admin/impersonate/{tenant_id}")
+async def impersonate_tenant(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
+    """الدخول كعميل - للمشاهدة والتحكم المباشر"""
+    
+    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="العميل غير موجود")
+    
+    # البحث عن admin العميل
+    admin = await db.users.find_one({"tenant_id": tenant_id, "role": UserRole.ADMIN})
+    if not admin:
+        raise HTTPException(status_code=404, detail="مدير العميل غير موجود")
+    
+    # إنشاء token للدخول كالعميل مع علامة impersonation
+    token = create_token(admin["id"], admin["role"], admin.get("branch_id"))
+    
+    return {
+        "token": token,
+        "user": {
+            "id": admin["id"],
+            "email": admin["email"],
+            "full_name": admin["full_name"],
+            "role": admin["role"],
+            "tenant_id": tenant_id
+        },
+        "tenant": tenant,
+        "impersonated": True,
+        "original_super_admin": current_user["id"]
+    }
+
+@api_router.get("/super-admin/tenants/{tenant_id}/live-stats")
+async def get_tenant_live_stats(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
+    """إحصائيات حية للعميل"""
+    
+    tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="العميل غير موجود")
+    
+    # إحصائيات اليوم
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    
+    today_orders = await db.orders.find({
+        "tenant_id": tenant_id,
+        "created_at": {"$gte": today}
+    }, {"_id": 0}).to_list(500)
+    
+    # حساب الإحصائيات
+    total_today = sum(o["total"] for o in today_orders if o.get("status") != "cancelled")
+    pending_orders = len([o for o in today_orders if o.get("status") == "pending"])
+    preparing_orders = len([o for o in today_orders if o.get("status") == "preparing"])
+    delivered_orders = len([o for o in today_orders if o.get("status") == "delivered"])
+    cancelled_orders = len([o for o in today_orders if o.get("status") == "cancelled"])
+    
+    # المنتجات الأكثر مبيعاً اليوم
+    product_sales = {}
+    for order in today_orders:
+        if order.get("status") != "cancelled":
+            for item in order.get("items", []):
+                name = item.get("name", "غير معروف")
+                if name not in product_sales:
+                    product_sales[name] = {"quantity": 0, "total": 0}
+                product_sales[name]["quantity"] += item.get("quantity", 0)
+                product_sales[name]["total"] += item.get("subtotal", 0)
+    
+    top_products = sorted(product_sales.items(), key=lambda x: x[1]["total"], reverse=True)[:5]
+    
+    # المستخدمين النشطين (لديهم وردية مفتوحة)
+    active_shifts = await db.shifts.count_documents({
+        "status": "open"
+    })
+    
+    return {
+        "tenant": tenant,
+        "today": {
+            "total_sales": total_today,
+            "total_orders": len(today_orders),
+            "pending_orders": pending_orders,
+            "preparing_orders": preparing_orders,
+            "delivered_orders": delivered_orders,
+            "cancelled_orders": cancelled_orders
+        },
+        "top_products": [{"name": p[0], **p[1]} for p in top_products],
+        "active_shifts": active_shifts,
+        "recent_orders": today_orders[:10]  # آخر 10 طلبات
+    }
+
+@api_router.get("/super-admin/tenants/{tenant_id}/orders")
+async def get_tenant_orders(tenant_id: str, date: Optional[str] = None, status: Optional[str] = None, current_user: dict = Depends(verify_super_admin)):
+    """جلب طلبات عميل معين"""
+    
+    query = {"tenant_id": tenant_id}
+    if date:
+        query["created_at"] = {"$regex": f"^{date}"}
+    if status:
+        query["status"] = status
+    
+    orders = await db.orders.find(query, {"_id": 0}).sort("created_at", -1).limit(100).to_list(100)
+    return orders
+
+@api_router.get("/super-admin/tenants/{tenant_id}/products")
+async def get_tenant_products(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
+    """جلب منتجات عميل معين"""
+    
+    products = await db.products.find({"tenant_id": tenant_id}, {"_id": 0}).to_list(500)
+    return products
+
+@api_router.delete("/super-admin/tenants/{tenant_id}/permanent")
+async def permanently_delete_tenant(tenant_id: str, confirm: bool = False, current_user: dict = Depends(verify_super_admin)):
+    """حذف عميل نهائياً مع جميع بياناته"""
+    
+    if not confirm:
+        raise HTTPException(status_code=400, detail="يجب تأكيد الحذف بإرسال confirm=true")
+    
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        raise HTTPException(status_code=404, detail="العميل غير موجود")
+    
+    # حذف جميع البيانات المرتبطة
+    await db.users.delete_many({"tenant_id": tenant_id})
+    await db.branches.delete_many({"tenant_id": tenant_id})
+    await db.orders.delete_many({"tenant_id": tenant_id})
+    await db.products.delete_many({"tenant_id": tenant_id})
+    await db.categories.delete_many({"tenant_id": tenant_id})
+    await db.inventory.delete_many({"tenant_id": tenant_id})
+    await db.customers.delete_many({"tenant_id": tenant_id})
+    await db.shifts.delete_many({"tenant_id": tenant_id})
+    await db.expenses.delete_many({"tenant_id": tenant_id})
+    await db.drivers.delete_many({"tenant_id": tenant_id})
+    await db.tenants.delete_one({"id": tenant_id})
+    
+    return {"message": f"تم حذف العميل '{tenant['name']}' وجميع بياناته نهائياً"}
+
 # ==================== SEED DATA ====================
 
 @api_router.post("/seed")
