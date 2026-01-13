@@ -755,21 +755,19 @@ export default function SuperAdmin() {
                           <Eye className="h-4 w-4" />
                         </Button>
                         
-                        {/* إعادة تعيين كلمة المرور - مخفي للنظام الرئيسي */}
-                        {!tenant.is_main_system && (
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => {
-                              setSelectedTenant(tenant);
-                              setShowResetPassword(true);
-                            }}
-                            className="text-gray-400 hover:text-white"
-                            title="إعادة تعيين كلمة المرور"
-                          >
-                            <Key className="h-4 w-4" />
-                          </Button>
-                        )}
+                        {/* إعادة تعيين كلمة المرور */}
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={() => {
+                            setSelectedTenant(tenant);
+                            setShowResetPassword(true);
+                          }}
+                          className="text-gray-400 hover:text-white"
+                          title="إعادة تعيين كلمة المرور"
+                        >
+                          <Key className="h-4 w-4" />
+                        </Button>
                         
                         {/* تفعيل/تعطيل - مخفي للنظام الرئيسي */}
                         {!tenant.is_main_system && (
