@@ -800,15 +800,19 @@ export default function SuperAdmin() {
                         
                         {/* حذف - مخفي للنظام الرئيسي */}
                         {!tenant.is_main_system && (
-                          onClick={() => {
-                            setSelectedTenant(tenant);
-                            setShowDeleteConfirm(true);
-                          }}
-                          className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                          title="حذف نهائي"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => {
+                              setSelectedTenant(tenant);
+                              setShowDeleteConfirm(true);
+                            }}
+                            className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            title="حذف نهائي"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
