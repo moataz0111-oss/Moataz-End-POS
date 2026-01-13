@@ -168,8 +168,9 @@ class TestSuperAdminDashboard:
         
         tenant_id = tenants_response.json()[0]["id"]
         
+        # Correct endpoint is /live-stats not /live
         response = requests.get(
-            f"{BASE_URL}/api/super-admin/tenants/{tenant_id}/live",
+            f"{BASE_URL}/api/super-admin/tenants/{tenant_id}/live-stats",
             headers={"Authorization": f"Bearer {super_admin_token}"}
         )
         print(f"Get tenant live stats response: {response.status_code}")
