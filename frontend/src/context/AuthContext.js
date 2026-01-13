@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
+  const [currentShift, setCurrentShift] = useState(null);
 
   useEffect(() => {
     if (token) {
@@ -23,11 +24,30 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.get(`${API}/auth/me`);
       setUser(response.data);
+      
+      // فتح وردية تلقائياً للكاشير أو المدير
+      if (['cashier', 'manager', 'admin'].includes(response.data.role)) {
+        await autoOpenShift();
+      }
     } catch (error) {
       console.error('Failed to fetch user:', error);
       logout();
     } finally {
       setLoading(false);
+    }
+  };
+
+  // فتح وردية تلقائياً
+  const autoOpenShift = async () => {
+    try {
+      const response = await axios.post(`${API}/shifts/auto-open`);
+      setCurrentShift(response.data.shift);
+      
+      if (!response.data.was_existing) {
+        console.log('✅ تم فتح وردية جديدة تلقائياً');
+      }
+    } catch (error) {
+      console.error('Failed to auto-open shift:', error);
     }
   };
 
@@ -40,6 +60,13 @@ export const AuthProvider = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       setToken(newToken);
       setUser(userData);
+      
+      // فتح وردية تلقائياً للكاشير أو المدير
+      if (['cashier', 'manager', 'admin'].includes(userData.role)) {
+        setTimeout(async () => {
+          await autoOpenShift();
+        }, 500);
+      }
       
       return { success: true };
     } catch (error) {
@@ -74,6 +101,7 @@ export const AuthProvider = ({ children }) => {
     delete axios.defaults.headers.common['Authorization'];
     setToken(null);
     setUser(null);
+    setCurrentShift(null);
   };
 
   const hasPermission = (permission) => {
@@ -89,6 +117,18 @@ export const AuthProvider = ({ children }) => {
     return roles.includes(user.role);
   };
 
+  // تحديث الوردية الحالية
+  const refreshShift = async () => {
+    try {
+      const response = await axios.get(`${API}/shifts/current`);
+      setCurrentShift(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Failed to refresh shift:', error);
+      return null;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -99,7 +139,10 @@ export const AuthProvider = ({ children }) => {
       logout,
       hasPermission,
       hasRole,
-      isAuthenticated: !!user
+      isAuthenticated: !!user,
+      currentShift,
+      refreshShift,
+      autoOpenShift
     }}>
       {children}
     </AuthContext.Provider>
