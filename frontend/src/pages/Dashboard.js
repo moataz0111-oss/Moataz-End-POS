@@ -380,8 +380,8 @@ export default function Dashboard() {
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
-            {/* Super Admin Button - للمدير فقط */}
-            {user?.role === 'admin' && (
+            {/* Super Admin Button - للمالك فقط (بدون tenant_id) */}
+            {user?.role === 'admin' && !user?.tenant_id && (
               <Button
                 variant="outline"
                 size="sm"
