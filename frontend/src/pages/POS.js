@@ -799,13 +799,16 @@ export default function POS() {
                   return (
                     <button
                       key={table.id}
-                      onClick={() => {
-                        if (isAvailable || isSelected) {
+                      onClick={async () => {
+                        playClick();
+                        if (isOccupied && table.current_order_id) {
+                          // فتح الطلب المرتبط بالطاولة المشغولة
+                          await loadOrderForEditing(table.current_order_id);
+                          toast.success(`تم فتح طلب الطاولة ${table.number}`);
+                        } else if (isAvailable || isSelected) {
                           setSelectedTable(table.id);
-                          playClick();
                         }
                       }}
-                      disabled={!isAvailable && !isSelected}
                       style={{
                         backgroundColor: isSelected ? '#8b5cf6' : isOccupied ? '#ef4444' : isReserved ? '#f59e0b' : '#22c55e',
                         color: 'white'
@@ -814,7 +817,8 @@ export default function POS() {
                         aspect-square rounded-lg font-bold text-lg transition-all flex items-center justify-center
                         ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}
                         ${isAvailable && !isSelected ? 'hover:opacity-80' : ''}
-                        ${!isAvailable && !isSelected ? 'cursor-not-allowed opacity-90' : ''}
+                        ${isOccupied ? 'hover:ring-2 hover:ring-red-400 cursor-pointer' : ''}
+                        ${isReserved ? 'cursor-not-allowed opacity-90' : ''}
                       `}
                       data-testid={`table-btn-${table.number}`}
                     >
