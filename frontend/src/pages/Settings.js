@@ -149,8 +149,10 @@ export default function Settings() {
     name: '', ip_address: '', port: 9100, branch_id: '', printer_type: 'receipt'
   });
   const [categoryForm, setCategoryForm] = useState({
-    name: '', name_en: '', icon: '', color: '#D4AF37', sort_order: 0, kitchen_section_id: ''
+    name: '', name_en: '', icon: '', image: '', color: '#D4AF37', sort_order: 0, kitchen_section_id: ''
   });
+  const [editCategoryForm, setEditCategoryForm] = useState(null);
+  const [editCategoryDialogOpen, setEditCategoryDialogOpen] = useState(false);
   const [productForm, setProductForm] = useState({
     name: '', name_en: '', category_id: '', price: '', cost: '', operating_cost: '', image: '', description: '', barcode: ''
   });
