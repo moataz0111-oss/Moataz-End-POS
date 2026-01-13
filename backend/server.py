@@ -3111,7 +3111,7 @@ async def super_admin_login(email: str, password: str, secret_key: str):
     if not verify_password(password, user["password"]):
         raise HTTPException(status_code=401, detail="كلمة المرور غير صحيحة")
     
-    token = create_token(user["id"])
+    token = create_token(user["id"], user["role"], user.get("branch_id"))
     
     return {
         "token": token,
@@ -3155,7 +3155,7 @@ async def register_super_admin(secret_key: str, email: str, password: str, full_
     
     await db.users.insert_one(user_doc)
     
-    token = create_token(user_doc["id"])
+    token = create_token(user_doc["id"], user_doc["role"], None)
     
     return {
         "message": "تم إنشاء حساب Super Admin بنجاح",
