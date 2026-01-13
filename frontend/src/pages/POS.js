@@ -147,8 +147,13 @@ export default function POS() {
         setCustomerName(decodeURIComponent(name));
       }
       
-      // البحث عن بيانات العميل
-      searchCustomerByPhone(phone);
+      // البحث عن بيانات العميل بعد تأخير قصير للتأكد من جاهزية axios
+      const searchWithDelay = async () => {
+        // انتظار قصير للتأكد من إعداد axios headers
+        await new Promise(resolve => setTimeout(resolve, 500));
+        await searchCustomerByPhone(phone);
+      };
+      searchWithDelay();
       
       // إظهار رسالة
       if (fromCall === 'true') {
