@@ -1,78 +1,101 @@
 <analysis>**original_problem_statement:**
-المستخدم يريد بناء نظام شامل لإدارة المطاعم والكافيهات باسم Maestro EGP. المتطلبات تشمل نظام مستخدمين، إدارة المخزون، نقاط بيع (POS)، إدارة الطلبات (داخلي، سفري، توصيل)، طرق دفع متنوعة، تقارير مفصلة (مع إرسال يومي بالبريد الإلكتروني)، إدارة فروع، ورديات، عملاء، وتكاملات مع طابعات وتطبيقات توصيل.
+المستخدم يريد بناء نظام شامل لإدارة المطاعم والكافيهات باسم Maestro EGP. المتطلبات تشمل نظام مستخدمين (مع صلاحيات)، إدارة المخزون، نقاط بيع (POS)، إدارة الطلبات (داخلي، سفري، توصيل)، طرق دفع متنوعة، تقارير مفصلة، إدارة فروع، ورديات، وعملاء.
+أحدث الطلبات تشمل:
+- تطبيق ويب تقدمي (PWA) للسائقين يعمل بتسجيل الدخول (اسم مستخدم/كلمة مرور) بدلاً من الروابط الفردية.
+- خريطة تتبع مباشرة للسائقين في لوحة التحكم، مع أيقونات دراجات نارية متحركة ومواقع محدثة.
+- تقارير جديدة للمبيعات (ملغاة، خصومات، آجلة).
+- ميزة إغلاق الصندوق للكاشير في نهاية اليوم، مع جرد فئات النقود.
+- إصلاح مشكلة عدم قدرة المستخدمين الجدد على تسجيل الدخول.
+- إصلاح مشكلة عدم ظهور طلبات الطاولات المشغولة في قائمة الطلبات المعلقة.
 
 **User's preferred language**: Arabic (العربية)
 
 **what currently exists?**
-تطبيق ويب كامل (FastAPI + React) مع نظام مصادقة JWT. الواجهة تحتوي على لوحة تحكم، نقاط بيع، طاولات، إعدادات، وتقارير. تم تنفيذ ميزات رئيسية مثل:
-- نظام صلاحيات مفصل للمستخدمين.
-- إدارة المنتجات، الفئات، والفروع من صفحة الإعدادات، مع إمكانية تعديل الفئات وإضافة صور لها.
-- واجهة نقاط بيع (POS) متقدمة تدعم الطلبات المحلية (مع عرض الطاولات كمربعات)، السفري، والتوصيل (مع اختيار إلزامي للسائق).
-- قائمة للطلبات المعلقة (Pending Orders) لاسترجاع وتعديل الطلبات المحفوظة.
-- منطق لإلغاء الطلبات (أقل من دقيقة يتم الحذف، أكثر من دقيقة يتم تسجيله كملغي).
-- صفحة متقدمة لمتابعة سائقي التوصيل، تعرض المبالغ المدفوعة وغير المدفوعة، مع رابط خاص لكل سائق لعرض طلباته على هاتفه.
-- إمكانية التحكم في الصفحات التي تظهر في لوحة التحكم الرئيسية من الإعدادات.
-- تم تحسين واجهة المستخدم بعرض الفئات مع صور وأيقونات.
+تطبيق ويب كامل (FastAPI + React) مع نظام مصادقة JWT وصلاحيات للمستخدمين (مدير، مدير فرع، كاشير، سائق).
+
+**الميزات الرئيسية المنفذة:**
+- **نظام نقاط البيع (POS):** يدعم الطلبات المحلية (طاولات)، السفري، والتوصيل. تم إصلاح الخلل حيث لم تكن الطلبات المحفوظة تظهر في قائمة الطلبات المعلقة.
+- **إدارة السائقين والتوصيل:**
+    - صفحة إدارة توصيل () تعرض خريطة تتبع حية (باستخدام Leaflet/OpenStreetMap) مع أيقونات دراجات نارية متحركة 🏍️ لمواقع السائقين، ويتم تحديثها تلقائيًا.
+    - إمكانية إضافة وتعديل وحذف السائقين.
+    - إمكانية ربط حسابات السائقين بحسابات مستخدمين من نوع delivery.
+- **بوابة السائق (PWA):**
+    - رابط موحد () يتطلب تسجيل الدخول باسم المستخدم وكلمة المرور.
+    - تعمل كتطبيق ويب تقدمي (PWA) يمكن تثبيته على الهاتف.
+    - يرسل موقع السائق (GPS) تلقائيًا كل 30 ثانية لتحديث الخريطة.
+- **إدارة المستخدمين:**
+    - تم إصلاح مشكلة تسجيل دخول المستخدمين الجدد.
+    - تمت إضافة ميزة إعادة تعيين كلمة المرور للمستخدمين من قبل المسؤول.
+- **التقارير:** تم البدء في إضافة واجهة وتقارير جديدة (الإلغاء، الخصم، الآجل).
+- **إغلاق الصندوق:** تم البدء في إضافة واجهة ومكونات لميزة إغلاق الصندوق للكاشير.
 
 **Last working item**:
-- **Last item agent was working**: The agent was addressing the user's request to activate pending orders for takeaway and tables. The agent identified that while a Pending Orders modal exists, orders saved via the Save and Send to Kitchen button are getting the status  instead of , so they don't appear in the pending list. The goal is to correct this workflow.
-- **Status**: IN PROGRESS
-- **Agent Testing Done**: N
-- **Which testing method agent to use?**: both
+- **Last item agent was working**: تنفيذ طلب المستخدم بعرض أيقونات دراجات نارية 🏍️ على خريطة تتبع السائقين بدلاً من النقاط العادية، وجعلها خريطة حقيقية تفاعلية (باستخدام Leaflet/OpenStreetMap).
+- **Status**: USER VERIFICATION PENDING
+- **Agent Testing Done**: Y (Agent tested by updating driver locations via API and verified the map visually with screenshots).
+- **Which testing method agent to use?**: screenshot tool (to verify the map UI and driver icons).
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1:** (P0) Takeaway and Dine-in orders are not appearing in the Pending Orders list after being saved.
-
+- **Issue 1:** (P0) تضارب في جلسات المستخدم بين التطبيق الرئيسي وبوابة السائق.
   **Issues Detail:**
   - **Issue 1:**
-     - **Attempted fixes:** The agent created a Pending Orders modal and backend logic to fetch pending orders. However, the  function in  for Save and Send to Kitchen assigns the  status, which is incorrect for this workflow. The fix is to ensure these orders are saved with a  status.
+     - **Description:** عند تسجيل الدخول إلى بوابة السائق () ثم محاولة فتح الرابط الرئيسي للنظام ()، يتم إعادة توجيه المستخدم إلى بوابة السائق مرة أخرى. السبب هو أن كلا التطبيقين يستخدمان  في نفس النطاق، مما يسبب تضاربًا في حالة المصادقة.
+     - **Attempted fixes:** قدم الوكيل حلولاً يدوية للمستخدم (استخدام وضع التصفح الخفي أو مسح بيانات الموقع). لم يتم تنفيذ أي إصلاح دائم في الكود.
      - **Next debug checklist:**
-        1.  In , locate the  function.
-        2.  Modify the logic for the Save and Send to Kitchen action ().
-        3.  Ensure that when saving a Takeaway or Dine-in order this way, the  in the payload sent to the  endpoint is set to .
-        4.  Verify that clicking Pending Orders now shows these newly saved orders.
-     - **Why fix this issue and what will be achieved with the fix?**: This is a critical bug in the core POS workflow. Fixing it will allow cashiers to save and later retrieve dine-in and takeaway orders, which is essential for managing a busy restaurant floor.
-     - **Status**: IN PROGRESS
+        1.  في ، قم بتغيير مفاتيح  المستخدمة لتكون فريدة وخاصة ببوابة السائق فقط (مثل  بدلاً من ).
+        2.  في ، تأكد من أن التطبيق الرئيسي يستخدم فقط مفاتيح  الخاصة به.
+        3.  يمكن النظر في استخدام مسارات منفصلة تمامًا أو نطاقات فرعية إذا استمرت المشكلة لضمان عزل الجلسات بشكل كامل.
+     - **Why fix this issue and what will be achieved with the fix?**: هذا الخلل يسبب إرباكًا كبيرًا للمستخدم ويمنع مسؤولي النظام من الوصول إلى لوحة التحكم بسهولة إذا كانوا قد اختبروا بوابة السائق. إصلاحه سيضمن تجربة مستخدم سلسة ومنطقية.
+     - **Status**: NOT STARTED
      - **Is recurring issue?**: Y
-     - **Should Test frontend/backend/both after fix?**: both
-     - **Blocked on other issue**: None. This is the highest priority.
+     - **Should Test frontend/backend/both after fix?**: frontend
+     - **Blocked on other issue**: None
 
 **In progress Task List**:
-- **Task 1:** (P0) Fix the Pending Orders workflow.
-  - **Where to resume**: , inside the  function.
-  - **What will be achieved with this?**: A fully functional POS where cashiers can save takeaway and dine-in orders and retrieve them later for modification or payment.
+- **Task 1:** (P0) استكمال ميزة إغلاق الصندوق (Close Cash Register).
+  - **Where to resume**: في ، تم إضافة الزر والنافذة المنبثقة () والحالات المتعلقة بها. الخطوات التالية هي:
+      1.  ربط النموذج في النافذة المنبثقة لإرسال البيانات.
+      2.  إنشاء endpoint جديد في  (مثل ) لاستقبال بيانات جرد الصندوق وحفظها في قاعدة البيانات.
+      3.  ربط الواجهة الأمامية بالـ API الجديد.
+  - **What will be achieved with this?**: سيتمكن الكاشير من جرد الصندوق وتسجيل المبالغ النقدية في نهاية الوردية، مما يوفر تقارير مالية دقيقة.
   - **Status**: IN PROGRESS
   - **Should Test frontend/backend/both after fix?**: both
-  - **Blocked on something**: None.
+  - **Blocked on something**: None
+
+- **Task 2:** (P1) استكمال واختبار التقارير الجديدة.
+  - **Where to resume**: تم إضافة الـ Endpoints في  (, , ) والتبويبات في . الخطوات التالية هي:
+      1.  التأكد من أن دوال  في  تستدعي هذه الـ Endpoints بشكل صحيح.
+      2.  عرض البيانات المستلمة في جداول أو بطاقات داخل كل تبويب.
+      3.  اختبار كل تقرير للتأكد من دقة البيانات المعروضة.
+  - **What will be achieved with this?**: تزويد الإدارة برؤى أعمق حول العمليات المالية، مثل الطلبات الملغاة، الخصومات الممنوحة، والمدفوعات الآجلة.
+  - **Status**: IN PROGRESS
+  - **Should Test frontend/backend/both after fix?**: both
+  - **Blocked on something**: None
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **(P1) Caller ID Integration:** Research and present options (e.g., third-party telephony APIs) to the user for implementing a caller ID feature that displays customer info on incoming calls. The backend database for customers is already in place.
-    - **(P1) Email Reports:** Implement functionality to send daily summary reports via email using a service like SendGrid.
-    - **(P2) Printer Integration:** Research and implement a method for the web application to print receipts on local network printers.
+    - **(P1) تكامل هوية المتصل (Caller ID):** بحث وتقديم خيارات للمستخدم لتنفيذ ميزة عرض معلومات العميل عند تلقي مكالمة هاتفية.
+    - **(P1) تقارير البريد الإلكتروني:** تنفيذ إرسال تقارير ملخصة يومية عبر البريد الإلكتروني.
 - **Future Tasks:**
-    - **(P2) Click Sounds:** Implement click sounds on all interactive UI elements as originally requested.
-    - **(P2) Backend Refactoring:** The  file is now over 2100 lines and urgently needs to be refactored into a structured project with separate files/folders for routes, models, and services to ensure future maintainability.
+    - **(P2) تكامل الطابعة:** بحث وتنفيذ طريقة لطباعة الإيصالات على طابعات الشبكة المحلية.
+    - **(P2) أصوات النقر (Click Sounds):** إضافة مؤثرات صوتية عند النقر على جميع عناصر الواجهة التفاعلية.
+    - **(P0 - CRITICAL) إعادة هيكلة الكود الخلفي (Backend Refactoring):** ملف  تجاوز 2300 سطر ويحتاج بشكل عاجل إلى تقسيمه إلى هيكل مشروع منظم (routes, models, services) لضمان قابلية الصيانة المستقبلية.
 
 **Completed work in this session**
-- **Recently completed:**
-  - **Driver Tracking & Portal:** Created a comprehensive delivery management page to track drivers' earnings (paid/unpaid) and a separate mobile-friendly portal for drivers to view their assigned orders.
-  - **Advanced POS Customization:** Implemented an admin setting to control which pages (POS, Tables, etc.) are visible on the main dashboard, and restricted cashier view to only essential pages.
-  - **Category Management with Images:** Added the ability to edit categories and upload images for them in the Settings page. These images are now displayed on the POS screen.
-  - **Order Cancellation Logic:** Implemented a time-based cancellation rule: orders cancelled in <1 min are deleted, while those >2 mins are marked as cancelled for reporting.
-  - **UI/UX Enhancements:**
-      - Replaced dropdowns for Tables and Delivery Companies in POS with button grids for faster selection.
-      - Implemented clear color-coding for table status (Available, Occupied).
-      - Moved product categories to the right sidebar in the POS view.
-      - Removed the test table (#99).
-  - **Delivery Workflow Fix:** Made driver selection mandatory for delivery orders in the POS and automated the process of assigning the order to the selected driver.
+- **إصلاح الطلبات المعلقة:** تم إصلاح الخلل حيث لم تكن طلبات السفرى والطاولات تظهر في قائمة الطلبات المعلقة.
+- **بوابة سائق موحدة (PWA):** تم تحويل بوابة السائق إلى تطبيق ويب تقدمي () مع تسجيل دخول آمن بدلاً من الروابط الفردية.
+- **خريطة تتبع حية:** تم تنفيذ خريطة تتبع للسائقين في صفحة التوصيل باستخدام أيقونات دراجات نارية متحركة 🏍️ ومواقع محدثة تلقائيًا.
+- **إدارة كاملة للسائقين:** تمت إضافة وظائف التعديل والحذف والربط بحسابات المستخدمين للسائقين.
+- **إصلاح مشاكل المستخدمين:** تم حل مشكلة عدم قدرة المستخدمين الجدد على تسجيل الدخول عبر إضافة ميزة إعادة تعيين كلمة المرور.
+- **تحسينات واجهة نقاط البيع:** يمكن الآن فتح طلب الطاولة المشغولة مباشرة بالضغط على الطاولة الحمراء.
+- **حل مشكلة السائق غير موجود:** تم حل الخطأ الذي كان يظهر في بوابة السائق بسبب استخدام روابط قديمة.
 
 **Earlier issues found/mentioned but not fixed**
-- None in this session.
+- **Issue 1:** The main app URL () sometimes incorrectly redirects to the driver login page due to shared  state. (Detailed in All Pending/In progress Issue list).
 
 **Known issue recurrence from previous fork**
-- The core issue of hidden takeaway orders from the previous fork was partially addressed by creating a Pending Orders modal, but the workflow of saving orders into that list was not completed, leading to its recurrence as the main pending issue now.
+- The Pending Orders workflow issue was a recurrence from a previous fork and is now **RESOLVED**.
 
 **Code Architecture**
 
@@ -81,82 +104,83 @@
 - **Backend:** FastAPI
 - **Frontend:** React.js
 - **Database:** MongoDB
-- **Styling:** TailwindCSS with shadcn/ui components.
-- **Authentication:** JWT (JSON Web Tokens) with a detailed custom permissions system.
+- **Styling:** TailwindCSS, shadcn/ui
+- **Authentication:** JWT (JSON Web Tokens)
+- **Mapping:** Leaflet.js, OpenStreetMap
 
 **key DB schema**
-- **users:** {username, password_hash, role, branch_id, permissions: List[str]}
-- **products:** {name, price, category, cost, stock_quantity, image_url}
-- **categories:** {name, icon, color, sort_order, image_url} (New: )
-- **orders:** {..., status: ('pending', 'preparing', 'ready', 'delivered', 'cancelled'), driver_id, auto_ready}
-- **tables:** {name, capacity, status}
-- **customers:** {phone, name, address}
-- **drivers:** {name, phone, branch_id, is_active} (New)
-- **settings:** {key: 'dashboard_items', value: {showPOS: true, ...}} (New)
+- **drivers:** {name, phone, branch_id, is_active, : Optional[str], : Optional[dict]}
+- **users:** {username, password_hash, role: ('admin', 'manager', 'cashier', 'delivery'), branch_id, permissions}
+- **orders:** {..., status: ('pending', 'preparing', 'ready', 'delivered', 'cancelled'), : ('pending', 'paid')}
 
 **changes in tech stack**
-- None.
+- **Added:** ,  for the driver tracking map.
 
 **All files of reference**
-- : Contains all backend logic, including new endpoints for drivers, dashboard settings, and modified order logic.
-- : The most heavily modified file, contains logic for all order types, pending orders, and UI changes. **This is where the next fix is needed.**
-- : Contains new UI for managing categories with images and controlling dashboard visibility.
-- : Completely overhauled to be a driver management dashboard.
-- : New page for drivers to view their orders.
-- : Updated to respect visibility settings.
-- : Updated with the new route for the Driver Portal.
+- : Heavily modified with new endpoints for driver location, reports, user management, and linking drivers.
+- : Completely rewritten as a login-based PWA.
+- : Overhauled to include driver CRUD, user linking, and the Leaflet map component.
+- : Logic updated to correctly handle and display pending orders for all types.
+- : Updated to add the 'delivery' role and the reset password feature.
+- : Routing logic modified for the  role.
+- : New file for PWA configuration.
+- : New file for the PWA service worker.
 
 **Areas that need refactoring**:
-- **CRITICAL:** The  file must be broken down. Its monolithic structure is a significant source of technical debt, making maintenance and debugging increasingly difficult. This should be the highest priority task after fixing the current POS workflow bug.
+- **CRITICAL:** The  file is now extremely large and complex. It is the single most significant source of technical debt and must be refactored into a proper project structure (e.g., separating routes, models, and business logic) to ensure the project's long-term health.
 
 **key api endpoints**
--  (POST): Logic modified to handle  and assign .
--  (POST): New endpoint for time-based cancellation.
--  (GET, POST): New endpoints to manage drivers.
--  (GET): New endpoint for the driver portal.
--  (GET, POST): New endpoints to manage main page visibility.
--  (PUT): Modified to accept .
--  (DELETE): New endpoint to delete tables.
+- **PUT** : Updates a driver's GPS location.
+- **GET** : Retrieves locations of all active drivers.
+- **PUT** : Updates driver details.
+- **DELETE** : Deletes a driver.
+- **POST** : Links a driver to a user account.
+- **GET** : Retrieves driver information based on the logged-in user's token.
+- **POST** : Allows an admin to reset a user's password.
+- **GET** : Modified to support filtering by  and .
+- **GET** , , : New endpoints for new reports.
 
 **Critical Info for New Agent**
-- Your immediate and highest priority is to fix the pending order workflow. When a user clicks Save and Send to Kitchen for a takeaway or dine-in order, it must be saved with  and appear in the Pending Orders modal in .
-- The backend  file is dangerously large. After fixing the pending order bug, you must prioritize and plan the refactoring of this file into a proper project structure (e.g., , , ). Propose this to the user as the next major step for system stability.
-- The user has repeatedly requested features that require more complex integrations (Caller ID, Local Printers). Do not attempt to implement these without first researching the technical options and discussing the feasibility, complexity, and potential costs with the user.
+- Your highest priority after user feedback should be to address the pending tasks: Close Cash Register and the new reports.
+- Immediately after, you must address the critical usability issue of  conflict between the main app and driver portal.
+- The backend monolith  is a ticking time bomb. You should strongly propose its refactoring as a top-priority task to the user to ensure system stability and future development speed.
 
 **documents and test reports created in this job**
-- 
+-  (Updated)
 - 
 
 **Last 10 User Messages and any pending HUMAN messages**
-10.  - User requests to activate pending orders. **Status: IN PROGRESS**
-9.  - User wants to see the pending orders working. **Status: IN PROGRESS**
-8.  - User requests to remove the Orders page, auto-ready orders, fix driver assignment, and create a mobile portal for drivers. **Status: Completed**
-7.  - User requests a new feature to track delivery drivers and their paid/unpaid orders. **Status: Completed**
-6.  - User confirms to change the  account's role to 'cashier'. **Status: Completed**
-5.  - User states that the agent has completed what was asked. **Status: Acknowledged**
-4.  - User requests category editing with images, new order cancellation logic, and visibility controls for dashboard pages based on user role. **Status: Completed**
-3.  - User asks for category icons/images, table to be freed on order completion, deletion of table 99, and new cancellation logic. **Status: Completed**
-2.  - User reports issues with delivery and wants the old table design (squares, red for occupied) back. **Status: Completed**
-1.  - User wants the category list moved to the right side of the POS screen. **Status: Completed**
+10. User wants motorcycle icons on the tracking map. **Status: Completed (Verification Pending)**
+9.  User reports the main admin link opens the driver portal. **Status: Workaround provided, permanent fix needed.**
+8.  User asks for the admin link again. **Status: Provided.**
+7.  User wants a single login-based link for all drivers. **Status: Completed.**
+6.  User reports an error Failed to fetch data for user Hani. **Status: Resolved.**
+5.  User shows a screenshot of the login error. **Status: Acknowledged.**
+4.  User reports new users cannot log in. **Status: Resolved.**
+3.  User requests new reports (cancellation, discount, deferred) and a close cash register feature. **Status: IN PROGRESS.**
+2.  User wants to edit drivers. **Status: Completed.**
+1.  User wants to open an occupied table's order by clicking on the table in the POS view. **Status: Completed.**
 
 **Project Health Check:**
-- **Broken:** The core workflow for saving and retrieving pending takeaway/dine-in orders is broken.
+- **Broken:** The routing conflict caused by shared  is a significant usability bug that prevents seamless switching between admin and driver views.
 - **Mocked:** None.
 
 **3rd Party Integrations**
-- **SendGrid (Email):** Planned for email reports.
-- **Telephony/Caller ID Service:** Research required for this feature.
-- **Stripe (Payments):** Planned.
+- **Leaflet / OpenStreetMap:** Used for the driver tracking map.
+- **Planned:** SendGrid (Email), Telephony/Caller ID Service, Stripe (Payments).
 
 **Testing status**
-- **Testing agent used after significant changes:** YES, after the initial POS overhaul.
+- **Testing agent used after significant changes:** YES.
 - **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** Test files were updated by the testing agent in .
-- **Known regressions:** The pending order workflow for takeaway/dine-in is a regression, as the user cannot retrieve saved orders.
+- **Test files created:** 
+- **Known regressions:** None.
 
 **Credentials to test flow:**
-- **Admin:**  | **Password:** 
-- **Cashier:**  | **Password:**  (Role is now correctly )
+- **Admin:**  | 
+- **Manager:**  | 
+- **Cashier:**  | 
+- **Delivery:**  | 
 
 **What agent forgot to execute**
-- The agent built the UI for pending orders but missed connecting the Save button's action to actually create an order with the  status, which was the original intent of the feature.</analysis>
+- The agent has not implemented a permanent code fix for the  conflict issue between the main application and the driver portal.
+- The Close Cash Register feature and the new reports (Cancelled, Discount, Deferred) were started but are not complete. The backend logic and final UI connections are still pending.</analysis>
