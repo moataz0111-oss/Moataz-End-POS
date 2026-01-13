@@ -3684,6 +3684,34 @@ async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user
     if not confirm:
         raise HTTPException(status_code=400, detail="يجب تأكيد التصفير بإرسال confirm=true")
     
+    # التحقق إذا كان النظام الرئيسي
+    if tenant_id == "main-system":
+        # حذف طلبات النظام الرئيسي (بدون tenant_id)
+        orders_result = await db.orders.delete_many({
+            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+        })
+        
+        # حذف ورديات النظام الرئيسي
+        shifts_result = await db.shifts.delete_many({
+            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+        })
+        
+        # إعادة تعيين إحصائيات عملاء النظام الرئيسي
+        await db.customers.update_many({
+            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+        }, {"$set": {
+            "total_orders": 0,
+            "total_spent": 0.0,
+            "last_order_date": None
+        }})
+        
+        return {
+            "message": "تم تصفير مبيعات النظام الرئيسي بنجاح",
+            "deleted_orders": orders_result.deleted_count,
+            "deleted_shifts": shifts_result.deleted_count
+        }
+    
+    # للعملاء العاديين
     tenant = await db.tenants.find_one({"id": tenant_id})
     if not tenant:
         raise HTTPException(status_code=404, detail="العميل غير موجود")
