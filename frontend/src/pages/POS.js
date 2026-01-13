@@ -505,6 +505,29 @@ export default function POS() {
 
   return (
     <div className="min-h-screen bg-background flex" dir="rtl">
+      {/* Categories Sidebar - Right */}
+      <div className="w-48 border-l border-border bg-card flex flex-col">
+        <div className="p-3 border-b border-border">
+          <h2 className="font-bold text-foreground text-sm">الفئات</h2>
+        </div>
+        <ScrollArea className="flex-1">
+          <div className="p-2 space-y-1">
+            {categories.map(cat => (
+              <Button
+                key={cat.id}
+                variant={selectedCategory === cat.id ? 'default' : 'ghost'}
+                className={`w-full justify-start h-auto py-3 ${selectedCategory === cat.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
+                onClick={() => { setSelectedCategory(cat.id); playClick(); }}
+                data-testid={`category-${cat.id}`}
+              >
+                <span className="ml-2 text-lg">{cat.icon}</span>
+                <span className="truncate">{cat.name}</span>
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
       {/* Main Content - Products */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -585,28 +608,8 @@ export default function POS() {
           </div>
         </header>
 
-        {/* Categories */}
-        <div className="p-4 border-b border-border bg-card/50">
-          <ScrollArea className="w-full whitespace-nowrap">
-            <div className="flex gap-2">
-              {categories.map(cat => (
-                <Button
-                  key={cat.id}
-                  variant={selectedCategory === cat.id ? 'default' : 'outline'}
-                  className={`shrink-0 ${selectedCategory === cat.id ? 'bg-primary text-primary-foreground' : ''}`}
-                  onClick={() => { setSelectedCategory(cat.id); playClick(); }}
-                  data-testid={`category-${cat.id}`}
-                >
-                  <span className="ml-2">{cat.icon}</span>
-                  {cat.name}
-                </Button>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
-
         {/* Search */}
-        <div className="p-4 bg-card/30">
+        <div className="p-4 bg-card/30 border-b border-border">
           <div className="relative max-w-md">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -621,7 +624,7 @@ export default function POS() {
 
         {/* Products Grid */}
         <ScrollArea className="flex-1 p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {filteredProducts.map(product => (
               <Card
                 key={product.id}
