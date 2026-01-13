@@ -46,7 +46,8 @@ import {
   Upload,
   ImageIcon,
   BarChart,
-  ShoppingCart
+  ShoppingCart,
+  Key
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
