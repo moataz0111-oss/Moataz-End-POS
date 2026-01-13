@@ -101,7 +101,7 @@ export default function Dashboard() {
       // Fetch today's stats
       const today = new Date().toISOString().split('T')[0];
       const [salesRes, ordersRes] = await Promise.all([
-        axios.get(`${API}/reports/sales`, { params: { branch_id: selectedBranch, start_date: today } }),
+        axios.get(`${API}/reports/sales`, { params: { branch_id: selectedBranch, start_date: today, end_date: today } }),
         axios.get(`${API}/orders`, { params: { branch_id: selectedBranch, date: today } })
       ]);
 
