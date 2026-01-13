@@ -135,6 +135,21 @@ export default function Settings() {
   const [newEmail, setNewEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
+  // Call Center States
+  const [callCenterConfig, setCallCenterConfig] = useState({
+    enabled: false,
+    provider: '',
+    api_url: '',
+    api_key: '',
+    api_secret: '',
+    webhook_secret: '',
+    auto_popup: true,
+    auto_save_new_callers: true,
+    play_sound: true
+  });
+  const [callCenterTestStatus, setCallCenterTestStatus] = useState(null);
+  const [webhookUrl, setWebhookUrl] = useState('');
+  
   // Dialog states
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
