@@ -997,6 +997,23 @@ async def update_table_status(table_id: str, status: str, current_user: dict = D
     await db.tables.update_one({"id": table_id}, {"$set": {"status": status}})
     return {"message": "تم التحديث"}
 
+@api_router.delete("/tables/{table_id}")
+async def delete_table(table_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف طاولة - فقط للمالك أو المدير"""
+    if current_user.get("role") not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية حذف الطاولات")
+    
+    table = await db.tables.find_one({"id": table_id})
+    if not table:
+        raise HTTPException(status_code=404, detail="الطاولة غير موجودة")
+    
+    # التحقق من أن الطاولة ليست مشغولة
+    if table.get("status") == "occupied":
+        raise HTTPException(status_code=400, detail="لا يمكن حذف طاولة مشغولة")
+    
+    await db.tables.delete_one({"id": table_id})
+    return {"message": "تم حذف الطاولة"}
+
 # ==================== CUSTOMER ROUTES - إدارة العملاء ====================
 
 @api_router.post("/customers", response_model=CustomerResponse)
