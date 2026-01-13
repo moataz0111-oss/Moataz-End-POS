@@ -4,6 +4,14 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { formatPrice } from '../utils/currency';
+import { 
+  playClick, 
+  playSuccess, 
+  playNewOrderNotification, 
+  playIncomingCall,
+  getSoundSettings,
+  saveSoundSettings
+} from '../utils/sound';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -48,6 +56,9 @@ import {
   BarChart,
   ShoppingCart,
   Key,
+  Volume2,
+  VolumeX,
+  Bell,
   Headphones,
   Webhook,
   Link,
