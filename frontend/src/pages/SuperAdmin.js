@@ -1010,9 +1010,364 @@ export default function SuperAdmin() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Login Backgrounds Section */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                <Image className="h-5 w-5 text-pink-400" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">خلفيات صفحة الدخول</CardTitle>
+                <p className="text-sm text-gray-400">تحكم في مظهر صفحة تسجيل الدخول</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button 
+                onClick={saveBackgroundSettings} 
+                className="bg-green-600 hover:bg-green-700 gap-2"
+                disabled={backgroundsLoading}
+              >
+                {backgroundsLoading ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                حفظ التغييرات
+              </Button>
+              <Button 
+                onClick={() => setShowAddBackground(true)} 
+                className="bg-purple-600 hover:bg-purple-700 gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                إضافة خلفية
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Settings Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Animation Toggle */}
+              <div className="p-4 bg-gray-700/30 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">تفعيل الحركة</Label>
+                  <Switch
+                    checked={backgroundSettings.animation_enabled}
+                    onCheckedChange={(checked) => 
+                      setBackgroundSettings(prev => ({...prev, animation_enabled: checked}))
+                    }
+                  />
+                </div>
+              </div>
+              
+              {/* Auto Play */}
+              <div className="p-4 bg-gray-700/30 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm">تبديل تلقائي</Label>
+                  <Switch
+                    checked={backgroundSettings.auto_play}
+                    onCheckedChange={(checked) => 
+                      setBackgroundSettings(prev => ({...prev, auto_play: checked}))
+                    }
+                  />
+                </div>
+              </div>
+              
+              {/* Transition Type */}
+              <div className="p-4 bg-gray-700/30 rounded-lg space-y-2">
+                <Label className="text-sm">نوع الانتقال</Label>
+                <Select
+                  value={backgroundSettings.transition_type}
+                  onValueChange={(v) => 
+                    setBackgroundSettings(prev => ({...prev, transition_type: v}))
+                  }
+                >
+                  <SelectTrigger className="bg-gray-700/50 border-gray-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectItem value="fade">تلاشي (Fade)</SelectItem>
+                    <SelectItem value="slide">انزلاق (Slide)</SelectItem>
+                    <SelectItem value="crossfade">تقاطع (Crossfade)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Logo Animation */}
+              <div className="p-4 bg-gray-700/30 rounded-lg space-y-2">
+                <Label className="text-sm">حركة الشعار</Label>
+                <Select
+                  value={backgroundSettings.logo_animation}
+                  onValueChange={(v) => 
+                    setBackgroundSettings(prev => ({...prev, logo_animation: v}))
+                  }
+                >
+                  <SelectTrigger className="bg-gray-700/50 border-gray-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectItem value="pulse">نبض (Pulse)</SelectItem>
+                    <SelectItem value="bounce">ارتداد (Bounce)</SelectItem>
+                    <SelectItem value="glow">توهج (Glow)</SelectItem>
+                    <SelectItem value="none">بدون حركة</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Custom Logo */}
+            <div className="p-4 bg-gray-700/30 rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>شعار مخصص (اختياري)</Label>
+                <Switch
+                  checked={backgroundSettings.show_logo}
+                  onCheckedChange={(checked) => 
+                    setBackgroundSettings(prev => ({...prev, show_logo: checked}))
+                  }
+                />
+              </div>
+              {backgroundSettings.show_logo && (
+                <Input
+                  placeholder="رابط الشعار (PNG أو SVG)"
+                  value={backgroundSettings.logo_url || ''}
+                  onChange={(e) => 
+                    setBackgroundSettings(prev => ({...prev, logo_url: e.target.value}))
+                  }
+                  className="bg-gray-700/50 border-gray-600"
+                />
+              )}
+            </div>
+
+            {/* Overlay Color */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 bg-gray-700/30 rounded-lg space-y-3">
+                <Label>لون التعتيم</Label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    value="#000000"
+                    onChange={(e) => {
+                      const hex = e.target.value;
+                      setBackgroundSettings(prev => ({
+                        ...prev, 
+                        overlay_color: `rgba(${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)},0.5)`
+                      }));
+                    }}
+                    className="w-10 h-10 rounded cursor-pointer"
+                  />
+                  <Input
+                    value={backgroundSettings.overlay_color}
+                    onChange={(e) => 
+                      setBackgroundSettings(prev => ({...prev, overlay_color: e.target.value}))
+                    }
+                    className="bg-gray-700/50 border-gray-600 flex-1"
+                    placeholder="rgba(0,0,0,0.5)"
+                  />
+                </div>
+              </div>
+              
+              <div className="p-4 bg-gray-700/30 rounded-lg space-y-3">
+                <Label>مدة الانتقال (ثواني)</Label>
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0.5"
+                  max="5"
+                  value={backgroundSettings.transition_duration}
+                  onChange={(e) => 
+                    setBackgroundSettings(prev => ({...prev, transition_duration: parseFloat(e.target.value)}))
+                  }
+                  className="bg-gray-700/50 border-gray-600"
+                />
+              </div>
+            </div>
+
+            {/* Backgrounds Grid */}
+            <div>
+              <Label className="text-lg mb-4 block">الخلفيات ({backgroundSettings.backgrounds?.length || 0})</Label>
+              
+              {(!backgroundSettings.backgrounds || backgroundSettings.backgrounds.length === 0) ? (
+                <div className="text-center py-12 bg-gray-700/20 rounded-lg border-2 border-dashed border-gray-600">
+                  <Image className="h-12 w-12 mx-auto text-gray-500 mb-3" />
+                  <p className="text-gray-400">لا توجد خلفيات</p>
+                  <p className="text-sm text-gray-500 mt-1">أضف خلفيات لتظهر في صفحة تسجيل الدخول</p>
+                  <Button 
+                    onClick={() => setShowAddBackground(true)}
+                    variant="outline" 
+                    className="mt-4 border-gray-600"
+                  >
+                    <Plus className="h-4 w-4 ml-2" />
+                    إضافة خلفية
+                  </Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {backgroundSettings.backgrounds.map((bg, index) => (
+                    <div 
+                      key={bg.id || index} 
+                      className={`relative group rounded-lg overflow-hidden border-2 ${
+                        bg.is_active ? 'border-green-500' : 'border-gray-600'
+                      }`}
+                    >
+                      {/* Preview Image */}
+                      <div className="aspect-video bg-gray-700 relative">
+                        <img 
+                          src={bg.image_url} 
+                          alt={bg.title || `خلفية ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = 'https://via.placeholder.com/400x225?text=Image+Error';
+                          }}
+                        />
+                        
+                        {/* Overlay on hover */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => toggleBackgroundActive(bg.id)}
+                            className={bg.is_active ? 'text-green-400 hover:text-green-300' : 'text-gray-400 hover:text-white'}
+                          >
+                            {bg.is_active ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => deleteBackground(bg.id)}
+                            className="text-red-400 hover:text-red-300"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </Button>
+                        </div>
+                        
+                        {/* Status Badge */}
+                        <div className="absolute top-2 right-2">
+                          <Badge className={bg.is_active ? 'bg-green-500/80' : 'bg-gray-500/80'}>
+                            {bg.is_active ? 'مفعّل' : 'معطّل'}
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      {/* Info */}
+                      <div className="p-3 bg-gray-800">
+                        <p className="font-medium text-sm truncate">{bg.title || `خلفية ${index + 1}`}</p>
+                        <div className="flex items-center justify-between mt-2">
+                          <Select
+                            value={bg.animation_type}
+                            onValueChange={(v) => updateBackgroundAnimation(bg.id, v)}
+                          >
+                            <SelectTrigger className="h-8 text-xs bg-gray-700/50 border-gray-600 w-28">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-800 border-gray-700">
+                              <SelectItem value="fade">تلاشي</SelectItem>
+                              <SelectItem value="zoom">تكبير</SelectItem>
+                              <SelectItem value="kenburns">Ken Burns</SelectItem>
+                              <SelectItem value="slide">انزلاق</SelectItem>
+                              <SelectItem value="parallax">Parallax</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <span className="text-xs text-gray-500">#{index + 1}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </main>
 
-      {/* New Tenant Modal */}
+      {/* Add Background Modal */}
+      <Dialog open={showAddBackground} onOpenChange={setShowAddBackground}>
+        <DialogContent className="max-w-md bg-gray-800 border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5 text-pink-400" />
+              إضافة خلفية جديدة
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>رابط الصورة *</Label>
+              <Input
+                placeholder="https://example.com/image.jpg"
+                value={newBackgroundUrl}
+                onChange={(e) => setNewBackgroundUrl(e.target.value)}
+                className="bg-gray-700/50 border-gray-600"
+              />
+              <p className="text-xs text-gray-500">يفضل استخدام صور بدقة عالية (1920x1080 أو أعلى)</p>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>عنوان الخلفية (اختياري)</Label>
+              <Input
+                placeholder="مثال: خلفية المطعم الرئيسية"
+                value={newBackgroundTitle}
+                onChange={(e) => setNewBackgroundTitle(e.target.value)}
+                className="bg-gray-700/50 border-gray-600"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>نوع الحركة</Label>
+              <Select
+                value={newBackgroundAnimation}
+                onValueChange={setNewBackgroundAnimation}
+              >
+                <SelectTrigger className="bg-gray-700/50 border-gray-600">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="fade">تلاشي (Fade)</SelectItem>
+                  <SelectItem value="zoom">تكبير بطيء (Zoom)</SelectItem>
+                  <SelectItem value="kenburns">Ken Burns Effect</SelectItem>
+                  <SelectItem value="slide">انزلاق (Slide)</SelectItem>
+                  <SelectItem value="parallax">Parallax</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Preview */}
+            {newBackgroundUrl && (
+              <div className="space-y-2">
+                <Label>معاينة</Label>
+                <div className="aspect-video rounded-lg overflow-hidden bg-gray-700">
+                  <img 
+                    src={newBackgroundUrl} 
+                    alt="معاينة"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/400x225?text=Invalid+URL';
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddBackground(false)} className="border-gray-600">
+              إلغاء
+            </Button>
+            <Button 
+              onClick={addNewBackground} 
+              className="bg-purple-600 hover:bg-purple-700"
+              disabled={backgroundsLoading || !newBackgroundUrl}
+            >
+              {backgroundsLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin ml-2" />
+              ) : (
+                <Plus className="h-4 w-4 ml-2" />
+              )}
+              إضافة
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Dialog open={showNewTenant} onOpenChange={setShowNewTenant}>
         <DialogContent className="max-w-lg bg-gray-800 border-gray-700 text-white">
           <DialogHeader>
