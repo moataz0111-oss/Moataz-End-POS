@@ -364,13 +364,26 @@ export default function HR() {
       <div className="bg-card border-b sticky top-0 z-40">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">إدارة الموارد البشرية</h1>
-                <p className="text-sm text-muted-foreground">إدارة الموظفين والرواتب والحضور</p>
+            <div className="flex items-center gap-4">
+              {/* زر الرجوع */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/')}
+                className="h-10 w-10"
+                data-testid="back-btn"
+              >
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                  <Users className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-foreground">إدارة الموارد البشرية</h1>
+                  <p className="text-sm text-muted-foreground">إدارة الموظفين والرواتب والحضور</p>
+                </div>
               </div>
             </div>
             
@@ -392,6 +405,17 @@ export default function HR() {
                   ))}
                 </SelectContent>
               </Select>
+              
+              {/* زر الصفحة الرئيسية */}
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => navigate('/')}
+                className="h-10 w-10"
+                title="الصفحة الرئيسية"
+              >
+                <Home className="h-5 w-5" />
+              </Button>
             </div>
           </div>
         </div>
