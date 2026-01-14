@@ -4012,21 +4012,34 @@ async def simulate_incoming_call(data: dict, current_user: dict = Depends(get_cu
     """محاكاة مكالمة واردة للاختبار"""
     
     phone = data.get("phone", "07801234567")
+    tenant_id = get_user_tenant_id(current_user)
     
     # تنظيف رقم الهاتف
     phone = phone.replace(" ", "").replace("-", "").replace("+", "")
     
-    # البحث عن العميل
-    customer = await db.customers.find_one(
-        {"$or": [{"phone": phone}, {"phone2": phone}]},
-        {"_id": 0}
-    )
+    # البحث عن العميل مع مراعاة tenant_id
+    customer_query = {"$or": [{"phone": phone}, {"phone2": phone}]}
+    if tenant_id:
+        customer_query["tenant_id"] = tenant_id
+    else:
+        customer_query["$or"] = [
+            {"$and": [{"phone": phone}, {"$or": [{"tenant_id": None}, {"tenant_id": {"$exists": False}}]}]},
+            {"$and": [{"phone2": phone}, {"$or": [{"tenant_id": None}, {"tenant_id": {"$exists": False}}]}]}
+        ]
+    
+    customer = await db.customers.find_one(customer_query, {"_id": 0})
     
     # آخر طلب للعميل
     last_order = None
     if customer:
+        order_query = {"customer_phone": phone}
+        if tenant_id:
+            order_query["tenant_id"] = tenant_id
+        else:
+            order_query["$or"] = [{"tenant_id": None}, {"tenant_id": {"$exists": False}}]
+        
         last_order = await db.orders.find_one(
-            {"customer_phone": phone},
+            order_query,
             {"_id": 0},
             sort=[("created_at", -1)]
         )
@@ -4042,7 +4055,8 @@ async def simulate_incoming_call(data: dict, current_user: dict = Depends(get_cu
         "is_new_customer": customer is None,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "status": "ringing",
-        "simulated": True
+        "simulated": True,
+        "tenant_id": tenant_id
     }
     
     active_calls[call_id] = call_data
