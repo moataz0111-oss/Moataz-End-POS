@@ -100,7 +100,7 @@ export default function HR() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
       const [empRes, branchRes, attRes, advRes, dedRes, bonRes, payRes] = await Promise.all([
