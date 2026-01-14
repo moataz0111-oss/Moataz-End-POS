@@ -4594,17 +4594,66 @@ async def get_tenant_details(tenant_id: str, current_user: dict = Depends(verify
     }
 
 @api_router.put("/super-admin/tenants/{tenant_id}")
-async def update_tenant(tenant_id: str, updates: dict, current_user: dict = Depends(verify_super_admin)):
-    """تحديث بيانات مستأجر"""
+async def update_tenant(tenant_id: str, updates: dict, background_tasks: BackgroundTasks, current_user: dict = Depends(verify_super_admin)):
+    """تحديث بيانات مستأجر مع إرسال بريد إلكتروني تلقائي"""
     tenant = await db.tenants.find_one({"id": tenant_id})
     if not tenant:
         raise HTTPException(status_code=404, detail="المستأجر غير موجود")
     
-    allowed_updates = ["name", "subscription_type", "max_branches", "max_users", "is_active", "expires_at"]
+    # قائمة الحقول المسموح بتحديثها
+    allowed_updates = [
+        "name", "owner_name", "owner_email", "owner_phone", 
+        "subscription_type", "max_branches", "max_users", 
+        "is_active", "expires_at"
+    ]
     update_data = {k: v for k, v in updates.items() if k in allowed_updates}
+    
+    # التحقق من تغيير البريد الإلكتروني
+    email_changed = False
+    new_email = updates.get("owner_email")
+    if new_email and new_email != tenant.get("owner_email"):
+        # التحقق من عدم استخدام البريد من قبل
+        existing = await db.users.find_one({"email": new_email})
+        if existing:
+            raise HTTPException(status_code=400, detail="البريد الإلكتروني مستخدم من قبل")
+        email_changed = True
     
     if update_data:
         await db.tenants.update_one({"id": tenant_id}, {"$set": update_data})
+    
+    # تحديث بيانات المستخدم الأدمن إذا تم تغيير البريد أو الاسم
+    admin_update = {}
+    if new_email and email_changed:
+        admin_update["email"] = new_email
+    if updates.get("owner_name"):
+        admin_update["full_name"] = updates.get("owner_name")
+    
+    if admin_update:
+        await db.users.update_one(
+            {"tenant_id": tenant_id, "role": UserRole.ADMIN},
+            {"$set": admin_update}
+        )
+    
+    # إرسال بريد إلكتروني إذا طُلب ذلك
+    if updates.get("send_welcome_email"):
+        admin = await db.users.find_one({"tenant_id": tenant_id, "role": UserRole.ADMIN}, {"_id": 0})
+        if admin:
+            # إعادة تعيين كلمة مرور مؤقتة للإرسال
+            temp_password = updates.get("temp_password") or f"{tenant.get('slug')}123"
+            await db.users.update_one(
+                {"id": admin["id"]},
+                {"$set": {"password": hash_password(temp_password)}}
+            )
+            
+            # إرسال البريد في الخلفية
+            background_tasks.add_task(
+                send_welcome_email,
+                recipient_email=admin.get("email"),
+                tenant_name=update_data.get("name", tenant.get("name")),
+                owner_name=update_data.get("owner_name", tenant.get("owner_name")),
+                username=admin.get("email"),
+                password=temp_password
+            )
     
     updated = await db.tenants.find_one({"id": tenant_id}, {"_id": 0})
     return updated
