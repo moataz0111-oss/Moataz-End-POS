@@ -703,10 +703,12 @@ class PasswordReset(BaseModel):
 @api_router.put("/users/{user_id}/reset-password")
 async def reset_user_password(user_id: str, data: PasswordReset, current_user: dict = Depends(get_current_user)):
     """إعادة تعيين كلمة مرور المستخدم"""
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    user = await db.users.find_one({"id": user_id})
+    # التحقق من أن المستخدم ينتمي لنفس الـ tenant
+    query = build_tenant_query(current_user, {"id": user_id})
+    user = await db.users.find_one(query)
     if not user:
         raise HTTPException(status_code=404, detail="المستخدم غير موجود")
     
