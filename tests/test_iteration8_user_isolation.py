@@ -117,12 +117,15 @@ class TestSuperAdminTenantEdit:
         self.session.headers.update({"Content-Type": "application/json"})
     
     def super_admin_login(self):
-        """Login as super admin"""
-        response = self.session.post(f"{BASE_URL}/api/super-admin/login", json={
-            "email": SUPER_ADMIN["email"],
-            "password": SUPER_ADMIN["password"],
-            "secret_key": SUPER_ADMIN["secret_key"]
-        })
+        """Login as super admin (uses query params)"""
+        response = self.session.post(
+            f"{BASE_URL}/api/super-admin/login",
+            params={
+                "email": SUPER_ADMIN["email"],
+                "password": SUPER_ADMIN["password"],
+                "secret_key": SUPER_ADMIN["secret_key"]
+            }
+        )
         if response.status_code == 200:
             token = response.json().get("token")
             self.session.headers.update({"Authorization": f"Bearer {token}"})
