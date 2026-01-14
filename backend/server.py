@@ -5974,7 +5974,8 @@ async def create_biometric_device(device: BiometricDeviceCreate, current_user: d
     }
     
     await db.biometric_devices.insert_one(new_device)
-    del new_device["_id"] if "_id" in new_device else None
+    if "_id" in new_device:
+        del new_device["_id"]
     
     return {"message": "تم إضافة الجهاز بنجاح", "device": new_device}
 
