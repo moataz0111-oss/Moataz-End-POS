@@ -270,3 +270,21 @@ div[style*="position: fixed"][style*="bottom"],
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+/* Hide any fixed bottom badge/watermark */
+body > div[style*="position: fixed"][style*="bottom"]:not([class]):not([id]),
+body > a[style*="position: fixed"][style*="bottom"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* More specific selectors for Emergent badge */
+[style*="z-index: 99999"],
+[style*="z-index:99999"],
+[style*="z-index: 9999"][style*="bottom"],
+div[style*="Made with"],
+a[title*="Emergent"],
+img[alt*="Emergent"] {
+    display: none !important;
+    visibility: hidden !important;
+}
