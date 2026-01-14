@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { formatPrice } from '../utils/currency';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -43,7 +44,9 @@ import {
   UserX,
   Timer,
   Gift,
-  Minus
+  Minus,
+  ArrowRight,
+  Home
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 
