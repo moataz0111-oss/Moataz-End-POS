@@ -92,6 +92,7 @@ export default function SuperAdmin() {
   const [showLiveView, setShowLiveView] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showResetSalesConfirm, setShowResetSalesConfirm] = useState(false);
+  const [showEditTenant, setShowEditTenant] = useState(false);
   
   // New tenant form
   const [newTenantForm, setNewTenantForm] = useState({
@@ -103,6 +104,19 @@ export default function SuperAdmin() {
     subscription_type: 'trial',
     max_branches: 1,
     max_users: 5
+  });
+  
+  // Edit tenant form
+  const [editTenantForm, setEditTenantForm] = useState({
+    name: '',
+    owner_name: '',
+    owner_email: '',
+    owner_phone: '',
+    subscription_type: 'trial',
+    max_branches: 1,
+    max_users: 5,
+    send_welcome_email: false,
+    temp_password: ''
   });
   
   const [newPassword, setNewPassword] = useState('');
