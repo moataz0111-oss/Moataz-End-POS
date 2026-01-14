@@ -6160,6 +6160,721 @@ async def get_biometric_attendance(
     records = await db.biometric_attendance.find(query, {"_id": 0}).sort("punch_time", -1).to_list(500)
     return records
 
+# ==================== LOYALTY PROGRAM ROUTES ====================
+
+class LoyaltySettingsUpdate(BaseModel):
+    is_enabled: bool = True
+    points_per_currency: float = 1.0
+    currency_per_point: float = 0.01
+    min_redeem_points: int = 100
+    max_redeem_percent: float = 50
+    points_expiry_days: int = 365
+    welcome_bonus: int = 50
+    birthday_bonus: int = 100
+    referral_bonus: int = 200
+    tiers: List[Dict[str, Any]] = []
+
+class LoyaltyMemberCreate(BaseModel):
+    customer_id: str
+    customer_name: str
+    phone: str
+    email: Optional[str] = None
+    birthday: Optional[str] = None
+    referred_by: Optional[str] = None
+
+class EarnPointsRequest(BaseModel):
+    member_id: str
+    order_id: str
+    order_total: float
+
+class RedeemPointsRequest(BaseModel):
+    member_id: str
+    points_to_redeem: int
+    order_id: str
+
+DEFAULT_LOYALTY_TIERS = [
+    {"name": "برونزي", "name_en": "Bronze", "min_points": 0, "discount_percent": 0, "points_multiplier": 1.0, "color": "#CD7F32"},
+    {"name": "فضي", "name_en": "Silver", "min_points": 500, "discount_percent": 5, "points_multiplier": 1.25, "color": "#C0C0C0"},
+    {"name": "ذهبي", "name_en": "Gold", "min_points": 1500, "discount_percent": 10, "points_multiplier": 1.5, "color": "#FFD700"},
+    {"name": "بلاتيني", "name_en": "Platinum", "min_points": 5000, "discount_percent": 15, "points_multiplier": 2.0, "color": "#E5E4E2"}
+]
+
+@api_router.get("/loyalty/settings")
+async def get_loyalty_settings(current_user: dict = Depends(get_current_user)):
+    """جلب إعدادات برنامج الولاء"""
+    settings = await db.loyalty_settings.find_one(
+        {"tenant_id": current_user.get("tenant_id")}, 
+        {"_id": 0}
+    )
+    
+    if not settings:
+        return {
+            "is_enabled": True,
+            "points_per_currency": 1.0,
+            "currency_per_point": 0.01,
+            "min_redeem_points": 100,
+            "max_redeem_percent": 50,
+            "points_expiry_days": 365,
+            "welcome_bonus": 50,
+            "birthday_bonus": 100,
+            "referral_bonus": 200,
+            "tiers": DEFAULT_LOYALTY_TIERS
+        }
+    return settings
+
+@api_router.put("/loyalty/settings")
+async def update_loyalty_settings(settings: LoyaltySettingsUpdate, current_user: dict = Depends(get_current_user)):
+    """تحديث إعدادات برنامج الولاء"""
+    await db.loyalty_settings.update_one(
+        {"tenant_id": current_user.get("tenant_id")},
+        {"$set": {**settings.model_dump(), "tenant_id": current_user.get("tenant_id")}},
+        upsert=True
+    )
+    return {"message": "تم تحديث الإعدادات"}
+
+@api_router.get("/loyalty/members")
+async def get_loyalty_members(current_user: dict = Depends(get_current_user)):
+    """قائمة أعضاء برنامج الولاء"""
+    members = await db.loyalty_members.find(
+        {"tenant_id": current_user.get("tenant_id")},
+        {"_id": 0}
+    ).sort("total_points", -1).to_list(500)
+    return members
+
+@api_router.post("/loyalty/members")
+async def create_loyalty_member(member: LoyaltyMemberCreate, current_user: dict = Depends(get_current_user)):
+    """إضافة عضو جديد"""
+    # التحقق من عدم وجود العضو
+    existing = await db.loyalty_members.find_one({
+        "phone": member.phone,
+        "tenant_id": current_user.get("tenant_id")
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="العضو موجود مسبقاً")
+    
+    # جلب إعدادات الولاء
+    settings = await db.loyalty_settings.find_one({"tenant_id": current_user.get("tenant_id")})
+    welcome_bonus = settings.get("welcome_bonus", 50) if settings else 50
+    
+    new_member = {
+        "id": str(uuid.uuid4()),
+        "customer_id": member.customer_id,
+        "customer_name": member.customer_name,
+        "phone": member.phone,
+        "email": member.email,
+        "total_points": welcome_bonus,
+        "available_points": welcome_bonus,
+        "redeemed_points": 0,
+        "current_tier": "bronze",
+        "lifetime_spending": 0,
+        "total_orders": 0,
+        "join_date": datetime.now(timezone.utc).isoformat(),
+        "birthday": member.birthday,
+        "referral_code": str(uuid.uuid4())[:8].upper(),
+        "referred_by": member.referred_by,
+        "tenant_id": current_user.get("tenant_id")
+    }
+    
+    await db.loyalty_members.insert_one(new_member)
+    
+    # تسجيل نقاط الترحيب
+    if welcome_bonus > 0:
+        transaction = {
+            "id": str(uuid.uuid4()),
+            "member_id": new_member["id"],
+            "transaction_type": "bonus",
+            "points": welcome_bonus,
+            "description": "نقاط الترحيب",
+            "balance_after": welcome_bonus,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "tenant_id": current_user.get("tenant_id")
+        }
+        await db.loyalty_transactions.insert_one(transaction)
+    
+    # مكافأة الإحالة
+    if member.referred_by:
+        referrer = await db.loyalty_members.find_one({"referral_code": member.referred_by})
+        if referrer:
+            referral_bonus = settings.get("referral_bonus", 200) if settings else 200
+            await db.loyalty_members.update_one(
+                {"id": referrer["id"]},
+                {"$inc": {"total_points": referral_bonus, "available_points": referral_bonus}}
+            )
+            ref_transaction = {
+                "id": str(uuid.uuid4()),
+                "member_id": referrer["id"],
+                "transaction_type": "bonus",
+                "points": referral_bonus,
+                "description": f"مكافأة إحالة - {member.customer_name}",
+                "balance_after": referrer.get("available_points", 0) + referral_bonus,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "tenant_id": current_user.get("tenant_id")
+            }
+            await db.loyalty_transactions.insert_one(ref_transaction)
+    
+    if "_id" in new_member:
+        del new_member["_id"]
+    
+    return {"message": "تم إضافة العضو", "member": new_member}
+
+@api_router.get("/loyalty/members/{member_id}")
+async def get_loyalty_member(member_id: str, current_user: dict = Depends(get_current_user)):
+    """تفاصيل عضو"""
+    member = await db.loyalty_members.find_one(
+        {"id": member_id, "tenant_id": current_user.get("tenant_id")},
+        {"_id": 0}
+    )
+    if not member:
+        raise HTTPException(status_code=404, detail="العضو غير موجود")
+    return member
+
+@api_router.post("/loyalty/earn")
+async def earn_points(request: EarnPointsRequest, current_user: dict = Depends(get_current_user)):
+    """كسب نقاط من طلب"""
+    member = await db.loyalty_members.find_one({"id": request.member_id, "tenant_id": current_user.get("tenant_id")})
+    if not member:
+        raise HTTPException(status_code=404, detail="العضو غير موجود")
+    
+    settings = await db.loyalty_settings.find_one({"tenant_id": current_user.get("tenant_id")})
+    points_per_currency = settings.get("points_per_currency", 1.0) if settings else 1.0
+    tiers = settings.get("tiers", DEFAULT_LOYALTY_TIERS) if settings else DEFAULT_LOYALTY_TIERS
+    
+    # حساب مضاعف المستوى
+    multiplier = 1.0
+    for tier in tiers:
+        if tier.get("name_en", "").lower() == member.get("current_tier", "bronze").lower():
+            multiplier = tier.get("points_multiplier", 1.0)
+            break
+    
+    earned_points = int(request.order_total * points_per_currency * multiplier)
+    new_total = member.get("total_points", 0) + earned_points
+    new_available = member.get("available_points", 0) + earned_points
+    
+    # تحديد المستوى الجديد
+    new_tier = "bronze"
+    for tier in sorted(tiers, key=lambda x: x.get("min_points", 0), reverse=True):
+        if new_total >= tier.get("min_points", 0):
+            new_tier = tier.get("name_en", "bronze").lower()
+            break
+    
+    await db.loyalty_members.update_one(
+        {"id": request.member_id},
+        {"$set": {
+            "total_points": new_total,
+            "available_points": new_available,
+            "current_tier": new_tier,
+            "lifetime_spending": member.get("lifetime_spending", 0) + request.order_total,
+            "total_orders": member.get("total_orders", 0) + 1
+        }}
+    )
+    
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "member_id": request.member_id,
+        "order_id": request.order_id,
+        "transaction_type": "earn",
+        "points": earned_points,
+        "description": f"طلب #{request.order_id[:8]}",
+        "balance_after": new_available,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "tenant_id": current_user.get("tenant_id")
+    }
+    await db.loyalty_transactions.insert_one(transaction)
+    
+    return {"earned_points": earned_points, "new_balance": new_available, "new_tier": new_tier}
+
+@api_router.post("/loyalty/redeem")
+async def redeem_points(request: RedeemPointsRequest, current_user: dict = Depends(get_current_user)):
+    """استبدال نقاط"""
+    member = await db.loyalty_members.find_one({"id": request.member_id, "tenant_id": current_user.get("tenant_id")})
+    if not member:
+        raise HTTPException(status_code=404, detail="العضو غير موجود")
+    
+    if member.get("available_points", 0) < request.points_to_redeem:
+        raise HTTPException(status_code=400, detail="رصيد النقاط غير كافي")
+    
+    settings = await db.loyalty_settings.find_one({"tenant_id": current_user.get("tenant_id")})
+    min_redeem = settings.get("min_redeem_points", 100) if settings else 100
+    currency_per_point = settings.get("currency_per_point", 0.01) if settings else 0.01
+    
+    if request.points_to_redeem < min_redeem:
+        raise HTTPException(status_code=400, detail=f"الحد الأدنى للاستبدال {min_redeem} نقطة")
+    
+    discount_value = request.points_to_redeem * currency_per_point
+    new_available = member.get("available_points", 0) - request.points_to_redeem
+    new_redeemed = member.get("redeemed_points", 0) + request.points_to_redeem
+    
+    await db.loyalty_members.update_one(
+        {"id": request.member_id},
+        {"$set": {"available_points": new_available, "redeemed_points": new_redeemed}}
+    )
+    
+    transaction = {
+        "id": str(uuid.uuid4()),
+        "member_id": request.member_id,
+        "order_id": request.order_id,
+        "transaction_type": "redeem",
+        "points": -request.points_to_redeem,
+        "description": f"استبدال في طلب #{request.order_id[:8]}",
+        "balance_after": new_available,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "tenant_id": current_user.get("tenant_id")
+    }
+    await db.loyalty_transactions.insert_one(transaction)
+    
+    return {"discount_value": discount_value, "new_balance": new_available}
+
+@api_router.get("/loyalty/transactions/{member_id}")
+async def get_member_transactions(member_id: str, current_user: dict = Depends(get_current_user)):
+    """سجل معاملات العضو"""
+    transactions = await db.loyalty_transactions.find(
+        {"member_id": member_id, "tenant_id": current_user.get("tenant_id")},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return transactions
+
+# ==================== RECIPES & RAW MATERIALS ROUTES ====================
+
+class RawMaterialCreate(BaseModel):
+    name: str
+    name_en: Optional[str] = None
+    unit: str
+    unit_cost: float
+    current_stock: float = 0
+    min_stock: float = 0
+    max_stock: float = 0
+    category: str = "general"
+    branch_id: Optional[str] = None
+
+class RecipeCreate(BaseModel):
+    product_id: str
+    ingredients: List[Dict[str, Any]]
+    labor_cost: float = 0
+    overhead_cost: float = 0
+    portions: int = 1
+    preparation_time: int = 0
+    instructions: Optional[str] = None
+
+MATERIAL_CATEGORIES = [
+    {"id": "meat", "name": "لحوم ودواجن"},
+    {"id": "seafood", "name": "مأكولات بحرية"},
+    {"id": "vegetables", "name": "خضروات"},
+    {"id": "fruits", "name": "فواكه"},
+    {"id": "dairy", "name": "ألبان وبيض"},
+    {"id": "grains", "name": "حبوب ونشويات"},
+    {"id": "spices", "name": "توابل وبهارات"},
+    {"id": "oils", "name": "زيوت ودهون"},
+    {"id": "beverages", "name": "مشروبات"},
+    {"id": "packaging", "name": "تغليف"},
+    {"id": "general", "name": "عام"}
+]
+
+@api_router.get("/recipes/categories")
+async def get_material_categories():
+    """تصنيفات المواد الخام"""
+    return MATERIAL_CATEGORIES
+
+@api_router.get("/recipes/materials")
+async def get_raw_materials(category: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """قائمة المواد الخام"""
+    query = {"tenant_id": current_user.get("tenant_id")}
+    if category:
+        query["category"] = category
+    
+    materials = await db.raw_materials.find(query, {"_id": 0}).to_list(500)
+    return materials
+
+@api_router.post("/recipes/materials")
+async def create_raw_material(material: RawMaterialCreate, current_user: dict = Depends(get_current_user)):
+    """إضافة مادة خام"""
+    new_material = {
+        "id": str(uuid.uuid4()),
+        **material.model_dump(),
+        "tenant_id": current_user.get("tenant_id"),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.raw_materials.insert_one(new_material)
+    if "_id" in new_material:
+        del new_material["_id"]
+    
+    return {"message": "تم إضافة المادة", "material": new_material}
+
+@api_router.put("/recipes/materials/{material_id}")
+async def update_raw_material(material_id: str, material: RawMaterialCreate, current_user: dict = Depends(get_current_user)):
+    """تحديث مادة خام"""
+    await db.raw_materials.update_one(
+        {"id": material_id, "tenant_id": current_user.get("tenant_id")},
+        {"$set": {**material.model_dump(), "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"message": "تم التحديث"}
+
+@api_router.delete("/recipes/materials/{material_id}")
+async def delete_raw_material(material_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف مادة خام"""
+    await db.raw_materials.delete_one({"id": material_id, "tenant_id": current_user.get("tenant_id")})
+    return {"message": "تم الحذف"}
+
+@api_router.get("/recipes")
+async def get_recipes(current_user: dict = Depends(get_current_user)):
+    """قائمة الوصفات"""
+    recipes = await db.recipes.find({"tenant_id": current_user.get("tenant_id")}, {"_id": 0}).to_list(500)
+    return recipes
+
+@api_router.post("/recipes")
+async def create_recipe(recipe: RecipeCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء وصفة"""
+    # جلب معلومات المنتج
+    product = await db.products.find_one({"id": recipe.product_id}, {"_id": 0})
+    if not product:
+        raise HTTPException(status_code=404, detail="المنتج غير موجود")
+    
+    # جلب المواد الخام
+    material_ids = [ing.get("material_id") for ing in recipe.ingredients]
+    materials = await db.raw_materials.find({"id": {"$in": material_ids}}, {"_id": 0}).to_list(100)
+    materials_dict = {m["id"]: m for m in materials}
+    
+    # حساب التكلفة
+    total_cost = 0
+    ingredients_list = []
+    
+    for ing in recipe.ingredients:
+        mat = materials_dict.get(ing.get("material_id"))
+        if mat:
+            ing_cost = ing.get("quantity", 0) * mat.get("unit_cost", 0)
+            total_cost += ing_cost
+            ingredients_list.append({
+                "material_id": mat["id"],
+                "material_name": mat["name"],
+                "quantity": ing.get("quantity", 0),
+                "unit": mat["unit"],
+                "unit_cost": mat["unit_cost"],
+                "total_cost": round(ing_cost, 3)
+            })
+    
+    final_cost = total_cost + recipe.labor_cost + recipe.overhead_cost
+    selling_price = product.get("price", 0)
+    profit_margin = ((selling_price - final_cost) / selling_price * 100) if selling_price > 0 else 0
+    
+    new_recipe = {
+        "id": str(uuid.uuid4()),
+        "product_id": recipe.product_id,
+        "product_name": product.get("name", ""),
+        "ingredients": ingredients_list,
+        "total_cost": round(total_cost, 3),
+        "labor_cost": recipe.labor_cost,
+        "overhead_cost": recipe.overhead_cost,
+        "final_cost": round(final_cost, 3),
+        "selling_price": selling_price,
+        "profit_margin": round(profit_margin, 2),
+        "portions": recipe.portions,
+        "preparation_time": recipe.preparation_time,
+        "instructions": recipe.instructions,
+        "tenant_id": current_user.get("tenant_id"),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.recipes.insert_one(new_recipe)
+    if "_id" in new_recipe:
+        del new_recipe["_id"]
+    
+    return {"message": "تم إنشاء الوصفة", "recipe": new_recipe}
+
+@api_router.get("/recipes/{recipe_id}")
+async def get_recipe(recipe_id: str, current_user: dict = Depends(get_current_user)):
+    """تفاصيل وصفة"""
+    recipe = await db.recipes.find_one({"id": recipe_id, "tenant_id": current_user.get("tenant_id")}, {"_id": 0})
+    if not recipe:
+        raise HTTPException(status_code=404, detail="الوصفة غير موجودة")
+    return recipe
+
+@api_router.delete("/recipes/{recipe_id}")
+async def delete_recipe(recipe_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف وصفة"""
+    await db.recipes.delete_one({"id": recipe_id, "tenant_id": current_user.get("tenant_id")})
+    return {"message": "تم الحذف"}
+
+@api_router.get("/recipes/alerts/low-stock")
+async def get_low_stock_alerts(current_user: dict = Depends(get_current_user)):
+    """تنبيهات المخزون المنخفض"""
+    materials = await db.raw_materials.find({
+        "tenant_id": current_user.get("tenant_id"),
+        "is_active": True,
+        "$expr": {"$lte": ["$current_stock", "$min_stock"]}
+    }, {"_id": 0}).to_list(100)
+    
+    alerts = []
+    for mat in materials:
+        severity = "critical" if mat.get("current_stock", 0) == 0 else "warning"
+        alerts.append({
+            "material_id": mat["id"],
+            "material_name": mat["name"],
+            "current_stock": mat.get("current_stock", 0),
+            "min_stock": mat.get("min_stock", 0),
+            "unit": mat.get("unit", ""),
+            "severity": severity
+        })
+    
+    return alerts
+
+# ==================== INVOICE & PRINTING ROUTES ====================
+
+class PrinterCreate(BaseModel):
+    name: str
+    printer_type: str = "thermal"
+    paper_width: int = 80
+    connection_type: str = "network"
+    ip_address: Optional[str] = None
+    port: int = 9100
+    branch_id: str
+    is_default: bool = False
+
+class InvoiceTemplateCreate(BaseModel):
+    name: str
+    template_type: str = "receipt"
+    show_logo: bool = True
+    logo_url: Optional[str] = None
+    business_name: str = ""
+    business_name_en: Optional[str] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    tax_number: Optional[str] = None
+    footer_text: Optional[str] = None
+    footer_text_en: Optional[str] = None
+    show_qr_code: bool = False
+    paper_width: int = 80
+    branch_id: Optional[str] = None
+    is_default: bool = False
+
+@api_router.get("/invoices/printers")
+async def get_printers(current_user: dict = Depends(get_current_user)):
+    """قائمة الطابعات"""
+    printers = await db.printers.find({"tenant_id": current_user.get("tenant_id")}, {"_id": 0}).to_list(50)
+    return printers
+
+@api_router.post("/invoices/printers")
+async def create_printer(printer: PrinterCreate, current_user: dict = Depends(get_current_user)):
+    """إضافة طابعة"""
+    new_printer = {
+        "id": str(uuid.uuid4()),
+        **printer.model_dump(),
+        "tenant_id": current_user.get("tenant_id"),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.printers.insert_one(new_printer)
+    if "_id" in new_printer:
+        del new_printer["_id"]
+    
+    return {"message": "تم إضافة الطابعة", "printer": new_printer}
+
+@api_router.delete("/invoices/printers/{printer_id}")
+async def delete_printer(printer_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف طابعة"""
+    await db.printers.delete_one({"id": printer_id, "tenant_id": current_user.get("tenant_id")})
+    return {"message": "تم الحذف"}
+
+@api_router.get("/invoices/templates")
+async def get_invoice_templates(current_user: dict = Depends(get_current_user)):
+    """قائمة قوالب الفواتير"""
+    templates = await db.invoice_templates.find({"tenant_id": current_user.get("tenant_id")}, {"_id": 0}).to_list(50)
+    return templates
+
+@api_router.post("/invoices/templates")
+async def create_invoice_template(template: InvoiceTemplateCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء قالب فاتورة"""
+    new_template = {
+        "id": str(uuid.uuid4()),
+        **template.model_dump(),
+        "tenant_id": current_user.get("tenant_id"),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.invoice_templates.insert_one(new_template)
+    if "_id" in new_template:
+        del new_template["_id"]
+    
+    return {"message": "تم إنشاء القالب", "template": new_template}
+
+@api_router.put("/invoices/templates/{template_id}")
+async def update_invoice_template(template_id: str, template: InvoiceTemplateCreate, current_user: dict = Depends(get_current_user)):
+    """تحديث قالب فاتورة"""
+    await db.invoice_templates.update_one(
+        {"id": template_id, "tenant_id": current_user.get("tenant_id")},
+        {"$set": {**template.model_dump(), "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"message": "تم التحديث"}
+
+@api_router.delete("/invoices/templates/{template_id}")
+async def delete_invoice_template(template_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف قالب"""
+    await db.invoice_templates.delete_one({"id": template_id, "tenant_id": current_user.get("tenant_id")})
+    return {"message": "تم الحذف"}
+
+@api_router.post("/invoices/print/{order_id}")
+async def print_invoice(order_id: str, print_type: str = "customer", printer_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """طباعة فاتورة"""
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # جلب قالب الفاتورة
+    template = await db.invoice_templates.find_one({
+        "tenant_id": current_user.get("tenant_id"),
+        "template_type": "receipt" if print_type == "customer" else print_type,
+        "is_default": True
+    }, {"_id": 0})
+    
+    if not template:
+        template = {
+            "business_name": "المطعم",
+            "show_logo": True,
+            "footer_text": "شكراً لزيارتكم",
+            "paper_width": 80
+        }
+    
+    # تحضير بيانات الطلب للطباعة
+    print_data = {
+        "order_number": order.get("order_number", order["id"][:8]),
+        "date": datetime.fromisoformat(order.get("created_at", datetime.now(timezone.utc).isoformat())).strftime("%Y-%m-%d %H:%M"),
+        "table_number": order.get("table_number"),
+        "customer_name": order.get("customer_name"),
+        "items": order.get("items", []),
+        "subtotal": order.get("subtotal", 0),
+        "discount": order.get("discount", 0),
+        "tax": order.get("tax", 0),
+        "total": order.get("total", 0),
+        "payment_method": order.get("payment_method", "cash"),
+        "order_type": order.get("order_type", "dine_in"),
+        "notes": order.get("notes")
+    }
+    
+    # TODO: إرسال للطابعة عبر الشبكة
+    # في الوقت الحالي، نرجع بيانات الطباعة
+    
+    return {
+        "message": "جاهز للطباعة",
+        "print_data": print_data,
+        "template": template
+    }
+
+# ==================== PUSH NOTIFICATIONS ROUTES ====================
+
+class FCMTokenCreate(BaseModel):
+    user_id: str
+    user_type: str
+    token: str
+    device_type: str = "web"
+    device_id: Optional[str] = None
+    branch_id: Optional[str] = None
+
+class SendNotificationRequest(BaseModel):
+    target_type: str  # user, role, branch, all
+    target_id: Optional[str] = None
+    title: str
+    body: str
+    data: Dict[str, Any] = {}
+
+@api_router.post("/notifications/fcm/register")
+async def register_fcm_token(token_data: FCMTokenCreate, current_user: dict = Depends(get_current_user)):
+    """تسجيل FCM Token"""
+    existing = await db.fcm_tokens.find_one({"token": token_data.token})
+    
+    if existing:
+        await db.fcm_tokens.update_one(
+            {"token": token_data.token},
+            {"$set": {
+                "user_id": token_data.user_id,
+                "user_type": token_data.user_type,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+    else:
+        new_token = {
+            "id": str(uuid.uuid4()),
+            **token_data.model_dump(),
+            "tenant_id": current_user.get("tenant_id"),
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.fcm_tokens.insert_one(new_token)
+    
+    return {"message": "تم التسجيل"}
+
+@api_router.delete("/notifications/fcm/unregister")
+async def unregister_fcm_token(token: str, current_user: dict = Depends(get_current_user)):
+    """إلغاء تسجيل FCM Token"""
+    await db.fcm_tokens.delete_one({"token": token})
+    return {"message": "تم الإلغاء"}
+
+@api_router.post("/notifications/send")
+async def send_notification(request: SendNotificationRequest, background_tasks: BackgroundTasks, current_user: dict = Depends(get_current_user)):
+    """إرسال إشعار"""
+    # جلب Tokens المستهدفة
+    query = {"tenant_id": current_user.get("tenant_id"), "is_active": True}
+    
+    if request.target_type == "user":
+        query["user_id"] = request.target_id
+    elif request.target_type == "role":
+        query["user_type"] = request.target_id
+    elif request.target_type == "branch":
+        query["branch_id"] = request.target_id
+    
+    tokens = await db.fcm_tokens.find(query, {"token": 1, "_id": 0}).to_list(1000)
+    token_list = [t["token"] for t in tokens]
+    
+    if not token_list:
+        return {"message": "لا توجد أجهزة مسجلة", "sent": 0}
+    
+    # TODO: إرسال عبر Firebase
+    # في الوقت الحالي نسجل الإشعار فقط
+    
+    notification_log = {
+        "id": str(uuid.uuid4()),
+        "target_type": request.target_type,
+        "target_id": request.target_id,
+        "title": request.title,
+        "body": request.body,
+        "data": request.data,
+        "sent_count": len(token_list),
+        "status": "sent",
+        "tenant_id": current_user.get("tenant_id"),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.notification_logs.insert_one(notification_log)
+    
+    return {"message": "تم الإرسال", "sent": len(token_list)}
+
+@api_router.get("/notifications/logs")
+async def get_notification_logs(current_user: dict = Depends(get_current_user)):
+    """سجل الإشعارات"""
+    logs = await db.notification_logs.find(
+        {"tenant_id": current_user.get("tenant_id")},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return logs
+
+# Helper function to send notification on new order (called from order creation)
+async def notify_new_order(order: dict, tenant_id: str):
+    """إرسال إشعار طلب جديد"""
+    try:
+        # جلب tokens السائقين والموظفين
+        tokens = await db.fcm_tokens.find({
+            "tenant_id": tenant_id,
+            "user_type": {"$in": ["driver", "admin", "staff"]},
+            "is_active": True
+        }).to_list(100)
+        
+        if tokens:
+            # TODO: إرسال عبر Firebase
+            logger.info(f"Would send notification for order {order.get('id')} to {len(tokens)} devices")
+    except Exception as e:
+        logger.error(f"Failed to send notification: {e}")
+
 # Include router and middleware
 app.include_router(api_router)
 
