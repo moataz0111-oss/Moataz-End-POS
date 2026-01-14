@@ -222,7 +222,9 @@ export default function Settings() {
     showInventory: true,
     showDelivery: true,
     showReports: true,
-    showSettings: true
+    showSettings: true,
+    showHR: true,
+    showWarehouse: true
   });
 
   useEffect(() => {
