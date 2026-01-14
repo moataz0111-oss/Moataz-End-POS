@@ -140,6 +140,8 @@ class UserResponse(BaseModel):
     tenant_id: Optional[str] = None
 
 class UserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
     full_name: Optional[str] = None
     role: Optional[str] = None
     branch_id: Optional[str] = None
