@@ -1379,6 +1379,794 @@ async def get_operating_costs(branch_id: Optional[str] = None, current_user: dic
     costs = await db.operating_costs.find(query, {"_id": 0}).to_list(100)
     return costs
 
+# ==================== HR ROUTES - إدارة الموارد البشرية ====================
+
+# --- الموظفين ---
+
+@api_router.post("/employees", response_model=EmployeeResponse)
+async def create_employee(employee: EmployeeCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء موظف جديد"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    employee_doc = {
+        "id": str(uuid.uuid4()),
+        **employee.model_dump(),
+        "tenant_id": get_user_tenant_id(current_user),
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.employees.insert_one(employee_doc)
+    del employee_doc["_id"]
+    return employee_doc
+
+@api_router.get("/employees", response_model=List[EmployeeResponse])
+async def get_employees(
+    branch_id: Optional[str] = None,
+    department: Optional[str] = None,
+    is_active: Optional[bool] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب قائمة الموظفين"""
+    query = build_tenant_query(current_user)
+    if branch_id:
+        query["branch_id"] = branch_id
+    if department:
+        query["department"] = department
+    if is_active is not None:
+        query["is_active"] = is_active
+    
+    employees = await db.employees.find(query, {"_id": 0}).to_list(1000)
+    return employees
+
+@api_router.get("/employees/{employee_id}", response_model=EmployeeResponse)
+async def get_employee(employee_id: str, current_user: dict = Depends(get_current_user)):
+    """جلب موظف محدد"""
+    query = build_tenant_query(current_user, {"id": employee_id})
+    employee = await db.employees.find_one(query, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    return employee
+
+@api_router.put("/employees/{employee_id}")
+async def update_employee(employee_id: str, update: EmployeeUpdate, current_user: dict = Depends(get_current_user)):
+    """تحديث بيانات موظف"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": employee_id})
+    employee = await db.employees.find_one(query)
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+    if update_data:
+        await db.employees.update_one({"id": employee_id}, {"$set": update_data})
+    
+    return await db.employees.find_one({"id": employee_id}, {"_id": 0})
+
+@api_router.delete("/employees/{employee_id}")
+async def delete_employee(employee_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف موظف"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": employee_id})
+    employee = await db.employees.find_one(query)
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # تعطيل بدلاً من الحذف للحفاظ على السجلات
+    await db.employees.update_one({"id": employee_id}, {"$set": {"is_active": False}})
+    return {"message": "تم تعطيل الموظف"}
+
+# --- الحضور والانصراف ---
+
+@api_router.post("/attendance", response_model=AttendanceResponse)
+async def create_attendance(attendance: AttendanceCreate, current_user: dict = Depends(get_current_user)):
+    """تسجيل حضور/انصراف"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    # التحقق من وجود الموظف
+    employee = await db.employees.find_one({"id": attendance.employee_id}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # حساب ساعات العمل إذا توفر وقت الحضور والانصراف
+    worked_hours = None
+    if attendance.check_in and attendance.check_out:
+        try:
+            check_in = datetime.strptime(attendance.check_in, "%H:%M")
+            check_out = datetime.strptime(attendance.check_out, "%H:%M")
+            worked_hours = (check_out - check_in).seconds / 3600
+        except:
+            pass
+    
+    attendance_doc = {
+        "id": str(uuid.uuid4()),
+        **attendance.model_dump(),
+        "employee_name": employee.get("name"),
+        "worked_hours": worked_hours,
+        "tenant_id": get_user_tenant_id(current_user),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.attendance.insert_one(attendance_doc)
+    del attendance_doc["_id"]
+    return attendance_doc
+
+@api_router.get("/attendance")
+async def get_attendance(
+    employee_id: Optional[str] = None,
+    branch_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب سجلات الحضور"""
+    query = build_tenant_query(current_user)
+    if employee_id:
+        query["employee_id"] = employee_id
+    if branch_id:
+        # جلب الموظفين في الفرع
+        employees = await db.employees.find({"branch_id": branch_id}, {"id": 1}).to_list(1000)
+        emp_ids = [e["id"] for e in employees]
+        query["employee_id"] = {"$in": emp_ids}
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("date", {})["$lte"] = end_date
+    
+    records = await db.attendance.find(query, {"_id": 0}).sort("date", -1).to_list(1000)
+    return records
+
+@api_router.put("/attendance/{attendance_id}")
+async def update_attendance(attendance_id: str, update: dict, current_user: dict = Depends(get_current_user)):
+    """تحديث سجل حضور"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": attendance_id})
+    record = await db.attendance.find_one(query)
+    if not record:
+        raise HTTPException(status_code=404, detail="السجل غير موجود")
+    
+    # حساب ساعات العمل الجديدة
+    check_in = update.get("check_in", record.get("check_in"))
+    check_out = update.get("check_out", record.get("check_out"))
+    worked_hours = record.get("worked_hours")
+    
+    if check_in and check_out:
+        try:
+            ci = datetime.strptime(check_in, "%H:%M")
+            co = datetime.strptime(check_out, "%H:%M")
+            worked_hours = (co - ci).seconds / 3600
+        except:
+            pass
+    
+    update["worked_hours"] = worked_hours
+    await db.attendance.update_one({"id": attendance_id}, {"$set": update})
+    return await db.attendance.find_one({"id": attendance_id}, {"_id": 0})
+
+# --- السلف ---
+
+@api_router.post("/advances", response_model=AdvanceResponse)
+async def create_advance(advance: AdvanceCreate, current_user: dict = Depends(get_current_user)):
+    """طلب سلفة"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    employee = await db.employees.find_one({"id": advance.employee_id}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    monthly_deduction = advance.amount / advance.deduction_months
+    
+    advance_doc = {
+        "id": str(uuid.uuid4()),
+        **advance.model_dump(),
+        "employee_name": employee.get("name"),
+        "remaining_amount": advance.amount,
+        "deducted_amount": 0,
+        "monthly_deduction": monthly_deduction,
+        "status": "approved",  # يمكن إضافة workflow للموافقة
+        "date": advance.date or datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "tenant_id": get_user_tenant_id(current_user),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.advances.insert_one(advance_doc)
+    
+    # إضافة السلفة كمصروف
+    expense_doc = {
+        "id": str(uuid.uuid4()),
+        "category": "advance",
+        "description": f"سلفة للموظف {employee.get('name')}",
+        "amount": advance.amount,
+        "payment_method": "cash",
+        "branch_id": employee.get("branch_id"),
+        "employee_id": advance.employee_id,
+        "advance_id": advance_doc["id"],
+        "tenant_id": get_user_tenant_id(current_user),
+        "date": advance_doc["date"],
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.expenses.insert_one(expense_doc)
+    
+    del advance_doc["_id"]
+    return advance_doc
+
+@api_router.get("/advances")
+async def get_advances(
+    employee_id: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب قائمة السلف"""
+    query = build_tenant_query(current_user)
+    if employee_id:
+        query["employee_id"] = employee_id
+    if status:
+        query["status"] = status
+    
+    advances = await db.advances.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return advances
+
+# --- الخصومات ---
+
+@api_router.post("/deductions", response_model=DeductionResponse)
+async def create_deduction(deduction: DeductionCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء خصم"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    employee = await db.employees.find_one({"id": deduction.employee_id}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # حساب مبلغ الخصم
+    amount = deduction.amount or 0
+    if not amount:
+        hourly_rate = employee.get("salary", 0) / (30 * employee.get("work_hours_per_day", 8))
+        daily_rate = employee.get("salary", 0) / 30
+        
+        if deduction.hours:
+            amount = deduction.hours * hourly_rate
+        elif deduction.days:
+            amount = deduction.days * daily_rate
+    
+    deduction_doc = {
+        "id": str(uuid.uuid4()),
+        **deduction.model_dump(),
+        "employee_name": employee.get("name"),
+        "amount": amount,
+        "tenant_id": get_user_tenant_id(current_user),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.deductions.insert_one(deduction_doc)
+    del deduction_doc["_id"]
+    return deduction_doc
+
+@api_router.get("/deductions")
+async def get_deductions(
+    employee_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب قائمة الخصومات"""
+    query = build_tenant_query(current_user)
+    if employee_id:
+        query["employee_id"] = employee_id
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("date", {})["$lte"] = end_date
+    
+    deductions = await db.deductions.find(query, {"_id": 0}).sort("date", -1).to_list(500)
+    return deductions
+
+# --- المكافآت ---
+
+@api_router.post("/bonuses", response_model=BonusResponse)
+async def create_bonus(bonus: BonusCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء مكافأة"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    employee = await db.employees.find_one({"id": bonus.employee_id}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # حساب مبلغ المكافأة
+    amount = bonus.amount or 0
+    if not amount and bonus.hours:
+        hourly_rate = employee.get("salary", 0) / (30 * employee.get("work_hours_per_day", 8))
+        overtime_rate = hourly_rate * 1.5  # الوقت الإضافي بـ 1.5x
+        amount = bonus.hours * overtime_rate
+    
+    bonus_doc = {
+        "id": str(uuid.uuid4()),
+        **bonus.model_dump(),
+        "employee_name": employee.get("name"),
+        "amount": amount,
+        "tenant_id": get_user_tenant_id(current_user),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.bonuses.insert_one(bonus_doc)
+    del bonus_doc["_id"]
+    return bonus_doc
+
+@api_router.get("/bonuses")
+async def get_bonuses(
+    employee_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب قائمة المكافآت"""
+    query = build_tenant_query(current_user)
+    if employee_id:
+        query["employee_id"] = employee_id
+    if start_date:
+        query["date"] = {"$gte": start_date}
+    if end_date:
+        query.setdefault("date", {})["$lte"] = end_date
+    
+    bonuses = await db.bonuses.find(query, {"_id": 0}).sort("date", -1).to_list(500)
+    return bonuses
+
+# --- كشوفات الرواتب ---
+
+@api_router.post("/payroll/calculate")
+async def calculate_payroll(
+    employee_id: str,
+    month: str,  # YYYY-MM
+    current_user: dict = Depends(get_current_user)
+):
+    """حساب راتب موظف لشهر معين"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    employee = await db.employees.find_one({"id": employee_id}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # جلب سجلات الحضور للشهر
+    start_date = f"{month}-01"
+    end_date = f"{month}-31"
+    
+    attendance_query = build_tenant_query(current_user, {
+        "employee_id": employee_id,
+        "date": {"$gte": start_date, "$lte": end_date}
+    })
+    attendance_records = await db.attendance.find(attendance_query, {"_id": 0}).to_list(31)
+    
+    # حساب أيام العمل والغياب
+    worked_days = len([r for r in attendance_records if r.get("status") == "present"])
+    absent_days = len([r for r in attendance_records if r.get("status") == "absent"])
+    late_hours = sum([r.get("late_minutes", 0) / 60 for r in attendance_records])
+    overtime_hours = sum([max(0, (r.get("worked_hours") or 0) - employee.get("work_hours_per_day", 8)) for r in attendance_records])
+    
+    # جلب الخصومات للشهر
+    deductions_query = build_tenant_query(current_user, {
+        "employee_id": employee_id,
+        "date": {"$gte": start_date, "$lte": end_date}
+    })
+    deductions = await db.deductions.find(deductions_query, {"_id": 0}).to_list(100)
+    total_deductions = sum([d.get("amount", 0) for d in deductions])
+    
+    # جلب المكافآت للشهر
+    bonuses_query = build_tenant_query(current_user, {
+        "employee_id": employee_id,
+        "date": {"$gte": start_date, "$lte": end_date}
+    })
+    bonuses = await db.bonuses.find(bonuses_query, {"_id": 0}).to_list(100)
+    total_bonuses = sum([b.get("amount", 0) for b in bonuses])
+    
+    # جلب السلف المستحقة
+    advances_query = build_tenant_query(current_user, {
+        "employee_id": employee_id,
+        "status": "approved",
+        "remaining_amount": {"$gt": 0}
+    })
+    advances = await db.advances.find(advances_query, {"_id": 0}).to_list(100)
+    advance_deduction = sum([a.get("monthly_deduction", 0) for a in advances])
+    
+    # حساب صافي الراتب
+    basic_salary = employee.get("salary", 0)
+    net_salary = basic_salary + total_bonuses - total_deductions - advance_deduction
+    
+    return {
+        "employee_id": employee_id,
+        "employee_name": employee.get("name"),
+        "month": month,
+        "basic_salary": basic_salary,
+        "worked_days": worked_days,
+        "absent_days": absent_days,
+        "late_hours": late_hours,
+        "overtime_hours": overtime_hours,
+        "total_deductions": total_deductions,
+        "total_bonuses": total_bonuses,
+        "advance_deduction": advance_deduction,
+        "net_salary": net_salary,
+        "deductions_details": deductions,
+        "bonuses_details": bonuses,
+        "advances_details": advances
+    }
+
+@api_router.post("/payroll", response_model=PayrollResponse)
+async def create_payroll(payroll: PayrollCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء كشف راتب"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    employee = await db.employees.find_one({"id": payroll.employee_id}, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    payroll_doc = {
+        "id": str(uuid.uuid4()),
+        **payroll.model_dump(),
+        "employee_name": employee.get("name"),
+        "status": "draft",
+        "tenant_id": get_user_tenant_id(current_user),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "paid_at": None
+    }
+    await db.payroll.insert_one(payroll_doc)
+    del payroll_doc["_id"]
+    return payroll_doc
+
+@api_router.get("/payroll")
+async def get_payroll(
+    employee_id: Optional[str] = None,
+    month: Optional[str] = None,
+    status: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب كشوفات الرواتب"""
+    query = build_tenant_query(current_user)
+    if employee_id:
+        query["employee_id"] = employee_id
+    if month:
+        query["month"] = month
+    if status:
+        query["status"] = status
+    
+    payrolls = await db.payroll.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return payrolls
+
+@api_router.put("/payroll/{payroll_id}/pay")
+async def pay_payroll(payroll_id: str, current_user: dict = Depends(get_current_user)):
+    """صرف الراتب"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": payroll_id})
+    payroll = await db.payroll.find_one(query)
+    if not payroll:
+        raise HTTPException(status_code=404, detail="كشف الراتب غير موجود")
+    
+    if payroll.get("status") == "paid":
+        raise HTTPException(status_code=400, detail="تم صرف الراتب مسبقاً")
+    
+    # تحديث حالة الراتب
+    await db.payroll.update_one(
+        {"id": payroll_id},
+        {"$set": {
+            "status": "paid",
+            "paid_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # خصم السلف من رصيدها
+    if payroll.get("advance_deduction", 0) > 0:
+        advances = await db.advances.find({
+            "employee_id": payroll["employee_id"],
+            "status": "approved",
+            "remaining_amount": {"$gt": 0}
+        }).to_list(100)
+        
+        for advance in advances:
+            deduction = min(advance.get("monthly_deduction", 0), advance.get("remaining_amount", 0))
+            new_remaining = advance.get("remaining_amount", 0) - deduction
+            new_deducted = advance.get("deducted_amount", 0) + deduction
+            status = "paid" if new_remaining <= 0 else "approved"
+            
+            await db.advances.update_one(
+                {"id": advance["id"]},
+                {"$set": {
+                    "remaining_amount": new_remaining,
+                    "deducted_amount": new_deducted,
+                    "status": status
+                }}
+            )
+    
+    # إضافة مصروف الراتب
+    employee = await db.employees.find_one({"id": payroll["employee_id"]}, {"_id": 0})
+    expense_doc = {
+        "id": str(uuid.uuid4()),
+        "category": "salaries",
+        "description": f"راتب {payroll.get('employee_name')} - {payroll.get('month')}",
+        "amount": payroll.get("net_salary", 0),
+        "payment_method": "cash",
+        "branch_id": employee.get("branch_id") if employee else None,
+        "employee_id": payroll.get("employee_id"),
+        "payroll_id": payroll_id,
+        "tenant_id": get_user_tenant_id(current_user),
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.expenses.insert_one(expense_doc)
+    
+    return {"message": "تم صرف الراتب", "payroll": await db.payroll.find_one({"id": payroll_id}, {"_id": 0})}
+
+# ==================== INVENTORY TRANSFER ROUTES - تحويلات المخزون ====================
+
+async def get_next_transfer_number() -> int:
+    """الحصول على رقم التحويل التالي"""
+    counter = await db.counters.find_one_and_update(
+        {"type": "transfer"},
+        {"$inc": {"counter": 1}},
+        upsert=True,
+        return_document=True
+    )
+    return counter["counter"]
+
+@api_router.post("/inventory-transfers", response_model=InventoryTransferResponse)
+async def create_inventory_transfer(transfer: InventoryTransferCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء طلب تحويل مخزون"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    transfer_number = await get_next_transfer_number()
+    
+    # جلب أسماء الفروع
+    from_branch = await db.branches.find_one({"id": transfer.from_branch_id}, {"name": 1})
+    to_branch = await db.branches.find_one({"id": transfer.to_branch_id}, {"name": 1})
+    
+    transfer_doc = {
+        "id": str(uuid.uuid4()),
+        "transfer_number": transfer_number,
+        **transfer.model_dump(),
+        "from_branch_name": from_branch.get("name") if from_branch else None,
+        "to_branch_name": to_branch.get("name") if to_branch else None,
+        "status": "pending",
+        "tenant_id": get_user_tenant_id(current_user),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.inventory_transfers.insert_one(transfer_doc)
+    del transfer_doc["_id"]
+    return transfer_doc
+
+@api_router.get("/inventory-transfers")
+async def get_inventory_transfers(
+    from_branch_id: Optional[str] = None,
+    to_branch_id: Optional[str] = None,
+    status: Optional[str] = None,
+    transfer_type: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب تحويلات المخزون"""
+    query = build_tenant_query(current_user)
+    if from_branch_id:
+        query["from_branch_id"] = from_branch_id
+    if to_branch_id:
+        query["to_branch_id"] = to_branch_id
+    if status:
+        query["status"] = status
+    if transfer_type:
+        query["transfer_type"] = transfer_type
+    
+    transfers = await db.inventory_transfers.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return transfers
+
+@api_router.put("/inventory-transfers/{transfer_id}/approve")
+async def approve_inventory_transfer(transfer_id: str, current_user: dict = Depends(get_current_user)):
+    """الموافقة على التحويل"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": transfer_id})
+    transfer = await db.inventory_transfers.find_one(query)
+    if not transfer:
+        raise HTTPException(status_code=404, detail="التحويل غير موجود")
+    
+    if transfer.get("status") != "pending":
+        raise HTTPException(status_code=400, detail="لا يمكن الموافقة على هذا التحويل")
+    
+    await db.inventory_transfers.update_one(
+        {"id": transfer_id},
+        {"$set": {
+            "status": "approved",
+            "approved_by": current_user["id"],
+            "approved_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "تمت الموافقة على التحويل"}
+
+@api_router.put("/inventory-transfers/{transfer_id}/ship")
+async def ship_inventory_transfer(transfer_id: str, current_user: dict = Depends(get_current_user)):
+    """شحن التحويل (خصم من المخزن المرسل)"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": transfer_id})
+    transfer = await db.inventory_transfers.find_one(query)
+    if not transfer:
+        raise HTTPException(status_code=404, detail="التحويل غير موجود")
+    
+    if transfer.get("status") != "approved":
+        raise HTTPException(status_code=400, detail="يجب الموافقة على التحويل أولاً")
+    
+    # خصم الكميات من المخزن المرسل
+    for item in transfer.get("items", []):
+        await db.inventory.update_one(
+            {"id": item.get("inventory_id"), "branch_id": transfer["from_branch_id"]},
+            {"$inc": {"quantity": -item.get("quantity", 0)}}
+        )
+    
+    await db.inventory_transfers.update_one(
+        {"id": transfer_id},
+        {"$set": {
+            "status": "shipped",
+            "shipped_by": current_user["id"],
+            "shipped_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "تم شحن التحويل"}
+
+@api_router.put("/inventory-transfers/{transfer_id}/receive")
+async def receive_inventory_transfer(transfer_id: str, current_user: dict = Depends(get_current_user)):
+    """استلام التحويل (إضافة للمخزن المستلم)"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": transfer_id})
+    transfer = await db.inventory_transfers.find_one(query)
+    if not transfer:
+        raise HTTPException(status_code=404, detail="التحويل غير موجود")
+    
+    if transfer.get("status") != "shipped":
+        raise HTTPException(status_code=400, detail="يجب شحن التحويل أولاً")
+    
+    # إضافة الكميات للمخزن المستلم
+    for item in transfer.get("items", []):
+        # التحقق من وجود الصنف في المخزن المستلم
+        existing = await db.inventory.find_one({
+            "id": item.get("inventory_id"),
+            "branch_id": transfer["to_branch_id"]
+        })
+        
+        if existing:
+            await db.inventory.update_one(
+                {"id": item.get("inventory_id"), "branch_id": transfer["to_branch_id"]},
+                {"$inc": {"quantity": item.get("quantity", 0)}}
+            )
+        else:
+            # إنشاء صنف جديد في المخزن المستلم
+            source_item = await db.inventory.find_one({"id": item.get("inventory_id")}, {"_id": 0})
+            if source_item:
+                new_item = {
+                    **source_item,
+                    "id": str(uuid.uuid4()),
+                    "branch_id": transfer["to_branch_id"],
+                    "quantity": item.get("quantity", 0),
+                    "last_updated": datetime.now(timezone.utc).isoformat()
+                }
+                await db.inventory.insert_one(new_item)
+    
+    await db.inventory_transfers.update_one(
+        {"id": transfer_id},
+        {"$set": {
+            "status": "received",
+            "received_by": current_user["id"],
+            "received_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "تم استلام التحويل"}
+
+# ==================== PURCHASE REQUEST ROUTES - طلبات الشراء ====================
+
+async def get_next_request_number() -> int:
+    """الحصول على رقم الطلب التالي"""
+    counter = await db.counters.find_one_and_update(
+        {"type": "purchase_request"},
+        {"$inc": {"counter": 1}},
+        upsert=True,
+        return_document=True
+    )
+    return counter["counter"]
+
+@api_router.post("/purchase-requests", response_model=PurchaseRequestResponse)
+async def create_purchase_request(request: PurchaseRequestCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء طلب شراء"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    request_number = await get_next_request_number()
+    
+    branch = await db.branches.find_one({"id": request.branch_id}, {"name": 1})
+    
+    request_doc = {
+        "id": str(uuid.uuid4()),
+        "request_number": request_number,
+        **request.model_dump(),
+        "branch_name": branch.get("name") if branch else None,
+        "status": "pending",
+        "tenant_id": get_user_tenant_id(current_user),
+        "created_by": current_user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.purchase_requests.insert_one(request_doc)
+    del request_doc["_id"]
+    return request_doc
+
+@api_router.get("/purchase-requests")
+async def get_purchase_requests(
+    branch_id: Optional[str] = None,
+    status: Optional[str] = None,
+    priority: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب طلبات الشراء"""
+    query = build_tenant_query(current_user)
+    if branch_id:
+        query["branch_id"] = branch_id
+    if status:
+        query["status"] = status
+    if priority:
+        query["priority"] = priority
+    
+    requests = await db.purchase_requests.find(query, {"_id": 0}).sort("created_at", -1).to_list(500)
+    return requests
+
+@api_router.put("/purchase-requests/{request_id}/approve")
+async def approve_purchase_request(request_id: str, current_user: dict = Depends(get_current_user)):
+    """الموافقة على طلب الشراء"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": request_id})
+    request = await db.purchase_requests.find_one(query)
+    if not request:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    await db.purchase_requests.update_one(
+        {"id": request_id},
+        {"$set": {
+            "status": "approved",
+            "approved_by": current_user["id"],
+            "approved_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    return {"message": "تمت الموافقة على طلب الشراء"}
+
+@api_router.put("/purchase-requests/{request_id}/status")
+async def update_purchase_request_status(request_id: str, status: str, current_user: dict = Depends(get_current_user)):
+    """تحديث حالة طلب الشراء"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPERVISOR, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": request_id})
+    request = await db.purchase_requests.find_one(query)
+    if not request:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    await db.purchase_requests.update_one(
+        {"id": request_id},
+        {"$set": {"status": status}}
+    )
+    return {"message": "تم تحديث الحالة"}
+
 # ==================== TABLE ROUTES ====================
 
 @api_router.post("/tables", response_model=TableResponse)
