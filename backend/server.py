@@ -4525,8 +4525,8 @@ async def get_all_tenants(current_user: dict = Depends(verify_super_admin)):
     return [main_system] + tenants
 
 @api_router.post("/super-admin/tenants")
-async def create_tenant(tenant: TenantCreate, current_user: dict = Depends(verify_super_admin)):
-    """إنشاء مستأجر جديد (عميل جديد)"""
+async def create_tenant(tenant: TenantCreate, background_tasks: BackgroundTasks, current_user: dict = Depends(verify_super_admin)):
+    """إنشاء مستأجر جديد (عميل جديد) مع إرسال بريد ترحيبي"""
     
     # التحقق من عدم وجود slug مكرر
     existing = await db.tenants.find_one({"slug": tenant.slug})
