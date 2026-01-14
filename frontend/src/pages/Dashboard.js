@@ -35,7 +35,9 @@ import {
   Banknote,
   Crown,
   Building2,
-  Headphones
+  Headphones,
+  UserCog,
+  ArrowLeftRight
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
