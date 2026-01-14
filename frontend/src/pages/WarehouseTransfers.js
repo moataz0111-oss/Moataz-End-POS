@@ -69,7 +69,7 @@ export default function WarehouseTransfers() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
       const [transfersRes, requestsRes, branchesRes, inventoryRes] = await Promise.all([
@@ -99,7 +99,7 @@ export default function WarehouseTransfers() {
       return;
     }
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/inventory-transfers`, {
         ...transferForm,
         items: selectedItems.map(item => ({
@@ -121,7 +121,7 @@ export default function WarehouseTransfers() {
 
   const handleTransferAction = async (transferId, action) => {
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.put(`${API}/inventory-transfers/${transferId}/${action}`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(
         action === 'approve' ? 'تمت الموافقة على التحويل' :
@@ -138,7 +138,7 @@ export default function WarehouseTransfers() {
   const handleCreateRequest = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/purchase-requests`, {
         ...requestForm,
         items: requestForm.items.filter(item => item.name && item.quantity)
@@ -154,7 +154,7 @@ export default function WarehouseTransfers() {
 
   const handleRequestAction = async (requestId, action) => {
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       if (action === 'approve') {
         await axios.put(`${API}/purchase-requests/${requestId}/approve`, {}, { headers: { Authorization: `Bearer ${token}` } });
       } else {
