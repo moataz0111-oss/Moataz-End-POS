@@ -5,9 +5,9 @@
 
 ---
 
-## ✅ Completed Features
+## ✅ Completed Features (Jan 15, 2026)
 
-### Core Features
+### Core System
 - [x] نظام المصادقة (JWT)
 - [x] إدارة المنتجات والتصنيفات
 - [x] إدارة الطلبات (محلي، سفري، توصيل)
@@ -19,94 +19,99 @@
 ### Multi-tenant System
 - [x] لوحة تحكم Super Admin
 - [x] فصل البيانات بين العملاء
-- [x] تصفير المبيعات للعملاء
-- [x] إعادة تعيين كلمات المرور
-- [x] تعديل بيانات العملاء الكاملة
-- [x] إرسال بريد ترحيبي تلقائي للعملاء
+- [x] نظام صلاحيات الميزات (Feature Flags)
+- [x] تعديل بيانات العملاء + بريد ترحيبي
 
-### Login Page Animated Backgrounds
-- [x] خلفيات متحركة لصفحة تسجيل الدخول
-- [x] 5 أنواع حركات: Fade, Zoom, Ken Burns, Slide, Parallax
-- [x] تبديل تلقائي بين الخلفيات
+### Login Page 
+- [x] خلفيات متحركة قابلة للتخصيص
+- [x] 5 أنواع حركات
 - [x] تحكم كامل من Super Admin
-- [x] تصميم Glass Effect للكارت
 
 ### Kitchen Display System (KDS)
 - [x] شاشة المطبخ KDS كاملة
-- [x] عرض الطلبات الجديدة والمحضّرة
-- [x] تتبع وقت كل طلب
-- [x] تنبيهات للطلبات المتأخرة
-- [x] وضع ملء الشاشة
-- [x] صوت تنبيه للطلبات الجديدة
+- [x] تتبع الطلبات والأوقات
 
 ### Excel Export
-- [x] تصدير تقارير المبيعات إلى Excel
-- [x] تصدير تقارير المنتجات (الأكثر مبيعاً)
-- [x] تصدير تقارير المصاريف
-- [x] تنسيق احترافي مع ألوان
+- [x] تصدير تقارير المبيعات
+- [x] تصدير تقارير المنتجات والمصاريف
 
-### Call Center System
-- [x] إعدادات ربط الكول سنتر
-- [x] Webhook لاستقبال المكالمات
-- [x] إشعار منبثق للمكالمات الواردة
-- [x] صفحة سجل المكالمات
+### Call Center
+- [x] Webhook للمكالمات
+- [x] إشعار منبثق + سجل مكالمات
 
 ### HR System
 - [x] إدارة الموظفين (CRUD)
 - [x] تسجيل الحضور والانصراف
 - [x] نظام السلف والخصومات
-- [x] حساب كشوفات الرواتب
+- [x] كشوفات الرواتب
 
-### Warehouse & Inventory System
-- [x] تحويلات المخزون بين الفروع
-- [x] طلبات الشراء من الفروع
-
-### 🆕 Driver Tracking Map (Jan 15, 2026)
-- [x] مكون خريطة متقدم `/components/DriverTrackingMap.js`
-- [x] 3 أنماط خريطة (Streets, Satellite, Dark)
-- [x] تتبع السائقين بماركرات متحركة
-- [x] خطوط توصيل للطلبات النشطة
-- [x] قائمة جانبية للسائقين
-- [x] نوافذ معلومات تفاعلية
-- [x] تكامل كامل مع صفحة التوصيل
+### Warehouse System
+- [x] تحويلات المخزون
+- [x] طلبات الشراء
 
 ### 🆕 PWA Enhancement (Jan 15, 2026)
-- [x] تحسين Service Worker v3
-- [x] Manifest لتطبيق الإدارة (manifest-admin.json)
-- [x] مكون زر تثبيت PWA (`PWAInstallButton.js`)
-- [x] تعليمات التثبيت للـ iOS, Android, Desktop
-- [x] استراتيجيات تخزين مؤقت متعددة
+- [x] Service Worker v3 محسّن
+- [x] manifest-admin.json للوحة الإدارة
+- [x] مكون PWAInstallButton
+- [x] تعليمات التثبيت لجميع الأجهزة
 
 ### 🆕 Biometric Device Integration (Jan 15, 2026)
-- [x] واجهة API لأجهزة البصمة ZKTeco
-- [x] واجهة مستخدم لإدارة الأجهزة في صفحة HR
-- [x] دعم Push SDK لاستقبال البيانات
-- [x] مزامنة سجلات الحضور
-- [x] اختبار الاتصال بالأجهزة
-- [x] تعليمات الربط للمستخدم
+- [x] pyzk مثبت للاتصال بأجهزة ZKTeco
+- [x] واجهة API كاملة للأجهزة
+- [x] واجهة مستخدم في HR
+- [x] دعم Push SDK
+
+### 🆕 Loyalty Program (Jan 15, 2026)
+- [x] نظام نقاط الولاء الكامل
+- [x] 4 مستويات (برونزي، فضي، ذهبي، بلاتيني)
+- [x] كسب واستبدال النقاط
+- [x] نقاط ترحيب وإحالة وعيد ميلاد
+- [x] مضاعفات النقاط حسب المستوى
+- [x] واجهة مستخدم كاملة `/loyalty`
+
+### 🆕 Recipes & Raw Materials (Jan 15, 2026)
+- [x] إدارة المواد الخام (11 تصنيف)
+- [x] إنشاء وصفات للمنتجات
+- [x] حساب التكلفة التلقائي
+- [x] حساب هامش الربح
+- [x] تنبيهات المخزون المنخفض
+- [x] واجهة مستخدم كاملة `/recipes`
+
+### 🆕 Invoice Customization & Printing (Jan 15, 2026)
+- [x] قوالب فواتير مخصصة
+- [x] دعم طابعات حرارية (58mm/80mm)
+- [x] إعدادات الشعار والعنوان والتذييل
+- [x] معاينة الفاتورة
+- [x] إدارة الطابعات (Network/USB/Bluetooth)
+- [x] واجهة مستخدم كاملة `/invoices`
+
+### 🆕 Push Notifications Infrastructure (Jan 15, 2026)
+- [x] واجهة API لتسجيل FCM tokens
+- [x] إرسال إشعارات (user/role/branch/all)
+- [x] قوالب إشعارات جاهزة
+- [x] سجل الإشعارات
+- [x] firebase-admin مثبت
 
 ---
 
-## 🔄 In Progress / Upcoming
+## 🔄 Needs Testing/Configuration
 
-### Priority 1 (P0/P1)
-- [ ] **إصلاح PWA للسائقين** - يتطلب اختبار من المستخدم على جهاز فعلي
-- [ ] **إكمال تكامل أجهزة البصمة** - تثبيت مكتبة pyzk على السيرفر الإنتاجي
+### PWA
+- [ ] يحتاج اختبار من المستخدم على جهاز فعلي (iOS/Android/Desktop)
 
-### Code Refactoring (P1)
-- [ ] **تقسيم server.py** (6100+ سطر) إلى ملفات منفصلة
-  - تم إنشاء `/backend/api/login_backgrounds.py` كنموذج
-  - تم إنشاء `/backend/api/biometric.py`
-  - باقي الملفات تحتاج النقل التدريجي
+### Biometric Devices
+- [ ] يحتاج اتصال فعلي بجهاز ZKTeco لاختبار المزامنة
+
+### Push Notifications
+- [ ] يحتاج تكوين Firebase project وإضافة المفاتيح
 
 ---
 
 ## 📋 Future Tasks (P2)
-- [ ] برنامج ولاء العملاء
-- [ ] تخصيص الفاتورة وربط الطابعات
-- [ ] نظام الوصفات والمواد الخام
-- [ ] ربط السلف والخصومات بالرواتب
+- [ ] إشعارات Push حية للسائقين (يحتاج Firebase setup)
+- [ ] ربط السلف والخصومات بالرواتب تلقائياً
 - [ ] كشوف رواتب مطبوعة
+- [ ] إكمال إعادة هيكلة server.py
 
 ---
 
@@ -125,27 +130,54 @@
 
 ---
 
-## 📡 Key API Endpoints
+## 📡 New API Endpoints (Jan 15, 2026)
 
-### Biometric Devices (NEW)
-- `GET /api/biometric/devices` - قائمة الأجهزة
-- `POST /api/biometric/devices` - إضافة جهاز
-- `POST /api/biometric/devices/{id}/test` - اختبار الاتصال
-- `POST /api/biometric/devices/{id}/sync` - مزامنة الحضور
-- `POST /api/biometric/push` - استقبال Push من الأجهزة
-- `GET /api/biometric/attendance` - سجلات الحضور
+### Loyalty Program
+- `GET /api/loyalty/settings` - إعدادات الولاء
+- `PUT /api/loyalty/settings` - تحديث الإعدادات
+- `GET /api/loyalty/members` - قائمة الأعضاء
+- `POST /api/loyalty/members` - إضافة عضو
+- `POST /api/loyalty/earn` - كسب نقاط
+- `POST /api/loyalty/redeem` - استبدال نقاط
+- `GET /api/loyalty/transactions/{member_id}` - سجل المعاملات
 
-### Kitchen Display
-- `GET /api/orders?status=pending,preparing` - طلبات المطبخ
-- `PUT /api/orders/{id}/status` - تحديث حالة الطلب
+### Recipes & Raw Materials
+- `GET /api/recipes/categories` - تصنيفات المواد
+- `GET /api/recipes/materials` - قائمة المواد الخام
+- `POST /api/recipes/materials` - إضافة مادة
+- `GET /api/recipes` - قائمة الوصفات
+- `POST /api/recipes` - إنشاء وصفة
+- `GET /api/recipes/alerts/low-stock` - تنبيهات المخزون
 
-### Excel Export
-- `GET /api/reports/export/excel?report_type=sales|products|expenses`
+### Invoice & Printing
+- `GET /api/invoices/templates` - قوالب الفواتير
+- `POST /api/invoices/templates` - إنشاء قالب
+- `GET /api/invoices/printers` - قائمة الطابعات
+- `POST /api/invoices/printers` - إضافة طابعة
+- `POST /api/invoices/print/{order_id}` - طباعة فاتورة
 
-### Login Backgrounds
-- `GET /api/login-backgrounds`
-- `PUT /api/login-backgrounds`
-- `POST /api/login-backgrounds/upload`
+### Push Notifications
+- `POST /api/notifications/fcm/register` - تسجيل token
+- `POST /api/notifications/send` - إرسال إشعار
+- `GET /api/notifications/logs` - سجل الإشعارات
+
+---
+
+## 📁 New Files Created (Jan 15, 2026)
+
+### Backend
+- `/app/backend/api/loyalty.py` - نماذج الولاء
+- `/app/backend/api/recipes.py` - نماذج الوصفات
+- `/app/backend/api/invoices.py` - نماذج الفواتير
+- `/app/backend/api/notifications.py` - نماذج الإشعارات
+
+### Frontend
+- `/app/frontend/src/pages/Loyalty.js` - صفحة الولاء
+- `/app/frontend/src/pages/Recipes.js` - صفحة الوصفات
+- `/app/frontend/src/pages/Invoices.js` - صفحة الفواتير
+- `/app/frontend/src/components/PWAInstallButton.js`
+- `/app/frontend/src/components/BiometricDevices.js`
+- `/app/frontend/public/manifest-admin.json`
 
 ---
 
@@ -155,32 +187,28 @@
 - **Database**: MongoDB
 - **Maps**: Leaflet / OpenStreetMap
 - **Excel**: openpyxl
-- **Biometric**: pyzk (ZKTeco devices)
-
----
-
-## 📁 New Files Created (Jan 15, 2026)
-- `/app/frontend/src/components/PWAInstallButton.js` - مكون زر تثبيت PWA
-- `/app/frontend/src/components/BiometricDevices.js` - واجهة إدارة أجهزة البصمة
-- `/app/frontend/public/manifest-admin.json` - ملف manifest للوحة الإدارة
-- `/app/backend/api/biometric.py` - ملف API منفصل لأجهزة البصمة (نموذج)
-- `/app/backend/api/login_backgrounds.py` - ملف API منفصل للخلفيات (نموذج)
+- **Biometric**: pyzk (ZKTeco)
+- **Push**: firebase-admin
 
 ---
 
 ## 📊 Deployment Status
-- ✅ All APIs Working
+- ✅ All Core APIs Working
 - ✅ Kitchen Display: Working
 - ✅ Excel Export: Working
 - ✅ Login Backgrounds: Working
 - ✅ Driver Map: Working
 - ✅ Biometric Devices UI: Working
 - ✅ PWA Install Button: Working
+- ✅ Loyalty Program: Working
+- ✅ Recipes System: Working
+- ✅ Invoice Templates: Working
 - ✅ Ready for Production
 
 ---
 
-## ⚠️ Notes for Next Session
-1. **PWA Testing**: يحتاج اختبار من المستخدم على جهاز فعلي (Android/iOS/Desktop)
-2. **Biometric Devices**: يحتاج تثبيت `pyzk` على السيرفر الإنتاجي للاتصال الفعلي بالأجهزة
-3. **Refactoring**: يُفضل نقل routes تدريجياً من `server.py` لتحسين الصيانة
+## ⚠️ Notes
+1. **PWA**: يحتاج اختبار على أجهزة فعلية
+2. **Biometric**: يحتاج جهاز ZKTeco للاتصال الفعلي
+3. **Push Notifications**: يحتاج إعداد Firebase project
+4. **Refactoring**: server.py أصبح ~6700 سطر - يُفضل التقسيم تدريجياً
