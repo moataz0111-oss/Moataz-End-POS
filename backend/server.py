@@ -697,6 +697,38 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
     await db.users.delete_one({"id": user_id})
     return {"message": "تم حذف المستخدم"}
 
+@api_router.post("/users", response_model=UserResponse)
+async def create_user(user: UserCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء مستخدم جديد مع tenant_id تلقائياً"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    # التحقق من عدم وجود المستخدم
+    existing = await db.users.find_one({"$or": [{"email": user.email}, {"username": user.username}]})
+    if existing:
+        raise HTTPException(status_code=400, detail="المستخدم موجود بالفعل")
+    
+    # الحصول على tenant_id من المستخدم الحالي
+    tenant_id = get_user_tenant_id(current_user)
+    
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "username": user.username,
+        "email": user.email,
+        "password": hash_password(user.password),
+        "full_name": user.full_name,
+        "role": user.role,
+        "branch_id": user.branch_id,
+        "permissions": user.permissions,
+        "tenant_id": tenant_id,  # إضافة tenant_id تلقائياً
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user_doc)
+    del user_doc["password"]
+    del user_doc["_id"]
+    return user_doc
+
 class PasswordReset(BaseModel):
     new_password: str
 
