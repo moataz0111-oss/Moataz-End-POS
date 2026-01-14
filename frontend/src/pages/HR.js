@@ -1041,11 +1041,20 @@ export default function HR() {
                           <td className="p-3 font-bold">{formatPrice(pay.net_salary)}</td>
                           <td className="p-3">{getPayrollStatusBadge(pay.status)}</td>
                           <td className="p-3">
-                            {pay.status !== 'paid' && (
-                              <Button size="sm" onClick={() => payPayroll(pay.id)}>
-                                <Banknote className="h-4 w-4 ml-2" /> صرف
+                            <div className="flex gap-2">
+                              {pay.status !== 'paid' && (
+                                <Button size="sm" onClick={() => payPayroll(pay.id)}>
+                                  <Banknote className="h-4 w-4 ml-2" /> صرف
+                                </Button>
+                              )}
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.open(`/payroll/print/${pay.id}`, '_blank')}
+                              >
+                                <Printer className="h-4 w-4" />
                               </Button>
-                            )}
+                            </div>
                           </td>
                         </tr>
                       ))}
