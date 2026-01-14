@@ -4516,15 +4516,6 @@ async def get_printers(branch_id: Optional[str] = None):
 # ==================== SUPER ADMIN & TENANT MANAGEMENT ====================
 # نظام إدارة المستأجرين - لوحة تحكم المالك الرئيسي
 
-# كلمة سر خاصة للـ Super Admin - من متغيرات البيئة
-SUPER_ADMIN_SECRET = os.environ.get("SUPER_ADMIN_SECRET", "271018")
-
-# التحقق من صلاحية Super Admin
-async def verify_super_admin(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") != UserRole.SUPER_ADMIN:
-        raise HTTPException(status_code=403, detail="صلاحيات Super Admin مطلوبة")
-    return current_user
-
 @api_router.post("/super-admin/login")
 async def super_admin_login(email: str, password: str, secret_key: str):
     """تسجيل دخول Super Admin"""
