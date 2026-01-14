@@ -129,6 +129,25 @@ export default function SuperAdmin() {
     temp_password: ''
   });
   
+  // Tenant features
+  const [showFeaturesModal, setShowFeaturesModal] = useState(false);
+  const [tenantFeatures, setTenantFeatures] = useState({
+    showPOS: true,
+    showTables: true,
+    showOrders: true,
+    showExpenses: true,
+    showInventory: true,
+    showDelivery: true,
+    showReports: true,
+    showSettings: true,
+    showHR: false,
+    showWarehouse: false,
+    showCallLogs: false,
+    showCallCenter: false,
+    showKitchen: false
+  });
+  const [featuresLoading, setFeaturesLoading] = useState(false);
+  
   const [newPassword, setNewPassword] = useState('');
   const [copiedCredentials, setCopiedCredentials] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
