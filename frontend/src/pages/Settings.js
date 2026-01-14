@@ -1068,6 +1068,29 @@ export default function Settings() {
                     <form onSubmit={handleUpdateUser} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
+                          <Label className="text-foreground">اسم المستخدم</Label>
+                          <Input
+                            value={editUserForm.username}
+                            onChange={(e) => setEditUserForm({ ...editUserForm, username: e.target.value })}
+                            required
+                            className="mt-1"
+                            dir="ltr"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-foreground">البريد الإلكتروني</Label>
+                          <Input
+                            type="email"
+                            value={editUserForm.email}
+                            onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
+                            required
+                            className="mt-1"
+                            dir="ltr"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
                           <Label className="text-foreground">الاسم الكامل</Label>
                           <Input
                             value={editUserForm.full_name}
