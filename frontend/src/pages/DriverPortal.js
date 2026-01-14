@@ -436,7 +436,7 @@ export default function DriverPortal() {
             </form>
 
             {/* PWA Install */}
-            {isPWAInstallable && (
+            {isPWAInstallable ? (
               <div className="mt-6 pt-4 border-t border-gray-700">
                 <Button 
                   variant="outline" 
@@ -445,6 +445,37 @@ export default function DriverPortal() {
                 >
                   <Download className="h-5 w-5 ml-2" />
                   تثبيت التطبيق
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-6 pt-4 border-t border-gray-700">
+                <p className="text-center text-gray-400 text-sm mb-3">لتثبيت التطبيق على هاتفك:</p>
+                <div className="text-xs text-gray-500 space-y-2">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0">1</span>
+                    <span><strong>Android:</strong> اضغط على ⋮ ثم "Add to Home screen"</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="bg-green-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0">2</span>
+                    <span><strong>iOS:</strong> اضغط على <Share2 className="inline h-3 w-3" /> ثم "Add to Home Screen"</span>
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  className="w-full mt-3 text-gray-400 hover:text-green-400 text-xs"
+                  onClick={() => {
+                    // Try to trigger install prompt manually
+                    if (deferredPrompt) {
+                      installPWA();
+                    } else {
+                      toast.info('اتبع الخطوات أعلاه لتثبيت التطبيق', {
+                        description: 'Android: القائمة ⋮ → Add to Home screen\niOS: زر المشاركة → Add to Home Screen'
+                      });
+                    }
+                  }}
+                >
+                  <Download className="h-4 w-4 ml-1" />
+                  تعليمات التثبيت
                 </Button>
               </div>
             )}
