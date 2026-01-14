@@ -53,6 +53,7 @@ import { toast, Toaster } from 'sonner';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function HR() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('employees');
   const [employees, setEmployees] = useState([]);
   const [branches, setBranches] = useState([]);
