@@ -691,31 +691,18 @@ export default function Delivery() {
                   ))}
                 </div>
 
-                {/* الخريطة مع Leaflet */}
-                <div 
-                  id="drivers-map" 
-                  className="relative rounded-lg overflow-hidden border border-border" 
-                  style={{ height: '500px' }}
-                  ref={mapContainerRef}
-                >
-                  {driverLocations.filter(d => d.location_lat && d.location_lng).length === 0 ? (
-                    <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-10">
-                      <div className="text-center">
-                        <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground text-lg">لا توجد مواقع متاحة للسائقين</p>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          يجب على السائقين تفعيل GPS من تطبيقهم
-                        </p>
-                      </div>
-                    </div>
-                  ) : null}
+                {/* الخريطة المتقدمة */}
+                <div className="rounded-xl overflow-hidden border border-gray-700">
+                  <DriverTrackingMap 
+                    drivers={driverLocations}
+                    orders={pendingOrders}
+                    height="550px"
+                    showControls={true}
+                    showDriverList={true}
+                    autoRefresh={true}
+                    refreshInterval={15000}
+                  />
                 </div>
-                
-                {/* تحميل الخريطة */}
-                <DriverMap 
-                  drivers={driverLocations} 
-                  mapContainerRef={mapContainerRef}
-                />
 
                 {/* تعليمات */}
                 <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
