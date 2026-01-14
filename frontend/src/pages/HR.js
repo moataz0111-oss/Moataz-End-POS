@@ -132,7 +132,7 @@ export default function HR() {
   const handleCreateEmployee = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/employees`, {
         ...employeeForm,
         salary: parseFloat(employeeForm.salary),
@@ -150,7 +150,7 @@ export default function HR() {
   const handleUpdateEmployee = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.put(`${API}/employees/${editingEmployee.id}`, {
         ...employeeForm,
         salary: parseFloat(employeeForm.salary),
@@ -169,7 +169,7 @@ export default function HR() {
   const handleDeleteEmployee = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا الموظف؟')) return;
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.delete(`${API}/employees/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('تم تعطيل الموظف');
       fetchData();
@@ -189,7 +189,7 @@ export default function HR() {
   const handleCreateAttendance = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/attendance`, attendanceForm, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('تم تسجيل الحضور');
       setAttendanceDialogOpen(false);
@@ -204,7 +204,7 @@ export default function HR() {
   const handleCreateAdvance = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/advances`, {
         ...advanceForm,
         amount: parseFloat(advanceForm.amount),
@@ -223,7 +223,7 @@ export default function HR() {
   const handleCreateDeduction = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/deductions`, {
         ...deductionForm,
         amount: deductionForm.amount ? parseFloat(deductionForm.amount) : null,
@@ -243,7 +243,7 @@ export default function HR() {
   const handleCreateBonus = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/bonuses`, {
         ...bonusForm,
         amount: bonusForm.amount ? parseFloat(bonusForm.amount) : null,
@@ -261,7 +261,7 @@ export default function HR() {
   // Payroll handlers
   const calculatePayroll = async (employeeId) => {
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       const res = await axios.post(`${API}/payroll/calculate?employee_id=${employeeId}&month=${selectedMonth}`, {}, { headers: { Authorization: `Bearer ${token}` } });
       setPayrollPreview(res.data);
       setPayrollDialogOpen(true);
@@ -273,7 +273,7 @@ export default function HR() {
   const createPayroll = async () => {
     if (!payrollPreview) return;
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.post(`${API}/payroll`, {
         employee_id: payrollPreview.employee_id,
         month: payrollPreview.month,
@@ -295,7 +295,7 @@ export default function HR() {
   const payPayroll = async (payrollId) => {
     if (!window.confirm('هل أنت متأكد من صرف هذا الراتب؟')) return;
     try {
-      const token = localStorage.getItem('maestro_token');
+      const token = localStorage.getItem('token');
       await axios.put(`${API}/payroll/${payrollId}/pay`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success('تم صرف الراتب');
       fetchData();
