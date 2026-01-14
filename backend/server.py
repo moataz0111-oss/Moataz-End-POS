@@ -4216,6 +4216,203 @@ async def get_credit_report(
         "orders": orders
     }
 
+# ==================== EXPORT TO EXCEL ====================
+
+from io import BytesIO
+from fastapi.responses import StreamingResponse
+
+@api_router.get("/reports/export/excel")
+async def export_sales_to_excel(
+    report_type: str = "sales",  # sales, products, delivery, expenses
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """تصدير التقارير إلى Excel"""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+        from openpyxl.utils import get_column_letter
+    except ImportError:
+        raise HTTPException(status_code=500, detail="مكتبة Excel غير متوفرة")
+    
+    # Create workbook
+    wb = Workbook()
+    ws = wb.active
+    
+    # Styling
+    header_font = Font(bold=True, color="FFFFFF", size=12)
+    header_fill = PatternFill(start_color="1F2937", end_color="1F2937", fill_type="solid")
+    header_alignment = Alignment(horizontal="center", vertical="center")
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # Query dates
+    if not start_date:
+        start_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if not end_date:
+        end_date = start_date
+    
+    query = build_tenant_query(current_user, {
+        "created_at": {"$gte": start_date, "$lte": end_date + "T23:59:59"}
+    })
+    if branch_id:
+        query["branch_id"] = branch_id
+    
+    if report_type == "sales":
+        ws.title = "تقرير المبيعات"
+        
+        # Get orders
+        orders = await db.orders.find(query, {"_id": 0}).to_list(10000)
+        
+        # Headers
+        headers = ["رقم الطلب", "التاريخ", "الوقت", "النوع", "العميل", "الفرع", "طريقة الدفع", "المبلغ", "الحالة"]
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
+            cell.border = thin_border
+        
+        # Data
+        order_types = {"dine_in": "محلي", "takeaway": "سفري", "delivery": "توصيل"}
+        payment_methods = {"cash": "نقدي", "card": "بطاقة", "credit": "آجل"}
+        statuses = {"pending": "معلق", "preparing": "قيد التحضير", "ready": "جاهز", "completed": "مكتمل", "delivered": "تم التوصيل", "cancelled": "ملغي"}
+        
+        for row, order in enumerate(orders, 2):
+            created_at = datetime.fromisoformat(order["created_at"].replace("Z", "+00:00")) if order.get("created_at") else datetime.now()
+            
+            data = [
+                order.get("order_number", ""),
+                created_at.strftime("%Y-%m-%d"),
+                created_at.strftime("%H:%M"),
+                order_types.get(order.get("order_type", ""), order.get("order_type", "")),
+                order.get("customer_name", "بدون اسم"),
+                order.get("branch_name", ""),
+                payment_methods.get(order.get("payment_method", ""), order.get("payment_method", "")),
+                order.get("total", 0),
+                statuses.get(order.get("status", ""), order.get("status", ""))
+            ]
+            
+            for col, value in enumerate(data, 1):
+                cell = ws.cell(row=row, column=col, value=value)
+                cell.border = thin_border
+                if col == 8:  # Amount column
+                    cell.number_format = '#,##0'
+        
+        # Summary row
+        summary_row = len(orders) + 3
+        ws.cell(row=summary_row, column=7, value="الإجمالي:").font = Font(bold=True)
+        total_cell = ws.cell(row=summary_row, column=8, value=sum(o.get("total", 0) for o in orders))
+        total_cell.font = Font(bold=True)
+        total_cell.number_format = '#,##0'
+        
+    elif report_type == "products":
+        ws.title = "تقرير المنتجات"
+        
+        # Get orders with items
+        orders = await db.orders.find(query, {"_id": 0, "items": 1, "total": 1, "status": 1}).to_list(10000)
+        
+        # Aggregate products
+        products = {}
+        for order in orders:
+            if order.get("status") == "cancelled":
+                continue
+            for item in order.get("items", []):
+                name = item.get("name", "غير معروف")
+                if name not in products:
+                    products[name] = {"quantity": 0, "revenue": 0}
+                products[name]["quantity"] += item.get("quantity", 1)
+                products[name]["revenue"] += item.get("price", 0) * item.get("quantity", 1)
+        
+        # Headers
+        headers = ["المنتج", "الكمية المباعة", "الإيرادات"]
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
+            cell.border = thin_border
+        
+        # Data sorted by quantity
+        sorted_products = sorted(products.items(), key=lambda x: x[1]["quantity"], reverse=True)
+        for row, (name, data) in enumerate(sorted_products, 2):
+            ws.cell(row=row, column=1, value=name).border = thin_border
+            ws.cell(row=row, column=2, value=data["quantity"]).border = thin_border
+            revenue_cell = ws.cell(row=row, column=3, value=data["revenue"])
+            revenue_cell.border = thin_border
+            revenue_cell.number_format = '#,##0'
+        
+    elif report_type == "expenses":
+        ws.title = "تقرير المصاريف"
+        
+        # Get expenses
+        expenses = await db.expenses.find(query, {"_id": 0}).to_list(10000)
+        
+        # Headers
+        headers = ["التاريخ", "الفئة", "الوصف", "المبلغ"]
+        for col, header in enumerate(headers, 1):
+            cell = ws.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = header_alignment
+            cell.border = thin_border
+        
+        # Data
+        for row, expense in enumerate(expenses, 2):
+            created_at = datetime.fromisoformat(expense["created_at"].replace("Z", "+00:00")) if expense.get("created_at") else datetime.now()
+            
+            data = [
+                created_at.strftime("%Y-%m-%d"),
+                expense.get("category", ""),
+                expense.get("description", ""),
+                expense.get("amount", 0)
+            ]
+            
+            for col, value in enumerate(data, 1):
+                cell = ws.cell(row=row, column=col, value=value)
+                cell.border = thin_border
+                if col == 4:
+                    cell.number_format = '#,##0'
+        
+        # Summary
+        summary_row = len(expenses) + 3
+        ws.cell(row=summary_row, column=3, value="الإجمالي:").font = Font(bold=True)
+        total_cell = ws.cell(row=summary_row, column=4, value=sum(e.get("amount", 0) for e in expenses))
+        total_cell.font = Font(bold=True)
+        total_cell.number_format = '#,##0'
+    
+    # Auto-adjust column widths
+    for column in ws.columns:
+        max_length = 0
+        column_letter = get_column_letter(column[0].column)
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = (max_length + 2) * 1.2
+        ws.column_dimensions[column_letter].width = adjusted_width
+    
+    # Save to bytes
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    filename = f"report_{report_type}_{start_date}_to_{end_date}.xlsx"
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # ==================== CASH REGISTER ROUTES ====================
 
 # Note: The main cash register close endpoint is defined above at /api/cash-register/close 
