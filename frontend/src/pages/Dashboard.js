@@ -269,6 +269,7 @@ export default function Dashboard() {
   const allQuickActions = [
     { label: 'نقاط البيع', icon: ShoppingCart, path: '/pos', color: 'bg-primary', key: 'showPOS' },
     { label: 'الطاولات', icon: LayoutGrid, path: '/tables', color: 'bg-blue-500', key: 'showTables' },
+    { label: 'شاشة المطبخ', icon: ChefHat, path: '/kitchen', color: 'bg-yellow-500', key: 'showKitchen' },
     { label: 'التقارير', icon: BarChart3, path: '/reports', color: 'bg-amber-500', key: 'showReports' },
     { label: 'المصاريف', icon: Receipt, path: '/expenses', color: 'bg-red-500', key: 'showExpenses' },
     { label: 'المخزون', icon: Package, path: '/inventory', color: 'bg-purple-500', key: 'showInventory' },
