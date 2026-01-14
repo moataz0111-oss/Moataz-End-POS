@@ -279,7 +279,8 @@ export default function Settings() {
   const handleCreateUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/auth/register`, userForm);
+      // استخدام endpoint جديد يضيف tenant_id تلقائياً
+      await axios.post(`${API}/users`, userForm);
       toast.success('تم إنشاء المستخدم');
       setUserDialogOpen(false);
       setUserForm({ username: '', email: '', password: '', full_name: '', role: 'cashier', branch_id: '', permissions: [] });
