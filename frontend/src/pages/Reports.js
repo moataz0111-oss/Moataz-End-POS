@@ -219,6 +219,18 @@ export default function Reports() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Export Button */}
+            <div className="relative group">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => exportToExcel(activeTab === 'sales' ? 'sales' : activeTab === 'products' ? 'products' : 'expenses')}
+              >
+                <Download className="h-4 w-4" />
+                تصدير Excel
+              </Button>
+            </div>
+            
             <Button variant="outline" size="icon" onClick={fetchReports} data-testid="refresh-btn">
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
