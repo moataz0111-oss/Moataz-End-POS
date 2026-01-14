@@ -1043,6 +1043,19 @@ export default function SuperAdmin() {
                           <Edit className="h-4 w-4" />
                         </Button>
                         
+                        {/* صلاحيات الميزات */}
+                        {!tenant.is_main_system && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => openFeaturesModal(tenant)}
+                            className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                            title="صلاحيات الميزات"
+                          >
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        )}
+                        
                         {/* التفاصيل */}
                         <Button 
                           variant="ghost" 
