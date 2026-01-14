@@ -33,6 +33,7 @@ import {
   Plus,
   Search,
   Eye,
+  EyeOff,
   Edit,
   Trash2,
   RefreshCw,
