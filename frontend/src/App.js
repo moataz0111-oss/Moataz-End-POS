@@ -232,6 +232,24 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* الكوبونات والعروض */}
+      <Route 
+        path="/coupons" 
+        element={
+          <ProtectedRoute>
+            <Coupons />
+          </ProtectedRoute>
+        } 
+      />
+      {/* طباعة كشف الراتب */}
+      <Route 
+        path="/payroll/print/:payrollId" 
+        element={
+          <ProtectedRoute>
+            <PayrollPrint />
+          </ProtectedRoute>
+        } 
+      />
       {/* صفحة السائق - بدون حماية للوصول من الهاتف */}
       <Route path="/driver" element={<DriverPortal />} />
       {/* صفحة Super Admin - لوحة تحكم المالك */}
