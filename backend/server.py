@@ -4240,7 +4240,8 @@ async def get_dashboard_settings():
         "showReports": True,
         "showSettings": True,
         "showHR": True,
-        "showWarehouse": True
+        "showWarehouse": True,
+        "showCallLogs": True
     }
     if settings and settings.get("value"):
         # دمج الإعدادات الافتراضية مع المحفوظة لضمان ظهور الخيارات الجديدة
