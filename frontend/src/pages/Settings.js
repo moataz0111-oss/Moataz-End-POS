@@ -701,21 +701,99 @@ export default function Settings() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-6">
+      <main className="max-w-6xl mx-auto px-6 py-6">
         <Tabs defaultValue="appearance" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-10">
-            <TabsTrigger value="appearance">المظهر</TabsTrigger>
-            {hasRole(['admin', 'manager']) && <TabsTrigger value="dashboard">الرئيسية</TabsTrigger>}
-            {hasRole(['admin', 'manager']) && <TabsTrigger value="users">المستخدمين</TabsTrigger>}
-            {hasRole(['admin', 'manager']) && <TabsTrigger value="customers">العملاء</TabsTrigger>}
-            {hasRole(['admin']) && <TabsTrigger value="branches">الفروع</TabsTrigger>}
-            {hasRole(['admin', 'manager']) && <TabsTrigger value="categories">الفئات</TabsTrigger>}
-            {hasRole(['admin', 'manager']) && <TabsTrigger value="products">المنتجات</TabsTrigger>}
-            {hasRole(['admin', 'manager']) && <TabsTrigger value="printers">الطابعات</TabsTrigger>}
-            {hasRole(['admin']) && <TabsTrigger value="delivery">شركات التوصيل</TabsTrigger>}
-            {hasRole(['admin']) && <TabsTrigger value="callcenter">الكول سنتر</TabsTrigger>}
-            {hasRole(['admin']) && <TabsTrigger value="notifications">الإشعارات</TabsTrigger>}
-          </TabsList>
+          {/* شريط التبويبات المحسن */}
+          <div className="bg-card border rounded-xl p-2 overflow-x-auto">
+            <TabsList className="flex flex-wrap gap-2 w-full h-auto bg-transparent p-0">
+              <TabsTrigger 
+                value="appearance" 
+                className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                المظهر
+              </TabsTrigger>
+              {hasRole(['admin', 'manager']) && (
+                <TabsTrigger 
+                  value="dashboard"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  الرئيسية
+                </TabsTrigger>
+              )}
+              {hasRole(['admin', 'manager']) && (
+                <TabsTrigger 
+                  value="users"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  المستخدمين
+                </TabsTrigger>
+              )}
+              {hasRole(['admin', 'manager']) && (
+                <TabsTrigger 
+                  value="customers"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  العملاء
+                </TabsTrigger>
+              )}
+              {hasRole(['admin']) && (
+                <TabsTrigger 
+                  value="branches"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  الفروع
+                </TabsTrigger>
+              )}
+              {hasRole(['admin', 'manager']) && (
+                <TabsTrigger 
+                  value="categories"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  الفئات
+                </TabsTrigger>
+              )}
+              {hasRole(['admin', 'manager']) && (
+                <TabsTrigger 
+                  value="products"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  المنتجات
+                </TabsTrigger>
+              )}
+              {hasRole(['admin', 'manager']) && (
+                <TabsTrigger 
+                  value="printers"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  الطابعات
+                </TabsTrigger>
+              )}
+              {hasRole(['admin']) && (
+                <TabsTrigger 
+                  value="delivery"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  شركات التوصيل
+                </TabsTrigger>
+              )}
+              {hasRole(['admin']) && (
+                <TabsTrigger 
+                  value="callcenter"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  الكول سنتر
+                </TabsTrigger>
+              )}
+              {hasRole(['admin']) && (
+                <TabsTrigger 
+                  value="notifications"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  الإشعارات
+                </TabsTrigger>
+              )}
+            </TabsList>
+          </div>
 
           {/* Appearance */}
           <TabsContent value="appearance">
