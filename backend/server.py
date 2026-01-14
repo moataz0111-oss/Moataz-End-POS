@@ -1350,6 +1350,7 @@ async def get_expense_categories():
         {"id": "rent", "name": "إيجار"},
         {"id": "utilities", "name": "كهرباء وماء"},
         {"id": "salaries", "name": "رواتب"},
+        {"id": "advance", "name": "سلف"},
         {"id": "maintenance", "name": "صيانة"},
         {"id": "supplies", "name": "مستلزمات"},
         {"id": "marketing", "name": "تسويق"},
