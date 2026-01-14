@@ -1055,6 +1055,15 @@ export default function HR() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Biometric Devices Tab */}
+          <TabsContent value="biometric">
+            <Card>
+              <CardContent className="p-6">
+                <BiometricDevices branches={branches} />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         {/* Payroll Preview Dialog */}
