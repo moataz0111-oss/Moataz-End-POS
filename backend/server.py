@@ -96,6 +96,22 @@ class TenantCreate(BaseModel):
     max_branches: int = 1
     max_users: int = 5
 
+class TenantFeatures(BaseModel):
+    """ميزات العميل المتاحة"""
+    showPOS: bool = True
+    showTables: bool = True
+    showOrders: bool = True
+    showExpenses: bool = True
+    showInventory: bool = True
+    showDelivery: bool = True
+    showReports: bool = True
+    showSettings: bool = True
+    showHR: bool = False
+    showWarehouse: bool = False
+    showCallLogs: bool = False
+    showCallCenter: bool = False
+    showKitchen: bool = False
+
 class TenantResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
