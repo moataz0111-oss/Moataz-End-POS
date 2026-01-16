@@ -681,7 +681,15 @@ export default function SuperAdmin() {
         showWarehouse: false,
         showCallLogs: false,
         showCallCenter: false,
-        showKitchen: false
+        showKitchen: false,
+        showLoyalty: true,
+        showCoupons: true,
+        showRecipes: false,
+        showReservations: true,
+        showReviews: true,
+        showSmartReports: true,
+        showPurchasing: false,
+        showBranchOrders: false
       });
     } finally {
       setFeaturesLoading(false);
