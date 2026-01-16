@@ -139,6 +139,7 @@ export default function Dashboard() {
     fetchData();
     fetchDashboardSettings();
     fetchTenantInfo();
+    fetchDashboardBackgrounds();
   }, [selectedBranch]);
 
   // تحميل ترتيب الأيقونات المحفوظ
