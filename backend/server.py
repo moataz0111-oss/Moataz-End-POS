@@ -5166,6 +5166,140 @@ async def delete_login_background(background_id: str, current_user: dict = Depen
     
     return {"message": "تم حذف الخلفية"}
 
+# ==================== FILE UPLOAD ROUTES ====================
+
+async def process_and_save_image(file: UploadFile, target_dir: Path, max_size: tuple = (1920, 1080), quality: int = 85) -> str:
+    """معالجة وحفظ الصورة بالحجم والصيغة المناسبة"""
+    try:
+        # قراءة محتوى الملف
+        content = await file.read()
+        
+        # فتح الصورة
+        image = Image.open(io.BytesIO(content))
+        
+        # تحويل RGBA إلى RGB إذا لزم الأمر
+        if image.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', image.size, (255, 255, 255))
+            if image.mode == 'P':
+                image = image.convert('RGBA')
+            background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+            image = background
+        elif image.mode != 'RGB':
+            image = image.convert('RGB')
+        
+        # تغيير الحجم مع الحفاظ على النسبة
+        image.thumbnail(max_size, Image.Resampling.LANCZOS)
+        
+        # إنشاء اسم ملف فريد
+        file_id = str(uuid.uuid4())
+        filename = f"{file_id}.jpg"
+        filepath = target_dir / filename
+        
+        # حفظ الصورة بصيغة JPEG مضغوطة
+        image.save(filepath, "JPEG", quality=quality, optimize=True)
+        
+        return filename
+    except Exception as e:
+        logger.error(f"Error processing image: {e}")
+        raise HTTPException(status_code=400, detail=f"فشل في معالجة الصورة: {str(e)}")
+
+@api_router.post("/upload/background")
+async def upload_background_file(
+    file: UploadFile = File(...),
+    title: str = Form(None),
+    animation_type: str = Form("fade"),
+    current_user: dict = Depends(verify_super_admin)
+):
+    """رفع خلفية من الجهاز مع تحويل تلقائي"""
+    
+    # التحقق من نوع الملف
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif', 'image/bmp', 'image/tiff']
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="نوع الملف غير مدعوم. الأنواع المدعومة: JPEG, PNG, GIF, WEBP, HEIC, BMP, TIFF")
+    
+    # معالجة وحفظ الصورة
+    filename = await process_and_save_image(file, BACKGROUNDS_DIR, max_size=(1920, 1080), quality=85)
+    
+    # إنشاء URL للصورة
+    base_url = os.environ.get('REACT_APP_BACKEND_URL', '')
+    image_url = f"{base_url}/uploads/backgrounds/{filename}"
+    
+    # جلب الإعدادات الحالية
+    settings = await db.settings.find_one({"type": "login_backgrounds"}, {"_id": 0})
+    current_backgrounds = []
+    current_value = {}
+    
+    if settings and settings.get("value"):
+        current_value = settings["value"]
+        current_backgrounds = current_value.get("backgrounds", [])
+    
+    # إضافة الخلفية الجديدة
+    new_background = {
+        "id": str(uuid.uuid4()),
+        "image_url": image_url,
+        "title": title,
+        "animation_type": animation_type,
+        "animation_duration": 8,
+        "overlay_opacity": 0.5,
+        "is_active": True,
+        "sort_order": len(current_backgrounds),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    current_backgrounds.append(new_background)
+    
+    # تحديث مع الحفاظ على الإعدادات الأخرى
+    default_settings = {
+        "backgrounds": current_backgrounds,
+        "animation_enabled": current_value.get("animation_enabled", True),
+        "transition_type": current_value.get("transition_type", "fade"),
+        "transition_duration": current_value.get("transition_duration", 1.5),
+        "auto_play": current_value.get("auto_play", True),
+        "show_logo": current_value.get("show_logo", True),
+        "logo_url": current_value.get("logo_url", None),
+        "logo_animation": current_value.get("logo_animation", "pulse"),
+        "overlay_color": current_value.get("overlay_color", "rgba(0,0,0,0.5)"),
+        "text_color": current_value.get("text_color", "#ffffff")
+    }
+    
+    # حفظ التحديث
+    await db.settings.update_one(
+        {"type": "login_backgrounds"},
+        {"$set": {"type": "login_backgrounds", "value": default_settings}},
+        upsert=True
+    )
+    
+    return {"message": "تم رفع الخلفية بنجاح", "background": new_background}
+
+@api_router.post("/upload/logo")
+async def upload_logo_file(
+    file: UploadFile = File(...),
+    tenant_id: str = Form(None),
+    current_user: dict = Depends(verify_super_admin)
+):
+    """رفع شعار للعميل"""
+    
+    # التحقق من نوع الملف
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="نوع الملف غير مدعوم")
+    
+    # معالجة وحفظ الصورة
+    filename = await process_and_save_image(file, LOGOS_DIR, max_size=(512, 512), quality=90)
+    
+    # إنشاء URL للشعار
+    base_url = os.environ.get('REACT_APP_BACKEND_URL', '')
+    logo_url = f"{base_url}/uploads/logos/{filename}"
+    
+    # تحديث الشعار للعميل إذا تم تحديد tenant_id
+    if tenant_id:
+        await db.tenants.update_one(
+            {"id": tenant_id},
+            {"$set": {"logo_url": logo_url}}
+        )
+    
+    return {"message": "تم رفع الشعار بنجاح", "logo_url": logo_url}
+
 # ==================== PRINTER ROUTES ====================
 
 class PrinterCreate(BaseModel):
