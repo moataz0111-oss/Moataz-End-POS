@@ -616,33 +616,17 @@ export default function Dashboard() {
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
 
-            {/* Background Manager Button - للمالك فقط */}
-            {user?.role === 'admin' && !user?.tenant_id && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/super-admin?tab=backgrounds')}
-                className="gap-2 border-pink-500 text-pink-500 hover:bg-pink-500/10"
-                data-testid="backgrounds-btn"
-              >
-                <Image className="h-4 w-4" />
-                الخلفيات
-              </Button>
-            )}
-
-            {/* Dashboard Background Button - للعملاء */}
-            {user?.tenant_id && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowBackgroundDialog(true)}
-                className="gap-2 border-pink-500 text-pink-500 hover:bg-pink-500/10"
-                data-testid="tenant-backgrounds-btn"
-              >
-                <Image className="h-4 w-4" />
-                الخلفيات
-              </Button>
-            )}
+            {/* Dashboard Background Button - لجميع المستخدمين */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowBackgroundDialog(true)}
+              className="gap-2 border-pink-500 text-pink-500 hover:bg-pink-500/10"
+              data-testid="backgrounds-btn"
+            >
+              <Image className="h-4 w-4" />
+              الخلفيات
+            </Button>
 
             {/* Super Admin Button - للمالك فقط (بدون tenant_id) */}
             {user?.role === 'admin' && !user?.tenant_id && (
