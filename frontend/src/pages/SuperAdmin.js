@@ -1477,16 +1477,63 @@ export default function SuperAdmin() {
           </DialogHeader>
           
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>رابط الصورة *</Label>
-              <Input
-                placeholder="https://example.com/image.jpg"
-                value={newBackgroundUrl}
-                onChange={(e) => setNewBackgroundUrl(e.target.value)}
-                className="bg-gray-700/50 border-gray-600"
-              />
-              <p className="text-xs text-gray-500">يفضل استخدام صور بدقة عالية (1920x1080 أو أعلى)</p>
+            {/* Toggle between URL and Device upload */}
+            <div className="flex gap-2 p-1 bg-gray-700/50 rounded-lg">
+              <Button
+                variant={backgroundUploadMode === 'url' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setBackgroundUploadMode('url')}
+                className={`flex-1 ${backgroundUploadMode === 'url' ? 'bg-purple-600' : ''}`}
+              >
+                <Globe className="h-4 w-4 ml-2" />
+                رابط URL
+              </Button>
+              <Button
+                variant={backgroundUploadMode === 'device' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setBackgroundUploadMode('device')}
+                className={`flex-1 ${backgroundUploadMode === 'device' ? 'bg-purple-600' : ''}`}
+              >
+                <Upload className="h-4 w-4 ml-2" />
+                من الجهاز
+              </Button>
             </div>
+
+            {backgroundUploadMode === 'url' ? (
+              <div className="space-y-2">
+                <Label>رابط الصورة *</Label>
+                <Input
+                  placeholder="https://example.com/image.jpg"
+                  value={newBackgroundUrl}
+                  onChange={(e) => setNewBackgroundUrl(e.target.value)}
+                  className="bg-gray-700/50 border-gray-600"
+                />
+                <p className="text-xs text-gray-500">يفضل استخدام صور بدقة عالية (1920x1080 أو أعلى)</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label>اختر صورة من الجهاز *</Label>
+                <div className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-purple-500 transition-colors">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBackgroundFileChange}
+                    className="hidden"
+                    id="background-file-input"
+                  />
+                  <label htmlFor="background-file-input" className="cursor-pointer">
+                    <Upload className="h-10 w-10 mx-auto text-gray-400 mb-2" />
+                    <p className="text-sm text-gray-400">
+                      {selectedBackgroundFile ? selectedBackgroundFile.name : 'اضغط لاختيار صورة أو اسحب وأفلت'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      الأنواع المدعومة: JPEG, PNG, GIF, WEBP, HEIC, BMP, TIFF
+                    </p>
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500">سيتم تحويل الصورة تلقائياً للحجم والصيغة المناسبة</p>
+              </div>
+            )}
             
             <div className="space-y-2">
               <Label>عنوان الخلفية (اختياري)</Label>
@@ -1518,12 +1565,12 @@ export default function SuperAdmin() {
             </div>
 
             {/* Preview */}
-            {newBackgroundUrl && (
+            {(newBackgroundUrl || backgroundPreviewUrl) && (
               <div className="space-y-2">
                 <Label>معاينة</Label>
                 <div className="aspect-video rounded-lg overflow-hidden bg-gray-700">
                   <img 
-                    src={newBackgroundUrl} 
+                    src={backgroundUploadMode === 'url' ? newBackgroundUrl : backgroundPreviewUrl} 
                     alt="معاينة"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -1536,13 +1583,23 @@ export default function SuperAdmin() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddBackground(false)} className="border-gray-600">
+            <Button variant="outline" onClick={() => {
+              setShowAddBackground(false);
+              setSelectedBackgroundFile(null);
+              setBackgroundPreviewUrl('');
+            }} className="border-gray-600">
               إلغاء
             </Button>
             <Button 
-              onClick={addNewBackground} 
+              onClick={() => {
+                if (backgroundUploadMode === 'device' && selectedBackgroundFile) {
+                  uploadBackgroundFromDevice(selectedBackgroundFile);
+                } else {
+                  addNewBackground();
+                }
+              }} 
               className="bg-purple-600 hover:bg-purple-700"
-              disabled={backgroundsLoading || !newBackgroundUrl}
+              disabled={backgroundsLoading || (backgroundUploadMode === 'url' && !newBackgroundUrl) || (backgroundUploadMode === 'device' && !selectedBackgroundFile)}
             >
               {backgroundsLoading ? (
                 <RefreshCw className="h-4 w-4 animate-spin ml-2" />
