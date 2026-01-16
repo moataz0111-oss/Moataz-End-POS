@@ -569,21 +569,71 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-4 md:space-y-6 overflow-y-auto">
         {/* Quick Actions */}
         <section>
-          <h2 className="text-base md:text-lg font-bold font-cairo mb-3 text-foreground">الإجراءات السريعة</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base md:text-lg font-bold font-cairo text-foreground">الإجراءات السريعة</h2>
+            {isReordering && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exitReorderMode}
+                className="gap-2 text-green-500 border-green-500 hover:bg-green-500/10"
+              >
+                <Check className="h-4 w-4" />
+                تم
+              </Button>
+            )}
+          </div>
+          
+          {/* تعليمات إعادة الترتيب */}
+          <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
+            <Move className="h-3 w-3" />
+            اضغط مطولاً لإعادة ترتيب
+          </p>
+
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3">
             {quickActions.map((action) => (
-              <Button
-                key={action.path}
-                variant="outline"
-                className="h-auto py-3 md:py-4 flex flex-col items-center gap-2 bg-card hover:bg-card/80 border-border/50 hover:border-primary/50 transition-all hover:-translate-y-0.5"
-                onClick={() => navigate(action.path)}
-                data-testid={`quick-action-${action.path.slice(1)}`}
+              <div
+                key={action.id}
+                data-action-id={action.id}
+                draggable={isReordering}
+                onDragStart={(e) => handleDragStart(e, action)}
+                onDragOver={(e) => handleDragOver(e, action)}
+                onDragEnd={handleDragEnd}
+                onTouchStart={(e) => handleLongPressStart(e, action)}
+                onTouchMove={(e) => handleTouchMove(e, action)}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={(e) => handleLongPressStart(e, action)}
+                onMouseUp={handleLongPressEnd}
+                onMouseLeave={handleLongPressEnd}
+                className={`
+                  relative cursor-pointer select-none
+                  ${draggedItem === action.id ? 'opacity-50 scale-95' : ''}
+                  ${isReordering ? 'animate-pulse' : ''}
+                  transition-all duration-200
+                `}
               >
-                <div className={`w-10 h-10 md:w-11 md:h-11 ${action.color} rounded-xl flex items-center justify-center`}>
-                  <action.icon className="h-5 w-5 md:h-5.5 md:w-5.5 text-white" />
-                </div>
-                <span className="text-xs md:text-sm font-medium text-foreground text-center leading-tight">{action.label}</span>
-              </Button>
+                <Button
+                  variant="outline"
+                  className={`
+                    h-auto py-3 md:py-4 flex flex-col items-center gap-2 w-full
+                    bg-card hover:bg-card/80 border-border/50 hover:border-primary/50 
+                    transition-all hover:-translate-y-0.5
+                    ${isReordering ? 'ring-2 ring-primary/50 ring-offset-2 ring-offset-background' : ''}
+                  `}
+                  onClick={() => !isReordering && navigate(action.path)}
+                  data-testid={`quick-action-${action.id}`}
+                >
+                  {isReordering && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                      <GripVertical className="h-3 w-3 text-white" />
+                    </div>
+                  )}
+                  <div className={`w-10 h-10 md:w-11 md:h-11 ${action.color} rounded-xl flex items-center justify-center shadow-lg`}>
+                    <action.icon className="h-5 w-5 md:h-5.5 md:w-5.5 text-white" />
+                  </div>
+                  <span className="text-xs md:text-sm font-medium text-foreground text-center leading-tight">{action.label}</span>
+                </Button>
+              </div>
             ))}
           </div>
         </section>
