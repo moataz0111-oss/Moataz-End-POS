@@ -283,7 +283,6 @@ export default function Dashboard() {
     { label: 'برنامج الولاء', icon: Gift, path: '/loyalty', color: 'bg-pink-500', key: 'showLoyalty' },
     { label: 'الكوبونات', icon: Gift, path: '/coupons', color: 'bg-violet-500', key: 'showCoupons' },
     { label: 'الوصفات', icon: ChefHat, path: '/recipes', color: 'bg-teal-500', key: 'showRecipes' },
-    { label: 'الفواتير', icon: FileText, path: '/invoices', color: 'bg-slate-500', key: 'showInvoices' },
     { label: 'الإعدادات', icon: Settings, path: '/settings', color: 'bg-gray-500', key: 'showSettings' },
   ];
   
