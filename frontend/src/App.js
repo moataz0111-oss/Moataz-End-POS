@@ -224,15 +224,7 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
-      {/* الفواتير والطباعة */}
-      <Route 
-        path="/invoices" 
-        element={
-          <ProtectedRoute>
-            <Invoices />
-          </ProtectedRoute>
-        } 
-      />
+      {/* الفواتير والطباعة - تم إزالتها حسب طلب المستخدم */}
       {/* الكوبونات والعروض */}
       <Route 
         path="/coupons" 
