@@ -507,7 +507,9 @@ export default function Dashboard() {
               <span className="text-xl font-black text-primary-foreground font-cairo">M</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold font-cairo text-foreground">Maestro EGP</h1>
+              <h1 className="text-xl font-bold font-cairo text-foreground">
+                {tenantInfo?.name_ar || tenantInfo?.name || 'Maestro EGP'}
+              </h1>
               <p className="text-sm text-muted-foreground">مرحباً، {user?.full_name}</p>
             </div>
           </div>
@@ -535,6 +537,20 @@ export default function Dashboard() {
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
+
+            {/* Background Manager Button - للمالك فقط */}
+            {user?.role === 'admin' && !user?.tenant_id && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/super-admin?tab=backgrounds')}
+                className="gap-2 border-pink-500 text-pink-500 hover:bg-pink-500/10"
+                data-testid="backgrounds-btn"
+              >
+                <Image className="h-4 w-4" />
+                الخلفيات
+              </Button>
+            )}
 
             {/* Super Admin Button - للمالك فقط (بدون tenant_id) */}
             {user?.role === 'admin' && !user?.tenant_id && (
