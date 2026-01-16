@@ -702,30 +702,43 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-4 md:space-y-6 overflow-y-auto">
-        {/* Quick Actions */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base md:text-lg font-bold font-cairo text-foreground">الإجراءات السريعة</h2>
-            {isReordering && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={exitReorderMode}
-                className="gap-2 text-green-500 border-green-500 hover:bg-green-500/10"
-              >
-                <Check className="h-4 w-4" />
-                تم
-              </Button>
-            )}
-          </div>
+        {/* Quick Actions with Background */}
+        <section 
+          className="relative rounded-2xl overflow-hidden"
+          style={{
+            backgroundImage: selectedBackground ? `url(${selectedBackground})` : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          {/* Overlay for better readability */}
+          {selectedBackground && (
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
+          )}
           
-          {/* تعليمات إعادة الترتيب */}
-          <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-            <Move className="h-3 w-3" />
-            اضغط مطولاً لإعادة ترتيب
-          </p>
+          <div className={`relative z-10 ${selectedBackground ? 'p-4 md:p-6' : ''}`}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-base md:text-lg font-bold font-cairo text-foreground">الإجراءات السريعة</h2>
+              {isReordering && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={exitReorderMode}
+                  className="gap-2 text-green-500 border-green-500 hover:bg-green-500/10"
+                >
+                  <Check className="h-4 w-4" />
+                  تم
+                </Button>
+              )}
+            </div>
+            
+            {/* تعليمات إعادة الترتيب */}
+            <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
+              <Move className="h-3 w-3" />
+              اضغط مطولاً لإعادة ترتيب
+            </p>
 
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3">
             {quickActions.map((action) => (
               <div
                 key={action.id}
