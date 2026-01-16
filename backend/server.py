@@ -5045,6 +5045,35 @@ async def get_dashboard_settings(current_user: dict = Depends(get_current_user))
     
     return default_settings
 
+@api_router.get("/tenant/info")
+async def get_tenant_info(current_user: dict = Depends(get_current_user)):
+    """جلب معلومات العميل (الشعار والاسم) للعرض في Dashboard"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # إذا كان النظام الرئيسي (بدون tenant)
+    if not tenant_id:
+        # جلب إعدادات النظام العامة
+        settings = await db.settings.find_one({"type": "system_branding"}, {"_id": 0})
+        if settings and settings.get("value"):
+            return settings["value"]
+        return {
+            "name": "Maestro EGP",
+            "name_ar": "مايسترو",
+            "name_en": "Maestro EGP",
+            "logo_url": None
+        }
+    
+    # جلب معلومات العميل
+    tenant = await db.tenants.find_one(
+        {"id": tenant_id}, 
+        {"_id": 0, "name": 1, "name_ar": 1, "name_en": 1, "logo_url": 1}
+    )
+    
+    if not tenant:
+        return {"name": "Maestro EGP", "logo_url": None}
+    
+    return tenant
+
 # ==================== LOGIN BACKGROUNDS API ====================
 
 # كلمة سر خاصة للـ Super Admin - من متغيرات البيئة
