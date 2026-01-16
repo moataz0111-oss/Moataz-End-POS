@@ -23,9 +23,10 @@
 - [x] تعديل بيانات العملاء + بريد ترحيبي
 
 ### Login Page 
-- [x] خلفيات متحركة قابلة للتخصيص
-- [x] 5 أنواع حركات
+- [x] خلفيات متحركة قابلة للتخصيص (6 خلفيات)
+- [x] 5 أنواع حركات (fade, zoom, kenburns, slide, parallax)
 - [x] تحكم كامل من Super Admin
+- [x] رفع خلفيات من الجهاز
 
 ### Kitchen Display System (KDS)
 - [x] شاشة المطبخ KDS كاملة
@@ -43,7 +44,7 @@
 - [x] إدارة الموظفين (CRUD)
 - [x] تسجيل الحضور والانصراف
 - [x] نظام السلف والخصومات
-- [x] كشوفات الرواتب
+- [x] كشوفات الرواتب + صفحة طباعة
 
 ### Warehouse System
 - [x] تحويلات المخزون
@@ -76,27 +77,43 @@
 - [x] نظام العروض الترويجية
 - [x] واجهة مستخدم كاملة `/coupons`
 
-### Payroll System
-- [x] ربط السلف والخصومات بالرواتب تلقائياً
-- [x] صفحة طباعة كشف الراتب `/payroll/print/:id`
-
 ### 🆕 Background & Logo Upload System (Jan 16, 2026)
 - [x] **رفع الخلفيات من الجهاز**: خيار جديد لرفع الصور مباشرة
-- [x] **معالجة تلقائية للصور**: تحويل جميع الصيغ إلى JPEG بحجم مناسب (1920x1080)
+- [x] **معالجة تلقائية للصور**: تحويل جميع الصيغ إلى JPEG بحجم مناسب
 - [x] **دعم صيغ متعددة**: JPEG, PNG, GIF, WEBP, HEIC, BMP, TIFF
-- [x] **واجهة سحب وإفلات**: منطقة رفع بديهية
+- [x] **6 خلفيات متاحة** للنظام
 
 ### 🆕 Tenant Identity Management (Jan 16, 2026)
-- [x] **شعار المطعم**: رفع شعار مخصص لكل عميل من الجهاز
-- [x] **اسم المطعم (عربي)**: حقل جديد للاسم بالعربي
-- [x] **اسم المطعم (إنجليزي)**: حقل جديد للاسم بالإنجليزي
-- [x] **تحكم من المالك**: يتحكم Super Admin فقط في هوية العميل
+- [x] **شعار المطعم**: رفع شعار مخصص لكل عميل
+- [x] **اسم المطعم (عربي/إنجليزي)**: حقول جديدة
+- [x] **تحكم من المالك**: يتحكم Super Admin فقط
 
-### 🆕 Dashboard UI Improvements (Jan 16, 2026)
-- [x] **تصغير الأزرار**: أزرار الإجراءات السريعة أصغر وأكثر كثافة
-- [x] **قابلية التمرير**: الصفحة قابلة للتمرير لعرض جميع الخيارات
-- [x] **شبكة أفضل**: 3 أعمدة على الجوال، 4 متوسط، 6 كبير
-- [x] **إزالة قسم الفواتير**: تم حذفه حسب طلب المستخدم
+### 🆕 Dashboard Reorder Feature (Jan 16, 2026)
+- [x] **ميزة السحب والإفلات**: اضغط مطولاً لإعادة ترتيب الأيقونات
+- [x] **حفظ الترتيب**: يحفظ في localStorage لكل مستخدم
+- [x] **تصميم جديد**: أيقونات بتدرجات لونية جميلة
+- [x] **شبكة محسنة**: 3/4/6 أعمدة حسب حجم الشاشة
+
+### 🆕 New Pages (Jan 16, 2026)
+- [x] **الحجوزات** (`/reservations`): إدارة حجوزات الطاولات
+  - إنشاء حجز جديد
+  - تأكيد/إلغاء الحجوزات
+  - فلترة بالتاريخ والحالة
+  - إحصائيات يومية
+  
+- [x] **التقييمات** (`/reviews`): نظام تقييم العملاء
+  - عرض التقييمات مع النجوم
+  - تقييم مفصل (طعام، خدمة، توصيل)
+  - إضافة ردود الإدارة
+  - إحصائيات وتوزيع التقييمات
+  
+- [x] **التقارير الذكية** (`/smart-reports`): تحليلات متقدمة
+  - إحصائيات المبيعات والطلبات
+  - رؤى ذكية (Insights)
+  - المنتجات الأكثر مبيعاً مع نسب النمو
+  - المبيعات حسب الساعة
+  - مقارنات الأداء (يومي/أسبوعي/شهري)
+  - توزيع أنواع الطلبات (Pie Chart)
 
 ---
 
@@ -115,29 +132,52 @@
 
 ---
 
-## 📡 New API Endpoints (Jan 16, 2026)
+## 📡 API Endpoints
 
 ### File Upload
-- `POST /api/upload/background` - رفع خلفية من الجهاز (multipart/form-data)
-- `POST /api/upload/logo` - رفع شعار للعميل (multipart/form-data)
+- `POST /api/upload/background` - رفع خلفية من الجهاز
+- `POST /api/upload/logo` - رفع شعار للعميل
 
-### Tenant Updates
-- `PUT /api/super-admin/tenants/{id}` - تحديث بيانات العميل (يشمل name_ar, name_en, logo_url)
+### Reservations
+- `GET /api/reservations` - جلب الحجوزات
+- `POST /api/reservations` - إنشاء حجز
+- `PUT /api/reservations/{id}/status` - تحديث حالة الحجز
+- `DELETE /api/reservations/{id}` - حذف حجز
+
+### Reviews
+- `GET /api/reviews` - جلب التقييمات
+- `POST /api/reviews/{id}/reply` - إضافة رد
+
+### Smart Reports
+- `GET /api/reports/smart` - جلب التقارير الذكية
 
 ---
 
-## 📁 New/Modified Files (Jan 16, 2026)
+## 📁 Project Structure
 
-### Backend
-- `/app/backend/server.py` - إضافة APIs رفع الملفات ومعالجة الصور
-- `/app/backend/uploads/` - مجلد جديد للملفات المرفوعة
-  - `/backgrounds/` - خلفيات صفحة الدخول
-  - `/logos/` - شعارات العملاء
-
-### Frontend
-- `/app/frontend/src/pages/SuperAdmin.js` - تحديث نوافذ إضافة الخلفية وتعديل العميل
-- `/app/frontend/src/pages/Dashboard.js` - تحسين حجم الأزرار والتخطيط
-- `/app/frontend/src/App.js` - إزالة مسار الفواتير
+```
+/app
+├── backend/
+│   ├── server.py (6000+ lines - needs refactoring)
+│   ├── api/
+│   │   ├── biometric.py
+│   │   ├── login_backgrounds.py
+│   │   └── ... (other modules)
+│   └── uploads/
+│       ├── backgrounds/
+│       └── logos/
+├── frontend/
+│   └── src/
+│       ├── pages/
+│       │   ├── Dashboard.js (✅ with reorder feature)
+│       │   ├── Reservations.js (🆕)
+│       │   ├── Reviews.js (🆕)
+│       │   ├── SmartReports.js (🆕)
+│       │   └── ...
+│       └── App.js
+└── memory/
+    └── PRD.md
+```
 
 ---
 
@@ -148,7 +188,6 @@
 - **Maps**: Leaflet / OpenStreetMap
 - **Excel**: openpyxl
 - **Biometric**: pyzk (ZKTeco)
-- **Push**: firebase-admin
 - **Image Processing**: Pillow (PIL)
 
 ---
@@ -157,7 +196,7 @@
 - ✅ All Core APIs Working
 - ✅ Kitchen Display: Working
 - ✅ Excel Export: Working
-- ✅ Login Backgrounds: Working (with device upload)
+- ✅ Login Backgrounds: Working (6 backgrounds)
 - ✅ Driver Map: Working
 - ✅ PWA Install Button: Working
 - ✅ Loyalty Program: Working
@@ -165,6 +204,10 @@
 - ✅ Coupons & Promotions: Working
 - ✅ Background Upload: Working
 - ✅ Logo Upload: Working
+- ✅ Dashboard Reorder: Working
+- ✅ Reservations: Working
+- ✅ Reviews: Working
+- ✅ Smart Reports: Working
 - ✅ Ready for Production
 
 ---
@@ -185,16 +228,11 @@
 - [ ] تنبيهات تلقائية عند انخفاض المخزون
 
 ### P1 - Medium Priority
-- [ ] تحسين خريطة السائقين الحية (خط السير والتتبع الدقيق)
-- [ ] الخلفيات المتجاوبة (وضع مظلم/فاتح)
+- [ ] تحسين خريطة السائقين الحية
 - [ ] إشعارات Push (Firebase) للسائقين
 - [ ] تكامل أجهزة البصمة ZKTeco (كتابة منطق الاتصال)
-- [ ] نظام الولاء والوصفات (إكمال الواجهات)
-- [ ] نظام تقييم العملاء للطلبات
-- [ ] نظام حجوزات الطاولات
-- [ ] تقارير ذكية بالرسوم البيانية
+- [ ] الخلفيات المتجاوبة (وضع مظلم/فاتح)
 
 ### P2 - Low Priority
-- [ ] ميزة السحب والإفلات لترتيب أيقونات Dashboard
 - [ ] أزرار رجوع موحدة في جميع الصفحات
 - [ ] تقسيم ملفات SuperAdmin.js و HR.js
