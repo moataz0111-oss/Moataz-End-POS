@@ -306,13 +306,11 @@ export default function SuperAdmin() {
     setLoading(true);
     
     try {
-      const res = await axios.post(`${API}/super-admin/register`, null, {
-        params: {
-          email: registerForm.email,
-          password: registerForm.password,
-          full_name: registerForm.full_name,
-          secret_key: registerForm.secret_key
-        }
+      const res = await axios.post(`${API}/super-admin/register`, {
+        email: registerForm.email,
+        password: registerForm.password,
+        full_name: registerForm.full_name,
+        secret_key: registerForm.secret_key
       });
       
       localStorage.setItem('super_admin_token', res.data.token);
