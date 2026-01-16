@@ -46,9 +46,24 @@ export default function Reviews() {
 
   const fetchReviews = async () => {
     try {
-      const res = await axios.get(`${API}/reviews`);
-      setReviews(res.data.reviews || []);
-      setStats(res.data.stats || stats);
+      // جلب التقييمات
+      const reviewsRes = await axios.get(`${API}/reviews`);
+      const reviewsData = Array.isArray(reviewsRes.data) ? reviewsRes.data : [];
+      setReviews(reviewsData);
+      
+      // جلب الإحصائيات
+      const statsRes = await axios.get(`${API}/reviews/stats`);
+      setStats({
+        average: statsRes.data.average_rating || 0,
+        total: statsRes.data.total || 0,
+        distribution: {
+          5: statsRes.data.five_star || 0,
+          4: statsRes.data.four_star || 0,
+          3: statsRes.data.three_star || 0,
+          2: statsRes.data.two_star || 0,
+          1: statsRes.data.one_star || 0
+        }
+      });
     } catch (error) {
       // بيانات تجريبية
       const mockReviews = [
