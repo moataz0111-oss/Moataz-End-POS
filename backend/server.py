@@ -5347,9 +5347,8 @@ async def upload_logo_file(
     # معالجة وحفظ الصورة
     filename = await process_and_save_image(file, LOGOS_DIR, max_size=(512, 512), quality=90)
     
-    # إنشاء URL للشعار
-    base_url = os.environ.get('REACT_APP_BACKEND_URL', '')
-    logo_url = f"{base_url}/api/uploads/logos/{filename}"
+    # إنشاء URL نسبي للشعار
+    logo_url = f"/api/uploads/logos/{filename}"
     
     # تحديث الشعار للعميل إذا تم تحديد tenant_id
     if tenant_id:
