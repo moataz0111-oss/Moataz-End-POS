@@ -104,6 +104,8 @@ class PaymentMethod:
 
 class TenantCreate(BaseModel):
     name: str  # اسم المطعم/الكافيه
+    name_ar: Optional[str] = None  # اسم المطعم بالعربي
+    name_en: Optional[str] = None  # اسم المطعم بالإنجليزي
     slug: str  # رابط فريد (مثل: my-restaurant)
     owner_name: str  # اسم المالك
     owner_email: EmailStr
@@ -111,6 +113,7 @@ class TenantCreate(BaseModel):
     subscription_type: str = "trial"  # trial, basic, premium
     max_branches: int = 1
     max_users: int = 5
+    logo_url: Optional[str] = None  # شعار المطعم
 
 class TenantFeatures(BaseModel):
     """ميزات العميل المتاحة"""
