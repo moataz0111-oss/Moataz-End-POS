@@ -616,7 +616,7 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="text-xl font-bold font-cairo text-foreground">
-                {tenantInfo?.name_ar || tenantInfo?.name || 'Maestro EGP'}
+                {tenantInfo?.name || tenantInfo?.name_en || 'Maestro'}
               </h1>
               <p className="text-sm text-muted-foreground">مرحباً، {user?.full_name}</p>
             </div>
