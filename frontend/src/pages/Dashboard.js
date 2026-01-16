@@ -44,7 +44,8 @@ import {
   CalendarDays,
   PieChart,
   GripVertical,
-  Move
+  Move,
+  Image
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
