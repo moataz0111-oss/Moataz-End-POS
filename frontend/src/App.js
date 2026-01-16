@@ -24,7 +24,8 @@ import WarehouseTransfers from "./pages/WarehouseTransfers";
 import KitchenDisplay from "./pages/KitchenDisplay";
 import Loyalty from "./pages/Loyalty";
 import Recipes from "./pages/Recipes";
-import Invoices from "./pages/Invoices";
+// Invoices page removed as per user request
+// import Invoices from "./pages/Invoices";
 import Coupons from "./pages/Coupons";
 import PayrollPrint from "./pages/PayrollPrint";
 
