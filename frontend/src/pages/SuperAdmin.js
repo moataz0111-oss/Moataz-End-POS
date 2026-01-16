@@ -700,7 +700,16 @@ export default function SuperAdmin() {
         showReviews: true,
         showSmartReports: true,
         showPurchasing: false,
-        showBranchOrders: false
+        showBranchOrders: false,
+        settingsUsers: true,
+        settingsCustomers: true,
+        settingsBranches: true,
+        settingsCategories: true,
+        settingsProducts: true,
+        settingsPrinters: true,
+        settingsDeliveryCompanies: true,
+        settingsCallCenter: true,
+        settingsNotifications: true
       });
     } finally {
       setFeaturesLoading(false);
