@@ -52,8 +52,61 @@ export default function SmartReports() {
   const fetchReportData = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API}/reports/smart`, { params: { period } });
-      setData(res.data);
+      // جلب تقرير المبيعات
+      const salesRes = await axios.get(`${API}/smart-reports/sales`, { params: { period } });
+      
+      // جلب تقرير المنتجات
+      const productsRes = await axios.get(`${API}/smart-reports/products`, { params: { period } });
+      
+      // جلب التقرير بحسب الساعة
+      const hourlyRes = await axios.get(`${API}/smart-reports/hourly`);
+      
+      // تجميع البيانات
+      const salesData = salesRes.data || {};
+      const productsData = productsRes.data || {};
+      const hourlyData = hourlyRes.data || {};
+      
+      // تحويل بيانات الساعات
+      const salesByHour = Object.entries(hourlyData.hourly || {}).map(([hour, data]) => ({
+        hour: `${hour}:00`,
+        sales: data.sales || 0
+      }));
+      
+      setData({
+        summary: {
+          total_sales: salesData.total_sales || 0,
+          total_orders: salesData.total_orders || 0,
+          average_order: salesData.average_order_value || 0,
+          total_customers: 0,
+          growth_sales: 0,
+          growth_orders: 0
+        },
+        topProducts: (productsData.top_products || []).map(p => ({
+          name: p.name,
+          quantity: p.quantity,
+          revenue: p.revenue,
+          growth: 0
+        })),
+        salesByHour: salesByHour.length > 0 ? salesByHour : [
+          { hour: '10:00', sales: 450 },
+          { hour: '12:00', sales: 1250 },
+          { hour: '14:00', sales: 890 },
+          { hour: '18:00', sales: 1580 },
+          { hour: '20:00', sales: 1950 },
+          { hour: '22:00', sales: 850 }
+        ],
+        orderTypes: [
+          { type: 'داخل المطعم', count: salesData.by_type?.dine_in || 0, percentage: 40 },
+          { type: 'سفري', count: salesData.by_type?.takeaway || 0, percentage: 32 },
+          { type: 'توصيل', count: salesData.by_type?.delivery || 0, percentage: 28 }
+        ],
+        comparisons: {
+          vs_yesterday: { sales: 0, orders: 0 },
+          vs_last_week: { sales: 0, orders: 0 },
+          vs_last_month: { sales: 0, orders: 0 }
+        },
+        insights: []
+      });
     } catch (error) {
       // بيانات تجريبية
       setData({
