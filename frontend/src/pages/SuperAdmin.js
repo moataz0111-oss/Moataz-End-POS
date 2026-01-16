@@ -149,7 +149,15 @@ export default function SuperAdmin() {
     showWarehouse: false,
     showCallLogs: false,
     showCallCenter: false,
-    showKitchen: false
+    showKitchen: false,
+    showLoyalty: true,
+    showCoupons: true,
+    showRecipes: false,
+    showReservations: true,
+    showReviews: true,
+    showSmartReports: true,
+    showPurchasing: false,
+    showBranchOrders: false
   });
   const [featuresLoading, setFeaturesLoading] = useState(false);
   
@@ -715,7 +723,15 @@ export default function SuperAdmin() {
       showWarehouse: true,
       showCallLogs: true,
       showCallCenter: true,
-      showKitchen: true
+      showKitchen: true,
+      showLoyalty: true,
+      showCoupons: true,
+      showRecipes: true,
+      showReservations: true,
+      showReviews: true,
+      showSmartReports: true,
+      showPurchasing: true,
+      showBranchOrders: true
     });
   };
 
@@ -733,7 +749,15 @@ export default function SuperAdmin() {
       showWarehouse: false,
       showCallLogs: false,
       showCallCenter: false,
-      showKitchen: false
+      showKitchen: false,
+      showLoyalty: false,
+      showCoupons: false,
+      showRecipes: false,
+      showReservations: false,
+      showReviews: false,
+      showSmartReports: false,
+      showPurchasing: false,
+      showBranchOrders: false
     });
   };
 
