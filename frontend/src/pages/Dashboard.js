@@ -503,8 +503,17 @@ export default function Dashboard() {
       <header className="sticky top-0 z-50 glass border-b border-border/50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <span className="text-xl font-black text-primary-foreground font-cairo">M</span>
+            {/* Logo - يعرض شعار العميل إذا وجد */}
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center overflow-hidden shadow-lg">
+              {tenantInfo?.logo_url ? (
+                <img 
+                  src={tenantInfo.logo_url} 
+                  alt="Logo" 
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xl font-black text-primary-foreground font-cairo">M</span>
+              )}
             </div>
             <div>
               <h1 className="text-xl font-bold font-cairo text-foreground">
