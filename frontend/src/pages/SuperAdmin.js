@@ -544,6 +544,53 @@ export default function SuperAdmin() {
     toast.success('تم النسخ');
   };
 
+  // ==================== System Branding Functions ====================
+  
+  const fetchSystemBranding = async () => {
+    try {
+      const res = await axios.get(`${API}/system/branding`);
+      setSystemBranding(res.data);
+      if (res.data.logo_url) {
+        const logoUrl = res.data.logo_url;
+        if (logoUrl.startsWith('/api')) {
+          setSystemLogoPreview(`${API}${logoUrl.replace('/api', '')}`);
+        } else {
+          setSystemLogoPreview(logoUrl);
+        }
+      }
+    } catch (error) {
+      console.log('Error fetching system branding');
+    }
+  };
+
+  const saveSystemBranding = async () => {
+    setBrandingLoading(true);
+    try {
+      let logoUrl = systemBranding.logo_url;
+      
+      // رفع الشعار أولاً إذا تم اختياره
+      if (systemLogoFile) {
+        const formData = new FormData();
+        formData.append('file', systemLogoFile);
+        const uploadRes = await axios.post(`${API}/upload/logo`, formData);
+        logoUrl = uploadRes.data.logo_url;
+      }
+      
+      await axios.put(`${API}/system/branding`, {
+        ...systemBranding,
+        logo_url: logoUrl
+      });
+      
+      setSystemBranding(prev => ({ ...prev, logo_url: logoUrl }));
+      setSystemLogoFile(null);
+      toast.success('تم حفظ هوية النظام بنجاح');
+    } catch (error) {
+      toast.error('فشل في حفظ هوية النظام');
+    } finally {
+      setBrandingLoading(false);
+    }
+  };
+
   // ==================== Background Management Functions ====================
   
   const fetchBackgroundSettings = async () => {
