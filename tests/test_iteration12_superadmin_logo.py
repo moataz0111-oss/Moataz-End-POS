@@ -110,11 +110,20 @@ class TestTenantList:
         data = response.json()
         assert isinstance(data, list), "Response should be a list"
         
-        if len(data) > 0:
-            tenant = data[0]
-            print(f"First tenant: {tenant.get('name')} (ID: {tenant.get('id')})")
-            pytest.test_tenant_id = tenant.get('id')
-            pytest.test_tenant_name = tenant.get('name')
+        # Find a real tenant (not main-system which is virtual)
+        for tenant in data:
+            if tenant.get('id') != 'main-system' and not tenant.get('is_main_system'):
+                print(f"Using tenant: {tenant.get('name')} (ID: {tenant.get('id')})")
+                pytest.test_tenant_id = tenant.get('id')
+                pytest.test_tenant_name = tenant.get('name')
+                break
+        
+        if not hasattr(pytest, 'test_tenant_id'):
+            # Fallback to first tenant if no non-main tenant found
+            if len(data) > 0:
+                tenant = data[0]
+                pytest.test_tenant_id = tenant.get('id')
+                pytest.test_tenant_name = tenant.get('name')
         
         print(f"✓ Got {len(data)} tenants")
 
