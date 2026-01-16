@@ -28,6 +28,9 @@ import Recipes from "./pages/Recipes";
 // import Invoices from "./pages/Invoices";
 import Coupons from "./pages/Coupons";
 import PayrollPrint from "./pages/PayrollPrint";
+import Reservations from "./pages/Reservations";
+import Reviews from "./pages/Reviews";
+import SmartReports from "./pages/SmartReports";
 
 // Components
 import IncomingCallPopup from "./components/IncomingCallPopup";
