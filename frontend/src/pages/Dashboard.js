@@ -164,6 +164,62 @@ export default function Dashboard() {
     }
   };
 
+  // جلب خلفيات Dashboard المتاحة للعميل
+  const fetchDashboardBackgrounds = async () => {
+    try {
+      const res = await axios.get(`${API}/dashboard-backgrounds`);
+      setDashboardBackgrounds(res.data.backgrounds || []);
+      setSelectedBackground(res.data.selected || null);
+    } catch (error) {
+      console.log('No dashboard backgrounds available');
+    }
+  };
+
+  // رفع خلفية جديدة
+  const handleUploadBackground = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'dashboard');
+    
+    setUploadingBg(true);
+    try {
+      await axios.post(`${API}/upload-image`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success('تم رفع الخلفية بنجاح');
+      fetchDashboardBackgrounds();
+    } catch (error) {
+      toast.error('فشل رفع الخلفية');
+    } finally {
+      setUploadingBg(false);
+    }
+  };
+
+  // اختيار خلفية Dashboard
+  const handleSelectBackground = async (backgroundUrl) => {
+    try {
+      await axios.put(`${API}/dashboard-backgrounds/select`, { background_url: backgroundUrl });
+      setSelectedBackground(backgroundUrl);
+      toast.success('تم تحديث الخلفية');
+    } catch (error) {
+      toast.error('فشل تحديث الخلفية');
+    }
+  };
+
+  // إزالة خلفية Dashboard
+  const handleRemoveBackground = async () => {
+    try {
+      await axios.put(`${API}/dashboard-backgrounds/select`, { background_url: null });
+      setSelectedBackground(null);
+      toast.success('تم إزالة الخلفية');
+    } catch (error) {
+      toast.error('فشل إزالة الخلفية');
+    }
+  };
+
   const fetchDashboardSettings = async () => {
     try {
       const res = await axios.get(`${API}/settings/dashboard`);
