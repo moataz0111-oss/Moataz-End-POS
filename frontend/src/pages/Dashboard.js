@@ -128,6 +128,12 @@ export default function Dashboard() {
   const [closingResult, setClosingResult] = useState(null);
   const [isClosing, setIsClosing] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  
+  // حالات خلفية Dashboard
+  const [showBackgroundDialog, setShowBackgroundDialog] = useState(false);
+  const [dashboardBackgrounds, setDashboardBackgrounds] = useState([]);
+  const [selectedBackground, setSelectedBackground] = useState(null);
+  const [uploadingBg, setUploadingBg] = useState(false);
 
   useEffect(() => {
     fetchData();
