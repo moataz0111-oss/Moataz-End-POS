@@ -5070,9 +5070,9 @@ async def get_tenant_info(current_user: dict = Depends(get_current_user)):
         if settings and settings.get("value"):
             return settings["value"]
         return {
-            "name": "Maestro EGP",
-            "name_ar": "مايسترو",
-            "name_en": "Maestro EGP",
+            "name": "Maestro",
+            "name_ar": "Maestro",
+            "name_en": "Maestro",
             "logo_url": None
         }
     
@@ -5083,9 +5083,36 @@ async def get_tenant_info(current_user: dict = Depends(get_current_user)):
     )
     
     if not tenant:
-        return {"name": "Maestro EGP", "logo_url": None}
+        return {"name": "Maestro", "logo_url": None}
     
     return tenant
+
+@api_router.get("/system/branding")
+async def get_system_branding(current_user: dict = Depends(verify_super_admin)):
+    """جلب إعدادات هوية النظام الرئيسي"""
+    settings = await db.settings.find_one({"type": "system_branding"}, {"_id": 0})
+    if settings and settings.get("value"):
+        return settings["value"]
+    return {
+        "name": "Maestro",
+        "name_ar": "Maestro",
+        "name_en": "Maestro",
+        "logo_url": None
+    }
+
+@api_router.put("/system/branding")
+async def update_system_branding(branding: dict, current_user: dict = Depends(verify_super_admin)):
+    """تحديث إعدادات هوية النظام الرئيسي (الاسم والشعار)"""
+    allowed_fields = ["name", "name_ar", "name_en", "logo_url"]
+    update_data = {k: v for k, v in branding.items() if k in allowed_fields}
+    
+    await db.settings.update_one(
+        {"type": "system_branding"},
+        {"$set": {"type": "system_branding", "value": update_data}},
+        upsert=True
+    )
+    
+    return {"message": "تم تحديث هوية النظام بنجاح", "branding": update_data}
 
 # ==================== LOGIN BACKGROUNDS API ====================
 
