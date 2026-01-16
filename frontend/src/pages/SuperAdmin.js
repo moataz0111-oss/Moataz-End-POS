@@ -171,6 +171,19 @@ export default function SuperAdmin() {
   const [newBackgroundTitle, setNewBackgroundTitle] = useState('');
   const [newBackgroundAnimation, setNewBackgroundAnimation] = useState('fade');
   const [backgroundsLoading, setBackgroundsLoading] = useState(false);
+  const [backgroundUploadMode, setBackgroundUploadMode] = useState('url'); // 'url' or 'device'
+  const [selectedBackgroundFile, setSelectedBackgroundFile] = useState(null);
+  const [backgroundPreviewUrl, setBackgroundPreviewUrl] = useState('');
+
+  // للتعامل مع معاينة الملف المرفوع
+  const handleBackgroundFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedBackgroundFile(file);
+      const url = URL.createObjectURL(file);
+      setBackgroundPreviewUrl(url);
+    }
+  };
 
   useEffect(() => {
     if (token) {
