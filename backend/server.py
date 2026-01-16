@@ -5705,7 +5705,11 @@ async def update_tenant_features(tenant_id: str, features: dict, current_user: d
         "showInventory", "showDelivery", "showReports", "showSettings",
         "showHR", "showWarehouse", "showCallLogs", "showCallCenter", "showKitchen",
         "showLoyalty", "showCoupons", "showRecipes", "showReservations",
-        "showReviews", "showSmartReports", "showPurchasing", "showBranchOrders"
+        "showReviews", "showSmartReports", "showPurchasing", "showBranchOrders",
+        # خيارات الإعدادات
+        "settingsUsers", "settingsCustomers", "settingsBranches", 
+        "settingsCategories", "settingsProducts", "settingsPrinters",
+        "settingsDeliveryCompanies", "settingsCallCenter", "settingsNotifications"
     ]
     
     # فلترة الميزات المرسلة
@@ -5748,7 +5752,17 @@ async def get_tenant_features(tenant_id: str, current_user: dict = Depends(verif
         "showReviews": True,
         "showSmartReports": True,
         "showPurchasing": False,
-        "showBranchOrders": False
+        "showBranchOrders": False,
+        # خيارات الإعدادات
+        "settingsUsers": True,
+        "settingsCustomers": True,
+        "settingsBranches": True,
+        "settingsCategories": True,
+        "settingsProducts": True,
+        "settingsPrinters": True,
+        "settingsDeliveryCompanies": True,
+        "settingsCallCenter": True,
+        "settingsNotifications": True
     }
     
     # دمج الميزات المحفوظة مع الافتراضية
