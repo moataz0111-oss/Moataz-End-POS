@@ -198,6 +198,17 @@ export default function SuperAdmin() {
   const [backgroundUploadMode, setBackgroundUploadMode] = useState('url'); // 'url' or 'device'
   const [selectedBackgroundFile, setSelectedBackgroundFile] = useState(null);
   const [backgroundPreviewUrl, setBackgroundPreviewUrl] = useState('');
+  
+  // System Branding State
+  const [systemBranding, setSystemBranding] = useState({
+    name: 'Maestro',
+    name_ar: 'Maestro',
+    name_en: 'Maestro',
+    logo_url: null
+  });
+  const [systemLogoFile, setSystemLogoFile] = useState(null);
+  const [systemLogoPreview, setSystemLogoPreview] = useState('');
+  const [brandingLoading, setBrandingLoading] = useState(false);
 
   // للتعامل مع معاينة الملف المرفوع
   const handleBackgroundFileChange = (e) => {
@@ -223,6 +234,7 @@ export default function SuperAdmin() {
     if (isAuthenticated) {
       fetchData();
       fetchBackgroundSettings();
+      fetchSystemBranding();
     }
   }, [isAuthenticated]);
 
