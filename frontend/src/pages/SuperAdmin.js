@@ -1352,6 +1352,126 @@ export default function SuperAdmin() {
           </CardContent>
         </Card>
 
+        {/* System Branding Section - هوية النظام الرئيسي */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center">
+                <Crown className="h-5 w-5 text-blue-400" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">هوية النظام الرئيسي</CardTitle>
+                <p className="text-sm text-gray-400">تحكم في اسم وشعار النظام الرئيسي (لمدير النظام)</p>
+              </div>
+            </div>
+            <Button 
+              onClick={saveSystemBranding} 
+              className="bg-blue-600 hover:bg-blue-700 gap-2"
+              disabled={brandingLoading}
+            >
+              {brandingLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+              حفظ الهوية
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* الشعار */}
+              <div className="space-y-4">
+                <Label className="text-sm font-medium">شعار النظام</Label>
+                <div className="flex items-start gap-4">
+                  <div className="w-24 h-24 bg-gray-700/50 rounded-xl border-2 border-dashed border-gray-600 flex items-center justify-center overflow-hidden">
+                    {systemLogoPreview ? (
+                      <img 
+                        src={systemLogoPreview} 
+                        alt="System Logo" 
+                        className="w-full h-full object-contain"
+                      />
+                    ) : (
+                      <Crown className="h-10 w-10 text-gray-500" />
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          setSystemLogoFile(file);
+                          setSystemLogoPreview(URL.createObjectURL(file));
+                        }
+                      }}
+                      className="hidden"
+                      id="system-logo-input"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById('system-logo-input').click()}
+                      className="border-gray-600 text-gray-300"
+                    >
+                      <Upload className="h-4 w-4 ml-2" />
+                      رفع شعار
+                    </Button>
+                    <p className="text-xs text-gray-500">PNG, JPG (أقصى 5MB)</p>
+                    {systemLogoPreview && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSystemLogoFile(null);
+                          setSystemLogoPreview('');
+                          setSystemBranding(prev => ({ ...prev, logo_url: null }));
+                        }}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        <X className="h-4 w-4 ml-1" />
+                        إزالة
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* الأسماء */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm">اسم النظام (يظهر في Dashboard)</Label>
+                  <Input
+                    placeholder="مثال: Maestro"
+                    value={systemBranding.name}
+                    onChange={(e) => setSystemBranding({...systemBranding, name: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">الاسم بالعربي (اختياري)</Label>
+                  <Input
+                    placeholder="مثال: مايسترو"
+                    value={systemBranding.name_ar}
+                    onChange={(e) => setSystemBranding({...systemBranding, name_ar: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                    dir="rtl"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">الاسم بالإنجليزي (اختياري)</Label>
+                  <Input
+                    placeholder="e.g. Maestro"
+                    value={systemBranding.name_en}
+                    onChange={(e) => setSystemBranding({...systemBranding, name_en: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Login Backgrounds Section */}
         <Card className="bg-gray-800/50 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
