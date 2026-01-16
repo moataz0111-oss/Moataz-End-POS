@@ -5020,7 +5020,17 @@ async def get_dashboard_settings(current_user: dict = Depends(get_current_user))
         "showReviews": True,
         "showSmartReports": True,
         "showPurchasing": True,
-        "showBranchOrders": True
+        "showBranchOrders": True,
+        # خيارات الإعدادات
+        "settingsUsers": True,
+        "settingsCustomers": True,
+        "settingsBranches": True,
+        "settingsCategories": True,
+        "settingsProducts": True,
+        "settingsPrinters": True,
+        "settingsDeliveryCompanies": True,
+        "settingsCallCenter": True,
+        "settingsNotifications": True
     }
     
     # جلب إعدادات لوحة القيادة المحفوظة
