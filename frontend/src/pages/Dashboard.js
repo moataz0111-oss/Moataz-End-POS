@@ -1188,6 +1188,98 @@ export default function Dashboard() {
           </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      {/* Dashboard Background Dialog */}
+      <Dialog open={showBackgroundDialog} onOpenChange={setShowBackgroundDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Image className="h-5 w-5 text-pink-500" />
+              خلفية لوحة التحكم
+            </DialogTitle>
+          </DialogHeader>
+
+          <ScrollArea className="max-h-[60vh]">
+            <div className="space-y-4 p-1">
+              {/* رفع خلفية جديدة */}
+              <div className="p-4 border-2 border-dashed border-border rounded-lg text-center">
+                <label className="cursor-pointer block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleUploadBackground}
+                    disabled={uploadingBg}
+                  />
+                  {uploadingBg ? (
+                    <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                      جاري الرفع...
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Plus className="h-8 w-8 mx-auto text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">اضغط لرفع صورة جديدة</p>
+                    </div>
+                  )}
+                </label>
+              </div>
+
+              {/* زر إزالة الخلفية */}
+              {selectedBackground && (
+                <Button
+                  variant="outline"
+                  className="w-full gap-2 border-red-500 text-red-500 hover:bg-red-500/10"
+                  onClick={handleRemoveBackground}
+                >
+                  <X className="h-4 w-4" />
+                  إزالة الخلفية الحالية
+                </Button>
+              )}
+
+              {/* الخلفيات المتاحة */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {dashboardBackgrounds.map((bg, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => handleSelectBackground(bg)}
+                    className={`relative cursor-pointer rounded-lg overflow-hidden aspect-video border-2 transition-all ${
+                      selectedBackground === bg
+                        ? 'border-pink-500 ring-2 ring-pink-500/30'
+                        : 'border-transparent hover:border-pink-500/50'
+                    }`}
+                  >
+                    <img
+                      src={bg}
+                      alt={`Background ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {selectedBackground === bg && (
+                      <div className="absolute inset-0 bg-pink-500/20 flex items-center justify-center">
+                        <Check className="h-8 w-8 text-white drop-shadow-lg" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {dashboardBackgrounds.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Image className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>لا توجد خلفيات متاحة</p>
+                  <p className="text-sm">قم برفع صورة جديدة</p>
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBackgroundDialog(false)}>
+              إغلاق
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
