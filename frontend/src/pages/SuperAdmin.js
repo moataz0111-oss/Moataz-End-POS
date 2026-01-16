@@ -750,7 +750,16 @@ export default function SuperAdmin() {
       showReviews: true,
       showSmartReports: true,
       showPurchasing: true,
-      showBranchOrders: true
+      showBranchOrders: true,
+      settingsUsers: true,
+      settingsCustomers: true,
+      settingsBranches: true,
+      settingsCategories: true,
+      settingsProducts: true,
+      settingsPrinters: true,
+      settingsDeliveryCompanies: true,
+      settingsCallCenter: true,
+      settingsNotifications: true
     });
   };
 
@@ -776,7 +785,16 @@ export default function SuperAdmin() {
       showReviews: false,
       showSmartReports: false,
       showPurchasing: false,
-      showBranchOrders: false
+      showBranchOrders: false,
+      settingsUsers: false,
+      settingsCustomers: false,
+      settingsBranches: false,
+      settingsCategories: false,
+      settingsProducts: false,
+      settingsPrinters: false,
+      settingsDeliveryCompanies: false,
+      settingsCallCenter: false,
+      settingsNotifications: false
     });
   };
 
