@@ -45,7 +45,9 @@ import {
   PieChart,
   GripVertical,
   Move,
-  Image
+  Image,
+  ShoppingBag,
+  Warehouse
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
