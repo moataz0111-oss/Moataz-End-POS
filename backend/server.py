@@ -19,6 +19,7 @@ from PIL import Image
 import io
 import base64
 import aiofiles
+import asyncio
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -54,6 +55,112 @@ security = HTTPBearer()
 # Mount static files directory
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="api_uploads")
+
+# ==================== DATABASE INITIALIZATION ====================
+
+async def init_database():
+    """تهيئة قاعدة البيانات بالبيانات الأساسية عند بدء التطبيق"""
+    try:
+        # التحقق من وجود Super Admin
+        super_admin = await db.users.find_one({"role": "super_admin"})
+        if not super_admin:
+            logger.info("🔧 Initializing database with default data...")
+            
+            # إنشاء Super Admin
+            super_admin_password = bcrypt.hashpw("owner123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            super_admin_doc = {
+                "id": str(uuid.uuid4()),
+                "username": "super_admin",
+                "email": "owner@maestroegp.com",
+                "password": super_admin_password,
+                "full_name": "Owner",
+                "role": "super_admin",
+                "branch_id": None,
+                "tenant_id": None,
+                "permissions": ["all", "super_admin"],
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.users.insert_one(super_admin_doc)
+            logger.info("✅ Super Admin created: owner@maestroegp.com")
+            
+            # إنشاء مدير النظام الرئيسي
+            admin_password = bcrypt.hashpw("admin123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            admin_doc = {
+                "id": str(uuid.uuid4()),
+                "username": "admin",
+                "email": "admin@maestroegp.com",
+                "password": admin_password,
+                "full_name": "مدير النظام",
+                "role": "admin",
+                "branch_id": None,
+                "tenant_id": None,
+                "permissions": ["all"],
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.users.insert_one(admin_doc)
+            logger.info("✅ Main Admin created: admin@maestroegp.com")
+            
+            # إنشاء الفرع الرئيسي
+            branch_doc = {
+                "id": str(uuid.uuid4()),
+                "name": "الفرع الرئيسي",
+                "code": "MAIN",
+                "address": "العنوان الرئيسي",
+                "phone": "",
+                "is_main": True,
+                "is_active": True,
+                "tenant_id": None,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.branches.insert_one(branch_doc)
+            logger.info("✅ Main Branch created")
+            
+            # إعدادات النظام
+            branding_doc = {
+                "type": "system_branding",
+                "value": {
+                    "name": "Maestro",
+                    "name_ar": "Maestro",
+                    "name_en": "Maestro",
+                    "logo_url": None
+                }
+            }
+            await db.settings.insert_one(branding_doc)
+            
+            # خلفية تسجيل الدخول الافتراضية
+            bg_doc = {
+                "type": "login_backgrounds",
+                "backgrounds": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920",
+                        "title": "مطعم فاخر",
+                        "is_active": True
+                    }
+                ],
+                "settings": {
+                    "transition_effect": "fade",
+                    "transition_speed": 5,
+                    "overlay_color": "rgba(0,0,0,0.5)",
+                    "text_color": "#ffffff"
+                }
+            }
+            await db.settings.insert_one(bg_doc)
+            
+            logger.info("🎉 Database initialization complete!")
+        else:
+            logger.info("ℹ️ Database already initialized")
+    except Exception as e:
+        logger.error(f"❌ Database initialization error: {e}")
+
+@app.on_event("startup")
+async def startup_event():
+    """يتم تشغيله عند بدء التطبيق"""
+    logger.info("🚀 Starting Maestro EGP API...")
+    await init_database()
+    logger.info("✅ Application started successfully")
 
 # ==================== HEALTH CHECK ====================
 
