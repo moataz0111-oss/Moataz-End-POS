@@ -85,6 +85,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [tenantInfo, setTenantInfo] = useState(null); // معلومات العميل (الشعار والاسم)
   const [dashboardSettings, setDashboardSettings] = useState({
     showPOS: true,
     showTables: true,
