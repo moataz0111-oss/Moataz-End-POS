@@ -149,13 +149,13 @@ export default function Reviews() {
 
   const handleReply = async (reviewId, reply) => {
     try {
-      await axios.post(`${API}/reviews/${reviewId}/reply`, { reply });
+      await axios.put(`${API}/reviews/${reviewId}/respond`, { response: reply });
       toast.success('تم إضافة الرد');
       fetchReviews();
     } catch (error) {
       // تحديث محلي
       setReviews(reviews.map(r => 
-        r.id === reviewId ? { ...r, reply } : r
+        r.id === reviewId ? { ...r, reply, response: reply } : r
       ));
       toast.success('تم إضافة الرد');
     }
