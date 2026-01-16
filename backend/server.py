@@ -135,6 +135,8 @@ class TenantResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
     name: str
+    name_ar: Optional[str] = None
+    name_en: Optional[str] = None
     slug: str
     owner_name: str
     owner_email: str
@@ -145,6 +147,7 @@ class TenantResponse(BaseModel):
     is_active: bool
     created_at: str
     expires_at: Optional[str] = None
+    logo_url: Optional[str] = None
 
 # User Models
 class UserCreate(BaseModel):
