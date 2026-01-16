@@ -5017,7 +5017,9 @@ async def get_dashboard_settings(current_user: dict = Depends(get_current_user))
         "showRecipes": True,
         "showReservations": True,
         "showReviews": True,
-        "showSmartReports": True
+        "showSmartReports": True,
+        "showPurchasing": True,
+        "showBranchOrders": True
     }
     
     # جلب إعدادات لوحة القيادة المحفوظة
