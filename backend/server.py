@@ -53,6 +53,7 @@ security = HTTPBearer()
 
 # Mount static files directory
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="api_uploads")
 
 # ==================== HEALTH CHECK ====================
 
