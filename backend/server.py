@@ -130,6 +130,12 @@ class TenantFeatures(BaseModel):
     showCallLogs: bool = False
     showCallCenter: bool = False
     showKitchen: bool = False
+    showLoyalty: bool = True
+    showCoupons: bool = True
+    showRecipes: bool = True
+    showReservations: bool = True
+    showReviews: bool = True
+    showSmartReports: bool = True
 
 class TenantResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
