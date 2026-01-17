@@ -870,7 +870,7 @@ export default function Settings() {
                   الرئيسية
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'manager', 'branch_manager']) && settingsPermissions.settingsUsers && (
+              {hasRole(['admin']) && settingsPermissions.settingsUsers && (
                 <TabsTrigger 
                   value="users"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
