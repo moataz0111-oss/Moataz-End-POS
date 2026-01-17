@@ -352,16 +352,25 @@ export default function Delivery() {
     }
   };
 
-  // فتح نافذة تحويل السائق
-  const openTransferDriverDialog = (order) => {
+  // فتح نافذة تحويل السائق وجلب جميع السائقين
+  const openTransferDriverDialog = async (order) => {
     setOrderToTransfer(order);
     setTransferDriverDialogOpen(true);
+    
+    // جلب جميع السائقين (بدون فلتر الفرع)
+    try {
+      const res = await axios.get(`${API}/drivers`);
+      // استبعاد السائق الحالي فقط
+      const filteredDrivers = res.data.filter(d => d.id !== order.driver_id);
+      setAllDriversForTransfer(filteredDrivers);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+      setAllDriversForTransfer([]);
+    }
   };
 
   // السائقين المتاحين للتحويل (جميع السائقين ما عدا السائق الحالي)
-  const availableDriversForTransfer = drivers.filter(
-    d => d.id !== orderToTransfer?.driver_id
-  );
+  const availableDriversForTransfer = allDriversForTransfer;
 
   // تحديد طلب كمدفوع
   const markOrderAsPaid = async (orderId) => {
