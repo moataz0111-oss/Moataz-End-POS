@@ -255,7 +255,7 @@ export default function Settings() {
   });
 
   useEffect(() => {
-    if (hasRole(['admin', 'manager'])) {
+    if (hasRole(['admin', 'manager', 'branch_manager'])) {
       fetchData();
       fetchSettingsPermissions();
     } else {
@@ -846,7 +846,7 @@ export default function Settings() {
               >
                 المظهر
               </TabsTrigger>
-              {hasRole(['admin', 'manager']) && (
+              {hasRole(['admin', 'manager', 'branch_manager']) && (
                 <TabsTrigger 
                   value="dashboard"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -854,7 +854,7 @@ export default function Settings() {
                   الرئيسية
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'manager']) && settingsPermissions.settingsUsers && (
+              {hasRole(['admin', 'manager', 'branch_manager']) && settingsPermissions.settingsUsers && (
                 <TabsTrigger 
                   value="users"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -871,7 +871,7 @@ export default function Settings() {
                   الأدوار والموظفين
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'manager']) && settingsPermissions.settingsCustomers && (
+              {hasRole(['admin', 'manager', 'branch_manager']) && settingsPermissions.settingsCustomers && (
                 <TabsTrigger 
                   value="customers"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -887,7 +887,7 @@ export default function Settings() {
                   الفروع
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'manager']) && settingsPermissions.settingsCategories && (
+              {hasRole(['admin', 'manager', 'branch_manager']) && settingsPermissions.settingsCategories && (
                 <TabsTrigger 
                   value="categories"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -895,7 +895,7 @@ export default function Settings() {
                   الفئات
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'manager']) && settingsPermissions.settingsProducts && (
+              {hasRole(['admin', 'manager', 'branch_manager']) && settingsPermissions.settingsProducts && (
                 <TabsTrigger 
                   value="products"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -903,7 +903,7 @@ export default function Settings() {
                   المنتجات
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'manager']) && settingsPermissions.settingsPrinters && (
+              {hasRole(['admin', 'manager', 'branch_manager']) && settingsPermissions.settingsPrinters && (
                 <TabsTrigger 
                   value="printers"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -976,7 +976,7 @@ export default function Settings() {
           </TabsContent>
 
           {/* Dashboard Settings - إعدادات الصفحة الرئيسية */}
-          {hasRole(['admin', 'manager']) && (
+          {hasRole(['admin', 'manager', 'branch_manager']) && (
             <TabsContent value="dashboard">
               <Card className="border-border/50 bg-card">
                 <CardHeader>
@@ -1151,7 +1151,7 @@ export default function Settings() {
           )}
 
           {/* Users */}
-          {hasRole(['admin', 'manager']) && (
+          {hasRole(['admin', 'manager', 'branch_manager']) && (
             <TabsContent value="users">
               <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -1937,7 +1937,7 @@ export default function Settings() {
           )}
 
           {/* Categories */}
-          {hasRole(['admin', 'manager']) && (
+          {hasRole(['admin', 'manager', 'branch_manager']) && (
             <TabsContent value="categories">
               <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -2177,7 +2177,7 @@ export default function Settings() {
           )}
 
           {/* Products */}
-          {hasRole(['admin', 'manager']) && (
+          {hasRole(['admin', 'manager', 'branch_manager']) && (
             <TabsContent value="products">
               <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -2486,7 +2486,7 @@ export default function Settings() {
           )}
 
           {/* Printers */}
-          {hasRole(['admin', 'manager']) && (
+          {hasRole(['admin', 'manager', 'branch_manager']) && (
             <TabsContent value="printers">
               <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between">
@@ -3206,7 +3206,7 @@ export default function Settings() {
           )}
 
           {/* Customers - إدارة العملاء */}
-          {hasRole(['admin', 'manager']) && (
+          {hasRole(['admin', 'manager', 'branch_manager']) && (
             <TabsContent value="customers">
               <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between">
