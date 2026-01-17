@@ -2359,7 +2359,7 @@ export default function Settings() {
                     
                     <div className="flex gap-2">
                       <Input 
-                        value={`${process.env.REACT_APP_BACKEND_URL}/api/callcenter/webhook`}
+                        value={`${API}/callcenter/webhook`}
                         readOnly
                         dir="ltr"
                         className="font-mono text-sm"
@@ -2367,7 +2367,7 @@ export default function Settings() {
                       <Button 
                         variant="outline"
                         onClick={() => {
-                          navigator.clipboard.writeText(`${process.env.REACT_APP_BACKEND_URL}/api/callcenter/webhook`);
+                          navigator.clipboard.writeText(`${API}/callcenter/webhook`);
                           toast.success('تم نسخ الرابط');
                         }}
                       >
