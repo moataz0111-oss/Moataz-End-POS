@@ -233,6 +233,22 @@ async def init_database():
     if old_shifts.modified_count > 0:
         print(f"   ✅ Auto-closed {old_shifts.modified_count} old shifts")
     
+    # 9.6 تحديث الطلبات القديمة التي لا تحتوي على shift_id
+    orders_without_shift = await db.orders.count_documents({"shift_id": {"$exists": False}})
+    if orders_without_shift > 0:
+        print(f"   ⚠️ Found {orders_without_shift} orders without shift_id")
+    
+    # 9.7 تحديث السائقين - إعادة تعيين current_order_id إذا كان الطلب قد تم تسليمه
+    drivers_with_orders = await db.drivers.find({"current_order_id": {"$ne": None}}).to_list(None)
+    for driver in drivers_with_orders:
+        order = await db.orders.find_one({"id": driver["current_order_id"]})
+        if not order or order.get("status") in ["delivered", "cancelled"]:
+            await db.drivers.update_one(
+                {"id": driver["id"]},
+                {"$set": {"current_order_id": None, "is_available": True}}
+            )
+            print(f"   ✅ Reset current_order_id for driver: {driver.get('name', driver['id'][:8])}")
+    
     print("\n🎉 Database initialization complete!")
     print("=" * 50)
     print("📋 Login Credentials:")
