@@ -370,7 +370,7 @@ export default function Settings() {
       await axios.post(`${API}/staff`, staffForm);
       toast.success('تم إنشاء الموظف بنجاح');
       setStaffDialogOpen(false);
-      setStaffForm({ full_name: '', email: '', phone: '', password: '', role: 'cashier', branch_id: branches[0]?.id || '', job_title: '' });
+      setStaffForm({ full_name: '', email: '', phone: '', password: '', role: 'cashier', branch_id: branches[0]?.id || '', job_title: '', permissions: [] });
       fetchStaffData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل في إنشاء الموظف');
