@@ -177,7 +177,22 @@ export default function POS() {
       setCategories(catRes.data);
       setProducts(prodRes.data);
       setDeliveryApps(appsRes.data);
-      setCurrentShift(shiftRes.data);
+      
+      // إذا لم تكن هناك وردية مفتوحة، افتح واحدة تلقائياً
+      if (!shiftRes.data) {
+        try {
+          const autoOpenRes = await axios.post(`${API}/shifts/auto-open`);
+          setCurrentShift(autoOpenRes.data.shift);
+          if (!autoOpenRes.data.was_existing) {
+            toast.success('تم فتح وردية جديدة تلقائياً');
+          }
+        } catch (autoOpenError) {
+          console.log('Could not auto-open shift:', autoOpenError);
+          setCurrentShift(null);
+        }
+      } else {
+        setCurrentShift(shiftRes.data);
+      }
 
       // جلب الطاولات
       let tablesData = [];
