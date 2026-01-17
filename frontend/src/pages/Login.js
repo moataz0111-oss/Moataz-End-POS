@@ -417,11 +417,18 @@ export default function Login() {
               )}
             </Button>
 
-            {/* Quick access to driver portal */}
-            <div className="text-center pt-2">
+            {/* روابط إضافية */}
+            <div className="text-center pt-4 space-y-2">
+              <button 
+                type="button"
+                onClick={() => toast.info('يرجى التواصل مع مدير النظام لإعادة تعيين كلمة المرور')}
+                className="text-sm text-gray-400 hover:text-primary transition-colors block w-full"
+              >
+                نسيت كلمة المرور؟
+              </button>
               <a 
                 href="/driver" 
-                className="text-sm text-gray-400 hover:text-primary transition-colors"
+                className="text-sm text-gray-500 hover:text-gray-400 transition-colors block"
               >
                 بوابة السائقين
               </a>
@@ -430,12 +437,12 @@ export default function Login() {
         </CardContent>
       </Card>
 
-      {/* Current background title */}
-      {currentBg?.title && (
+      {/* Current background title - hidden for cleaner look */}
+      {/* {currentBg?.title && (
         <div className="absolute bottom-6 left-6 z-10">
           <p className="text-white/50 text-sm">{currentBg.title}</p>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
