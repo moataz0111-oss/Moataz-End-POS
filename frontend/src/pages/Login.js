@@ -567,7 +567,7 @@ export default function Login() {
             </Button>
 
             {/* روابط إضافية */}
-            <div className="text-center pt-4 space-y-2">
+            <div className="text-center pt-4 space-y-3">
               <button 
                 type="button"
                 onClick={() => alert('يرجى التواصل مع مدير النظام لإعادة تعيين كلمة المرور')}
@@ -575,10 +575,13 @@ export default function Login() {
               >
                 نسيت كلمة المرور؟
               </button>
+              
+              {/* زر بوابة السائقين */}
               <a 
                 href="/driver" 
-                className="text-sm text-gray-500 hover:text-gray-400 transition-colors block"
+                className="flex items-center justify-center gap-2 text-sm text-green-400 hover:text-green-300 transition-colors py-2 px-4 rounded-lg border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 mx-auto"
               >
+                <Truck className="h-4 w-4" />
                 بوابة السائقين
               </a>
               
