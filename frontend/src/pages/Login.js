@@ -30,6 +30,24 @@ const DEFAULT_BACKGROUNDS = {
       image_url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920',
       title: 'طعام شهي',
       is_active: true
+    },
+    {
+      id: 'default-4',
+      image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920',
+      title: 'مطعم أنيق',
+      is_active: true
+    },
+    {
+      id: 'default-5',
+      image_url: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1920',
+      title: 'كافيه عصري',
+      is_active: true
+    },
+    {
+      id: 'default-6',
+      image_url: 'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=1920',
+      title: 'مطبخ احترافي',
+      is_active: true
     }
   ],
   settings: {
