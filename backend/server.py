@@ -4287,11 +4287,27 @@ async def create_driver(driver: DriverCreate, current_user: dict = Depends(get_c
     return driver_doc
 
 @api_router.get("/drivers", response_model=List[DriverResponse])
-async def get_drivers(branch_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_drivers(branch_id: Optional[str] = None, include_orders: bool = False, current_user: dict = Depends(get_current_user)):
     query = build_tenant_query(current_user)  # فلترة حسب tenant_id
     if branch_id:
         query["branch_id"] = branch_id
     drivers = await db.drivers.find(query, {"_id": 0}).to_list(100)
+    
+    # إذا طُلب تضمين بيانات الطلبات
+    if include_orders:
+        for driver in drivers:
+            if driver.get("current_order_id"):
+                order = await db.orders.find_one({"id": driver["current_order_id"]}, {"_id": 0})
+                if order:
+                    driver["current_order"] = {
+                        "id": order.get("id"),
+                        "order_number": order.get("order_number"),
+                        "total": order.get("total", 0),
+                        "customer_name": order.get("customer_name"),
+                        "customer_phone": order.get("customer_phone"),
+                        "status": order.get("status")
+                    }
+    
     return drivers
 
 @api_router.put("/drivers/{driver_id}")
