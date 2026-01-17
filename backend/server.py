@@ -4580,20 +4580,22 @@ async def transfer_order_to_driver(
     
     # تحديث حالة السائق القديم إذا كان موجوداً
     if old_driver_id:
-        remaining = await db.orders.count_documents({
-            "driver_id": old_driver_id,
-            "status": {"$in": ["out_for_delivery", "preparing"]}
-        })
-        if remaining == 0:
-            await db.drivers.update_one(
-                {"id": old_driver_id},
-                {"$set": {"current_status": "available"}}
-            )
+        # إزالة current_order_id من السائق القديم
+        await db.drivers.update_one(
+            {"id": old_driver_id},
+            {"$set": {
+                "current_order_id": None,
+                "is_available": True
+            }}
+        )
     
     # تحديث حالة السائق الجديد
     await db.drivers.update_one(
         {"id": new_driver_id},
-        {"$set": {"current_status": "on_delivery"}}
+        {"$set": {
+            "current_order_id": order_id,
+            "is_available": False
+        }}
     )
     
     logger.info(f"Order {order_id} transferred from driver {old_driver_name} to {new_driver.get('name')}")
