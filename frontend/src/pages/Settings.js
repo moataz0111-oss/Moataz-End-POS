@@ -1472,7 +1472,7 @@ export default function Settings() {
           )}
 
           {/* Staff Management - إدارة الموظفين والأدوار */}
-          {hasRole(['admin', 'manager']) && (
+          {hasRole(['admin']) && (
             <TabsContent value="staff">
               <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-4">
