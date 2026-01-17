@@ -61,6 +61,12 @@ app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="api_uplo
 async def init_database():
     """تهيئة قاعدة البيانات بالبيانات الأساسية عند بدء التطبيق"""
     try:
+        logger.info("🔍 Checking database initialization...")
+        
+        # التحقق من الاتصال بقاعدة البيانات
+        await db.command('ping')
+        logger.info("✅ Database connection successful")
+        
         # التحقق من وجود Super Admin
         super_admin = await db.users.find_one({"role": "super_admin"})
         if not super_admin:
@@ -82,7 +88,7 @@ async def init_database():
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db.users.insert_one(super_admin_doc)
-            logger.info("✅ Super Admin created: owner@maestroegp.com")
+            logger.info("✅ Super Admin created: owner@maestroegp.com / owner123")
             
             # إنشاء مدير النظام الرئيسي
             admin_password = bcrypt.hashpw("admin123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -100,7 +106,7 @@ async def init_database():
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db.users.insert_one(admin_doc)
-            logger.info("✅ Main Admin created: admin@maestroegp.com")
+            logger.info("✅ Main Admin created: admin@maestroegp.com / admin123")
             
             # إنشاء الفرع الرئيسي
             branch_doc = {
@@ -128,8 +134,9 @@ async def init_database():
                 }
             }
             await db.settings.insert_one(branding_doc)
+            logger.info("✅ System branding created")
             
-            # خلفية تسجيل الدخول الافتراضية
+            # خلفيات تسجيل الدخول الافتراضية - صور متعددة
             bg_doc = {
                 "type": "login_backgrounds",
                 "backgrounds": [
@@ -137,6 +144,18 @@ async def init_database():
                         "id": str(uuid.uuid4()),
                         "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920",
                         "title": "مطعم فاخر",
+                        "is_active": True
+                    },
+                    {
+                        "id": str(uuid.uuid4()),
+                        "image_url": "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1920",
+                        "title": "مطعم حديث",
+                        "is_active": True
+                    },
+                    {
+                        "id": str(uuid.uuid4()),
+                        "image_url": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920",
+                        "title": "طعام شهي",
                         "is_active": True
                     }
                 ],
@@ -148,12 +167,54 @@ async def init_database():
                 }
             }
             await db.settings.insert_one(bg_doc)
+            logger.info("✅ Login backgrounds created (3 images)")
             
-            logger.info("🎉 Database initialization complete!")
+            logger.info("=" * 50)
+            logger.info("🎉 DATABASE INITIALIZATION COMPLETE!")
+            logger.info("=" * 50)
+            logger.info("📋 LOGIN CREDENTIALS:")
+            logger.info("   Super Admin: owner@maestroegp.com / owner123")
+            logger.info("   Secret Key: 271018")
+            logger.info("   Main Admin: admin@maestroegp.com / admin123")
+            logger.info("=" * 50)
         else:
-            logger.info("ℹ️ Database already initialized")
+            logger.info("ℹ️ Database already initialized - Super Admin exists")
+            
+        # التحقق من وجود خلفيات تسجيل الدخول
+        login_bg = await db.settings.find_one({"type": "login_backgrounds"})
+        if not login_bg:
+            logger.info("🔧 Adding default login backgrounds...")
+            bg_doc = {
+                "type": "login_backgrounds",
+                "backgrounds": [
+                    {
+                        "id": str(uuid.uuid4()),
+                        "image_url": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920",
+                        "title": "مطعم فاخر",
+                        "is_active": True
+                    },
+                    {
+                        "id": str(uuid.uuid4()),
+                        "image_url": "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=1920",
+                        "title": "مطعم حديث",
+                        "is_active": True
+                    }
+                ],
+                "settings": {
+                    "transition_effect": "fade",
+                    "transition_speed": 5,
+                    "overlay_color": "rgba(0,0,0,0.5)",
+                    "text_color": "#ffffff"
+                }
+            }
+            await db.settings.insert_one(bg_doc)
+            logger.info("✅ Login backgrounds added")
+            
     except Exception as e:
-        logger.error(f"❌ Database initialization error: {e}")
+        logger.error(f"❌ Database initialization error: {str(e)}")
+        logger.error(f"❌ Error type: {type(e).__name__}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
 
 @app.on_event("startup")
 async def startup_event():
