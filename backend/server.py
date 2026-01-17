@@ -6085,6 +6085,7 @@ async def create_staff_member(staff: StaffCreate, current_user: dict = Depends(g
         "role": staff.role,
         "branch_id": staff.branch_id,
         "job_title": staff.job_title or STAFF_ROLES.get(staff.role, staff.role),
+        "permissions": staff.permissions or [],
         "tenant_id": tenant_id,
         "is_active": True,
         "last_login": None,
