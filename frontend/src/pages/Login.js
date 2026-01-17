@@ -87,9 +87,16 @@ export default function Login() {
     const fetchBackgrounds = async () => {
       try {
         const res = await axios.get(`${API}/login-backgrounds`);
-        setBackgroundSettings(res.data);
+        if (res.data && res.data.backgrounds && res.data.backgrounds.length > 0) {
+          setBackgroundSettings(res.data);
+        } else {
+          // استخدام الخلفيات الافتراضية إذا لم توجد خلفيات
+          setBackgroundSettings(DEFAULT_BACKGROUNDS);
+        }
       } catch (error) {
         console.log('Using default backgrounds');
+        // استخدام الخلفيات الافتراضية في حالة الخطأ
+        setBackgroundSettings(DEFAULT_BACKGROUNDS);
       }
     };
     fetchBackgrounds();
