@@ -9,7 +9,7 @@
         <!-- PWA Meta Tags for iOS -->
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Maestro Driver" />
+        <meta name="apple-mobile-web-app-title" content="Maestro EGP" />
         <meta name="mobile-web-app-capable" content="yes" />
         
         <!-- Apple Touch Icons -->
@@ -22,8 +22,8 @@
         <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
         
-        <!-- Manifest -->
-        <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+        <!-- Dynamic Manifest based on path -->
+        <link rel="manifest" id="app-manifest" href="%PUBLIC_URL%/manifest.json" />
         
         <!-- Splash Screens for iOS -->
         <meta name="apple-touch-startup-image" href="%PUBLIC_URL%/icons/icon-512.png" />
@@ -34,6 +34,28 @@
         These two scripts have been added for the Visual Edits, please do not edit or remove them
         -->
         <script>
+            // Dynamic manifest selection based on path
+            (function() {
+                var path = window.location.pathname;
+                var manifestLink = document.getElementById('app-manifest');
+                var themeColor = document.querySelector('meta[name="theme-color"]');
+                var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+                
+                if (path.startsWith('/driver')) {
+                    // Driver Portal - Green theme, Maestro Espedo
+                    manifestLink.href = '/manifest.json';
+                    if (themeColor) themeColor.content = '#10b981';
+                    if (appleTitle) appleTitle.content = 'Maestro Espedo';
+                    document.title = 'Maestro Espedo - بوابة السائق';
+                } else {
+                    // Admin Portal - Gold theme, Maestro EGP
+                    manifestLink.href = '/manifest-admin.json';
+                    if (themeColor) themeColor.content = '#D4AF37';
+                    if (appleTitle) appleTitle.content = 'Maestro EGP';
+                    document.title = 'Maestro EGP';
+                }
+            })();
+            
             // Register Service Worker for PWA
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
