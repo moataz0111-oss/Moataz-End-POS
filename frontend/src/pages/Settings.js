@@ -315,17 +315,102 @@ export default function Settings() {
       // تعيين الفرع الافتراضي لنموذج المستخدم الجديد
       if (branchesRes.data.length > 0) {
         setUserForm(prev => ({...prev, branch_id: prev.branch_id || branchesRes.data[0].id}));
+        setStaffForm(prev => ({...prev, branch_id: prev.branch_id || branchesRes.data[0].id}));
       }
       
       // جلب إعدادات الصفحة الرئيسية
       if (settingsRes.data.dashboard_settings) {
         setDashboardSettings(settingsRes.data.dashboard_settings);
       }
+      
+      // جلب الموظفين والأدوار
+      fetchStaffData();
     } catch (error) {
       console.error('Failed to fetch settings:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // دوال إدارة الموظفين
+  const fetchStaffData = async () => {
+    try {
+      setStaffLoading(true);
+      const [staffRes, rolesRes] = await Promise.all([
+        axios.get(`${API}/staff`),
+        axios.get(`${API}/staff/roles`)
+      ]);
+      setStaffList(staffRes.data);
+      setStaffRoles(rolesRes.data);
+    } catch (error) {
+      console.error('Failed to fetch staff:', error);
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
+  const handleCreateStaff = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/staff`, staffForm);
+      toast.success('تم إنشاء الموظف بنجاح');
+      setStaffDialogOpen(false);
+      setStaffForm({ full_name: '', email: '', phone: '', password: '', role: 'cashier', branch_id: branches[0]?.id || '', job_title: '' });
+      fetchStaffData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في إنشاء الموظف');
+    }
+  };
+
+  const handleUpdateStaff = async (e) => {
+    e.preventDefault();
+    if (!editStaffForm) return;
+    try {
+      await axios.put(`${API}/staff/${editStaffForm.id}`, {
+        full_name: editStaffForm.full_name,
+        phone: editStaffForm.phone,
+        role: editStaffForm.role,
+        branch_id: editStaffForm.branch_id,
+        job_title: editStaffForm.job_title,
+        is_active: editStaffForm.is_active
+      });
+      toast.success('تم تحديث بيانات الموظف');
+      setEditStaffDialogOpen(false);
+      setEditStaffForm(null);
+      fetchStaffData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في تحديث الموظف');
+    }
+  };
+
+  const handleDeleteStaff = async (staffId) => {
+    if (!window.confirm('هل أنت متأكد من تعطيل هذا الموظف؟')) return;
+    try {
+      await axios.delete(`${API}/staff/${staffId}`);
+      toast.success('تم تعطيل الموظف');
+      fetchStaffData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في تعطيل الموظف');
+    }
+  };
+
+  const handleResetStaffPassword = async (staffId) => {
+    const newPassword = window.prompt('أدخل كلمة المرور الجديدة:');
+    if (!newPassword) return;
+    try {
+      await axios.post(`${API}/staff/${staffId}/reset-password`, { new_password: newPassword });
+      toast.success('تم تغيير كلمة المرور');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في تغيير كلمة المرور');
+    }
+  };
+
+  const getFilteredStaff = () => {
+    return staffList.filter(staff => {
+      if (staffFilter.branch_id && staff.branch_id !== staffFilter.branch_id) return false;
+      if (staffFilter.role && staff.role !== staffFilter.role) return false;
+      return true;
+    });
   };
 
   const handleCreateUser = async (e) => {
