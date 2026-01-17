@@ -37,7 +37,8 @@ import {
   Trash2,
   Link,
   UserCheck,
-  Maximize
+  Maximize,
+  ArrowLeftRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -53,6 +54,13 @@ import {
   TabsList,
   TabsTrigger,
 } from '../components/ui/tabs';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
 import DriverTrackingMap from '../components/DriverTrackingMap';
 
 const API = API_URL;
