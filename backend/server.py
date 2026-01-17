@@ -888,6 +888,8 @@ class OrderResponse(BaseModel):
     delivery_app_name: Optional[str] = None  # اسم شركة التوصيل
     delivery_commission: float = 0.0
     driver_id: Optional[str] = None
+    driver_name: Optional[str] = None  # اسم السائق
+    driver_phone: Optional[str] = None  # هاتف السائق
     notes: Optional[str] = None
     created_at: str
     updated_at: str
