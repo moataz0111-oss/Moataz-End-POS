@@ -1471,6 +1471,301 @@ export default function Settings() {
             </TabsContent>
           )}
 
+          {/* Staff Management - إدارة الموظفين والأدوار */}
+          {hasRole(['admin', 'manager']) && (
+            <TabsContent value="staff">
+              <Card className="border-border/50 bg-card">
+                <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-4">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <Users className="h-5 w-5" />
+                    إدارة الموظفين والأدوار
+                  </CardTitle>
+                  <div className="flex gap-2 flex-wrap">
+                    {/* فلترة بالفرع */}
+                    <Select value={staffFilter.branch_id} onValueChange={(val) => setStaffFilter({...staffFilter, branch_id: val === 'all' ? '' : val})}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="جميع الفروع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الفروع</SelectItem>
+                        {branches.map(branch => (
+                          <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {/* فلترة بالدور */}
+                    <Select value={staffFilter.role} onValueChange={(val) => setStaffFilter({...staffFilter, role: val === 'all' ? '' : val})}>
+                      <SelectTrigger className="w-[150px]">
+                        <SelectValue placeholder="جميع الأدوار" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الأدوار</SelectItem>
+                        {Object.entries(staffRoles).map(([key, name]) => (
+                          <SelectItem key={key} value={key}>{name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Dialog open={staffDialogOpen} onOpenChange={setStaffDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="bg-primary text-primary-foreground">
+                          <Plus className="h-4 w-4 ml-2" />
+                          إضافة موظف
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle className="text-foreground">إضافة موظف جديد</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleCreateStaff} className="space-y-4">
+                          <div>
+                            <Label className="text-foreground">الاسم الكامل *</Label>
+                            <Input
+                              value={staffForm.full_name}
+                              onChange={(e) => setStaffForm({ ...staffForm, full_name: e.target.value })}
+                              required
+                              className="bg-background border-input"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">البريد الإلكتروني *</Label>
+                            <Input
+                              type="email"
+                              value={staffForm.email}
+                              onChange={(e) => setStaffForm({ ...staffForm, email: e.target.value })}
+                              required
+                              className="bg-background border-input"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">رقم الهاتف</Label>
+                            <Input
+                              value={staffForm.phone}
+                              onChange={(e) => setStaffForm({ ...staffForm, phone: e.target.value })}
+                              className="bg-background border-input"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">كلمة المرور *</Label>
+                            <Input
+                              type="password"
+                              value={staffForm.password}
+                              onChange={(e) => setStaffForm({ ...staffForm, password: e.target.value })}
+                              required
+                              className="bg-background border-input"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-foreground">الدور الوظيفي *</Label>
+                            <Select value={staffForm.role} onValueChange={(val) => setStaffForm({...staffForm, role: val})}>
+                              <SelectTrigger className="bg-background border-input">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Object.entries(staffRoles).map(([key, name]) => (
+                                  <SelectItem key={key} value={key}>{name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-foreground">الفرع *</Label>
+                            <Select value={staffForm.branch_id} onValueChange={(val) => setStaffForm({...staffForm, branch_id: val})}>
+                              <SelectTrigger className="bg-background border-input">
+                                <SelectValue placeholder="اختر الفرع" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {branches.map(branch => (
+                                  <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground mt-1">الموظف سيرى فقط بيانات هذا الفرع</p>
+                          </div>
+                          <div>
+                            <Label className="text-foreground">المسمى الوظيفي (اختياري)</Label>
+                            <Input
+                              value={staffForm.job_title}
+                              onChange={(e) => setStaffForm({ ...staffForm, job_title: e.target.value })}
+                              placeholder="مثال: كاشير الوردية الصباحية"
+                              className="bg-background border-input"
+                            />
+                          </div>
+                          <div className="flex gap-2 pt-4">
+                            <Button type="button" variant="outline" onClick={() => setStaffDialogOpen(false)} className="flex-1">
+                              إلغاء
+                            </Button>
+                            <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                              إضافة الموظف
+                            </Button>
+                          </div>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {staffLoading ? (
+                    <div className="text-center py-8 text-muted-foreground">جاري التحميل...</div>
+                  ) : getFilteredStaff().length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      لا يوجد موظفين. اضغط "إضافة موظف" لإنشاء موظف جديد.
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="border-b border-border">
+                          <tr className="text-right">
+                            <th className="py-3 px-4 text-foreground font-medium">الاسم</th>
+                            <th className="py-3 px-4 text-foreground font-medium">البريد</th>
+                            <th className="py-3 px-4 text-foreground font-medium">الدور</th>
+                            <th className="py-3 px-4 text-foreground font-medium">الفرع</th>
+                            <th className="py-3 px-4 text-foreground font-medium">الحالة</th>
+                            <th className="py-3 px-4 text-foreground font-medium">الإجراءات</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {getFilteredStaff().map(staff => (
+                            <tr key={staff.id} className="border-b border-border/50 hover:bg-muted/50">
+                              <td className="py-3 px-4">
+                                <div>
+                                  <div className="font-medium text-foreground">{staff.full_name}</div>
+                                  {staff.job_title && <div className="text-xs text-muted-foreground">{staff.job_title}</div>}
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 text-muted-foreground">{staff.email}</td>
+                              <td className="py-3 px-4">
+                                <span className="px-2 py-1 rounded-full text-xs bg-primary/10 text-primary">
+                                  {staffRoles[staff.role] || staff.role}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 text-muted-foreground">{staff.branch_name || 'غير محدد'}</td>
+                              <td className="py-3 px-4">
+                                {staff.is_active !== false ? (
+                                  <span className="px-2 py-1 rounded-full text-xs bg-green-500/10 text-green-600">نشط</span>
+                                ) : (
+                                  <span className="px-2 py-1 rounded-full text-xs bg-red-500/10 text-red-600">معطل</span>
+                                )}
+                              </td>
+                              <td className="py-3 px-4">
+                                <div className="flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setEditStaffForm(staff);
+                                      setEditStaffDialogOpen(true);
+                                    }}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleResetStaffPassword(staff.id)}
+                                    title="تغيير كلمة المرور"
+                                  >
+                                    <Key className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-red-500 hover:text-red-600"
+                                    onClick={() => handleDeleteStaff(staff.id)}
+                                  >
+                                    <Ban className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* نافذة تعديل الموظف */}
+              <Dialog open={editStaffDialogOpen} onOpenChange={setEditStaffDialogOpen}>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-foreground">تعديل بيانات الموظف</DialogTitle>
+                  </DialogHeader>
+                  {editStaffForm && (
+                    <form onSubmit={handleUpdateStaff} className="space-y-4">
+                      <div>
+                        <Label className="text-foreground">الاسم الكامل</Label>
+                        <Input
+                          value={editStaffForm.full_name}
+                          onChange={(e) => setEditStaffForm({ ...editStaffForm, full_name: e.target.value })}
+                          className="bg-background border-input"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-foreground">رقم الهاتف</Label>
+                        <Input
+                          value={editStaffForm.phone || ''}
+                          onChange={(e) => setEditStaffForm({ ...editStaffForm, phone: e.target.value })}
+                          className="bg-background border-input"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-foreground">الدور الوظيفي</Label>
+                        <Select value={editStaffForm.role} onValueChange={(val) => setEditStaffForm({...editStaffForm, role: val})}>
+                          <SelectTrigger className="bg-background border-input">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(staffRoles).map(([key, name]) => (
+                              <SelectItem key={key} value={key}>{name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-foreground">الفرع</Label>
+                        <Select value={editStaffForm.branch_id} onValueChange={(val) => setEditStaffForm({...editStaffForm, branch_id: val})}>
+                          <SelectTrigger className="bg-background border-input">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {branches.map(branch => (
+                              <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1">الموظف سيرى فقط بيانات هذا الفرع</p>
+                      </div>
+                      <div>
+                        <Label className="text-foreground">المسمى الوظيفي</Label>
+                        <Input
+                          value={editStaffForm.job_title || ''}
+                          onChange={(e) => setEditStaffForm({ ...editStaffForm, job_title: e.target.value })}
+                          className="bg-background border-input"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={editStaffForm.is_active !== false}
+                          onCheckedChange={(checked) => setEditStaffForm({ ...editStaffForm, is_active: checked })}
+                        />
+                        <Label className="text-foreground">الحساب نشط</Label>
+                      </div>
+                      <div className="flex gap-2 pt-4">
+                        <Button type="button" variant="outline" onClick={() => setEditStaffDialogOpen(false)} className="flex-1">
+                          إلغاء
+                        </Button>
+                        <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
+                          حفظ التعديلات
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </DialogContent>
+              </Dialog>
+            </TabsContent>
+          )}
+
           {/* Branches */}
           {hasRole(['admin']) && (
             <TabsContent value="branches">
