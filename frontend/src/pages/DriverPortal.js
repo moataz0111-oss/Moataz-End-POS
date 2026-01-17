@@ -479,6 +479,19 @@ export default function DriverPortal() {
                 </Button>
               </div>
             )}
+            
+            {/* زر الرجوع إلى بوابة النظام */}
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <a href="/login">
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-gray-400 hover:text-primary hover:bg-primary/10"
+                >
+                  <LogIn className="h-4 w-4 ml-2 rotate-180" />
+                  الرجوع إلى بوابة النظام
+                </Button>
+              </a>
+            </div>
           </CardContent>
         </Card>
       </div>
