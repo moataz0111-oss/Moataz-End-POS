@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { formatPrice } from '../utils/currency';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Button } from '../components/ui/button';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Input } from '../components/ui/input';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   ArrowRight,
   Phone,
@@ -24,6 +32,7 @@ import {
   Headphones
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   Select,
   SelectContent,
@@ -32,7 +41,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = API_URL;
 
 export default function CallLogs() {
   const { user } = useAuth();

@@ -1,15 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { formatPrice } from '../utils/currency';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { playNewOrderNotification, playKitchenBell } from '../utils/sound';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Button } from '../components/ui/button';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Input } from '../components/ui/input';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { ScrollArea } from '../components/ui/scroll-area';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Switch } from '../components/ui/switch';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Label } from '../components/ui/label';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   ArrowRight,
   Search,
@@ -28,6 +40,7 @@ import {
   Bell
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   Dialog,
   DialogContent,
@@ -42,7 +55,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = API_URL;
 
 export default function Orders() {
   const { user } = useAuth();

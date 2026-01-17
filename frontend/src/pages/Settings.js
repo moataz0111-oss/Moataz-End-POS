@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useTheme } from '../context/ThemeContext';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { formatPrice } from '../utils/currency';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { 
   playClick, 
   playSuccess, 
@@ -13,11 +19,17 @@ import {
   saveSoundSettings
 } from '../utils/sound';
 import { Button } from '../components/ui/button';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Input } from '../components/ui/input';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Label } from '../components/ui/label';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Switch } from '../components/ui/switch';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Textarea } from '../components/ui/textarea';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   ArrowRight,
   Settings as SettingsIcon,
@@ -71,6 +83,7 @@ import {
   Globe
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   Dialog,
   DialogContent,
@@ -92,7 +105,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = API_URL;
 
 // قائمة الصلاحيات المتاحة - موسعة
 const AVAILABLE_PERMISSIONS = [

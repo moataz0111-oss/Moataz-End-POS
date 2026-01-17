@@ -1,13 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { formatPrice } from '../utils/currency';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { playClick, playSuccess } from '../utils/sound';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Button } from '../components/ui/button';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Input } from '../components/ui/input';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Card, CardContent } from '../components/ui/card';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { ScrollArea } from '../components/ui/scroll-area';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { 
   ArrowRight,
   Search,
@@ -41,6 +51,7 @@ import {
   Eye
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   Dialog,
   DialogContent,
@@ -61,7 +72,7 @@ import {
   TabsTrigger,
 } from '../components/ui/tabs';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = API_URL;
 
 export default function POS() {
   const { user } = useAuth();

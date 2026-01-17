@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Button } from '../components/ui/button';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { Input } from '../components/ui/input';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import { toast } from 'sonner';
+import { API_URL, BACKEND_URL } from '../utils/api';
 import {
   ArrowRight,
   Star,
@@ -26,7 +33,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = BACKEND_URL;
 
 export default function Reviews() {
   const navigate = useNavigate();
