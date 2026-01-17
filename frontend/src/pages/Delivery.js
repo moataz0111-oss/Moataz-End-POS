@@ -633,15 +633,14 @@ export default function Delivery() {
                               className="w-full border-amber-500 text-amber-500 hover:bg-amber-500/10"
                               onClick={(e) => { 
                                 e.stopPropagation(); 
-                                // إنشاء كائن طلب وهمي للتحويل
-                                setOrderToTransfer({
+                                // استدعاء الدالة التي تجلب السائقين وتفتح النافذة
+                                openTransferDriverDialog({
                                   id: driver.current_order_id,
                                   order_number: driver.current_order?.order_number || '---',
                                   total: driver.current_order?.total || 0,
                                   driver_id: driver.id,
                                   driver_name: driver.name
                                 });
-                                setTransferDriverDialogOpen(true);
                               }}
                               data-testid={`transfer-driver-order-${driver.id}`}
                             >
