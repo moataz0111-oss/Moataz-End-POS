@@ -3547,10 +3547,24 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
     
     # Assign driver if specified
     if order.driver_id:
-        await db.drivers.update_one(
-            {"id": order.driver_id},
-            {"$set": {"is_available": False, "current_order_id": order_doc["id"]}}
-        )
+        driver = await db.drivers.find_one({"id": order.driver_id}, {"_id": 0})
+        if driver:
+            # Update order with driver info
+            await db.orders.update_one(
+                {"id": order_doc["id"]},
+                {"$set": {
+                    "driver_name": driver.get("name"),
+                    "driver_phone": driver.get("phone")
+                }}
+            )
+            order_doc["driver_name"] = driver.get("name")
+            order_doc["driver_phone"] = driver.get("phone")
+            
+            # Update driver availability
+            await db.drivers.update_one(
+                {"id": order.driver_id},
+                {"$set": {"is_available": False, "current_order_id": order_doc["id"]}}
+            )
     
     # Deduct inventory
     for item in order.items:
