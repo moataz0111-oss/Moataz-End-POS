@@ -124,8 +124,13 @@ export const AuthProvider = ({ children }) => {
 
   const hasPermission = (permission) => {
     if (!user) return false;
+    // المدير (admin) لديه جميع الصلاحيات
     if (user.role === 'admin') return true;
+    // SuperAdmin لديه جميع الصلاحيات
+    if (user.role === 'super_admin') return true;
+    // إذا كانت صلاحية "all" موجودة
     if (user.permissions?.includes('all')) return true;
+    // التحقق من الصلاحية المحددة
     return user.permissions?.includes(permission);
   };
 
