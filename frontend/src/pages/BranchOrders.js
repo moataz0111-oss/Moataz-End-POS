@@ -47,7 +47,7 @@ import {
   TabsTrigger,
 } from '../components/ui/tabs';
 
-const API = BACKEND_URL;
+const API = BACKEND_URL + '/api';
 
 export default function BranchOrders() {
   const navigate = useNavigate();

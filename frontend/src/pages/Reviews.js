@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 
-const API = BACKEND_URL;
+const API = BACKEND_URL + '/api';
 
 export default function Reviews() {
   const navigate = useNavigate();
