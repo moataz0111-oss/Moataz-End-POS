@@ -357,9 +357,9 @@ export default function Delivery() {
     setTransferDriverDialogOpen(true);
   };
 
-  // السائقين المتاحين للتحويل (نشطين ومتاحين)
+  // السائقين المتاحين للتحويل (جميع السائقين ما عدا السائق الحالي)
   const availableDriversForTransfer = drivers.filter(
-    d => d.is_active && d.id !== orderToTransfer?.driver_id
+    d => d.id !== orderToTransfer?.driver_id
   );
 
   // تحديد طلب كمدفوع
