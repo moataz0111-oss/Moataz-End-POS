@@ -5959,6 +5959,260 @@ async def delete_login_background(background_id: str, current_user: dict = Depen
     
     return {"message": "تم حذف الخلفية"}
 
+# ==================== ROLES & STAFF MANAGEMENT - إدارة الأدوار والموظفين ====================
+# نظام إدارة الموظفين والصلاحيات للعملاء
+
+class StaffCreate(BaseModel):
+    """نموذج إنشاء موظف جديد"""
+    full_name: str
+    email: str
+    phone: Optional[str] = None
+    password: str
+    role: str = "cashier"  # cashier, supervisor, delivery, branch_manager
+    branch_id: str
+    job_title: Optional[str] = None  # المسمى الوظيفي المخصص
+
+class StaffUpdate(BaseModel):
+    """نموذج تحديث بيانات موظف"""
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    role: Optional[str] = None
+    branch_id: Optional[str] = None
+    job_title: Optional[str] = None
+    is_active: Optional[bool] = None
+
+class StaffResponse(BaseModel):
+    """نموذج الاستجابة لبيانات الموظف"""
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    full_name: str
+    email: str
+    phone: Optional[str] = None
+    role: str
+    branch_id: Optional[str] = None
+    branch_name: Optional[str] = None
+    job_title: Optional[str] = None
+    is_active: bool = True
+    last_login: Optional[str] = None
+    created_at: Optional[str] = None
+
+# الأدوار المتاحة للموظفين (غير Admin و SuperAdmin)
+STAFF_ROLES = {
+    "branch_manager": "مدير فرع",
+    "supervisor": "مشرف",
+    "cashier": "كاشير",
+    "delivery": "سائق توصيل",
+    "waiter": "جرسون",
+    "kitchen": "مطبخ"
+}
+
+@api_router.get("/staff/roles")
+async def get_staff_roles(current_user: dict = Depends(get_current_user)):
+    """جلب قائمة الأدوار المتاحة للموظفين"""
+    if current_user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    return STAFF_ROLES
+
+@api_router.get("/staff", response_model=List[StaffResponse])
+async def get_staff_members(
+    branch_id: Optional[str] = None,
+    role: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """جلب قائمة الموظفين - للعميل فقط"""
+    if current_user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user)
+    
+    # استثناء المستخدمين الرئيسيين (Admin و SuperAdmin)
+    query["role"] = {"$nin": [UserRole.ADMIN, UserRole.SUPER_ADMIN]}
+    
+    if branch_id:
+        query["branch_id"] = branch_id
+    if role:
+        query["role"] = role
+    
+    staff = await db.users.find(query, {"_id": 0, "password": 0}).to_list(500)
+    
+    # إضافة اسم الفرع لكل موظف
+    branch_ids = list(set([s.get("branch_id") for s in staff if s.get("branch_id")]))
+    branches = await db.branches.find({"id": {"$in": branch_ids}}, {"_id": 0, "id": 1, "name": 1}).to_list(100)
+    branch_map = {b["id"]: b["name"] for b in branches}
+    
+    for s in staff:
+        s["branch_name"] = branch_map.get(s.get("branch_id"), "غير محدد")
+    
+    return staff
+
+@api_router.post("/staff", response_model=StaffResponse)
+async def create_staff_member(staff: StaffCreate, current_user: dict = Depends(get_current_user)):
+    """إنشاء موظف جديد"""
+    if current_user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    # التحقق من أن الدور صحيح
+    if staff.role not in STAFF_ROLES:
+        raise HTTPException(status_code=400, detail=f"الدور غير صحيح. الأدوار المتاحة: {', '.join(STAFF_ROLES.keys())}")
+    
+    # التحقق من عدم تكرار البريد
+    existing = await db.users.find_one({"email": staff.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="البريد الإلكتروني مستخدم")
+    
+    # التحقق من الفرع
+    tenant_id = get_user_tenant_id(current_user)
+    branch_query = {"id": staff.branch_id}
+    if tenant_id:
+        branch_query["tenant_id"] = tenant_id
+    
+    branch = await db.branches.find_one(branch_query, {"_id": 0})
+    if not branch:
+        raise HTTPException(status_code=404, detail="الفرع غير موجود")
+    
+    # إنشاء الموظف
+    now = datetime.now(timezone.utc).isoformat()
+    staff_doc = {
+        "id": str(uuid.uuid4()),
+        "full_name": staff.full_name,
+        "username": staff.email.split("@")[0],
+        "email": staff.email,
+        "phone": staff.phone,
+        "password": hash_password(staff.password),
+        "role": staff.role,
+        "branch_id": staff.branch_id,
+        "job_title": staff.job_title or STAFF_ROLES.get(staff.role, staff.role),
+        "tenant_id": tenant_id,
+        "is_active": True,
+        "last_login": None,
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    await db.users.insert_one(staff_doc)
+    
+    # إزالة كلمة المرور من الاستجابة
+    del staff_doc["password"]
+    del staff_doc["_id"]
+    staff_doc["branch_name"] = branch.get("name", "")
+    
+    return staff_doc
+
+@api_router.get("/staff/{staff_id}", response_model=StaffResponse)
+async def get_staff_member(staff_id: str, current_user: dict = Depends(get_current_user)):
+    """جلب بيانات موظف محدد"""
+    if current_user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": staff_id})
+    staff = await db.users.find_one(query, {"_id": 0, "password": 0})
+    
+    if not staff:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # جلب اسم الفرع
+    if staff.get("branch_id"):
+        branch = await db.branches.find_one({"id": staff["branch_id"]}, {"_id": 0, "name": 1})
+        staff["branch_name"] = branch.get("name", "") if branch else ""
+    
+    return staff
+
+@api_router.put("/staff/{staff_id}", response_model=StaffResponse)
+async def update_staff_member(staff_id: str, update: StaffUpdate, current_user: dict = Depends(get_current_user)):
+    """تحديث بيانات موظف"""
+    if current_user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": staff_id})
+    staff = await db.users.find_one(query)
+    
+    if not staff:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # التحقق من أن الموظف ليس Admin أو SuperAdmin
+    if staff.get("role") in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="لا يمكن تعديل هذا المستخدم")
+    
+    # بناء التحديث
+    update_data = {}
+    if update.full_name is not None:
+        update_data["full_name"] = update.full_name
+    if update.phone is not None:
+        update_data["phone"] = update.phone
+    if update.role is not None:
+        if update.role not in STAFF_ROLES:
+            raise HTTPException(status_code=400, detail="الدور غير صحيح")
+        update_data["role"] = update.role
+    if update.branch_id is not None:
+        # التحقق من الفرع
+        tenant_id = get_user_tenant_id(current_user)
+        branch_query = {"id": update.branch_id}
+        if tenant_id:
+            branch_query["tenant_id"] = tenant_id
+        branch = await db.branches.find_one(branch_query)
+        if not branch:
+            raise HTTPException(status_code=404, detail="الفرع غير موجود")
+        update_data["branch_id"] = update.branch_id
+    if update.job_title is not None:
+        update_data["job_title"] = update.job_title
+    if update.is_active is not None:
+        update_data["is_active"] = update.is_active
+    
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.users.update_one(query, {"$set": update_data})
+    
+    # جلب البيانات المحدثة
+    updated_staff = await db.users.find_one({"id": staff_id}, {"_id": 0, "password": 0})
+    
+    # جلب اسم الفرع
+    if updated_staff.get("branch_id"):
+        branch = await db.branches.find_one({"id": updated_staff["branch_id"]}, {"_id": 0, "name": 1})
+        updated_staff["branch_name"] = branch.get("name", "") if branch else ""
+    
+    return updated_staff
+
+@api_router.delete("/staff/{staff_id}")
+async def delete_staff_member(staff_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف (تعطيل) موظف"""
+    if current_user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": staff_id})
+    staff = await db.users.find_one(query)
+    
+    if not staff:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # التحقق من أن الموظف ليس Admin أو SuperAdmin
+    if staff.get("role") in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="لا يمكن حذف هذا المستخدم")
+    
+    # تعطيل بدلاً من الحذف
+    await db.users.update_one(query, {"$set": {"is_active": False, "updated_at": datetime.now(timezone.utc).isoformat()}})
+    
+    return {"message": "تم تعطيل الموظف"}
+
+@api_router.post("/staff/{staff_id}/reset-password")
+async def reset_staff_password(staff_id: str, new_password: str = Body(..., embed=True), current_user: dict = Depends(get_current_user)):
+    """إعادة تعيين كلمة مرور موظف"""
+    if current_user.get("role") not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = build_tenant_query(current_user, {"id": staff_id})
+    staff = await db.users.find_one(query)
+    
+    if not staff:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # التحقق من أن الموظف ليس Admin أو SuperAdmin
+    if staff.get("role") in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="لا يمكن تعديل هذا المستخدم")
+    
+    await db.users.update_one(query, {"$set": {"password": hash_password(new_password), "updated_at": datetime.now(timezone.utc).isoformat()}})
+    
+    return {"message": "تم تغيير كلمة المرور"}
+
 # ==================== FILE UPLOAD ROUTES ====================
 
 async def process_and_save_image(file: UploadFile, target_dir: Path, max_size: tuple = (1920, 1080), quality: int = 85) -> str:
