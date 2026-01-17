@@ -103,25 +103,40 @@ export default function Login() {
   const [currentBgIndex, setCurrentBgIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
+  // Secret key for database initialization
+  const [initSecretKey, setInitSecretKey] = useState('');
+  
   const { login } = useAuth();
   const navigate = useNavigate();
   
-  // Function to initialize database
+  // Function to initialize database - requires secret key
   const initializeDatabase = async () => {
+    // Validate secret key
+    if (initSecretKey !== '271018') {
+      setDbInitResult({
+        success: false,
+        error: 'مفتاح التهيئة غير صحيح'
+      });
+      return;
+    }
+    
     setDbInitLoading(true);
     setDbInitResult(null);
     try {
       const res = await axios.get(`${API}/init-db`);
       setDbInitResult({
         success: true,
-        data: res.data
+        message: res.data.status === 'already_initialized' 
+          ? 'قاعدة البيانات مهيأة مسبقاً' 
+          : 'تم تهيئة قاعدة البيانات بنجاح'
       });
-      // Show success for 3 seconds then allow login
+      // Hide panel after success
       setTimeout(() => {
         setShowDbInit(false);
         setError('');
         setLoginFailCount(0);
-      }, 5000);
+        setInitSecretKey('');
+      }, 3000);
     } catch (err) {
       setDbInitResult({
         success: false,
