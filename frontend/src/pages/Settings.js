@@ -862,7 +862,7 @@ export default function Settings() {
                   المستخدمين
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'manager']) && (
+              {hasRole(['admin']) && (
                 <TabsTrigger 
                   value="staff"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
