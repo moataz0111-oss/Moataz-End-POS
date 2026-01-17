@@ -26,7 +26,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+import { API_URL } from '../utils/api';
+const API = API_URL;
 
 export default function BiometricDevices({ branches = [] }) {
   const [devices, setDevices] = useState([]);

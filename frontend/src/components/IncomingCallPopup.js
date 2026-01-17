@@ -6,7 +6,8 @@ import { Card } from './ui/card';
 import { formatPrice } from '../utils/currency';
 import { getSoundSettings } from '../utils/sound';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+import { API_URL } from '../utils/api';
+const API = API_URL;
 
 export default function IncomingCallPopup() {
   const navigate = useNavigate();

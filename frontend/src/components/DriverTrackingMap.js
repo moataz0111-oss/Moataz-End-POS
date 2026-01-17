@@ -24,7 +24,8 @@ import {
 import axios from 'axios';
 import { toast } from 'sonner';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+import { API_URL } from '../utils/api';
+const API = API_URL;
 
 // خريطة تتبع السائقين المتقدمة
 export default function DriverTrackingMap({ 
