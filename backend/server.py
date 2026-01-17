@@ -4406,6 +4406,76 @@ async def collect_driver_payment(driver_id: str, amount: float = 0, current_user
         "orders_updated": result.modified_count
     }
 
+@api_router.post("/orders/{order_id}/transfer-driver")
+async def transfer_order_to_driver(
+    order_id: str,
+    new_driver_id: str = Body(..., embed=True),
+    current_user: dict = Depends(get_current_user)
+):
+    """تحويل الطلب من سائق إلى آخر"""
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    if order.get("status") == "delivered":
+        raise HTTPException(status_code=400, detail="لا يمكن تحويل طلب تم تسليمه")
+    
+    # التحقق من السائق الجديد
+    new_driver = await db.drivers.find_one({"id": new_driver_id})
+    if not new_driver:
+        raise HTTPException(status_code=404, detail="السائق الجديد غير موجود")
+    
+    if not new_driver.get("is_active"):
+        raise HTTPException(status_code=400, detail="السائق الجديد غير نشط")
+    
+    old_driver_id = order.get("driver_id")
+    old_driver_name = order.get("driver_name", "غير معين")
+    
+    # تحديث الطلب
+    await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {
+            "driver_id": new_driver_id,
+            "driver_name": new_driver.get("name"),
+            "driver_phone": new_driver.get("phone"),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "transfer_driver_history": {
+                "from_driver_id": old_driver_id,
+                "from_driver_name": old_driver_name,
+                "to_driver_id": new_driver_id,
+                "to_driver_name": new_driver.get("name"),
+                "transferred_at": datetime.now(timezone.utc).isoformat(),
+                "transferred_by": current_user["id"]
+            }
+        }}
+    )
+    
+    # تحديث حالة السائق القديم إذا كان موجوداً
+    if old_driver_id:
+        remaining = await db.orders.count_documents({
+            "driver_id": old_driver_id,
+            "status": {"$in": ["out_for_delivery", "preparing"]}
+        })
+        if remaining == 0:
+            await db.drivers.update_one(
+                {"id": old_driver_id},
+                {"$set": {"current_status": "available"}}
+            )
+    
+    # تحديث حالة السائق الجديد
+    await db.drivers.update_one(
+        {"id": new_driver_id},
+        {"$set": {"current_status": "on_delivery"}}
+    )
+    
+    logger.info(f"Order {order_id} transferred from driver {old_driver_name} to {new_driver.get('name')}")
+    
+    return {
+        "message": f"تم تحويل الطلب من {old_driver_name} إلى {new_driver.get('name')}",
+        "old_driver": old_driver_name,
+        "new_driver": new_driver.get("name")
+    }
+
 # ==================== DRIVER PORTAL APIs - صفحة السائق على الهاتف ====================
 
 @api_router.get("/drivers/portal/{driver_id}")
