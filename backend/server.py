@@ -4213,6 +4213,7 @@ async def create_driver(driver: DriverCreate, current_user: dict = Depends(get_c
         "id": str(uuid.uuid4()),
         **driver.model_dump(),
         "tenant_id": get_user_tenant_id(current_user),  # فصل البيانات
+        "is_active": True,  # تفعيل السائق تلقائياً
         "is_available": True,
         "current_order_id": None,
         "total_deliveries": 0
