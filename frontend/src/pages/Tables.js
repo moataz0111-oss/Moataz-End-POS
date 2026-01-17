@@ -17,7 +17,9 @@ import {
   Trash2,
   Check,
   X,
-  Clock
+  Clock,
+  ArrowLeftRight,
+  MoveRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -28,6 +30,13 @@ import {
   DialogTrigger,
 } from '../components/ui/dialog';
 import { Label } from '../components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/select';
 
 const API = API_URL;
 
@@ -42,6 +51,11 @@ export default function Tables() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
   const [formData, setFormData] = useState({ number: '', capacity: 4, section: '' });
+  
+  // حالات تحويل الطاولة
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
+  const [selectedTableForTransfer, setSelectedTableForTransfer] = useState(null);
+  const [targetTableId, setTargetTableId] = useState('');
 
   useEffect(() => {
     fetchData();
