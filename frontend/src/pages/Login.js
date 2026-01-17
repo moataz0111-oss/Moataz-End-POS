@@ -7,8 +7,9 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Lock, Mail, Eye, EyeOff, AlertCircle, Database, CheckCircle, Loader2, Truck } from 'lucide-react';
 import axios from 'axios';
+import { API_URL } from '../utils/api';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = API_URL;
 
 // خلفيات افتراضية في حالة فشل جلب الخلفيات من الخادم
 const DEFAULT_BACKGROUNDS = {
