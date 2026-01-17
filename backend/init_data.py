@@ -164,6 +164,14 @@ async def init_database():
     else:
         print("ℹ️ Default tenant settings already exist")
     
+    # ==================== 8. تفعيل السائقين الموجودين ====================
+    result = await db.drivers.update_many(
+        {"is_active": {"$exists": False}},
+        {"$set": {"is_active": True}}
+    )
+    if result.modified_count > 0:
+        print(f"✅ Activated {result.modified_count} existing drivers")
+    
     print("\n🎉 Database initialization complete!")
     print("=" * 50)
     print("📋 Login Credentials:")
