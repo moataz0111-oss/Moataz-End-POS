@@ -130,9 +130,22 @@ const AVAILABLE_PERMISSIONS = [
 const PERMISSION_GROUPS = [...new Set(AVAILABLE_PERMISSIONS.map(p => p.group))];
 
 export default function Settings() {
-  const { user, hasRole, logout } = useAuth();
+  const { user, hasRole, logout, hasPermission } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  
+  // دالة للتحقق من صلاحيات الإعدادات
+  const hasSettingsPermission = (permissionId) => {
+    // المدير (admin) لديه جميع الصلاحيات
+    if (user?.role === 'admin' || user?.role === 'super_admin') return true;
+    // مدير الفرع لديه معظم الصلاحيات
+    if (user?.role === 'branch_manager') return true;
+    // التحقق من صلاحيات الموظف
+    if (user?.permissions && user.permissions.length > 0) {
+      return user.permissions.includes(permissionId);
+    }
+    return false;
+  };
   
   const [users, setUsers] = useState([]);
   const [branches, setBranches] = useState([]);
