@@ -6,11 +6,18 @@ const getBackendUrl = () => {
   if (typeof window !== 'undefined' && window.location.hostname.includes('.emergent.host')) {
     return window.location.origin;
   }
-  // في بيئة المعاينة أو التطوير
+  
+  // في بيئة المعاينة (preview.emergentagent.com)
+  if (typeof window !== 'undefined' && window.location.hostname.includes('.emergentagent.com')) {
+    return window.location.origin;
+  }
+  
+  // في بيئة التطوير، استخدم REACT_APP_BACKEND_URL
   if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_BACKEND_URL) {
     return process.env.REACT_APP_BACKEND_URL;
   }
-  // Fallback
+  
+  // Fallback للبيئة المحلية
   return typeof window !== 'undefined' ? window.location.origin : '';
 };
 
