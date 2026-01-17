@@ -376,7 +376,7 @@ export default function DriverPortal() {
                 <Truck className="h-10 w-10 text-green-500" />
               </div>
               <h1 className="text-2xl font-bold text-white">بوابة السائق</h1>
-              <p className="text-gray-400 text-sm mt-1">Maestro EGP</p>
+              <p className="text-gray-400 text-sm mt-1">Maestro Espedo</p>
             </div>
 
             {/* Login Form */}
