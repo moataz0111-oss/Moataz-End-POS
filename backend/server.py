@@ -322,11 +322,7 @@ async def initialize_database_endpoint():
             
             return {
                 "status": "already_initialized",
-                "message": "قاعدة البيانات مهيأة مسبقاً",
-                "credentials": {
-                    "super_admin": "owner@maestroegp.com / owner123 (مفتاح السر: 271018)",
-                    "admin": "admin@maestroegp.com / admin123"
-                }
+                "message": "قاعدة البيانات مهيأة مسبقاً"
             }
         
         # إنشاء Super Admin
@@ -439,23 +435,17 @@ async def initialize_database_endpoint():
         }
         await db.settings.insert_one(bg_doc)
         
+        # Log credentials to server logs only (not in response)
+        logger.info("=" * 50)
+        logger.info("🎉 DATABASE INITIALIZED - CREDENTIALS (check server logs):")
+        logger.info("   Super Admin: owner@maestroegp.com / owner123")
+        logger.info("   Secret Key: 271018")
+        logger.info("   Main Admin: admin@maestroegp.com / admin123")
+        logger.info("=" * 50)
+        
         return {
             "status": "success",
-            "message": "تم تهيئة قاعدة البيانات بنجاح!",
-            "backgrounds_count": 6,
-            "credentials": {
-                "super_admin": {
-                    "url": "/super-admin",
-                    "email": "owner@maestroegp.com",
-                    "password": "owner123",
-                    "secret_key": "271018"
-                },
-                "admin": {
-                    "url": "/login",
-                    "email": "admin@maestroegp.com",
-                    "password": "admin123"
-                }
-            }
+            "message": "تم تهيئة قاعدة البيانات بنجاح! تحقق من البريد الإلكتروني أو تواصل مع مزود الخدمة للحصول على بيانات الدخول."
         }
         
     except Exception as e:
