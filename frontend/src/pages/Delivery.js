@@ -144,7 +144,7 @@ export default function Delivery() {
   const fetchData = async () => {
     try {
       const [driversRes, ordersRes, branchesRes] = await Promise.all([
-        axios.get(`${API}/drivers`, { params: { branch_id: selectedBranch } }),
+        axios.get(`${API}/drivers`, { params: { branch_id: selectedBranch, include_orders: true } }),
         axios.get(`${API}/orders`, { params: { branch_id: selectedBranch, status: 'ready' } }),
         axios.get(`${API}/branches`)
       ]);
