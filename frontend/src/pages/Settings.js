@@ -1606,6 +1606,33 @@ export default function Settings() {
                               className="bg-background border-input"
                             />
                           </div>
+                          
+                          {/* صلاحيات الموظف */}
+                          <div>
+                            <Label className="text-foreground mb-2 block">الصلاحيات</Label>
+                            <div className="border rounded-lg p-3 max-h-48 overflow-y-auto bg-muted/30">
+                              <div className="grid grid-cols-2 gap-2">
+                                {STAFF_PERMISSIONS.map(perm => (
+                                  <div key={perm.id} className="flex items-center gap-2">
+                                    <Switch
+                                      checked={staffForm.permissions?.includes(perm.id)}
+                                      onCheckedChange={(checked) => {
+                                        const newPerms = checked 
+                                          ? [...(staffForm.permissions || []), perm.id]
+                                          : (staffForm.permissions || []).filter(p => p !== perm.id);
+                                        setStaffForm({ ...staffForm, permissions: newPerms });
+                                      }}
+                                    />
+                                    <div>
+                                      <span className="text-sm text-foreground">{perm.name}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">حدد الصفحات التي يمكن للموظف رؤيتها</p>
+                          </div>
+                          
                           <div className="flex gap-2 pt-4">
                             <Button type="button" variant="outline" onClick={() => setStaffDialogOpen(false)} className="flex-1">
                               إلغاء
