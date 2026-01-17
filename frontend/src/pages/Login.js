@@ -534,7 +534,7 @@ export default function Login() {
             <div className="text-center pt-4 space-y-2">
               <button 
                 type="button"
-                onClick={() => toast.info('يرجى التواصل مع مدير النظام لإعادة تعيين كلمة المرور')}
+                onClick={() => alert('يرجى التواصل مع مدير النظام لإعادة تعيين كلمة المرور')}
                 className="text-sm text-gray-400 hover:text-primary transition-colors block w-full"
               >
                 نسيت كلمة المرور؟
@@ -545,6 +545,16 @@ export default function Login() {
               >
                 بوابة السائقين
               </a>
+              
+              {/* Direct database init button - always visible */}
+              <button 
+                type="button"
+                onClick={() => setShowDbInit(true)}
+                className="text-xs text-gray-600 hover:text-amber-400 transition-colors block w-full mt-4"
+                data-testid="show-db-init-link"
+              >
+                أول استخدام؟ تهيئة قاعدة البيانات
+              </button>
             </div>
           </form>
         </CardContent>
