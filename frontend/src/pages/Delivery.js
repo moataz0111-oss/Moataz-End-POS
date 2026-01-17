@@ -327,6 +327,41 @@ export default function Delivery() {
     }
   };
 
+  // تحويل الطلب لسائق آخر
+  const handleTransferDriver = async () => {
+    if (!orderToTransfer || !targetDriverId) {
+      toast.error('الرجاء اختيار السائق');
+      return;
+    }
+    
+    try {
+      await axios.post(`${API}/orders/${orderToTransfer.id}/transfer-driver`, {
+        new_driver_id: targetDriverId
+      });
+      toast.success('تم تحويل الطلب للسائق الجديد');
+      setTransferDriverDialogOpen(false);
+      setOrderToTransfer(null);
+      setTargetDriverId('');
+      fetchData();
+      if (selectedDriver) {
+        fetchDriverOrders(selectedDriver.id);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في تحويل الطلب');
+    }
+  };
+
+  // فتح نافذة تحويل السائق
+  const openTransferDriverDialog = (order) => {
+    setOrderToTransfer(order);
+    setTransferDriverDialogOpen(true);
+  };
+
+  // السائقين المتاحين للتحويل (نشطين ومتاحين)
+  const availableDriversForTransfer = drivers.filter(
+    d => d.is_active && d.id !== orderToTransfer?.driver_id
+  );
+
   // تحديد طلب كمدفوع
   const markOrderAsPaid = async (orderId) => {
     try {
