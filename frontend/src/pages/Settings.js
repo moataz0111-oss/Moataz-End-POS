@@ -1794,6 +1794,33 @@ export default function Settings() {
                         />
                         <Label className="text-foreground">الحساب نشط</Label>
                       </div>
+                      
+                      {/* صلاحيات الموظف */}
+                      <div>
+                        <Label className="text-foreground mb-2 block">الصلاحيات</Label>
+                        <div className="border rounded-lg p-3 max-h-48 overflow-y-auto bg-muted/30">
+                          <div className="grid grid-cols-2 gap-2">
+                            {STAFF_PERMISSIONS.map(perm => (
+                              <div key={perm.id} className="flex items-center gap-2">
+                                <Switch
+                                  checked={editStaffForm.permissions?.includes(perm.id)}
+                                  onCheckedChange={(checked) => {
+                                    const newPerms = checked 
+                                      ? [...(editStaffForm.permissions || []), perm.id]
+                                      : (editStaffForm.permissions || []).filter(p => p !== perm.id);
+                                    setEditStaffForm({ ...editStaffForm, permissions: newPerms });
+                                  }}
+                                />
+                                <div>
+                                  <span className="text-sm text-foreground">{perm.name}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">حدد الصفحات التي يمكن للموظف رؤيتها</p>
+                      </div>
+                      
                       <div className="flex gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={() => setEditStaffDialogOpen(false)} className="flex-1">
                           إلغاء
