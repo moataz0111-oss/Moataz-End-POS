@@ -1167,7 +1167,7 @@ export default function Settings() {
           )}
 
           {/* Users */}
-          {hasRole(['admin', 'manager', 'branch_manager']) && (
+          {hasRole(['admin']) && (
             <TabsContent value="users">
               <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-row items-center justify-between">
