@@ -6161,6 +6161,8 @@ async def update_staff_member(staff_id: str, update: StaffUpdate, current_user: 
         update_data["job_title"] = update.job_title
     if update.is_active is not None:
         update_data["is_active"] = update.is_active
+    if update.permissions is not None:
+        update_data["permissions"] = update.permissions
     
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
