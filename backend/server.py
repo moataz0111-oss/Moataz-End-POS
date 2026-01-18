@@ -11853,7 +11853,7 @@ async def get_menu_link(current_user: dict = Depends(get_current_user)):
         }
         await db.tenants.insert_one(tenant)
     
-    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://foodops-pro.preview.emergentagent.com')
+    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://restoadmin-2.preview.emergentagent.com')
     menu_url = f"{base_url}/menu/{tenant.get('menu_slug', tenant_id)}"
     
     return {
