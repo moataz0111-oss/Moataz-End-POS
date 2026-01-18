@@ -27,7 +27,8 @@ import {
   XCircle,
   Percent,
   CreditCard,
-  Clock
+  Clock,
+  FileSpreadsheet
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
