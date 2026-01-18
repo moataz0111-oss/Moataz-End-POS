@@ -390,10 +390,90 @@ export default function Settings() {
       
       // جلب الموظفين والأدوار
       fetchStaffData();
+      
+      // جلب إعدادات الدفع
+      fetchPaymentSettings();
     } catch (error) {
       console.error('Failed to fetch settings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // جلب إعدادات الدفع
+  const fetchPaymentSettings = async () => {
+    try {
+      const res = await axios.get(`${API}/payment-settings`);
+      setPaymentSettings(prev => ({ ...prev, ...res.data }));
+    } catch (error) {
+      console.error('Failed to fetch payment settings:', error);
+    }
+  };
+
+  // حفظ إعدادات Stripe
+  const saveStripeSettings = async () => {
+    try {
+      setPaymentSaving(true);
+      await axios.post(`${API}/payment-settings`, {
+        stripe_enabled: paymentSettings.stripe_enabled,
+        stripe_publishable_key: paymentSettings.stripe_publishable_key,
+        stripe_secret_key: paymentSettings.stripe_secret_key,
+        stripe_currency: paymentSettings.stripe_currency,
+        stripe_mode: paymentSettings.stripe_mode
+      });
+      toast.success('تم حفظ إعدادات Stripe بنجاح');
+    } catch (error) {
+      toast.error('فشل في حفظ إعدادات Stripe');
+    } finally {
+      setPaymentSaving(false);
+    }
+  };
+
+  // حفظ إعدادات زين كاش
+  const saveZainCashSettings = async () => {
+    try {
+      setPaymentSaving(true);
+      await axios.post(`${API}/payment-settings`, {
+        zaincash_enabled: paymentSettings.zaincash_enabled,
+        zaincash_phone: paymentSettings.zaincash_phone,
+        zaincash_name: paymentSettings.zaincash_name
+      });
+      toast.success('تم حفظ إعدادات زين كاش بنجاح');
+    } catch (error) {
+      toast.error('فشل في حفظ إعدادات زين كاش');
+    } finally {
+      setPaymentSaving(false);
+    }
+  };
+
+  // حفظ رسوم التوصيل
+  const saveDeliverySettings = async () => {
+    try {
+      setPaymentSaving(true);
+      await axios.post(`${API}/payment-settings`, {
+        delivery_fee: paymentSettings.delivery_fee,
+        min_order_amount: paymentSettings.min_order_amount
+      });
+      toast.success('تم حفظ رسوم التوصيل بنجاح');
+    } catch (error) {
+      toast.error('فشل في حفظ رسوم التوصيل');
+    } finally {
+      setPaymentSaving(false);
+    }
+  };
+
+  // رفع صورة QR لزين كاش
+  const uploadZainCashQR = async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await axios.post(`${API}/payment-settings/zaincash-qr`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setPaymentSettings(prev => ({ ...prev, zaincash_qr_image: res.data.image_url }));
+      toast.success('تم رفع صورة QR بنجاح');
+    } catch (error) {
+      toast.error('فشل في رفع الصورة');
     }
   };
 
