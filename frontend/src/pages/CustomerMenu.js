@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -28,18 +28,105 @@ import {
   CheckCircle,
   Truck,
   ChefHat,
-  X,
   ArrowRight,
+  ArrowLeft,
   Search,
   Download,
+  Store,
+  Navigation,
+  Loader2,
+  X,
   Smartphone,
-  Share2
+  Wallet
 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix Leaflet marker icon
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
+// ==================== LOCATION PICKER COMPONENT ====================
+function LocationPicker({ position, setPosition, onClose }) {
+  const [loading, setLoading] = useState(false);
+
+  const MapClickHandler = () => {
+    useMapEvents({
+      click: (e) => {
+        setPosition([e.latlng.lat, e.latlng.lng]);
+      },
+    });
+    return null;
+  };
+
+  const getCurrentLocation = () => {
+    setLoading(true);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setPosition([pos.coords.latitude, pos.coords.longitude]);
+          setLoading(false);
+        },
+        (error) => {
+          toast.error('فشل في تحديد الموقع');
+          setLoading(false);
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      toast.error('المتصفح لا يدعم تحديد الموقع');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        <Button 
+          variant="outline" 
+          onClick={getCurrentLocation}
+          disabled={loading}
+          className="flex-1"
+        >
+          {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Navigation className="h-4 w-4 ml-2" />}
+          موقعي الحالي
+        </Button>
+      </div>
+      <div className="h-[300px] rounded-lg overflow-hidden border">
+        <MapContainer
+          center={position || [33.3152, 44.3661]} // Baghdad default
+          zoom={13}
+          className="h-full w-full"
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; OpenStreetMap'
+          />
+          <MapClickHandler />
+          {position && <Marker position={position} />}
+        </MapContainer>
+      </div>
+      <p className="text-xs text-muted-foreground text-center">
+        انقر على الخريطة لتحديد موقع التوصيل
+      </p>
+    </div>
+  );
+}
+
+// ==================== MAIN COMPONENT ====================
 export default function CustomerMenu() {
   const { tenantId } = useParams();
+  const [searchParams] = useSearchParams();
+  
+  // App States
+  const [step, setStep] = useState('branches'); // branches, menu, cart, checkout, tracking
   const [restaurant, setRestaurant] = useState(null);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -47,35 +134,82 @@ export default function CustomerMenu() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCart, setShowCart] = useState(false);
-  const [showCheckout, setShowCheckout] = useState(false);
-  const [showTracking, setShowTracking] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState(null);
   
-  // بيانات العميل
+  // Customer Info
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryNotes, setDeliveryNotes] = useState('');
+  const [deliveryLocation, setDeliveryLocation] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cash');
-  const [selectedBranch, setSelectedBranch] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showMap, setShowMap] = useState(false);
+  
+  // PWA
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+  
+  // Payment
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [savedCards, setSavedCards] = useState([]);
+  const [saveCard, setSaveCard] = useState(false);
+
+  // Check payment status on return from Stripe
+  useEffect(() => {
+    const sessionId = searchParams.get('session_id');
+    const paymentSuccess = searchParams.get('payment_success');
+    const paymentCancelled = searchParams.get('payment_cancelled');
+    
+    if (sessionId && paymentSuccess) {
+      pollPaymentStatus(sessionId);
+    } else if (paymentCancelled) {
+      toast.error('تم إلغاء عملية الدفع');
+    }
+  }, [searchParams]);
+
+  const pollPaymentStatus = async (sessionId, attempts = 0) => {
+    const maxAttempts = 10;
+    if (attempts >= maxAttempts) {
+      toast.error('انتهت مهلة التحقق من الدفع');
+      return;
+    }
+    
+    try {
+      const res = await axios.get(`${API}/payments/status/${sessionId}`);
+      if (res.data.payment_status === 'paid') {
+        toast.success('تم الدفع بنجاح! ');
+        // جلب تفاصيل الطلب
+        if (res.data.order_id) {
+          const orderRes = await axios.get(`${API}/customer/order/${tenantId}/${res.data.order_id}`);
+          setCurrentOrder(orderRes.data.order);
+          setStep('tracking');
+          setCart([]);
+          localStorage.removeItem(`cart_${tenantId}`);
+        }
+      } else if (res.data.status === 'expired') {
+        toast.error('انتهت صلاحية جلسة الدفع');
+      } else {
+        // Continue polling
+        setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), 2000);
+      }
+    } catch (error) {
+      console.error('Payment status error:', error);
+    }
+  };
 
   // PWA Install handling
   useEffect(() => {
     const handler = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      // إظهار بانر التثبيت بعد 3 ثواني
       setTimeout(() => setShowInstallBanner(true), 3000);
     };
     
     window.addEventListener('beforeinstallprompt', handler);
     
-    // التحقق من iOS
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     
@@ -100,23 +234,37 @@ export default function CustomerMenu() {
 
   useEffect(() => {
     fetchMenu();
-    // تحميل السلة من localStorage
+    loadSavedData();
+  }, [tenantId]);
+
+  const loadSavedData = () => {
+    // Load cart
     const savedCart = localStorage.getItem(`cart_${tenantId}`);
     if (savedCart) {
       setCart(JSON.parse(savedCart));
     }
     
-    // تحميل بيانات العميل المحفوظة
+    // Load customer info
     const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
     if (savedCustomer) {
       const data = JSON.parse(savedCustomer);
       setCustomerName(data.name || '');
       setCustomerPhone(data.phone || '');
       setDeliveryAddress(data.address || '');
+      if (data.location) {
+        setDeliveryLocation(data.location);
+      }
     }
-  }, [tenantId]);
+    
+    // Load selected branch
+    const savedBranch = localStorage.getItem(`branch_${tenantId}`);
+    if (savedBranch) {
+      setSelectedBranch(savedBranch);
+      setStep('menu');
+    }
+  };
 
-  // حفظ السلة في localStorage
+  // Save cart
   useEffect(() => {
     localStorage.setItem(`cart_${tenantId}`, JSON.stringify(cart));
   }, [cart, tenantId]);
@@ -129,22 +277,15 @@ export default function CustomerMenu() {
       setProducts(res.data.products);
       setBranches(res.data.branches || []);
       
-      // تحديث عنوان الصفحة بشعار المطعم
       if (res.data.restaurant?.name) {
         document.title = res.data.restaurant.name + ' - القائمة';
       }
       
-      // تحديث أيقونة الصفحة إذا كان هناك شعار
-      if (res.data.restaurant?.logo) {
-        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-        link.type = 'image/x-icon';
-        link.rel = 'shortcut icon';
-        link.href = res.data.restaurant.logo;
-        document.getElementsByTagName('head')[0].appendChild(link);
-      }
-      
-      if (res.data.branches?.length > 0) {
+      // If only one branch, auto-select it
+      if (res.data.branches?.length === 1) {
         setSelectedBranch(res.data.branches[0].id);
+        localStorage.setItem(`branch_${tenantId}`, res.data.branches[0].id);
+        setStep('menu');
       }
       
       if (res.data.categories?.length > 0) {
@@ -157,12 +298,19 @@ export default function CustomerMenu() {
     }
   };
 
+  const selectBranch = (branchId) => {
+    setSelectedBranch(branchId);
+    localStorage.setItem(`branch_${tenantId}`, branchId);
+    setStep('menu');
+  };
+
   const filteredProducts = products.filter(p => {
+    const matchesBranch = !selectedBranch || !p.branch_id || p.branch_id === selectedBranch;
     const matchesCategory = !selectedCategory || p.category_id === selectedCategory;
     const matchesSearch = !searchQuery || 
       p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.name_en?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesBranch && matchesCategory && matchesSearch;
   });
 
   const addToCart = (product) => {
@@ -204,9 +352,24 @@ export default function CustomerMenu() {
   const deliveryFee = restaurant?.delivery_fee || 0;
   const grandTotal = cartTotal + deliveryFee;
 
+  // Save customer info
+  const saveCustomerInfo = () => {
+    localStorage.setItem(`customer_${tenantId}`, JSON.stringify({
+      name: customerName,
+      phone: customerPhone,
+      address: deliveryAddress,
+      location: deliveryLocation
+    }));
+  };
+
   const handleSubmitOrder = async () => {
-    if (!customerName || !customerPhone || !deliveryAddress) {
-      toast.error('يرجى ملء جميع الحقول المطلوبة');
+    if (!customerName || !customerPhone) {
+      toast.error('يرجى إدخال الاسم ورقم الهاتف');
+      return;
+    }
+
+    if (!deliveryAddress && !deliveryLocation) {
+      toast.error('يرجى إدخال عنوان التوصيل أو تحديده على الخريطة');
       return;
     }
 
@@ -216,8 +379,10 @@ export default function CustomerMenu() {
     }
 
     setSubmitting(true);
+    saveCustomerInfo();
+
     try {
-      const res = await axios.post(`${API}/customer/order/${tenantId}`, {
+      const orderData = {
         items: cart.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
@@ -225,18 +390,52 @@ export default function CustomerMenu() {
         })),
         delivery_address: deliveryAddress,
         delivery_notes: deliveryNotes,
+        delivery_location: deliveryLocation ? {
+          lat: deliveryLocation[0],
+          lng: deliveryLocation[1]
+        } : null,
         payment_method: paymentMethod,
         customer_name: customerName,
         customer_phone: customerPhone,
         branch_id: selectedBranch
-      });
+      };
+
+      const res = await axios.post(`${API}/customer/order/${tenantId}`, orderData);
 
       if (res.data.success) {
+        // If card payment, redirect to Stripe
+        if (paymentMethod === 'card') {
+          setProcessingPayment(true);
+          try {
+            const paymentRes = await axios.post(
+              `${API}/payments/create-checkout/${tenantId}`,
+              null,
+              {
+                params: {
+                  order_id: res.data.order.id,
+                  amount: grandTotal / 1000, // Convert IQD to USD approximate
+                  customer_phone: customerPhone,
+                  save_card: saveCard
+                }
+              }
+            );
+            
+            if (paymentRes.data.checkout_url) {
+              window.location.href = paymentRes.data.checkout_url;
+              return;
+            }
+          } catch (payError) {
+            toast.error('فشل في إنشاء جلسة الدفع');
+            setProcessingPayment(false);
+            return;
+          }
+        }
+
+        // Cash payment - show tracking
         toast.success(res.data.message);
         setCurrentOrder(res.data.order);
         setCart([]);
-        setShowCheckout(false);
-        setShowTracking(true);
+        setStep('tracking');
         localStorage.removeItem(`cart_${tenantId}`);
       }
     } catch (error) {
@@ -246,424 +445,685 @@ export default function CustomerMenu() {
     }
   };
 
-  const trackOrder = async (orderId) => {
-    try {
-      const res = await axios.get(`${API}/customer/order/${tenantId}/${orderId}`);
-      setCurrentOrder(res.data.order);
-      setShowTracking(true);
-    } catch (error) {
-      toast.error('فشل في جلب حالة الطلب');
-    }
-  };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('ar-IQ').format(price) + ' د.ع';
   };
 
+  const getSelectedBranchName = () => {
+    const branch = branches.find(b => b.id === selectedBranch);
+    return branch?.name || '';
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">جاري تحميل القائمة...</p>
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">جاري تحميل القائمة...</p>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background pb-24" dir="rtl">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-primary text-primary-foreground shadow-lg">
-        <div className="max-w-lg mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            {restaurant?.logo && (
-              <img src={restaurant.logo} alt="" className="w-12 h-12 rounded-full object-cover bg-white" />
-            )}
-            <div className="flex-1">
-              <h1 className="text-xl font-bold">{restaurant?.name || 'المطعم'}</h1>
-              {restaurant?.phone && (
-                <p className="text-sm opacity-80 flex items-center gap-1">
-                  <Phone className="h-3 w-3" />
-                  {restaurant.phone}
-                </p>
+  // ==================== BRANCH SELECTION VIEW ====================
+  if (step === 'branches' && branches.length > 1) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50" dir="rtl">
+        {/* Header */}
+        <header className="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
+          <div className="max-w-lg mx-auto px-4 py-6">
+            <div className="flex items-center gap-4">
+              {restaurant?.logo && (
+                <img src={restaurant.logo} alt="" className="w-16 h-16 rounded-full object-cover bg-white shadow-lg" />
               )}
+              <div>
+                <h1 className="text-2xl font-bold">{restaurant?.name || 'المطعم'}</h1>
+                <p className="text-orange-100">اختر الفرع الأقرب إليك</p>
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Search */}
-      <div className="sticky top-[72px] z-30 bg-background border-b px-4 py-2">
-        <div className="max-w-lg mx-auto relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="ابحث عن منتج..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pr-10"
-          />
-        </div>
-      </div>
+        {/* Install Banner */}
+        {showInstallBanner && (
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-3">
+            <div className="max-w-lg mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Smartphone className="h-5 w-5" />
+                <span className="text-sm">ثبّت التطبيق للوصول السريع</span>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" onClick={handleInstallClick}>
+                  <Download className="h-4 w-4 ml-1" />
+                  تثبيت
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setShowInstallBanner(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
-      {/* Categories */}
-      <div className="sticky top-[128px] z-30 bg-background border-b">
-        <div className="max-w-lg mx-auto px-4 py-2 overflow-x-auto">
-          <div className="flex gap-2">
-            <Button
-              variant={!selectedCategory ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSelectedCategory(null)}
-              className="whitespace-nowrap"
-            >
-              الكل
-            </Button>
-            {categories.map(cat => (
-              <Button
-                key={cat.id}
-                variant={selectedCategory === cat.id ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setSelectedCategory(cat.id)}
-                className="whitespace-nowrap"
+        {/* Branch List */}
+        <main className="max-w-lg mx-auto px-4 py-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <Store className="h-6 w-6 text-orange-500" />
+            الفروع المتاحة
+          </h2>
+          
+          <div className="space-y-3">
+            {branches.map(branch => (
+              <Card 
+                key={branch.id} 
+                className="cursor-pointer hover:shadow-lg transition-all hover:scale-[1.02] border-2 border-transparent hover:border-orange-300"
+                onClick={() => selectBranch(branch.id)}
+                data-testid={`branch-${branch.id}`}
               >
-                {cat.name}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Products */}
-      <main className="max-w-lg mx-auto px-4 py-4">
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>لا توجد منتجات</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-3">
-            {filteredProducts.map(product => (
-              <Card key={product.id} className="overflow-hidden">
-                <div className="aspect-square relative bg-muted">
-                  {product.image ? (
-                    <img 
-                      src={product.image} 
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl">
-                      🍽️
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-400 rounded-full flex items-center justify-center text-white">
+                      <Store className="h-6 w-6" />
                     </div>
-                  )}
-                  {!product.is_available && (
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                      <span className="text-white font-bold">غير متوفر</span>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg text-gray-800">{branch.name}</h3>
+                      {branch.address && (
+                        <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                          <MapPin className="h-3 w-3" />
+                          {branch.address}
+                        </p>
+                      )}
+                      {branch.phone && (
+                        <p className="text-sm text-gray-500 flex items-center gap-1">
+                          <Phone className="h-3 w-3" />
+                          {branch.phone}
+                        </p>
+                      )}
                     </div>
-                  )}
-                </div>
-                <CardContent className="p-3">
-                  <h3 className="font-medium text-sm line-clamp-2 mb-1">{product.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-primary">{formatPrice(product.price)}</span>
-                    <Button
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => addToCart(product)}
-                      disabled={!product.is_available}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
+                    <ArrowLeft className="h-5 w-5 text-orange-500" />
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
-        )}
-      </main>
+        </main>
+      </div>
+    );
+  }
 
-      {/* Cart Button */}
-      {cart.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t z-50">
-          <div className="max-w-lg mx-auto">
-            <Button 
-              className="w-full h-14 text-lg gap-2" 
-              onClick={() => setShowCart(true)}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              عرض السلة ({cartCount})
-              <span className="mr-auto font-bold">{formatPrice(cartTotal)}</span>
-            </Button>
+  // ==================== MENU VIEW ====================
+  if (step === 'menu') {
+    return (
+      <div className="min-h-screen bg-gray-50 pb-24" dir="rtl">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
+          <div className="max-w-lg mx-auto px-4 py-4">
+            <div className="flex items-center gap-3">
+              {restaurant?.logo && (
+                <img src={restaurant.logo} alt="" className="w-12 h-12 rounded-full object-cover bg-white" />
+              )}
+              <div className="flex-1">
+                <h1 className="text-xl font-bold">{restaurant?.name || 'المطعم'}</h1>
+                {selectedBranch && branches.length > 1 && (
+                  <button 
+                    onClick={() => setStep('branches')}
+                    className="text-sm text-orange-100 hover:text-white flex items-center gap-1"
+                  >
+                    <Store className="h-3 w-3" />
+                    {getSelectedBranchName()}
+                    <span className="underline">(تغيير)</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Install Banner */}
+        {showInstallBanner && (
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2">
+            <div className="max-w-lg mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                <span className="text-sm">ثبّت التطبيق</span>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="secondary" onClick={handleInstallClick}>تثبيت</Button>
+                <Button size="sm" variant="ghost" onClick={() => setShowInstallBanner(false)}><X className="h-4 w-4" /></Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Search */}
+        <div className="sticky top-[72px] z-30 bg-white border-b px-4 py-2 shadow-sm">
+          <div className="max-w-lg mx-auto relative">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="ابحث عن منتج..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pr-10 border-gray-200"
+              data-testid="search-input"
+            />
           </div>
         </div>
-      )}
 
-      {/* Cart Dialog */}
-      <Dialog open={showCart} onOpenChange={setShowCart}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <ShoppingCart className="h-5 w-5" />
+        {/* Categories */}
+        <div className="sticky top-[128px] z-30 bg-white border-b shadow-sm">
+          <div className="max-w-lg mx-auto px-4 py-2 overflow-x-auto">
+            <div className="flex gap-2">
+              <Button
+                variant={!selectedCategory ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedCategory(null)}
+                className={`whitespace-nowrap ${!selectedCategory ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+              >
+                الكل
+              </Button>
+              {categories.map(cat => (
+                <Button
+                  key={cat.id}
+                  variant={selectedCategory === cat.id ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`whitespace-nowrap ${selectedCategory === cat.id ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                >
+                  {cat.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Products */}
+        <main className="max-w-lg mx-auto px-4 py-4">
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <p>لا توجد منتجات</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {filteredProducts.map(product => (
+                <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow" data-testid={`product-${product.id}`}>
+                  <div className="aspect-square relative bg-gray-100">
+                    {product.image ? (
+                      <img 
+                        src={product.image} 
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-orange-100 to-red-100">
+                        🍽️
+                      </div>
+                    )}
+                    {!product.is_available && (
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                        <span className="text-white font-bold">غير متوفر</span>
+                      </div>
+                    )}
+                  </div>
+                  <CardContent className="p-3">
+                    <h3 className="font-medium text-sm line-clamp-2 mb-1 text-gray-800">{product.name}</h3>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-orange-600">{formatPrice(product.price)}</span>
+                      <Button
+                        size="icon"
+                        className="h-8 w-8 bg-orange-500 hover:bg-orange-600"
+                        onClick={() => addToCart(product)}
+                        disabled={!product.is_available}
+                        data-testid={`add-to-cart-${product.id}`}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </main>
+
+        {/* Cart Button */}
+        {cart.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg z-50">
+            <div className="max-w-lg mx-auto">
+              <Button 
+                className="w-full h-14 text-lg gap-2 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600" 
+                onClick={() => setStep('cart')}
+                data-testid="view-cart-btn"
+              >
+                <ShoppingCart className="h-5 w-5" />
+                عرض السلة ({cartCount})
+                <span className="mr-auto font-bold">{formatPrice(cartTotal)}</span>
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ==================== CART VIEW ====================
+  if (step === 'cart') {
+    return (
+      <div className="min-h-screen bg-gray-50" dir="rtl">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-white border-b shadow-sm">
+          <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => setStep('menu')}>
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5 text-orange-500" />
               سلة المشتريات
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-3 py-4">
-            {cart.map(item => (
-              <div key={item.product_id} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                <div className="flex-1">
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-primary font-bold">{formatPrice(item.price)}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-8 w-8"
-                    onClick={() => updateQuantity(item.product_id, -1)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="w-8 text-center font-bold">{item.quantity}</span>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-8 w-8"
-                    onClick={() => updateQuantity(item.product_id, 1)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 text-red-500"
-                    onClick={() => removeFromCart(item.product_id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+            </h1>
+            <Badge className="bg-orange-500">{cartCount}</Badge>
           </div>
+        </header>
 
-          <div className="border-t pt-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>المجموع الفرعي</span>
-              <span>{formatPrice(cartTotal)}</span>
+        <main className="max-w-lg mx-auto px-4 py-4 pb-32">
+          {cart.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+              <p className="text-lg">السلة فارغة</p>
+              <Button className="mt-4" onClick={() => setStep('menu')}>تصفح القائمة</Button>
             </div>
-            <div className="flex justify-between text-sm">
-              <span>رسوم التوصيل</span>
-              <span>{formatPrice(deliveryFee)}</span>
+          ) : (
+            <div className="space-y-3">
+              {cart.map(item => (
+                <Card key={item.product_id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-800">{item.name}</p>
+                        <p className="text-sm text-orange-600 font-bold">{formatPrice(item.price)}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => updateQuantity(item.product_id, -1)}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="w-8 text-center font-bold">{item.quantity}</span>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => updateQuantity(item.product_id, 1)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => removeFromCart(item.product_id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
-            <div className="flex justify-between font-bold text-lg pt-2 border-t">
-              <span>الإجمالي</span>
-              <span className="text-primary">{formatPrice(grandTotal)}</span>
-            </div>
-          </div>
+          )}
+        </main>
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCart(false)}>
-              متابعة التسوق
-            </Button>
-            <Button onClick={() => { setShowCart(false); setShowCheckout(true); }}>
-              إتمام الطلب
-              <ArrowRight className="h-4 w-4 mr-2" />
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Checkout Dialog */}
-      <Dialog open={showCheckout} onOpenChange={setShowCheckout}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>إتمام الطلب</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4 py-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">الاسم *</label>
-              <Input
-                placeholder="اسمك الكامل"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1 block">رقم الهاتف *</label>
-              <Input
-                placeholder="07xxxxxxxxx"
-                value={customerPhone}
-                onChange={(e) => setCustomerPhone(e.target.value)}
-                type="tel"
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1 block">عنوان التوصيل *</label>
-              <Textarea
-                placeholder="المنطقة، الشارع، أقرب نقطة دالة..."
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-                rows={2}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-1 block">ملاحظات إضافية</label>
-              <Input
-                placeholder="ملاحظات للسائق أو المطبخ..."
-                value={deliveryNotes}
-                onChange={(e) => setDeliveryNotes(e.target.value)}
-              />
-            </div>
-
-            {branches.length > 1 && (
-              <div>
-                <label className="text-sm font-medium mb-1 block">الفرع</label>
-                <select
-                  value={selectedBranch}
-                  onChange={(e) => setSelectedBranch(e.target.value)}
-                  className="w-full h-10 px-3 border rounded-md"
-                >
-                  {branches.map(branch => (
-                    <option key={branch.id} value={branch.id}>{branch.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">طريقة الدفع</label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant={paymentMethod === 'cash' ? 'default' : 'outline'}
-                  onClick={() => setPaymentMethod('cash')}
-                  className="h-12 gap-2"
-                >
-                  <Banknote className="h-5 w-5" />
-                  نقداً عند الاستلام
-                </Button>
-                <Button
-                  variant={paymentMethod === 'card' ? 'default' : 'outline'}
-                  onClick={() => setPaymentMethod('card')}
-                  className="h-12 gap-2"
-                  disabled
-                >
-                  <CreditCard className="h-5 w-5" />
-                  بطاقة (قريباً)
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-muted/30 rounded-lg p-3 space-y-1">
+        {/* Bottom Actions */}
+        {cart.length > 0 && (
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4">
+            <div className="max-w-lg mx-auto space-y-3">
               <div className="flex justify-between text-sm">
-                <span>المنتجات ({cartCount})</span>
+                <span>المجموع الفرعي</span>
                 <span>{formatPrice(cartTotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span>التوصيل</span>
+                <span>رسوم التوصيل</span>
                 <span>{formatPrice(deliveryFee)}</span>
               </div>
-              <div className="flex justify-between font-bold pt-2 border-t">
+              <div className="flex justify-between font-bold text-lg pt-2 border-t">
                 <span>الإجمالي</span>
-                <span className="text-primary">{formatPrice(grandTotal)}</span>
+                <span className="text-orange-600">{formatPrice(grandTotal)}</span>
               </div>
+              <Button 
+                className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+                onClick={() => setStep('checkout')}
+                data-testid="proceed-checkout-btn"
+              >
+                متابعة الطلب
+                <ArrowLeft className="h-5 w-5 mr-2" />
+              </Button>
             </div>
           </div>
+        )}
+      </div>
+    );
+  }
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCheckout(false)}>
-              رجوع
+  // ==================== CHECKOUT VIEW ====================
+  if (step === 'checkout') {
+    return (
+      <div className="min-h-screen bg-gray-50" dir="rtl">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-white border-b shadow-sm">
+          <div className="max-w-lg mx-auto px-4 py-4 flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => setStep('cart')}>
+              <ArrowRight className="h-5 w-5" />
             </Button>
-            <Button onClick={handleSubmitOrder} disabled={submitting}>
-              {submitting ? (
+            <h1 className="text-xl font-bold">إتمام الطلب</h1>
+          </div>
+        </header>
+
+        <main className="max-w-lg mx-auto px-4 py-4 pb-32">
+          <div className="space-y-4">
+            {/* Customer Info */}
+            <Card>
+              <CardContent className="p-4 space-y-4">
+                <h2 className="font-bold flex items-center gap-2">
+                  <User className="h-5 w-5 text-orange-500" />
+                  معلومات العميل
+                </h2>
+                
+                <div>
+                  <label className="text-sm font-medium mb-1 block">الاسم الكامل *</label>
+                  <Input
+                    placeholder="أدخل اسمك"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    data-testid="customer-name-input"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">رقم الهاتف *</label>
+                  <Input
+                    placeholder="07xxxxxxxxx"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    type="tel"
+                    data-testid="customer-phone-input"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Delivery Address */}
+            <Card>
+              <CardContent className="p-4 space-y-4">
+                <h2 className="font-bold flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-orange-500" />
+                  عنوان التوصيل
+                </h2>
+                
+                <div>
+                  <label className="text-sm font-medium mb-1 block">العنوان التفصيلي *</label>
+                  <Textarea
+                    placeholder="المنطقة، الشارع، أقرب نقطة دالة..."
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    rows={2}
+                    data-testid="delivery-address-input"
+                  />
+                </div>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setShowMap(true)}
+                >
+                  <Navigation className="h-4 w-4 ml-2" />
+                  {deliveryLocation ? 'تم تحديد الموقع ✓' : 'تحديد الموقع على الخريطة'}
+                </Button>
+
+                <div>
+                  <label className="text-sm font-medium mb-1 block">ملاحظات للسائق (اختياري)</label>
+                  <Input
+                    placeholder="ملاحظات إضافية..."
+                    value={deliveryNotes}
+                    onChange={(e) => setDeliveryNotes(e.target.value)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Payment Method */}
+            <Card>
+              <CardContent className="p-4 space-y-4">
+                <h2 className="font-bold flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-orange-500" />
+                  طريقة الدفع
+                </h2>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant={paymentMethod === 'cash' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('cash')}
+                    className={`h-16 flex-col gap-1 ${paymentMethod === 'cash' ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                    data-testid="payment-cash-btn"
+                  >
+                    <Banknote className="h-6 w-6" />
+                    <span className="text-xs">نقداً عند الاستلام</span>
+                  </Button>
+                  <Button
+                    variant={paymentMethod === 'card' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('card')}
+                    className={`h-16 flex-col gap-1 ${paymentMethod === 'card' ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                    data-testid="payment-card-btn"
+                  >
+                    <CreditCard className="h-6 w-6" />
+                    <span className="text-xs">بطاقة ائتمان</span>
+                  </Button>
+                </div>
+
+                {paymentMethod === 'card' && (
+                  <div className="p-3 bg-blue-50 rounded-lg">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={saveCard}
+                        onChange={(e) => setSaveCard(e.target.checked)}
+                        className="rounded"
+                      />
+                      <span className="text-sm text-blue-700">حفظ البطاقة للطلبات القادمة</span>
+                    </label>
+                    <p className="text-xs text-blue-600 mt-1">
+                      سيتم توجيهك إلى صفحة الدفع الآمنة
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Order Summary */}
+            <Card>
+              <CardContent className="p-4">
+                <h2 className="font-bold mb-3">ملخص الطلب</h2>
+                <div className="space-y-2 text-sm">
+                  {cart.map(item => (
+                    <div key={item.product_id} className="flex justify-between">
+                      <span>{item.name} × {item.quantity}</span>
+                      <span>{formatPrice(item.price * item.quantity)}</span>
+                    </div>
+                  ))}
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span>المجموع الفرعي</span>
+                      <span>{formatPrice(cartTotal)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>التوصيل</span>
+                      <span>{formatPrice(deliveryFee)}</span>
+                    </div>
+                    <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
+                      <span>الإجمالي</span>
+                      <span className="text-orange-600">{formatPrice(grandTotal)}</span>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+
+        {/* Submit Button */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4">
+          <div className="max-w-lg mx-auto">
+            <Button 
+              className="w-full h-14 text-lg bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              onClick={handleSubmitOrder}
+              disabled={submitting || processingPayment}
+              data-testid="submit-order-btn"
+            >
+              {submitting || processingPayment ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin ml-2" />
-                  جاري الإرسال...
+                  <Loader2 className="h-5 w-5 animate-spin ml-2" />
+                  {processingPayment ? 'جاري التحويل للدفع...' : 'جاري الإرسال...'}
                 </>
               ) : (
-                'تأكيد الطلب'
+                <>
+                  <CheckCircle className="h-5 w-5 ml-2" />
+                  {paymentMethod === 'card' ? 'متابعة للدفع' : 'تأكيد الطلب'}
+                </>
               )}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </div>
 
-      {/* Order Tracking Dialog */}
-      <Dialog open={showTracking} onOpenChange={setShowTracking}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Truck className="h-5 w-5" />
-              تتبع الطلب #{currentOrder?.order_number}
-            </DialogTitle>
-          </DialogHeader>
+        {/* Map Dialog */}
+        <Dialog open={showMap} onOpenChange={setShowMap}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-orange-500" />
+                تحديد موقع التوصيل
+              </DialogTitle>
+            </DialogHeader>
+            <LocationPicker 
+              position={deliveryLocation} 
+              setPosition={setDeliveryLocation}
+              onClose={() => setShowMap(false)}
+            />
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowMap(false)}>إلغاء</Button>
+              <Button onClick={() => {
+                if (deliveryLocation) {
+                  toast.success('تم تحديد الموقع');
+                }
+                setShowMap(false);
+              }}>
+                تأكيد الموقع
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
 
-          {currentOrder && (
-            <div className="space-y-6 py-4">
-              {/* Status Timeline */}
+  // ==================== TRACKING VIEW ====================
+  if (step === 'tracking' && currentOrder) {
+    const statusSteps = [
+      { status: 'pending', label: 'قيد الانتظار', icon: Clock },
+      { status: 'preparing', label: 'قيد التحضير', icon: ChefHat },
+      { status: 'ready', label: 'جاهز للتوصيل', icon: CheckCircle },
+      { status: 'out_for_delivery', label: 'السائق في الطريق', icon: Truck },
+      { status: 'delivered', label: 'تم التسليم', icon: CheckCircle }
+    ];
+    
+    const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
+    const currentIdx = statusOrder.indexOf(currentOrder.status);
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50" dir="rtl">
+        {/* Header */}
+        <header className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg">
+          <div className="max-w-lg mx-auto px-4 py-6 text-center">
+            <CheckCircle className="h-12 w-12 mx-auto mb-2" />
+            <h1 className="text-2xl font-bold">تم استلام طلبك!</h1>
+            <p className="text-green-100">رقم الطلب: #{currentOrder.order_number}</p>
+          </div>
+        </header>
+
+        <main className="max-w-lg mx-auto px-4 py-6 space-y-4">
+          {/* Status Timeline */}
+          <Card>
+            <CardContent className="p-4">
+              <h2 className="font-bold mb-4">حالة الطلب</h2>
               <div className="space-y-4">
-                {[
-                  { status: 'pending', label: 'قيد الانتظار', icon: Clock },
-                  { status: 'preparing', label: 'قيد التحضير', icon: ChefHat },
-                  { status: 'ready', label: 'جاهز للتوصيل', icon: CheckCircle },
-                  { status: 'out_for_delivery', label: 'السائق في الطريق', icon: Truck },
-                  { status: 'delivered', label: 'تم التسليم', icon: CheckCircle }
-                ].map((step, idx) => {
-                  const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
-                  const currentIdx = statusOrder.indexOf(currentOrder.status);
+                {statusSteps.map((step, idx) => {
                   const stepIdx = statusOrder.indexOf(step.status);
                   const isCompleted = stepIdx <= currentIdx;
                   const isCurrent = step.status === currentOrder.status;
                   
                   return (
                     <div key={step.status} className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                         isCompleted 
                           ? 'bg-green-500 text-white' 
-                          : 'bg-muted text-muted-foreground'
-                      } ${isCurrent ? 'ring-2 ring-green-500 ring-offset-2' : ''}`}>
+                          : 'bg-gray-100 text-gray-400'
+                      } ${isCurrent ? 'ring-4 ring-green-200 scale-110' : ''}`}>
                         <step.icon className="h-5 w-5" />
                       </div>
                       <div className="flex-1">
-                        <p className={`font-medium ${isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        <p className={`font-medium ${isCompleted ? 'text-gray-800' : 'text-gray-400'}`}>
                           {step.label}
                         </p>
                         {isCurrent && (
-                          <p className="text-sm text-green-500">الحالة الحالية</p>
+                          <p className="text-sm text-green-500 animate-pulse">الحالة الحالية</p>
                         )}
                       </div>
+                      {idx < statusSteps.length - 1 && (
+                        <div className={`absolute left-5 w-0.5 h-8 ${isCompleted ? 'bg-green-500' : 'bg-gray-200'}`} style={{marginTop: '40px'}} />
+                      )}
                     </div>
                   );
                 })}
               </div>
+            </CardContent>
+          </Card>
 
-              {/* Order Summary */}
-              <div className="bg-muted/30 rounded-lg p-3 space-y-2 text-sm">
+          {/* Order Details */}
+          <Card>
+            <CardContent className="p-4 space-y-3">
+              <h2 className="font-bold">تفاصيل الطلب</h2>
+              <div className="text-sm space-y-2">
                 <div className="flex justify-between">
-                  <span>المجموع</span>
-                  <span className="font-bold">{formatPrice(currentOrder.total)}</span>
+                  <span className="text-gray-500">المجموع</span>
+                  <span className="font-bold text-orange-600">{formatPrice(currentOrder.total)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>طريقة الدفع</span>
+                  <span className="text-gray-500">طريقة الدفع</span>
                   <span>{currentOrder.payment_method === 'cash' ? 'نقداً' : 'بطاقة'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>العنوان</span>
-                  <span className="text-left max-w-[200px] truncate">{currentOrder.delivery_address}</span>
+                  <span className="text-gray-500">العنوان</span>
+                  <span className="text-left max-w-[200px]">{currentOrder.delivery_address}</span>
                 </div>
               </div>
-            </div>
-          )}
+            </CardContent>
+          </Card>
 
-          <DialogFooter>
-            <Button onClick={() => setShowTracking(false)}>
-              إغلاق
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
+          {/* New Order Button */}
+          <Button 
+            className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
+            onClick={() => {
+              setCurrentOrder(null);
+              setStep('menu');
+            }}
+          >
+            طلب جديد
+          </Button>
+        </main>
+      </div>
+    );
+  }
+
+  // Default: redirect to menu
+  return null;
 }
