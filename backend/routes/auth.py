@@ -7,10 +7,7 @@ from datetime import datetime, timezone
 import uuid
 
 from core.database import db
-from models.schemas import (
-    UserCreate, UserLogin, UserUpdate, UserResponse,
-    PasswordReset
-)
+from models.schemas import UserCreate, UserLogin, UserUpdate, UserResponse
 from utils.auth import (
     get_current_user, hash_password, verify_password, 
     create_token, build_tenant_query, get_user_tenant_id
