@@ -660,17 +660,8 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Branch Selector */}
-            <select
-              value={selectedBranch || ''}
-              onChange={(e) => setSelectedBranch(e.target.value)}
-              className="bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground"
-              data-testid="branch-selector"
-            >
-              {branches.map(branch => (
-                <option key={branch.id} value={branch.id}>{branch.name}</option>
-              ))}
-            </select>
+            {/* Branch Selector - مكون اختيار الفرع العام */}
+            <BranchSelector />
 
             {/* Theme Toggle */}
             <Button
