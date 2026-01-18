@@ -274,25 +274,89 @@ export default function Dashboard() {
     try {
       // استخدام الفرع من Context
       const branchIdParam = getBranchIdForApi();
-
-      // Fetch today's stats
-      const today = new Date().toISOString().split('T')[0];
-      const params = { start_date: today, end_date: today };
+      const params = {};
       if (branchIdParam) {
         params.branch_id = branchIdParam;
       }
       
-      const [salesRes, ordersRes] = await Promise.all([
-        axios.get(`${API}/reports/sales`, { params }),
-        axios.get(`${API}/orders`, { params: { ...params, date: today } })
-      ]);
-
-      setStats(salesRes.data);
-      setRecentOrders(ordersRes.data.slice(0, 5));
+      // استخدام API الإحصائيات الشاملة الجديد
+      const statsRes = await axios.get(`${API}/dashboard/stats`, { params });
+      
+      setStats(statsRes.data);
+      setRecentOrders(statsRes.data.recent_orders || []);
     } catch (error) {
       console.error('Failed to fetch data:', error);
+      // Fallback للطريقة القديمة
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const params = { start_date: today, end_date: today };
+        if (getBranchIdForApi()) {
+          params.branch_id = getBranchIdForApi();
+        }
+        const [salesRes, ordersRes] = await Promise.all([
+          axios.get(`${API}/reports/sales`, { params }),
+          axios.get(`${API}/orders`, { params: { ...params, date: today } })
+        ]);
+        setStats({ today: salesRes.data });
+        setRecentOrders(ordersRes.data.slice(0, 5));
+      } catch (e) {
+        console.error('Fallback also failed:', e);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // جلب حالة اليوم
+  const fetchDayStatus = async () => {
+    try {
+      const branchIdParam = getBranchIdForApi();
+      const params = {};
+      if (branchIdParam) {
+        params.branch_id = branchIdParam;
+      }
+      const res = await axios.get(`${API}/day-management/status`, { params });
+      setDayStatus(res.data);
+      
+      // إظهار تنبيه إذا مر أكثر من 24 ساعة
+      if (res.data.should_close && res.data.open_shifts_count > 0) {
+        toast.warning('تنبيه: مر أكثر من 24 ساعة على فتح الوردية. يُنصح بإغلاق اليوم وترحيل البيانات.');
+      }
+      
+      // تنبيه الطلبات المعلقة
+      if (res.data.pending_orders_count > 0 && res.data.oldest_shift_hours >= 20) {
+        toast.info(`يوجد ${res.data.pending_orders_count} طلب معلق. يجب إغلاقها قبل ترحيل اليوم.`);
+      }
+    } catch (error) {
+      console.log('Day status not available');
+    }
+  };
+
+  // إغلاق اليوم وترحيل البيانات
+  const handleCloseDay = async (force = false) => {
+    setClosingDay(true);
+    try {
+      const branchIdParam = getBranchIdForApi();
+      const params = {};
+      if (branchIdParam) {
+        params.branch_id = branchIdParam;
+      }
+      
+      const res = await axios.post(`${API}/day-management/close`, { force }, { params });
+      
+      if (res.data.success) {
+        toast.success(res.data.message);
+        setShowDayCloseDialog(false);
+        fetchData();
+        fetchDayStatus();
+        autoOpenShift(); // فتح وردية جديدة تلقائياً
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      toast.error('فشل في إغلاق اليوم');
+    } finally {
+      setClosingDay(false);
     }
   };
 
