@@ -143,36 +143,14 @@ export default function BranchOrders() {
     }
   };
 
-  // الحصول على العناصر المتاحة للاختيار (منتجات أو مخزون)
-  const getAvailableItems = () => {
-    if (itemSource === 'products') {
-      return products.map(p => ({
-        id: p.id,
-        name: p.name,
-        unit: 'قطعة',
-        quantity: null, // غير محدد
-        type: 'product'
-      }));
-    } else {
-      return inventoryItems.map(item => ({
-        id: item.id,
-        name: item.name,
-        unit: item.unit,
-        quantity: item.quantity,
-        type: 'inventory'
-      }));
-    }
-  };
-
   const addItemToOrder = () => {
     if (!selectedProduct || quantity < 1) return;
     
-    const availableItems = getAvailableItems();
-    const item = availableItems.find(p => p.id === selectedProduct);
+    const item = finishedProducts.find(p => p.id === selectedProduct);
     if (!item) return;
     
-    // التحقق من الكمية المتاحة في المخزون
-    if (item.type === 'inventory' && item.quantity !== null && quantity > item.quantity) {
+    // التحقق من الكمية المتاحة
+    if (item.quantity !== null && item.quantity !== undefined && quantity > item.quantity) {
       toast.error(`الكمية المطلوبة أكبر من المتوفر (${item.quantity} ${item.unit})`);
       return;
     }
@@ -182,12 +160,13 @@ export default function BranchOrders() {
       product_name: item.name,
       quantity: quantity,
       unit: item.unit || 'قطعة',
-      source_type: item.type
+      cost_per_unit: item.cost_per_unit || 0
     };
     
     setForm({ ...form, items: [...form.items, newItem] });
     setSelectedProduct('');
     setQuantity(1);
+    toast.success(`تمت إضافة ${item.name}`);
   };
 
   const removeItem = (index) => {
