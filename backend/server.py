@@ -11220,6 +11220,164 @@ async def auto_close_old_shifts():
     except Exception as e:
         logger.error(f"Error in auto_close_old_shifts: {e}")
 
+
+# ==================== DAILY REPORT EMAIL (تقرير يومي بالبريد) ====================
+
+class DailyReportEmailRequest(BaseModel):
+    recipient_emails: List[str] = []  # قائمة البريد للإرسال
+    include_all_branches: bool = True
+
+@api_router.post("/day-management/send-report")
+async def send_daily_report_email(
+    request: DailyReportEmailRequest,
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """إرسال التقرير اليومي عبر البريد الإلكتروني"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    tenant_id = get_user_tenant_id(current_user)
+    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    
+    # جمع بيانات التقرير
+    base_query = {"status": {"$ne": OrderStatus.CANCELLED}}
+    if tenant_id:
+        base_query["tenant_id"] = tenant_id
+    
+    # جلب جميع الفروع
+    branch_query = {}
+    if tenant_id:
+        branch_query["tenant_id"] = tenant_id
+    branches = await db.branches.find(branch_query, {"_id": 0}).to_list(100)
+    
+    branches_data = []
+    total_sales = 0
+    total_orders = 0
+    total_expenses = 0
+    total_profit = 0
+    
+    for branch in branches:
+        if branch_id and branch["id"] != branch_id:
+            continue
+        
+        # طلبات الفرع اليوم
+        orders_query = {**base_query, "branch_id": branch["id"], "created_at": {"$gte": today}}
+        orders = await db.orders.find(orders_query, {"_id": 0, "total": 1, "profit": 1}).to_list(1000)
+        
+        # مصاريف الفرع اليوم
+        expenses_query = {"branch_id": branch["id"], "date": {"$gte": today}}
+        if tenant_id:
+            expenses_query["tenant_id"] = tenant_id
+        expenses = await db.expenses.find(expenses_query, {"_id": 0, "amount": 1}).to_list(1000)
+        
+        branch_sales = sum(o.get("total", 0) for o in orders)
+        branch_expenses = sum(e.get("amount", 0) for e in expenses)
+        branch_profit = sum(o.get("profit", 0) for o in orders) - branch_expenses
+        
+        branches_data.append({
+            "name": branch["name"],
+            "orders": len(orders),
+            "sales": branch_sales,
+            "expenses": branch_expenses,
+            "profit": branch_profit
+        })
+        
+        total_sales += branch_sales
+        total_orders += len(orders)
+        total_expenses += branch_expenses
+        total_profit += branch_profit
+    
+    # عدد الورديات المغلقة اليوم
+    shifts_closed = await db.day_closures.count_documents({
+        "closed_at": {"$gte": today},
+        **({"tenant_id": tenant_id} if tenant_id else {})
+    })
+    
+    # عدد الطلبات الملغية
+    cancelled_query = {**base_query, "status": OrderStatus.CANCELLED, "created_at": {"$gte": today}}
+    cancelled_orders = await db.orders.count_documents(cancelled_query)
+    
+    report_data = {
+        "branches": branches_data,
+        "total_sales": total_sales,
+        "total_orders": total_orders,
+        "total_expenses": total_expenses,
+        "net_profit": total_profit,
+        "shifts_closed": shifts_closed,
+        "cancelled_orders": cancelled_orders
+    }
+    
+    # تحديد قائمة المستلمين
+    recipient_emails = request.recipient_emails
+    if not recipient_emails:
+        # استخدام بريد المستخدم الحالي كافتراضي
+        recipient_emails = [current_user.get("email")]
+    
+    # إرسال التقرير
+    try:
+        from services.email_service import send_daily_report
+        result = await send_daily_report(tenant_id, report_data, recipient_emails)
+        return {
+            "success": True,
+            "message": f"تم إرسال التقرير إلى {result['success']} مستلم",
+            "report_data": report_data,
+            "email_results": result
+        }
+    except ImportError:
+        # إذا لم تكن خدمة البريد متاحة، نرجع البيانات فقط
+        return {
+            "success": False,
+            "message": "خدمة البريد غير متاحة حالياً",
+            "report_data": report_data
+        }
+    except Exception as e:
+        logger.error(f"Failed to send daily report: {e}")
+        return {
+            "success": False,
+            "message": str(e),
+            "report_data": report_data
+        }
+
+@api_router.get("/day-management/report-preview")
+async def get_daily_report_preview(
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """معاينة التقرير اليومي قبل الإرسال"""
+    tenant_id = get_user_tenant_id(current_user)
+    today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    
+    base_query = {"status": {"$ne": OrderStatus.CANCELLED}, "created_at": {"$gte": today}}
+    if tenant_id:
+        base_query["tenant_id"] = tenant_id
+    if branch_id:
+        base_query["branch_id"] = branch_id
+    
+    # جلب إحصائيات اليوم
+    orders = await db.orders.find(base_query, {"_id": 0}).to_list(1000)
+    
+    expenses_query = {"date": {"$gte": today}}
+    if tenant_id:
+        expenses_query["tenant_id"] = tenant_id
+    if branch_id:
+        expenses_query["branch_id"] = branch_id
+    expenses = await db.expenses.find(expenses_query, {"_id": 0}).to_list(1000)
+    
+    total_sales = sum(o.get("total", 0) for o in orders)
+    total_profit = sum(o.get("profit", 0) for o in orders)
+    total_expenses = sum(e.get("amount", 0) for e in expenses)
+    
+    return {
+        "date": today,
+        "total_sales": total_sales,
+        "total_orders": len(orders),
+        "total_expenses": total_expenses,
+        "gross_profit": total_profit,
+        "net_profit": total_profit - total_expenses,
+        "average_order_value": total_sales / len(orders) if orders else 0
+    }
+
 # إضافة مهمة الإغلاق التلقائي عند بدء التطبيق
 @app.on_event("startup")
 async def start_auto_close_scheduler():
