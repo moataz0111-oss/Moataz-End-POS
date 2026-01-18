@@ -5,9 +5,83 @@ import { Label } from './ui/label';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { API_URL } from '../utils/api';
-import { Upload, X, Image as ImageIcon, Link, Loader2 } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Link, Loader2, Minimize2 } from 'lucide-react';
 
 const API = API_URL;
+
+// دالة ضغط الصور
+const compressImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.8) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      
+      img.onload = () => {
+        // حساب الأبعاد الجديدة مع الحفاظ على النسبة
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+        
+        // إنشاء Canvas للضغط
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // تحويل إلى Blob
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              // إنشاء ملف جديد من الـ Blob
+              const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              
+              resolve({
+                file: compressedFile,
+                originalSize: file.size,
+                compressedSize: blob.size,
+                compressionRatio: ((1 - blob.size / file.size) * 100).toFixed(1)
+              });
+            } else {
+              reject(new Error('فشل في ضغط الصورة'));
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      
+      img.onerror = () => reject(new Error('فشل في تحميل الصورة'));
+    };
+    
+    reader.onerror = () => reject(new Error('فشل في قراءة الملف'));
+  });
+};
+
+// تنسيق حجم الملف
+const formatFileSize = (bytes) => {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+};
 
 export default function ImageUploader({
   value,
@@ -16,9 +90,14 @@ export default function ImageUploader({
   label = 'الصورة',
   placeholder = 'أدخل رابط الصورة أو ارفع صورة من جهازك',
   showPreview = true,
+  enableCompression = true, // تفعيل الضغط
+  maxWidth = 800,
+  maxHeight = 800,
+  quality = 0.8,
   className = ''
 }) {
   const [uploading, setUploading] = useState(false);
+  const [compressionInfo, setCompressionInfo] = useState(null);
   const [useUrl, setUseUrl] = useState(!value || value.startsWith('http'));
   const fileInputRef = useRef(null);
 
@@ -39,11 +118,36 @@ export default function ImageUploader({
     }
 
     setUploading(true);
+    setCompressionInfo(null);
     
     try {
+      let fileToUpload = file;
+      
+      // ضغط الصورة إذا كان مفعلاً
+      if (enableCompression && file.type !== 'image/gif') {
+        toast.loading('جاري ضغط الصورة...');
+        
+        const result = await compressImage(file, maxWidth, maxHeight, quality);
+        fileToUpload = result.file;
+        
+        setCompressionInfo({
+          original: formatFileSize(result.originalSize),
+          compressed: formatFileSize(result.compressedSize),
+          ratio: result.compressionRatio
+        });
+        
+        toast.dismiss();
+        
+        if (parseFloat(result.compressionRatio) > 0) {
+          toast.success(`تم ضغط الصورة بنسبة ${result.compressionRatio}%`);
+        }
+      }
+      
+      toast.loading('جاري رفع الصورة...');
+      
       const token = localStorage.getItem('token');
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', fileToUpload);
       formData.append('type', type);
 
       const response = await axios.post(`${API}/upload/image`, formData, {
@@ -53,13 +157,17 @@ export default function ImageUploader({
         }
       });
 
+      toast.dismiss();
+
       if (response.data.image_url) {
         onChange(response.data.image_url);
         toast.success('تم رفع الصورة بنجاح');
       }
     } catch (error) {
+      toast.dismiss();
       console.error('Upload error:', error);
       toast.error(error.response?.data?.detail || 'فشل في رفع الصورة');
+      setCompressionInfo(null);
     } finally {
       setUploading(false);
       // إعادة تعيين input الملف
@@ -75,6 +183,7 @@ export default function ImageUploader({
 
   const handleClear = () => {
     onChange('');
+    setCompressionInfo(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -181,9 +290,25 @@ export default function ImageUploader({
             )}
           </div>
           
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Minimize2 className="h-3 w-3" />
+            <span>الصور تُضغط تلقائياً لتوفير المساحة وتسريع التحميل</span>
+          </div>
+          
           <p className="text-xs text-muted-foreground">
             الصيغ المدعومة: JPG, PNG, GIF, WEBP, HEIC, BMP, TIFF (أقصى 10MB)
           </p>
+          
+          {/* معلومات الضغط */}
+          {compressionInfo && (
+            <div className="flex items-center gap-2 p-2 bg-green-500/10 rounded-lg text-xs text-green-600">
+              <Minimize2 className="h-4 w-4" />
+              <span>
+                تم الضغط: {compressionInfo.original} ← {compressionInfo.compressed} 
+                ({compressionInfo.ratio}% توفير)
+              </span>
+            </div>
+          )}
         </div>
       )}
 
