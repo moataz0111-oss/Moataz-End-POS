@@ -645,27 +645,49 @@ export default function Dashboard() {
     setDraggedItem(null);
   };
 
+  // الحصول على إحصائيات الفترة المحددة
+  const getCurrentPeriodStats = () => {
+    if (!stats) return { total_sales: 0, total_orders: 0, average_order_value: 0, total_profit: 0 };
+    return stats[statsPeriod] || stats.today || { total_sales: 0, total_orders: 0, average_order_value: 0, total_profit: 0 };
+  };
+
+  const periodStats = getCurrentPeriodStats();
+  
+  const periodLabels = {
+    today: 'اليوم',
+    week: 'الأسبوع',
+    month: 'الشهر',
+    all_time: 'الإجمالي'
+  };
+
   const statCards = [
     { 
-      label: 'مبيعات اليوم', 
-      value: formatPriceCompact(stats?.total_sales || 0), 
+      label: `مبيعات ${periodLabels[statsPeriod]}`, 
+      value: formatPriceCompact(periodStats?.total_sales || 0), 
       icon: DollarSign,
       color: 'text-green-500',
       bg: 'bg-green-500/10'
     },
     { 
       label: 'عدد الطلبات', 
-      value: stats?.total_orders || 0, 
+      value: periodStats?.total_orders || 0, 
       icon: ShoppingCart,
       color: 'text-blue-500',
       bg: 'bg-blue-500/10'
     },
     { 
       label: 'متوسط الطلب', 
-      value: formatPrice(stats?.average_order_value || 0), 
+      value: formatPrice(periodStats?.average_order_value || 0), 
       icon: TrendingUp,
       color: 'text-primary',
       bg: 'bg-primary/10'
+    },
+    { 
+      label: 'صافي الربح', 
+      value: formatPriceCompact(periodStats?.total_profit || 0), 
+      icon: Wallet,
+      color: 'text-purple-500',
+      bg: 'bg-purple-500/10'
     },
   ];
 
