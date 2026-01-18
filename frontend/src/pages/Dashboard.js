@@ -1598,9 +1598,39 @@ export default function Dashboard() {
             )}
           </div>
 
-          <DialogFooter className="flex gap-2">
+          <DialogFooter className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setShowDayCloseDialog(false)}>
               إلغاء
+            </Button>
+            
+            {/* زر إرسال التقرير بالبريد */}
+            <Button 
+              variant="outline"
+              onClick={async () => {
+                try {
+                  const branchIdParam = getBranchIdForApi();
+                  const params = {};
+                  if (branchIdParam) params.branch_id = branchIdParam;
+                  
+                  const res = await axios.post(`${API}/day-management/send-report`, {
+                    recipient_emails: [user?.email],
+                    include_all_branches: true
+                  }, { params });
+                  
+                  if (res.data.success) {
+                    toast.success('تم إرسال التقرير إلى بريدك الإلكتروني');
+                  } else {
+                    toast.info('تم إنشاء التقرير - خدمة البريد غير متاحة حالياً');
+                  }
+                } catch (error) {
+                  toast.error('فشل في إرسال التقرير');
+                }
+              }}
+              className="gap-1"
+              data-testid="send-report-email-btn"
+            >
+              <Mail className="h-4 w-4" />
+              إرسال تقرير بالبريد
             </Button>
             
             {dayStatus?.pending_orders_count > 0 ? (
