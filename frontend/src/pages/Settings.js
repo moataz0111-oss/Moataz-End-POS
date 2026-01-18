@@ -3476,7 +3476,10 @@ export default function Settings() {
                           <h4 className="font-bold text-foreground">Stripe - بطاقات الائتمان</h4>
                           <p className="text-xs text-muted-foreground">قبول بطاقات Visa, Mastercard والمزيد</p>
                         </div>
-                        <Switch defaultChecked />
+                        <Switch 
+                          checked={paymentSettings.stripe_enabled}
+                          onCheckedChange={(checked) => setPaymentSettings(prev => ({...prev, stripe_enabled: checked}))}
+                        />
                       </div>
                       
                       <div className="space-y-4">
@@ -3485,6 +3488,8 @@ export default function Settings() {
                           <Input 
                             placeholder="pk_live_xxxxxxxxxxxx"
                             className="bg-muted/30 font-mono text-sm"
+                            value={paymentSettings.stripe_publishable_key}
+                            onChange={(e) => setPaymentSettings(prev => ({...prev, stripe_publishable_key: e.target.value}))}
                           />
                         </div>
                         
@@ -3492,8 +3497,10 @@ export default function Settings() {
                           <Label className="text-foreground mb-2 block">المفتاح السري (Secret Key)</Label>
                           <Input 
                             type="password"
-                            placeholder="sk_live_xxxxxxxxxxxx"
+                            placeholder={paymentSettings.stripe_secret_key_set ? "••••••••••••••••" : "sk_live_xxxxxxxxxxxx"}
                             className="bg-muted/30 font-mono text-sm"
+                            value={paymentSettings.stripe_secret_key}
+                            onChange={(e) => setPaymentSettings(prev => ({...prev, stripe_secret_key: e.target.value}))}
                           />
                           <p className="text-xs text-muted-foreground mt-1">
                             يمكنك الحصول على المفاتيح من <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">لوحة تحكم Stripe</a>
@@ -3503,22 +3510,34 @@ export default function Settings() {
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-3 bg-muted/30 rounded-lg">
                             <p className="text-xs text-muted-foreground">العملة</p>
-                            <select className="w-full bg-transparent text-foreground font-bold mt-1">
+                            <select 
+                              className="w-full bg-transparent text-foreground font-bold mt-1"
+                              value={paymentSettings.stripe_currency}
+                              onChange={(e) => setPaymentSettings(prev => ({...prev, stripe_currency: e.target.value}))}
+                            >
                               <option value="USD">USD (دولار أمريكي)</option>
                               <option value="IQD">IQD (دينار عراقي)</option>
                             </select>
                           </div>
                           <div className="p-3 bg-muted/30 rounded-lg">
                             <p className="text-xs text-muted-foreground">الوضع</p>
-                            <select className="w-full bg-transparent text-foreground font-bold mt-1">
+                            <select 
+                              className="w-full bg-transparent text-foreground font-bold mt-1"
+                              value={paymentSettings.stripe_mode}
+                              onChange={(e) => setPaymentSettings(prev => ({...prev, stripe_mode: e.target.value}))}
+                            >
                               <option value="test">وضع الاختبار</option>
                               <option value="live">وضع الإنتاج</option>
                             </select>
                           </div>
                         </div>
 
-                        <Button className="w-full bg-purple-500 hover:bg-purple-600">
-                          <Save className="h-4 w-4 ml-2" />
+                        <Button 
+                          className="w-full bg-purple-500 hover:bg-purple-600"
+                          onClick={saveStripeSettings}
+                          disabled={paymentSaving}
+                        >
+                          {paymentSaving ? <RefreshCw className="h-4 w-4 ml-2 animate-spin" /> : <Save className="h-4 w-4 ml-2" />}
                           حفظ إعدادات Stripe
                         </Button>
                       </div>
@@ -3534,7 +3553,10 @@ export default function Settings() {
                           <h4 className="font-bold text-foreground">زين كاش - Zain Cash</h4>
                           <p className="text-xs text-muted-foreground">المحفظة الإلكترونية الأكثر انتشاراً في العراق</p>
                         </div>
-                        <Switch defaultChecked />
+                        <Switch 
+                          checked={paymentSettings.zaincash_enabled}
+                          onCheckedChange={(checked) => setPaymentSettings(prev => ({...prev, zaincash_enabled: checked}))}
+                        />
                       </div>
                       
                       <div className="space-y-4">
@@ -3544,6 +3566,8 @@ export default function Settings() {
                             placeholder="07xx xxx xxxx"
                             type="tel"
                             className="bg-muted/30 text-lg tracking-wider"
+                            value={paymentSettings.zaincash_phone}
+                            onChange={(e) => setPaymentSettings(prev => ({...prev, zaincash_phone: e.target.value}))}
                           />
                         </div>
                         
