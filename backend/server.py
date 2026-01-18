@@ -2688,6 +2688,507 @@ async def generate_all_payroll(
         "errors": errors
     }
 
+# ==================== PAYROLL REPORTS & EXPORT - تقارير الرواتب والتصدير ====================
+
+@api_router.get("/reports/payroll-summary")
+async def get_payroll_summary_report(
+    month: str,  # YYYY-MM
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """تقرير شامل للرواتب - إجمالي الرواتب، الخصومات، المكافآت، السلف، المستحقات"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # بناء استعلام الموظفين
+    emp_query = {"is_active": True}
+    if tenant_id:
+        emp_query["tenant_id"] = tenant_id
+    
+    # فلترة حسب الفرع
+    user_branch_id = current_user.get("branch_id")
+    user_role = current_user.get("role")
+    
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        emp_query["branch_id"] = user_branch_id
+    elif branch_id:
+        emp_query["branch_id"] = branch_id
+    
+    employees = await db.employees.find(emp_query, {"_id": 0}).to_list(500)
+    
+    start_date = f"{month}-01"
+    end_date = f"{month}-31"
+    
+    # بناء بيانات التقرير لكل موظف
+    employee_data = []
+    totals = {
+        "basic_salary": 0,
+        "total_deductions": 0,
+        "total_bonuses": 0,
+        "total_advances": 0,
+        "net_payable": 0
+    }
+    
+    for emp in employees:
+        # الخصومات
+        deductions = await db.deductions.find({
+            "employee_id": emp["id"],
+            "date": {"$gte": start_date, "$lte": end_date}
+        }, {"_id": 0}).to_list(100)
+        emp_deductions = sum(d.get("amount", 0) for d in deductions)
+        
+        # المكافآت
+        bonuses = await db.bonuses.find({
+            "employee_id": emp["id"],
+            "date": {"$gte": start_date, "$lte": end_date}
+        }, {"_id": 0}).to_list(100)
+        emp_bonuses = sum(b.get("amount", 0) for b in bonuses)
+        
+        # السلف المعلقة
+        advances = await db.advances.find({
+            "employee_id": emp["id"],
+            "status": "approved",
+            "remaining_amount": {"$gt": 0}
+        }, {"_id": 0}).to_list(100)
+        emp_advances = sum(a.get("monthly_deduction", 0) for a in advances)
+        pending_advances = sum(a.get("remaining_amount", 0) for a in advances)
+        
+        basic_salary = emp.get("salary", 0)
+        net_payable = basic_salary + emp_bonuses - emp_deductions - emp_advances
+        
+        # جلب اسم الفرع
+        branch = await db.branches.find_one({"id": emp.get("branch_id")}, {"_id": 0, "name": 1})
+        
+        employee_data.append({
+            "id": emp["id"],
+            "name": emp.get("name"),
+            "position": emp.get("position"),
+            "branch_id": emp.get("branch_id"),
+            "branch_name": branch.get("name") if branch else "-",
+            "basic_salary": basic_salary,
+            "deductions": emp_deductions,
+            "deductions_details": deductions,
+            "bonuses": emp_bonuses,
+            "bonuses_details": bonuses,
+            "advances_deduction": emp_advances,
+            "pending_advances": pending_advances,
+            "net_payable": net_payable
+        })
+        
+        totals["basic_salary"] += basic_salary
+        totals["total_deductions"] += emp_deductions
+        totals["total_bonuses"] += emp_bonuses
+        totals["total_advances"] += emp_advances
+        totals["net_payable"] += net_payable
+    
+    return {
+        "month": month,
+        "employee_count": len(employees),
+        "employees": employee_data,
+        "totals": totals
+    }
+
+@api_router.get("/reports/employee-salary-slip/{employee_id}")
+async def get_employee_salary_slip(
+    employee_id: str,
+    month: str,  # YYYY-MM
+    current_user: dict = Depends(get_current_user)
+):
+    """مفردات مرتب موظف واحد"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # جلب الموظف
+    emp_query = {"id": employee_id}
+    if tenant_id:
+        emp_query["tenant_id"] = tenant_id
+    
+    employee = await db.employees.find_one(emp_query, {"_id": 0})
+    if not employee:
+        raise HTTPException(status_code=404, detail="الموظف غير موجود")
+    
+    # التحقق من صلاحية الفرع
+    user_branch_id = current_user.get("branch_id")
+    user_role = current_user.get("role")
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        if employee.get("branch_id") != user_branch_id:
+            raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    start_date = f"{month}-01"
+    end_date = f"{month}-31"
+    
+    # جلب الفرع
+    branch = await db.branches.find_one({"id": employee.get("branch_id")}, {"_id": 0})
+    
+    # جلب معلومات العميل
+    tenant_info = await db.tenants.find_one({"id": tenant_id}, {"_id": 0}) if tenant_id else None
+    
+    # الخصومات التفصيلية
+    deductions = await db.deductions.find({
+        "employee_id": employee_id,
+        "date": {"$gte": start_date, "$lte": end_date}
+    }, {"_id": 0}).to_list(100)
+    
+    # تصنيف الخصومات
+    deductions_by_type = {}
+    for d in deductions:
+        dtype = d.get("deduction_type", "other")
+        if dtype not in deductions_by_type:
+            deductions_by_type[dtype] = {"items": [], "total": 0}
+        deductions_by_type[dtype]["items"].append(d)
+        deductions_by_type[dtype]["total"] += d.get("amount", 0)
+    
+    # المكافآت التفصيلية
+    bonuses = await db.bonuses.find({
+        "employee_id": employee_id,
+        "date": {"$gte": start_date, "$lte": end_date}
+    }, {"_id": 0}).to_list(100)
+    
+    # تصنيف المكافآت
+    bonuses_by_type = {}
+    for b in bonuses:
+        btype = b.get("bonus_type", "other")
+        if btype not in bonuses_by_type:
+            bonuses_by_type[btype] = {"items": [], "total": 0}
+        bonuses_by_type[btype]["items"].append(b)
+        bonuses_by_type[btype]["total"] += b.get("amount", 0)
+    
+    # السلف
+    advances = await db.advances.find({
+        "employee_id": employee_id,
+        "status": {"$in": ["approved", "paid"]}
+    }, {"_id": 0}).to_list(100)
+    
+    # الحضور
+    attendance = await db.attendance.find({
+        "employee_id": employee_id,
+        "date": {"$gte": start_date, "$lte": end_date}
+    }, {"_id": 0}).to_list(31)
+    
+    # إحصائيات الحضور
+    attendance_stats = {
+        "present": len([a for a in attendance if a.get("status") == "present"]),
+        "absent": len([a for a in attendance if a.get("status") == "absent"]),
+        "late": len([a for a in attendance if a.get("status") == "late"]),
+        "early_leave": len([a for a in attendance if a.get("status") == "early_leave"]),
+        "holiday": len([a for a in attendance if a.get("status") == "holiday"])
+    }
+    
+    # حساب الإجماليات
+    total_deductions = sum(d.get("amount", 0) for d in deductions)
+    total_bonuses = sum(b.get("amount", 0) for b in bonuses)
+    advance_deduction = sum(a.get("monthly_deduction", 0) for a in advances if a.get("status") == "approved")
+    pending_advances = sum(a.get("remaining_amount", 0) for a in advances if a.get("status") == "approved")
+    
+    basic_salary = employee.get("salary", 0)
+    net_salary = basic_salary + total_bonuses - total_deductions - advance_deduction
+    
+    return {
+        "employee": employee,
+        "branch": branch,
+        "tenant": tenant_info,
+        "month": month,
+        "salary_details": {
+            "basic_salary": basic_salary,
+            "salary_type": employee.get("salary_type", "monthly"),
+            "work_hours_per_day": employee.get("work_hours_per_day", 8)
+        },
+        "deductions": {
+            "items": deductions,
+            "by_type": deductions_by_type,
+            "total": total_deductions
+        },
+        "bonuses": {
+            "items": bonuses,
+            "by_type": bonuses_by_type,
+            "total": total_bonuses
+        },
+        "advances": {
+            "items": advances,
+            "deduction_this_month": advance_deduction,
+            "pending_total": pending_advances
+        },
+        "attendance": {
+            "records": attendance,
+            "stats": attendance_stats
+        },
+        "summary": {
+            "basic_salary": basic_salary,
+            "total_additions": total_bonuses,
+            "total_deductions": total_deductions + advance_deduction,
+            "net_salary": net_salary
+        },
+        "generated_at": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/reports/payroll/export/excel")
+async def export_payroll_excel(
+    month: str,
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """تصدير تقرير الرواتب إلى Excel"""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+    from io import BytesIO
+    
+    # جلب بيانات التقرير
+    tenant_id = get_user_tenant_id(current_user)
+    
+    emp_query = {"is_active": True}
+    if tenant_id:
+        emp_query["tenant_id"] = tenant_id
+    
+    user_branch_id = current_user.get("branch_id")
+    user_role = current_user.get("role")
+    
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        emp_query["branch_id"] = user_branch_id
+    elif branch_id:
+        emp_query["branch_id"] = branch_id
+    
+    employees = await db.employees.find(emp_query, {"_id": 0}).to_list(500)
+    
+    start_date = f"{month}-01"
+    end_date = f"{month}-31"
+    
+    # إنشاء ملف Excel
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "تقرير الرواتب"
+    
+    # التنسيق
+    header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # العنوان
+    ws.merge_cells('A1:H1')
+    ws['A1'] = f"تقرير الرواتب - {month}"
+    ws['A1'].font = Font(bold=True, size=14)
+    ws['A1'].alignment = Alignment(horizontal='center')
+    
+    # الرؤوس
+    headers = ['#', 'الموظف', 'الفرع', 'الراتب الأساسي', 'المكافآت', 'الخصومات', 'السلف', 'صافي الراتب']
+    for col, header in enumerate(headers, 1):
+        cell = ws.cell(row=3, column=col, value=header)
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center')
+        cell.border = thin_border
+    
+    # البيانات
+    row_num = 4
+    totals = [0, 0, 0, 0, 0]
+    
+    for idx, emp in enumerate(employees, 1):
+        # الخصومات
+        deductions = await db.deductions.find({
+            "employee_id": emp["id"],
+            "date": {"$gte": start_date, "$lte": end_date}
+        }, {"_id": 0}).to_list(100)
+        emp_deductions = sum(d.get("amount", 0) for d in deductions)
+        
+        # المكافآت
+        bonuses = await db.bonuses.find({
+            "employee_id": emp["id"],
+            "date": {"$gte": start_date, "$lte": end_date}
+        }, {"_id": 0}).to_list(100)
+        emp_bonuses = sum(b.get("amount", 0) for b in bonuses)
+        
+        # السلف
+        advances = await db.advances.find({
+            "employee_id": emp["id"],
+            "status": "approved",
+            "remaining_amount": {"$gt": 0}
+        }, {"_id": 0}).to_list(100)
+        emp_advances = sum(a.get("monthly_deduction", 0) for a in advances)
+        
+        basic_salary = emp.get("salary", 0)
+        net_salary = basic_salary + emp_bonuses - emp_deductions - emp_advances
+        
+        # جلب اسم الفرع
+        branch = await db.branches.find_one({"id": emp.get("branch_id")}, {"_id": 0, "name": 1})
+        
+        data = [
+            idx,
+            emp.get("name", ""),
+            branch.get("name", "-") if branch else "-",
+            basic_salary,
+            emp_bonuses,
+            emp_deductions,
+            emp_advances,
+            net_salary
+        ]
+        
+        for col, value in enumerate(data, 1):
+            cell = ws.cell(row=row_num, column=col, value=value)
+            cell.border = thin_border
+            if col >= 4:
+                cell.number_format = '#,##0'
+        
+        totals[0] += basic_salary
+        totals[1] += emp_bonuses
+        totals[2] += emp_deductions
+        totals[3] += emp_advances
+        totals[4] += net_salary
+        
+        row_num += 1
+    
+    # الإجماليات
+    ws.cell(row=row_num, column=2, value="الإجمالي").font = Font(bold=True)
+    ws.cell(row=row_num, column=2).border = thin_border
+    for col, total in enumerate(totals, 4):
+        cell = ws.cell(row=row_num, column=col, value=total)
+        cell.font = Font(bold=True)
+        cell.border = thin_border
+        cell.number_format = '#,##0'
+    
+    # عرض الأعمدة
+    ws.column_dimensions['A'].width = 5
+    ws.column_dimensions['B'].width = 25
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 15
+    ws.column_dimensions['E'].width = 12
+    ws.column_dimensions['F'].width = 12
+    ws.column_dimensions['G'].width = 12
+    ws.column_dimensions['H'].width = 15
+    
+    # حفظ الملف
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename=payroll_report_{month}.xlsx"}
+    )
+
+@api_router.get("/reports/employee-salary-slip/{employee_id}/export/excel")
+async def export_employee_salary_slip_excel(
+    employee_id: str,
+    month: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """تصدير مفردات مرتب موظف إلى Excel"""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+    from io import BytesIO
+    
+    # جلب بيانات الموظف
+    slip_data = await get_employee_salary_slip(employee_id, month, current_user)
+    employee = slip_data["employee"]
+    
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "مفردات المرتب"
+    
+    # التنسيق
+    header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    
+    # العنوان
+    ws.merge_cells('A1:D1')
+    ws['A1'] = "مفردات المرتب"
+    ws['A1'].font = Font(bold=True, size=16)
+    ws['A1'].alignment = Alignment(horizontal='center')
+    
+    # معلومات الموظف
+    ws['A3'] = "اسم الموظف:"
+    ws['B3'] = employee.get("name", "")
+    ws['C3'] = "الشهر:"
+    ws['D3'] = month
+    
+    ws['A4'] = "الوظيفة:"
+    ws['B4'] = employee.get("position", "")
+    ws['C4'] = "الفرع:"
+    ws['D4'] = slip_data["branch"].get("name", "-") if slip_data["branch"] else "-"
+    
+    # الراتب الأساسي
+    ws['A6'] = "الراتب الأساسي"
+    ws['A6'].font = Font(bold=True)
+    ws['B6'] = slip_data["salary_details"]["basic_salary"]
+    ws['B6'].number_format = '#,##0'
+    
+    # المكافآت
+    row = 8
+    ws[f'A{row}'] = "المكافآت"
+    ws[f'A{row}'].font = Font(bold=True)
+    ws[f'A{row}'].fill = PatternFill(start_color="92D050", end_color="92D050", fill_type="solid")
+    row += 1
+    
+    for bonus in slip_data["bonuses"]["items"]:
+        ws[f'A{row}'] = bonus.get("reason", bonus.get("bonus_type", ""))
+        ws[f'B{row}'] = bonus.get("amount", 0)
+        ws[f'B{row}'].number_format = '#,##0'
+        row += 1
+    
+    ws[f'A{row}'] = "إجمالي المكافآت"
+    ws[f'A{row}'].font = Font(bold=True)
+    ws[f'B{row}'] = slip_data["bonuses"]["total"]
+    ws[f'B{row}'].number_format = '#,##0'
+    row += 2
+    
+    # الخصومات
+    ws[f'A{row}'] = "الخصومات"
+    ws[f'A{row}'].font = Font(bold=True)
+    ws[f'A{row}'].fill = PatternFill(start_color="FF6B6B", end_color="FF6B6B", fill_type="solid")
+    row += 1
+    
+    for deduction in slip_data["deductions"]["items"]:
+        ws[f'A{row}'] = deduction.get("reason", deduction.get("deduction_type", ""))
+        ws[f'B{row}'] = deduction.get("amount", 0)
+        ws[f'B{row}'].number_format = '#,##0'
+        row += 1
+    
+    ws[f'A{row}'] = "إجمالي الخصومات"
+    ws[f'A{row}'].font = Font(bold=True)
+    ws[f'B{row}'] = slip_data["deductions"]["total"]
+    ws[f'B{row}'].number_format = '#,##0'
+    row += 2
+    
+    # السلف
+    ws[f'A{row}'] = "خصم السلف"
+    ws[f'A{row}'].font = Font(bold=True)
+    ws[f'B{row}'] = slip_data["advances"]["deduction_this_month"]
+    ws[f'B{row}'].number_format = '#,##0'
+    row += 2
+    
+    # صافي الراتب
+    ws[f'A{row}'] = "صافي الراتب"
+    ws[f'A{row}'].font = Font(bold=True, size=14)
+    ws[f'A{row}'].fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    ws[f'A{row}'].font = Font(bold=True, size=14, color="FFFFFF")
+    ws[f'B{row}'] = slip_data["summary"]["net_salary"]
+    ws[f'B{row}'].number_format = '#,##0'
+    ws[f'B{row}'].font = Font(bold=True, size=14)
+    
+    # عرض الأعمدة
+    ws.column_dimensions['A'].width = 30
+    ws.column_dimensions['B'].width = 15
+    ws.column_dimensions['C'].width = 15
+    ws.column_dimensions['D'].width = 15
+    
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+    
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f"attachment; filename=salary_slip_{employee.get('name', '')}_{month}.xlsx"}
+    )
+
 # ==================== COUPONS & PROMOTIONS ROUTES - الكوبونات والعروض ====================
 
 class CouponCreate(BaseModel):
