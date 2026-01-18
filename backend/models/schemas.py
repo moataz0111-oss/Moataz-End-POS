@@ -480,3 +480,160 @@ class CallCenterConfig(BaseModel):
 class IncomingCall(BaseModel):
     phone: str
     caller_name: Optional[str] = None
+
+
+# ==================== HR MODELS ====================
+
+class EmployeeCreate(BaseModel):
+    name: str
+    phone: str
+    email: Optional[str] = None
+    national_id: Optional[str] = None
+    position: str
+    department: Optional[str] = None
+    branch_id: str
+    hire_date: str
+    salary: float
+    salary_type: str = "monthly"
+    work_hours_per_day: float = 8.0
+    user_id: Optional[str] = None
+    hourly_rate: Optional[float] = None
+
+class EmployeeResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    name: str
+    phone: str
+    email: Optional[str] = None
+    national_id: Optional[str] = None
+    position: str
+    department: Optional[str] = None
+    branch_id: str
+    hire_date: str
+    salary: float
+    salary_type: str
+    work_hours_per_day: float
+    user_id: Optional[str] = None
+    is_active: bool = True
+    created_at: str
+    tenant_id: Optional[str] = None
+    hourly_rate: Optional[float] = None
+
+class EmployeeUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    national_id: Optional[str] = None
+    position: Optional[str] = None
+    department: Optional[str] = None
+    branch_id: Optional[str] = None
+    salary: Optional[float] = None
+    salary_type: Optional[str] = None
+    work_hours_per_day: Optional[float] = None
+    is_active: Optional[bool] = None
+    hourly_rate: Optional[float] = None
+
+class AttendanceCreate(BaseModel):
+    employee_id: str
+    date: str
+    check_in: Optional[str] = None
+    check_out: Optional[str] = None
+    status: str = "present"
+    notes: Optional[str] = None
+    source: str = "manual"
+
+class AttendanceResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    employee_id: str
+    employee_name: Optional[str] = None
+    date: str
+    check_in: Optional[str] = None
+    check_out: Optional[str] = None
+    worked_hours: Optional[float] = None
+    status: str
+    notes: Optional[str] = None
+    source: str
+    created_at: str
+
+class AdvanceCreate(BaseModel):
+    employee_id: str
+    amount: float
+    reason: Optional[str] = None
+    deduction_months: int = 1
+    date: Optional[str] = None
+
+class AdvanceResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    employee_id: str
+    employee_name: Optional[str] = None
+    amount: float
+    remaining_amount: float
+    deducted_amount: float = 0
+    deduction_months: int
+    monthly_deduction: float
+    reason: Optional[str] = None
+    status: str
+    date: str
+    created_at: str
+
+class DeductionCreate(BaseModel):
+    employee_id: str
+    deduction_type: str
+    amount: Optional[float] = None
+    hours: Optional[float] = None
+    days: Optional[float] = None
+    reason: str
+    date: str
+
+class DeductionResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    employee_id: str
+    employee_name: Optional[str] = None
+    deduction_type: str
+    amount: float
+    hours: Optional[float] = None
+    days: Optional[float] = None
+    reason: str
+    date: str
+    created_at: str
+
+class BonusCreate(BaseModel):
+    employee_id: str
+    bonus_type: str
+    amount: Optional[float] = None
+    hours: Optional[float] = None
+    reason: str
+    date: str
+
+class BonusResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    employee_id: str
+    employee_name: Optional[str] = None
+    bonus_type: str
+    amount: float
+    hours: Optional[float] = None
+    reason: str
+    date: str
+    created_at: str
+
+class PayrollResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    employee_id: str
+    employee_name: Optional[str] = None
+    month: str
+    basic_salary: float
+    total_bonuses: float
+    total_deductions: float
+    advance_deduction: float
+    net_salary: float
+    status: str
+    created_at: str
+
+
+class PasswordReset(BaseModel):
+    new_password: str
