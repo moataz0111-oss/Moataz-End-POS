@@ -53,7 +53,8 @@ import {
   Home,
   Fingerprint,
   FileSpreadsheet,
-  BarChart3
+  BarChart3,
+  FileText
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import BiometricDevices from '../components/BiometricDevices';
