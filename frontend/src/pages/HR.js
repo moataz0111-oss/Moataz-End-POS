@@ -256,6 +256,147 @@ export default function HR() {
     }
   };
 
+  // طباعة إيصال الخصم
+  const printDeductionReceipt = (deduction) => {
+    const employee = employees.find(e => e.id === deduction.employee_id);
+    const deductionTypeLabels = {
+      'absence': 'غياب',
+      'late': 'تأخير',
+      'early_leave': 'انصراف مبكر',
+      'violation': 'مخالفة',
+      'other': 'أخرى'
+    };
+    
+    const printWindow = window.open('', '_blank', 'width=400,height=600');
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="ar" dir="rtl">
+      <head>
+        <meta charset="UTF-8">
+        <title>إيصال خصم</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { 
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif; 
+            padding: 20px;
+            max-width: 350px;
+            margin: 0 auto;
+            direction: rtl;
+          }
+          .header { 
+            text-align: center; 
+            border-bottom: 2px dashed #333; 
+            padding-bottom: 15px; 
+            margin-bottom: 15px; 
+          }
+          .logo { font-size: 24px; font-weight: bold; color: #D4AF37; }
+          .title { font-size: 16px; margin-top: 8px; color: #dc2626; }
+          .receipt-no { font-size: 12px; color: #666; margin-top: 5px; }
+          .section { margin: 15px 0; padding: 10px; background: #f9f9f9; border-radius: 8px; }
+          .row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 14px; }
+          .label { color: #666; }
+          .value { font-weight: bold; }
+          .amount { 
+            font-size: 24px; 
+            text-align: center; 
+            color: #dc2626; 
+            padding: 15px; 
+            margin: 15px 0;
+            border: 2px solid #dc2626;
+            border-radius: 8px;
+          }
+          .reason { 
+            padding: 10px; 
+            background: #fee2e2; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            margin: 10px 0; 
+          }
+          .signature { 
+            margin-top: 30px; 
+            padding-top: 15px; 
+            border-top: 1px solid #ccc; 
+          }
+          .sig-line { 
+            margin-top: 40px; 
+            border-bottom: 1px solid #333; 
+            width: 60%; 
+          }
+          .sig-label { font-size: 12px; color: #666; margin-top: 5px; }
+          .footer { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 11px; 
+            color: #999; 
+            border-top: 2px dashed #333;
+            padding-top: 15px;
+          }
+          @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">Maestro EGP</div>
+          <div class="title">🔴 إيصال خصم</div>
+          <div class="receipt-no">رقم: ${deduction.id?.slice(0, 8) || 'N/A'}</div>
+        </div>
+        
+        <div class="section">
+          <div class="row">
+            <span class="label">اسم الموظف:</span>
+            <span class="value">${deduction.employee_name || employee?.name || 'غير محدد'}</span>
+          </div>
+          <div class="row">
+            <span class="label">التاريخ:</span>
+            <span class="value">${deduction.date || new Date().toLocaleDateString('ar-IQ')}</span>
+          </div>
+          <div class="row">
+            <span class="label">نوع الخصم:</span>
+            <span class="value">${deductionTypeLabels[deduction.deduction_type] || deduction.deduction_type}</span>
+          </div>
+        </div>
+        
+        <div class="amount">
+          مبلغ الخصم: ${formatPrice(deduction.amount)}
+        </div>
+        
+        <div class="reason">
+          <strong>السبب:</strong><br/>
+          ${deduction.reason || 'غير محدد'}
+        </div>
+        
+        ${deduction.hours ? `<div class="row"><span class="label">عدد الساعات:</span><span class="value">${deduction.hours} ساعة</span></div>` : ''}
+        ${deduction.days ? `<div class="row"><span class="label">عدد الأيام:</span><span class="value">${deduction.days} يوم</span></div>` : ''}
+        
+        <div class="signature">
+          <div>توقيع الموظف (علمت بالخصم):</div>
+          <div class="sig-line"></div>
+          <div class="sig-label">التاريخ: _______________</div>
+        </div>
+        
+        <div class="signature">
+          <div>توقيع المسؤول:</div>
+          <div class="sig-line"></div>
+          <div class="sig-label">الاسم: ${user?.full_name || '_______________'}</div>
+        </div>
+        
+        <div class="footer">
+          <p>تم إنشاء هذا الإيصال من نظام Maestro EGP</p>
+          <p>${new Date().toLocaleString('ar-IQ')}</p>
+        </div>
+        
+        <script>
+          window.onload = function() { window.print(); }
+        </script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   // Bonus handlers
   const handleCreateBonus = async (e) => {
     e.preventDefault();
