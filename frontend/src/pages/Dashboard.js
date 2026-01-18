@@ -91,6 +91,10 @@ export default function Dashboard() {
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tenantInfo, setTenantInfo] = useState(null); // معلومات العميل (الشعار والاسم)
+  const [statsPeriod, setStatsPeriod] = useState('today'); // today, week, month, all_time
+  const [dayStatus, setDayStatus] = useState(null); // حالة اليوم
+  const [showDayCloseDialog, setShowDayCloseDialog] = useState(false);
+  const [closingDay, setClosingDay] = useState(false);
   const [dashboardSettings, setDashboardSettings] = useState({
     showPOS: true,
     showTables: true,
