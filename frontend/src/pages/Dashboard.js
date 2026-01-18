@@ -83,11 +83,10 @@ const DENOMINATIONS = [
 export default function Dashboard() {
   const { user, logout, hasRole } = useAuth();
   const { theme, setTheme, isDark } = useTheme();
+  const { selectedBranchId, branches, getBranchIdForApi } = useBranch();
   const navigate = useNavigate();
   const printRef = useRef();
   
-  const [branches, setBranches] = useState([]);
-  const [selectedBranch, setSelectedBranch] = useState(null);
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
