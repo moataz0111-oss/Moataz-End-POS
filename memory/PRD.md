@@ -10,36 +10,49 @@
 - تقارير وإحصائيات ذكية
 - دعم Multi-tenancy (عدة عملاء)
 
-## الجلسة الحالية - 17 يناير 2026 (الإصدار 15)
+## الجلسة الحالية - 18 يناير 2026 (الإصدار 16)
 
 ### ✅ ما تم إنجازه في هذه الجلسة:
 
-#### 1. إصلاح تقرير إغلاق الصندوق (P0) ✅
-- إصلاح `/app/frontend/src/utils/api.js` - القيم تظهر بشكل صحيح الآن
+#### 1. نظام فلترة الفروع الشامل ✅
+- إنشاء `BranchContext.js` - Context عام للفرع المحدد
+- إنشاء `BranchSelector.js` - مكون اختيار الفرع في الشريط العلوي
+- تحديث `App.js` لإضافة `BranchProvider`
+- تحديث `Dashboard.js` لاستخدام `useBranch`
+- تحديث `Reports.js` لاستخدام الفلتر العام
 
-#### 2. إكمال ميزة تحويل السائق (P1) ✅
-- إضافة `current_order` و `driver_name` للـ Models
-- **اختبار:** 11/11 tests passed
+#### 2. تحديث جميع نقاط النهاية للتقارير ✅
+- `/api/reports/sales` - مبيعات الفرع أو الجميع
+- `/api/reports/purchases` - مشتريات الفرع
+- `/api/reports/inventory` - مخزون الفرع
+- `/api/reports/expenses` - مصاريف الفرع
+- `/api/reports/profit-loss` - أرباح وخسائر
+- `/api/reports/delivery-credits` - عمولات التوصيل
+- `/api/reports/products` - منتجات الفرع
+- `/api/reports/cancellations` - إلغاءات
+- `/api/reports/discounts` - خصومات
+- `/api/reports/credit` - آجل
 
-#### 3. نظام إدارة الموظفين والأدوار الكامل ✅
-- **6 أدوار وظيفية:** مدير فرع، مشرف، كاشير، سائق توصيل، جرسون، مطبخ
-- **21 صلاحية مخصصة:**
-  - 📄 **صلاحيات الصفحات (10):** نقاط البيع، إعطاء خصومات، الطلبات، الطاولات، شاشة المطبخ، التوصيل، المخزون، التقارير، المصاريف، إغلاق الصندوق
-  - ⚙️ **صلاحيات الإعدادات (11):** الإعدادات، المظهر، الرئيسية، العملاء، الفئات، المنتجات، الفروع، الطابعات، أقسام المطبخ، شركات التوصيل، الإشعارات
+#### 3. ميزات الفلترة:
+- **المدراء (admin/manager):** يمكنهم اختيار "جميع الفروع" أو فرع معين
+- **الموظفون:** يرون فقط بيانات فرعهم المحدد
+- **الاحتفاظ بالاختيار:** يتم حفظ الفرع المحدد في localStorage
 
-- **تقييد الفرع:** الموظف يرى فقط فرعه ومبيعاته
-- **تبويب "المستخدمين" و "الأدوار":** يظهر فقط للعميل (admin)
-
-### 📊 نتائج الاختبارات (Iteration 15)
-- **Backend:** 13/13 tests passed (100%)
-- **Frontend:** Role-based tab visibility working correctly
+### 📊 حالة النشر
+✅ **جاهز للنشر** - تم التحقق من جميع متطلبات النشر:
+- Environment variables configured
+- CORS allows all origins
+- MongoDB connection from environment
+- No hardcoded URLs
+- Supervisor configuration correct
 
 ## ملفات التغييرات:
-- `/app/backend/server.py`: قسم ROLES & STAFF MANAGEMENT مع permissions
-- `/app/frontend/src/pages/Settings.js`: تبويب الأدوار مع 21 صلاحية مقسمة لمجموعتين
-- `/app/frontend/src/context/AuthContext.js`: hasPermission function
-- `/app/frontend/src/App.js`: PermissionRoute component
-- `/app/frontend/src/pages/Dashboard.js`: فلترة الأيقونات حسب الصلاحيات
+- `/app/frontend/src/context/BranchContext.js` (جديد)
+- `/app/frontend/src/components/BranchSelector.js` (جديد)
+- `/app/frontend/src/App.js` (تحديث)
+- `/app/frontend/src/pages/Dashboard.js` (تحديث)
+- `/app/frontend/src/pages/Reports.js` (تحديث)
+- `/app/backend/server.py` (تحديث - جميع تقارير الفروع)
 
 ## جدول الصلاحيات
 
@@ -75,7 +88,7 @@
 ## المهام المتبقية
 
 ### 🔴 أولوية قصوى (P0)
-- [ ] إعادة هيكلة `/app/backend/server.py` (9500+ سطر)
+- [ ] إعادة هيكلة `/app/backend/server.py` (9600+ سطر)
 
 ### 🟡 أولوية عالية (P1)
 - [ ] تحسين خريطة السائقين الحية
@@ -85,6 +98,7 @@
 - [ ] إكمال تكامل أجهزة البصمة (ZKTeco)
 - [ ] نظام ولاء العملاء (Loyalty)
 - [ ] نظام إدارة الوصفات
+- [ ] إضافة وضع مظلم/فاتح
 
 ## بيانات الاختبار
 
@@ -92,9 +106,9 @@
 |-------|--------|-------------|-----------|
 | Admin | admin@maestroegp.com | admin123 | جميع الصلاحيات |
 | Super Admin | owner@maestroegp.com | owner123 | جميع الصلاحيات |
-| مدير فرع | yamen@test.com | test123 | معظم الصلاحيات |
-| كاشير | cashier1@test.com | test123 | فرع محدد فقط |
+| مدير فرع | manager@test.com | 123456 | معظم الصلاحيات |
+| كاشير | cashier@test.com | 123456 | فرع محدد فقط |
 
 ---
-آخر تحديث: 17 يناير 2026 - 11:40 PM
-نسبة الإنجاز: 98%
+آخر تحديث: 18 يناير 2026 - 12:25 AM
+نسبة الإنجاز: 99%
