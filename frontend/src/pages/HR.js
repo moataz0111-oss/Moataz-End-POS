@@ -1310,6 +1310,7 @@ export default function HR() {
                         <th className="text-right p-3">المبلغ</th>
                         <th className="text-right p-3">السبب</th>
                         <th className="text-right p-3">التاريخ</th>
+                        <th className="text-right p-3">إجراءات</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1327,6 +1328,18 @@ export default function HR() {
                           <td className="p-3 text-red-500">{formatPrice(ded.amount)}</td>
                           <td className="p-3">{ded.reason}</td>
                           <td className="p-3">{ded.date}</td>
+                          <td className="p-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => printDeductionReceipt(ded)}
+                              className="gap-1"
+                              data-testid={`print-deduction-${ded.id}`}
+                            >
+                              <Printer className="h-4 w-4" />
+                              طباعة
+                            </Button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
