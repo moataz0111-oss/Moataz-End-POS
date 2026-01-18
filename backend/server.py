@@ -11500,6 +11500,369 @@ async def list_backups(current_user: dict = Depends(get_current_user)):
     return {"backups": backups[:50]}  # آخر 50 نسخة
 
 
+# ==================== CUSTOMER MENU APP APIs ====================
+
+class CustomerRegister(BaseModel):
+    name: str
+    phone: str
+    email: Optional[str] = None
+    address: Optional[str] = None
+    password: Optional[str] = None
+
+class CustomerLogin(BaseModel):
+    phone: str
+    password: Optional[str] = None
+
+class CustomerOrderItem(BaseModel):
+    product_id: str
+    quantity: int
+    notes: Optional[str] = None
+
+class CustomerOrderCreate(BaseModel):
+    items: List[CustomerOrderItem]
+    delivery_address: str
+    delivery_notes: Optional[str] = None
+    payment_method: str = "cash"
+    customer_name: Optional[str] = None
+    customer_phone: Optional[str] = None
+    branch_id: Optional[str] = None
+
+def generate_menu_slug(name: str) -> str:
+    """إنشاء slug من اسم المطعم"""
+    import re
+    slug = name.lower().replace(" ", "-").replace("_", "-")
+    slug = re.sub(r'[^a-z0-9\-]', '', slug)
+    return slug or "menu"
+
+def hash_customer_password(password: str) -> str:
+    """تشفير كلمة مرور العميل"""
+    import hashlib
+    return hashlib.sha256(password.encode()).hexdigest()
+
+@api_router.get("/customer/menu/{tenant_id}")
+async def get_customer_menu(tenant_id: str):
+    """جلب قائمة الطعام للعملاء - بدون توثيق"""
+    # البحث عن tenant
+    tenant = await db.tenants.find_one(
+        {"$or": [{"id": tenant_id}, {"menu_slug": tenant_id}]},
+        {"_id": 0}
+    )
+    
+    if not tenant:
+        # إذا لم يوجد tenant، نستخدم tenant_id كـ query للمنتجات
+        # هذا للتوافق مع الأنظمة التي لا تستخدم tenants
+        tenant = {"id": tenant_id, "name": "المطعم"}
+    
+    tid = tenant.get("id", tenant_id)
+    
+    # جلب الفئات
+    categories = await db.categories.find(
+        {"$or": [{"tenant_id": tid}, {"tenant_id": {"$exists": False}}]},
+        {"_id": 0}
+    ).sort("sort_order", 1).to_list(100)
+    
+    # جلب المنتجات
+    products = await db.products.find(
+        {"$or": [{"tenant_id": tid}, {"tenant_id": {"$exists": False}}], "is_available": {"$ne": False}},
+        {"_id": 0}
+    ).to_list(500)
+    
+    # جلب الفروع
+    branches = await db.branches.find(
+        {"$or": [{"tenant_id": tid}, {"tenant_id": {"$exists": False}}], "is_active": {"$ne": False}},
+        {"_id": 0}
+    ).to_list(50)
+    
+    # جلب الإعدادات
+    settings = await db.tenant_settings.find_one({"tenant_id": tid}, {"_id": 0}) or {}
+    
+    return {
+        "restaurant": {
+            "id": tid,
+            "name": tenant.get("name", ""),
+            "logo": tenant.get("logo", ""),
+            "description": tenant.get("description", ""),
+            "phone": tenant.get("phone", ""),
+            "address": tenant.get("address", ""),
+            "delivery_fee": settings.get("delivery_fee", 0),
+            "min_order": settings.get("min_order", 0),
+            "payment_methods": settings.get("payment_methods", ["cash"]),
+            "menu_slug": tenant.get("menu_slug", tid)
+        },
+        "categories": categories,
+        "products": products,
+        "branches": branches
+    }
+
+@api_router.post("/customer/auth/register/{tenant_id}")
+async def register_customer(tenant_id: str, data: CustomerRegister):
+    """تسجيل عميل جديد"""
+    # التحقق من عدم وجود العميل
+    existing = await db.customers.find_one({
+        "phone": data.phone,
+        "$or": [{"tenant_id": tenant_id}, {"tenant_id": {"$exists": False}}]
+    })
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="رقم الهاتف مسجل بالفعل")
+    
+    customer = {
+        "id": str(uuid.uuid4()),
+        "name": data.name,
+        "phone": data.phone,
+        "email": data.email,
+        "address": data.address,
+        "password": hash_customer_password(data.password) if data.password else None,
+        "tenant_id": tenant_id,
+        "total_orders": 0,
+        "total_spent": 0,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.customers.insert_one(customer)
+    customer.pop("_id", None)
+    customer.pop("password", None)
+    
+    # إنشاء token
+    import secrets
+    token = secrets.token_urlsafe(32)
+    await db.customer_tokens.insert_one({
+        "token": token,
+        "customer_id": customer["id"],
+        "tenant_id": tenant_id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    return {"customer": customer, "token": token}
+
+@api_router.post("/customer/auth/login/{tenant_id}")
+async def login_customer(tenant_id: str, data: CustomerLogin):
+    """تسجيل دخول العميل"""
+    customer = await db.customers.find_one({
+        "phone": data.phone,
+        "$or": [{"tenant_id": tenant_id}, {"tenant_id": {"$exists": False}}]
+    }, {"_id": 0})
+    
+    if not customer:
+        raise HTTPException(status_code=401, detail="رقم الهاتف غير مسجل")
+    
+    # التحقق من كلمة المرور إذا كانت موجودة
+    if customer.get("password") and data.password:
+        if hash_customer_password(data.password) != customer["password"]:
+            raise HTTPException(status_code=401, detail="كلمة المرور غير صحيحة")
+    
+    # إنشاء token
+    import secrets
+    token = secrets.token_urlsafe(32)
+    await db.customer_tokens.insert_one({
+        "token": token,
+        "customer_id": customer["id"],
+        "tenant_id": tenant_id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    customer.pop("password", None)
+    return {"customer": customer, "token": token}
+
+async def get_customer_from_token(token: str):
+    """جلب العميل من token"""
+    if not token:
+        return None
+    
+    token_doc = await db.customer_tokens.find_one({"token": token})
+    if not token_doc:
+        return None
+    
+    customer = await db.customers.find_one(
+        {"id": token_doc["customer_id"]},
+        {"_id": 0, "password": 0}
+    )
+    return customer
+
+@api_router.post("/customer/order/{tenant_id}")
+async def create_customer_order(
+    tenant_id: str,
+    order: CustomerOrderCreate,
+    customer_token: Optional[str] = None
+):
+    """إنشاء طلب من تطبيق العميل"""
+    # جلب العميل
+    customer = None
+    if customer_token:
+        customer = await get_customer_from_token(customer_token)
+    
+    # حساب المجموع
+    total = 0
+    total_cost = 0
+    order_items = []
+    
+    for item in order.items:
+        product = await db.products.find_one({"id": item.product_id}, {"_id": 0})
+        if not product:
+            raise HTTPException(status_code=400, detail=f"المنتج غير موجود: {item.product_id}")
+        
+        item_total = product.get("price", 0) * item.quantity
+        item_cost = product.get("cost", 0) * item.quantity
+        
+        order_items.append({
+            "product_id": item.product_id,
+            "name": product.get("name"),
+            "name_en": product.get("name_en"),
+            "price": product.get("price", 0),
+            "quantity": item.quantity,
+            "total": item_total,
+            "notes": item.notes
+        })
+        
+        total += item_total
+        total_cost += item_cost
+    
+    # جلب رسوم التوصيل
+    settings = await db.tenant_settings.find_one({"tenant_id": tenant_id}) or {}
+    delivery_fee = settings.get("delivery_fee", 0)
+    
+    # إنشاء رقم الطلب
+    today = datetime.now(timezone.utc).strftime('%Y%m%d')
+    count = await db.orders.count_documents({"created_at": {"$gte": datetime.now(timezone.utc).strftime('%Y-%m-%d')}})
+    order_number = int(f"{today[-4:]}{count + 1:04d}")
+    
+    # تحديد الفرع
+    branch_id = order.branch_id
+    if not branch_id:
+        # استخدام أول فرع نشط
+        branch = await db.branches.find_one({"is_active": {"$ne": False}}, {"id": 1})
+        branch_id = branch["id"] if branch else None
+    
+    # إنشاء الطلب
+    order_doc = {
+        "id": str(uuid.uuid4()),
+        "order_number": order_number,
+        "tenant_id": tenant_id,
+        "branch_id": branch_id,
+        "customer_id": customer["id"] if customer else None,
+        "customer_name": customer["name"] if customer else order.customer_name,
+        "customer_phone": customer["phone"] if customer else order.customer_phone,
+        "delivery_address": order.delivery_address,
+        "delivery_notes": order.delivery_notes,
+        "items": order_items,
+        "subtotal": total,
+        "delivery_fee": delivery_fee,
+        "discount": 0,
+        "tax": 0,
+        "total": total + delivery_fee,
+        "total_cost": total_cost,
+        "profit": total - total_cost,
+        "payment_method": order.payment_method,
+        "payment_status": "paid" if order.payment_method in ["card", "zain_cash"] else "pending",
+        "status": "pending",
+        "order_type": "delivery",
+        "source": "customer_app",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.orders.insert_one(order_doc)
+    order_doc.pop("_id", None)
+    
+    # تحديث إحصائيات العميل
+    if customer:
+        await db.customers.update_one(
+            {"id": customer["id"]},
+            {"$inc": {"total_orders": 1, "total_spent": order_doc["total"]}}
+        )
+    
+    return {
+        "success": True,
+        "message": "تم إنشاء الطلب بنجاح! سيتم التواصل معك قريباً",
+        "order": order_doc
+    }
+
+@api_router.get("/customer/orders/{tenant_id}")
+async def get_customer_orders(tenant_id: str, customer_token: str):
+    """جلب طلبات العميل"""
+    customer = await get_customer_from_token(customer_token)
+    if not customer:
+        raise HTTPException(status_code=401, detail="غير مصرح")
+    
+    orders = await db.orders.find(
+        {"customer_id": customer["id"]},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(50).to_list(50)
+    
+    return orders
+
+@api_router.get("/customer/order/{tenant_id}/{order_id}")
+async def track_customer_order(tenant_id: str, order_id: str):
+    """تتبع حالة الطلب"""
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # جلب معلومات السائق
+    driver_info = None
+    if order.get("driver_id"):
+        driver = await db.drivers.find_one(
+            {"id": order["driver_id"]},
+            {"_id": 0, "name": 1, "phone": 1, "photo": 1}
+        )
+        if driver:
+            driver_info = driver
+    
+    # مراحل الطلب
+    status_labels = {
+        "pending": "قيد الانتظار",
+        "preparing": "قيد التحضير",
+        "ready": "جاهز للتوصيل",
+        "out_for_delivery": "السائق في الطريق",
+        "delivered": "تم التسليم",
+        "cancelled": "ملغي"
+    }
+    
+    current_status_index = ["pending", "preparing", "ready", "out_for_delivery", "delivered"].index(order["status"]) if order["status"] in ["pending", "preparing", "ready", "out_for_delivery", "delivered"] else 0
+    
+    timeline = []
+    for i, status in enumerate(["pending", "preparing", "ready", "out_for_delivery", "delivered"]):
+        timeline.append({
+            "status": status,
+            "label": status_labels.get(status, status),
+            "completed": i <= current_status_index
+        })
+    
+    return {
+        "order": order,
+        "driver": driver_info,
+        "status_label": status_labels.get(order["status"], order["status"]),
+        "timeline": timeline
+    }
+
+@api_router.get("/customer/menu-link")
+async def get_menu_link(current_user: dict = Depends(get_current_user)):
+    """جلب رابط القائمة للمستخدم"""
+    tenant_id = get_user_tenant_id(current_user) or "default"
+    
+    # التحقق من وجود tenant أو إنشائه
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    
+    if not tenant:
+        # إنشاء tenant جديد
+        tenant = {
+            "id": tenant_id,
+            "name": current_user.get("restaurant_name", "مطعمي"),
+            "menu_slug": generate_menu_slug(current_user.get("restaurant_name", tenant_id)),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.tenants.insert_one(tenant)
+    
+    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://foodops-pro.preview.emergentagent.com')
+    menu_url = f"{base_url}/menu/{tenant.get('menu_slug', tenant_id)}"
+    
+    return {
+        "menu_url": menu_url,
+        "tenant_id": tenant_id,
+        "menu_slug": tenant.get("menu_slug", tenant_id)
+    }
+
+
 # Include router and middleware
 app.include_router(api_router)
 
