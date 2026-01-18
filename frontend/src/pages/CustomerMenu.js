@@ -908,41 +908,148 @@ export default function CustomerMenu() {
                   طريقة الدفع
                 </h2>
                 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-2">
                   <Button
                     variant={paymentMethod === 'cash' ? 'default' : 'outline'}
                     onClick={() => setPaymentMethod('cash')}
-                    className={`h-16 flex-col gap-1 ${paymentMethod === 'cash' ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                    className={`h-20 flex-col gap-1 ${paymentMethod === 'cash' ? 'bg-orange-500 hover:bg-orange-600 border-2 border-orange-600' : 'border-2'}`}
                     data-testid="payment-cash-btn"
                   >
                     <Banknote className="h-6 w-6" />
-                    <span className="text-xs">نقداً عند الاستلام</span>
+                    <span className="text-xs font-bold">نقداً</span>
                   </Button>
                   <Button
                     variant={paymentMethod === 'card' ? 'default' : 'outline'}
                     onClick={() => setPaymentMethod('card')}
-                    className={`h-16 flex-col gap-1 ${paymentMethod === 'card' ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                    className={`h-20 flex-col gap-1 ${paymentMethod === 'card' ? 'bg-orange-500 hover:bg-orange-600 border-2 border-orange-600' : 'border-2'}`}
                     data-testid="payment-card-btn"
                   >
                     <CreditCard className="h-6 w-6" />
-                    <span className="text-xs">بطاقة ائتمان</span>
+                    <span className="text-xs font-bold">بطاقة</span>
+                  </Button>
+                  <Button
+                    variant={paymentMethod === 'zain_cash' ? 'default' : 'outline'}
+                    onClick={() => setPaymentMethod('zain_cash')}
+                    className={`h-20 flex-col gap-1 ${paymentMethod === 'zain_cash' ? 'bg-purple-500 hover:bg-purple-600 border-2 border-purple-600' : 'border-2'}`}
+                    data-testid="payment-zaincash-btn"
+                  >
+                    <Smartphone className="h-6 w-6" />
+                    <span className="text-xs font-bold">زين كاش</span>
                   </Button>
                 </div>
 
+                {/* Card Payment Form */}
                 {paymentMethod === 'card' && (
-                  <div className="p-3 bg-blue-50 rounded-lg">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                  <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 space-y-4">
+                    <div className="flex items-center gap-2 text-blue-700 mb-2">
+                      <CreditCard className="h-5 w-5" />
+                      <span className="font-bold">بيانات البطاقة</span>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">رقم البطاقة</label>
+                      <Input
+                        placeholder="0000 0000 0000 0000"
+                        className="bg-white text-lg tracking-wider"
+                        maxLength={19}
+                        data-testid="card-number-input"
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">تاريخ الانتهاء</label>
+                        <Input
+                          placeholder="MM/YY"
+                          className="bg-white"
+                          maxLength={5}
+                          data-testid="card-expiry-input"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">CVV</label>
+                        <Input
+                          placeholder="123"
+                          type="password"
+                          className="bg-white"
+                          maxLength={4}
+                          data-testid="card-cvv-input"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">اسم حامل البطاقة</label>
+                      <Input
+                        placeholder="JOHN DOE"
+                        className="bg-white uppercase"
+                        data-testid="card-name-input"
+                      />
+                    </div>
+                    
+                    <label className="flex items-center gap-2 cursor-pointer p-2 bg-white rounded-lg">
                       <input 
                         type="checkbox" 
                         checked={saveCard}
                         onChange={(e) => setSaveCard(e.target.checked)}
-                        className="rounded"
+                        className="rounded border-blue-300"
                       />
                       <span className="text-sm text-blue-700">حفظ البطاقة للطلبات القادمة</span>
                     </label>
-                    <p className="text-xs text-blue-600 mt-1">
-                      سيتم توجيهك إلى صفحة الدفع الآمنة
-                    </p>
+                    
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <span>جميع البيانات مشفرة ومحمية بتقنية SSL</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Zain Cash Form */}
+                {paymentMethod === 'zain_cash' && (
+                  <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 space-y-4">
+                    <div className="flex items-center gap-2 text-purple-700 mb-2">
+                      <Smartphone className="h-5 w-5" />
+                      <span className="font-bold">الدفع عبر زين كاش</span>
+                    </div>
+                    
+                    <div className="text-center p-4 bg-white rounded-lg">
+                      <p className="text-sm text-gray-600 mb-3">امسح الكود أو أرسل المبلغ لهذا الرقم:</p>
+                      
+                      {/* QR Code Placeholder */}
+                      <div className="w-40 h-40 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-3 border-2 border-dashed border-purple-300">
+                        <div className="text-center">
+                          <div className="grid grid-cols-5 gap-1 p-2">
+                            {[...Array(25)].map((_, i) => (
+                              <div key={i} className={`w-3 h-3 ${Math.random() > 0.5 ? 'bg-purple-800' : 'bg-white'}`}></div>
+                            ))}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-1">QR Code</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-purple-100 rounded-lg p-3">
+                        <p className="text-xs text-purple-600">رقم المحفظة:</p>
+                        <p className="text-xl font-bold text-purple-800 tracking-wider">0770 000 0000</p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">رقم هاتفك (زين كاش)</label>
+                      <Input
+                        placeholder="07xx xxx xxxx"
+                        className="bg-white"
+                        type="tel"
+                        data-testid="zaincash-phone-input"
+                      />
+                    </div>
+                    
+                    <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <p className="text-xs text-yellow-700">
+                        ⚠️ بعد إرسال المبلغ، أدخل رقم هاتفك واضغط "تأكيد الطلب"
+                      </p>
+                    </div>
                   </div>
                 )}
               </CardContent>
