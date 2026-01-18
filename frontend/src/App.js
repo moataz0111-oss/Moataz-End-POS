@@ -338,6 +338,8 @@ function AppRoutes() {
       <Route path="/driver" element={<DriverPortal />} />
       {/* صفحة Super Admin - لوحة تحكم المالك */}
       <Route path="/super-admin" element={<SuperAdmin />} />
+      {/* صفحة إدارة النظام */}
+      <Route path="/system-admin" element={<ProtectedRoute><SystemAdmin /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
