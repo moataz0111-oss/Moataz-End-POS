@@ -51,7 +51,11 @@ import {
   Image,
   ShoppingBag,
   Warehouse,
-  Mail
+  Mail,
+  Share2,
+  Copy,
+  Link,
+  QrCode
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
