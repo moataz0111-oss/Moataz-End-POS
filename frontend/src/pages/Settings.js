@@ -977,6 +977,14 @@ export default function Settings() {
                   الإشعارات
                 </TabsTrigger>
               )}
+              {hasRole(['admin']) && (
+                <TabsTrigger 
+                  value="payments"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  💳 الدفع الإلكتروني
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
 
