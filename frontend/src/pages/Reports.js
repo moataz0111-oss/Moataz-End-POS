@@ -411,6 +411,16 @@ export default function Reports() {
                     </div>
                   </CardContent>
                 </Card>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => exportToExcel('sales')}>
+                    <FileSpreadsheet className="h-4 w-4 ml-2" />
+                    تصدير Excel
+                  </Button>
+                  <Button variant="outline" onClick={() => exportToPDF('sales')}>
+                    <FileText className="h-4 w-4 ml-2" />
+                    تصدير PDF
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
