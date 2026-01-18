@@ -5071,9 +5071,24 @@ async def get_expenses_report(
     end_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
+    tenant_id = get_user_tenant_id(current_user)
     query = {}
-    if branch_id:
+    
+    # فلترة حسب tenant_id
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    else:
+        query["$or"] = [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    
+    # فلترة الفرع - التحقق من صلاحية المستخدم
+    user_branch_id = current_user.get("branch_id")
+    user_role = current_user.get("role")
+    
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        query["branch_id"] = user_branch_id
+    elif branch_id:
         query["branch_id"] = branch_id
+    
     if start_date:
         query["date"] = {"$gte": start_date}
     if end_date:
