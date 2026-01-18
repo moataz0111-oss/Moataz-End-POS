@@ -611,23 +611,31 @@ export default function CustomerMenu() {
 
         {/* Categories */}
         <div className="sticky top-[128px] z-30 bg-white border-b shadow-sm">
-          <div className="max-w-lg mx-auto px-4 py-2 overflow-x-auto">
-            <div className="flex gap-2">
+          <div className="max-w-lg mx-auto px-4 py-3 overflow-x-auto">
+            <div className="flex gap-2" style={{scrollBehavior: 'smooth'}}>
               <Button
-                variant={!selectedCategory ? 'default' : 'outline'}
+                variant="default"
                 size="sm"
                 onClick={() => setSelectedCategory(null)}
-                className={`whitespace-nowrap ${!selectedCategory ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                className={`whitespace-nowrap font-bold min-w-fit px-4 py-2 ${
+                  !selectedCategory 
+                    ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-md' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 border border-gray-200'
+                }`}
               >
                 الكل
               </Button>
               {categories.map(cat => (
                 <Button
                   key={cat.id}
-                  variant={selectedCategory === cat.id ? 'default' : 'outline'}
+                  variant="default"
                   size="sm"
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`whitespace-nowrap ${selectedCategory === cat.id ? 'bg-orange-500 hover:bg-orange-600' : ''}`}
+                  className={`whitespace-nowrap font-bold min-w-fit px-4 py-2 ${
+                    selectedCategory === cat.id 
+                      ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-md' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 border border-gray-200'
+                  }`}
                 >
                   {cat.name}
                 </Button>
