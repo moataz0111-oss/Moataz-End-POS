@@ -433,55 +433,36 @@ export default function BranchOrders() {
             </div>
 
             {/* Add Product */}
-            <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="font-bold">إضافة منتج</Label>
-                <div className="flex gap-2">
-                  <Button
-                    variant={itemSource === 'products' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => {
-                      setItemSource('products');
-                      setSelectedProduct('');
-                    }}
-                    className={itemSource === 'products' ? 'bg-orange-500 hover:bg-orange-600' : ''}
-                  >
-                    <Package className="h-4 w-4 ml-1" />
-                    المنتجات النهائية
-                  </Button>
-                  <Button
-                    variant={itemSource === 'inventory' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => {
-                      setItemSource('inventory');
-                      setSelectedProduct('');
-                    }}
-                    className={itemSource === 'inventory' ? 'bg-blue-500 hover:bg-blue-600' : ''}
-                  >
-                    <Building2 className="h-4 w-4 ml-1" />
-                    المخزون
-                  </Button>
-                </div>
+            <div className="p-4 bg-gradient-to-br from-orange-500/10 to-amber-500/10 border border-orange-500/30 rounded-lg space-y-3">
+              <div className="flex items-center gap-2">
+                <Package className="h-5 w-5 text-orange-500" />
+                <Label className="font-bold text-foreground">اختر منتج نهائي من المخزون</Label>
               </div>
               
               <div className="flex gap-2">
                 <Select value={selectedProduct} onValueChange={setSelectedProduct}>
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder={itemSource === 'products' ? 'اختر منتج نهائي' : 'اختر من المخزون'} />
+                  <SelectTrigger className="flex-1 bg-background">
+                    <SelectValue placeholder="اختر منتج نهائي..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {getAvailableItems().map(item => (
-                      <SelectItem key={item.id} value={item.id}>
-                        <div className="flex items-center justify-between w-full">
-                          <span>{item.name}</span>
-                          {item.quantity !== null && (
-                            <span className="text-xs text-muted-foreground mr-2">
-                              (متوفر: {item.quantity} {item.unit})
+                    {finishedProducts.length === 0 ? (
+                      <div className="p-4 text-center text-muted-foreground">
+                        <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">لا توجد منتجات نهائية في المخزون</p>
+                        <p className="text-xs mt-1">يمكنك إضافتها من صفحة المخزون</p>
+                      </div>
+                    ) : (
+                      finishedProducts.map(item => (
+                        <SelectItem key={item.id} value={item.id}>
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span className="font-medium">{item.name}</span>
+                            <span className="text-xs text-orange-600 bg-orange-100 px-2 py-0.5 rounded">
+                              متوفر: {item.quantity} {item.unit}
                             </span>
-                          )}
-                        </div>
-                      </SelectItem>
-                    ))}
+                          </div>
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
                 <Input
@@ -489,18 +470,23 @@ export default function BranchOrders() {
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-20"
+                  className="w-24 bg-background"
                   placeholder="الكمية"
                 />
-                <Button onClick={addItemToOrder} size="icon" className="bg-green-500 hover:bg-green-600">
+                <Button 
+                  onClick={addItemToOrder} 
+                  size="icon" 
+                  className="bg-green-500 hover:bg-green-600"
+                  disabled={!selectedProduct}
+                >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
               
-              {itemSource === 'inventory' && inventoryItems.length === 0 && (
-                <p className="text-xs text-muted-foreground text-center py-2">
-                  لا توجد عناصر في المخزون. يمكنك إضافتها من صفحة المخزون.
-                </p>
+              {finishedProducts.length === 0 && (
+                <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-sm text-yellow-600">
+                  ⚠️ لا توجد منتجات نهائية في المخزون. اذهب لصفحة المخزون وأضف منتجات من نوع "منتج نهائي".
+                </div>
               )}
             </div>
 
