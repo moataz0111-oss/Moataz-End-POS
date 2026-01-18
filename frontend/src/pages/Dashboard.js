@@ -1492,6 +1492,158 @@ export default function Dashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Day Management Dialog - إدارة اليوم */}
+      <Dialog open={showDayCloseDialog} onOpenChange={setShowDayCloseDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-primary" />
+              إدارة اليوم وترحيل البيانات
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {/* معلومات الحالة */}
+            <div className="grid grid-cols-2 gap-4">
+              <Card className="border-border/50">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">الورديات المفتوحة</p>
+                      <p className="text-2xl font-bold">{dayStatus?.open_shifts_count || 0}</p>
+                    </div>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      dayStatus?.open_shifts_count > 0 ? 'bg-green-500/10' : 'bg-muted'
+                    }`}>
+                      <Clock className={`h-5 w-5 ${dayStatus?.open_shifts_count > 0 ? 'text-green-500' : 'text-muted-foreground'}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-border/50">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">الطلبات المعلقة</p>
+                      <p className="text-2xl font-bold">{dayStatus?.pending_orders_count || 0}</p>
+                    </div>
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      dayStatus?.pending_orders_count > 0 ? 'bg-orange-500/10' : 'bg-muted'
+                    }`}>
+                      <ShoppingCart className={`h-5 w-5 ${dayStatus?.pending_orders_count > 0 ? 'text-orange-500' : 'text-muted-foreground'}`} />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* مدة الوردية */}
+            {dayStatus?.oldest_shift_hours > 0 && (
+              <div className={`p-3 rounded-lg border ${
+                dayStatus.oldest_shift_hours >= 24 ? 'bg-orange-500/10 border-orange-500/30' : 'bg-blue-500/10 border-blue-500/30'
+              }`}>
+                <p className="text-sm">
+                  <strong>مدة أقدم وردية:</strong> {Math.floor(dayStatus.oldest_shift_hours)} ساعة و {Math.floor((dayStatus.oldest_shift_hours % 1) * 60)} دقيقة
+                </p>
+              </div>
+            )}
+
+            {/* قائمة الطلبات المعلقة */}
+            {dayStatus?.pending_orders?.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm text-muted-foreground">الطلبات المعلقة التي تحتاج إغلاق:</h4>
+                <div className="max-h-40 overflow-y-auto space-y-2">
+                  {dayStatus.pending_orders.map(order => (
+                    <div key={order.id} className="flex items-center justify-between p-2 bg-muted/30 rounded-lg text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">#{order.order_number}</span>
+                        <span className={`px-2 py-0.5 rounded text-xs ${
+                          order.status === 'pending' ? 'bg-yellow-500/20 text-yellow-600' :
+                          order.status === 'preparing' ? 'bg-blue-500/20 text-blue-600' :
+                          'bg-green-500/20 text-green-600'
+                        }`}>
+                          {order.status === 'pending' ? 'قيد الانتظار' : order.status === 'preparing' ? 'قيد التحضير' : 'جاهز'}
+                        </span>
+                      </div>
+                      <span className="font-bold">{formatPrice(order.total)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* آخر إغلاق */}
+            {dayStatus?.last_day_close && (
+              <div className="p-3 bg-muted/30 rounded-lg text-sm">
+                <p className="text-muted-foreground">
+                  آخر إغلاق: {new Date(dayStatus.last_day_close.closed_at).toLocaleDateString('ar-IQ')} - 
+                  بواسطة: {dayStatus.last_day_close.closed_by}
+                </p>
+              </div>
+            )}
+
+            {/* تحذير */}
+            {dayStatus?.pending_orders_count > 0 && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-600">تحذير: يوجد طلبات معلقة</p>
+                  <p className="text-xs text-muted-foreground">
+                    يُفضل إغلاق جميع الطلبات قبل ترحيل اليوم. الإغلاق الإجباري سيلغي الطلبات المعلقة.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowDayCloseDialog(false)}>
+              إلغاء
+            </Button>
+            
+            {dayStatus?.pending_orders_count > 0 ? (
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={() => navigate('/orders')}
+                  className="gap-2"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  معالجة الطلبات
+                </Button>
+                <Button 
+                  variant="destructive"
+                  onClick={() => handleCloseDay(true)}
+                  disabled={closingDay}
+                  className="gap-2"
+                >
+                  {closingDay ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <X className="h-4 w-4" />
+                  )}
+                  إغلاق إجباري
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={() => handleCloseDay(false)}
+                disabled={closingDay || dayStatus?.open_shifts_count === 0}
+                className="gap-2"
+              >
+                {closingDay ? (
+                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                إغلاق اليوم وترحيل
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
