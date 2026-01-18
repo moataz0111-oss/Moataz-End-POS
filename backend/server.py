@@ -7039,6 +7039,68 @@ async def upload_logo_file(
     
     return {"message": "تم رفع الشعار بنجاح", "logo_url": logo_url}
 
+@api_router.post("/upload/image")
+async def upload_general_image(
+    file: UploadFile = File(...),
+    type: str = Form("product"),  # product, category, general
+    current_user: dict = Depends(get_current_user)
+):
+    """رفع صورة عامة للمنتجات أو الفئات"""
+    
+    # التحقق من نوع الملف
+    allowed_types = [
+        'image/jpeg', 'image/png', 'image/gif', 'image/webp', 
+        'image/heic', 'image/heif', 'image/bmp', 'image/tiff',
+        'image/svg+xml', 'image/avif'
+    ]
+    
+    # السماح بأي نوع صورة
+    content_type = file.content_type or ''
+    if not content_type.startswith('image/'):
+        raise HTTPException(status_code=400, detail="يجب أن يكون الملف صورة")
+    
+    # تحديد المجلد حسب النوع
+    if type == "product":
+        target_dir = PRODUCTS_DIR
+        subfolder = "products"
+        max_size = (800, 800)
+    elif type == "category":
+        target_dir = CATEGORIES_DIR
+        subfolder = "categories"
+        max_size = (400, 400)
+    else:
+        target_dir = IMAGES_DIR
+        subfolder = "images"
+        max_size = (1024, 1024)
+    
+    # معالجة وحفظ الصورة
+    filename = await process_and_save_image(file, target_dir, max_size=max_size, quality=85)
+    
+    # إنشاء URL للصورة
+    image_url = f"/api/uploads/images/{subfolder}/{filename}"
+    
+    return {
+        "message": "تم رفع الصورة بنجاح",
+        "image_url": image_url,
+        "filename": filename
+    }
+
+@api_router.post("/upload/product-image")
+async def upload_product_image(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """رفع صورة منتج"""
+    return await upload_general_image(file, "product", current_user)
+
+@api_router.post("/upload/category-image")
+async def upload_category_image(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """رفع صورة فئة"""
+    return await upload_general_image(file, "category", current_user)
+
 # ==================== PRINTER ROUTES ====================
 
 class PrinterCreate(BaseModel):
