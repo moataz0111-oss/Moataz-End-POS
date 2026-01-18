@@ -62,6 +62,12 @@ security = HTTPBearer()
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="api_uploads")
 
+# Helper function to check user roles
+def has_role(user: dict, roles: list) -> bool:
+    """التحقق من صلاحية المستخدم"""
+    user_role = user.get("role", "")
+    return user_role in roles or "super_admin" in roles and user_role == "super_admin"
+
 # ==================== DATABASE INITIALIZATION ====================
 
 async def init_database():
