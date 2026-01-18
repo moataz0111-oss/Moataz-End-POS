@@ -2258,16 +2258,13 @@ export default function Settings() {
                         </div>
                       </div>
                       <div>
-                        <Label className="text-foreground">رابط الصورة</Label>
-                        <Input
+                        <ImageUploader
                           value={editCategoryForm.image}
-                          onChange={(e) => setEditCategoryForm({ ...editCategoryForm, image: e.target.value })}
+                          onChange={(url) => setEditCategoryForm({ ...editCategoryForm, image: url })}
+                          type="category"
+                          label="صورة الفئة"
                           placeholder="https://example.com/image.jpg"
-                          className="mt-1"
                         />
-                        {editCategoryForm.image && (
-                          <img src={editCategoryForm.image} alt="معاينة" className="mt-2 h-20 w-20 object-cover rounded-lg" />
-                        )}
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div>
