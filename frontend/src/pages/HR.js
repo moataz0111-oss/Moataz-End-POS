@@ -62,6 +62,8 @@ const API = API_URL;
 
 export default function HR() {
   const navigate = useNavigate();
+  const { user, hasRole } = useAuth();
+  const { selectedBranchId, branches: contextBranches, getBranchIdForApi } = useBranch();
   const [activeTab, setActiveTab] = useState('employees');
   const [employees, setEmployees] = useState([]);
   const [branches, setBranches] = useState([]);
@@ -70,9 +72,9 @@ export default function HR() {
   const [deductions, setDeductions] = useState([]);
   const [bonuses, setBonuses] = useState([]);
   const [payrolls, setPayrolls] = useState([]);
+  const [payrollSummary, setPayrollSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedBranch, setSelectedBranch] = useState('all');
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
 
   // Dialogs
