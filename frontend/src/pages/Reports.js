@@ -522,6 +522,16 @@ export default function Reports() {
                     </CardContent>
                   </Card>
                 )}
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => exportToExcel('inventory')}>
+                    <FileSpreadsheet className="h-4 w-4 ml-2" />
+                    تصدير Excel
+                  </Button>
+                  <Button variant="outline" onClick={() => exportToPDF('inventory')}>
+                    <FileText className="h-4 w-4 ml-2" />
+                    تصدير PDF
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
@@ -572,6 +582,17 @@ export default function Reports() {
                     </div>
                   </CardContent>
                 </Card>
+
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => exportToExcel('expenses')}>
+                    <FileSpreadsheet className="h-4 w-4 ml-2" />
+                    تصدير Excel
+                  </Button>
+                  <Button variant="outline" onClick={() => exportToPDF('expenses')}>
+                    <FileText className="h-4 w-4 ml-2" />
+                    تصدير PDF
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
