@@ -420,7 +420,10 @@ export default function Dashboard() {
       
       setClosingResult(res.data);
       setShowReport(true);
-      toast.success('تم إغلاق الصندوق بنجاح!');
+      toast.success('تم إغلاق الصندوق والوردية بنجاح!');
+      
+      // تحديث حالة اليوم
+      fetchDayStatus();
       
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل في إغلاق الصندوق');
