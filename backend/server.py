@@ -11390,6 +11390,115 @@ async def start_auto_close_scheduler():
     asyncio.create_task(scheduler())
     logger.info("✅ Auto day close scheduler started")
 
+# إضافة indexes عند بدء التطبيق
+@app.on_event("startup")
+async def setup_database_indexes():
+    """إعداد indexes لتحسين الأداء"""
+    try:
+        from services.reliability_service import create_database_indexes
+        await create_database_indexes(db)
+    except Exception as e:
+        logger.error(f"Failed to create indexes: {e}")
+
+
+# ==================== SYSTEM HEALTH & RELIABILITY APIS ====================
+
+@api_router.get("/system/health")
+async def health_check():
+    """فحص صحة النظام - لا يحتاج توثيق"""
+    try:
+        from services.reliability_service import SystemHealth
+        return await SystemHealth.full_health_check(db)
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@api_router.get("/system/stats")
+async def get_system_stats(current_user: dict = Depends(get_current_user)):
+    """إحصائيات النظام"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    try:
+        from services.reliability_service import get_database_stats
+        db_stats = await get_database_stats(db)
+        
+        # إحصائيات إضافية
+        tenant_id = get_user_tenant_id(current_user)
+        query = {}
+        if tenant_id:
+            query["tenant_id"] = tenant_id
+        
+        stats = {
+            "database": db_stats,
+            "business": {
+                "total_orders": await db.orders.count_documents(query),
+                "total_products": await db.products.count_documents(query),
+                "total_customers": await db.customers.count_documents(query) if "customers" in await db.list_collection_names() else 0,
+                "total_employees": await db.employees.count_documents(query),
+                "total_branches": await db.branches.count_documents(query),
+                "active_shifts": await db.shifts.count_documents({**query, "status": "open"})
+            },
+            "capacity": {
+                "orders_limit": 1000000,
+                "products_limit": 100000,
+                "users_limit": 10000,
+                "status": "healthy"
+            }
+        }
+        
+        # تحديد حالة السعة
+        if stats["business"]["total_orders"] > 500000:
+            stats["capacity"]["status"] = "warning"
+        if stats["business"]["total_orders"] > 900000:
+            stats["capacity"]["status"] = "critical"
+        
+        return stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/system/backup")
+async def create_backup(current_user: dict = Depends(get_current_user)):
+    """إنشاء نسخة احتياطية"""
+    if current_user["role"] not in [UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح - Super Admin فقط")
+    
+    try:
+        from services.reliability_service import full_backup
+        result = await full_backup(db)
+        return {
+            "success": True,
+            "message": f"تم النسخ الاحتياطي: {len(result['success'])} مجموعة",
+            "details": result
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/system/backup/list")
+async def list_backups(current_user: dict = Depends(get_current_user)):
+    """قائمة النسخ الاحتياطية"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    import os
+    backup_path = "/app/backups"
+    
+    if not os.path.exists(backup_path):
+        return {"backups": [], "message": "لا توجد نسخ احتياطية"}
+    
+    backups = []
+    for f in os.listdir(backup_path):
+        if f.endswith('.json'):
+            file_path = os.path.join(backup_path, f)
+            stat = os.stat(file_path)
+            backups.append({
+                "filename": f,
+                "size_mb": round(stat.st_size / (1024*1024), 2),
+                "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat()
+            })
+    
+    backups.sort(key=lambda x: x["created_at"], reverse=True)
+    return {"backups": backups[:50]}  # آخر 50 نسخة
+
 
 # Include router and middleware
 app.include_router(api_router)
