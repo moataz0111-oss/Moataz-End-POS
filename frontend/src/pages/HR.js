@@ -726,6 +726,131 @@ export default function HR() {
             </Card>
           </TabsContent>
 
+          {/* Salary Report Tab - تقرير الرواتب الشامل */}
+          <TabsContent value="salary-report">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  تقرير الرواتب الشامل - {selectedMonth}
+                </CardTitle>
+                <Button onClick={() => exportPayrollReport('excel')}>
+                  <FileSpreadsheet className="h-4 w-4 ml-2" /> تصدير Excel
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {payrollSummary ? (
+                  <>
+                    {/* ملخص الإجماليات */}
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                      <Card className="bg-blue-500/10">
+                        <CardContent className="p-4 text-center">
+                          <p className="text-sm text-muted-foreground">الرواتب الأساسية</p>
+                          <p className="text-xl font-bold text-blue-500">{formatPrice(payrollSummary.totals?.basic_salary || 0)}</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-green-500/10">
+                        <CardContent className="p-4 text-center">
+                          <p className="text-sm text-muted-foreground">المكافآت</p>
+                          <p className="text-xl font-bold text-green-500">{formatPrice(payrollSummary.totals?.total_bonuses || 0)}</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-red-500/10">
+                        <CardContent className="p-4 text-center">
+                          <p className="text-sm text-muted-foreground">الخصومات</p>
+                          <p className="text-xl font-bold text-red-500">{formatPrice(payrollSummary.totals?.total_deductions || 0)}</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-yellow-500/10">
+                        <CardContent className="p-4 text-center">
+                          <p className="text-sm text-muted-foreground">السلف</p>
+                          <p className="text-xl font-bold text-yellow-500">{formatPrice(payrollSummary.totals?.total_advances || 0)}</p>
+                        </CardContent>
+                      </Card>
+                      <Card className="bg-cyan-500/10">
+                        <CardContent className="p-4 text-center">
+                          <p className="text-sm text-muted-foreground">صافي المستحقات</p>
+                          <p className="text-xl font-bold text-cyan-500">{formatPrice(payrollSummary.totals?.net_payable || 0)}</p>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* جدول تفصيلي */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="p-3 text-right">#</th>
+                            <th className="p-3 text-right">الموظف</th>
+                            <th className="p-3 text-right">الفرع</th>
+                            <th className="p-3 text-right">الوظيفة</th>
+                            <th className="p-3 text-right">الراتب الأساسي</th>
+                            <th className="p-3 text-right">المكافآت</th>
+                            <th className="p-3 text-right">الخصومات</th>
+                            <th className="p-3 text-right">السلف</th>
+                            <th className="p-3 text-right">صافي الراتب</th>
+                            <th className="p-3 text-right">الإجراءات</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {payrollSummary.employees?.map((emp, idx) => (
+                            <tr key={emp.id} className="border-b hover:bg-muted/30">
+                              <td className="p-3">{idx + 1}</td>
+                              <td className="p-3 font-medium">{emp.name}</td>
+                              <td className="p-3">{emp.branch_name}</td>
+                              <td className="p-3">{emp.position}</td>
+                              <td className="p-3">{formatPrice(emp.basic_salary)}</td>
+                              <td className="p-3 text-green-600">{formatPrice(emp.bonuses)}</td>
+                              <td className="p-3 text-red-600">{formatPrice(emp.deductions)}</td>
+                              <td className="p-3 text-yellow-600">{formatPrice(emp.advances_deduction)}</td>
+                              <td className="p-3 font-bold text-cyan-600">{formatPrice(emp.net_payable)}</td>
+                              <td className="p-3">
+                                <div className="flex gap-2">
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => exportEmployeeSalarySlip(emp.id, emp.name, 'excel')}
+                                    title="تصدير مفردات المرتب"
+                                  >
+                                    <FileSpreadsheet className="h-4 w-4" />
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => calculatePayroll(emp.id)}
+                                    title="إنشاء كشف راتب"
+                                  >
+                                    <FileText className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot className="bg-muted/50 font-bold">
+                          <tr>
+                            <td colSpan="4" className="p-3">الإجمالي</td>
+                            <td className="p-3">{formatPrice(payrollSummary.totals?.basic_salary || 0)}</td>
+                            <td className="p-3 text-green-600">{formatPrice(payrollSummary.totals?.total_bonuses || 0)}</td>
+                            <td className="p-3 text-red-600">{formatPrice(payrollSummary.totals?.total_deductions || 0)}</td>
+                            <td className="p-3 text-yellow-600">{formatPrice(payrollSummary.totals?.total_advances || 0)}</td>
+                            <td className="p-3 text-cyan-600">{formatPrice(payrollSummary.totals?.net_payable || 0)}</td>
+                            <td className="p-3"></td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>لا توجد بيانات رواتب لهذا الشهر</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Attendance Tab */}
           <TabsContent value="attendance">
             <Card>
