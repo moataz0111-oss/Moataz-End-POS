@@ -11749,7 +11749,7 @@ async def create_customer_order(
         "customer_phone": customer["phone"] if customer else order.customer_phone,
         "delivery_address": order.delivery_address,
         "delivery_notes": order.delivery_notes,
-        "delivery_location": order.delivery_location if hasattr(order, 'delivery_location') and order.delivery_location else None,
+        "delivery_location": order.delivery_location.model_dump() if hasattr(order, 'delivery_location') and order.delivery_location else None,
         "items": order_items,
         "subtotal": total,
         "delivery_fee": delivery_fee,
