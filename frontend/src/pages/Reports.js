@@ -137,14 +137,15 @@ export default function Reports() {
     try {
       toast.loading('جاري تحضير الملف...');
       
+      const branchId = getBranchIdForApi();
       const params = {
         report_type: reportType,
         start_date: startDate,
         end_date: endDate
       };
       
-      if (selectedBranch !== 'all') {
-        params.branch_id = selectedBranch;
+      if (branchId) {
+        params.branch_id = branchId;
       }
       
       const response = await axios.get(`${API}/reports/export/excel`, {
