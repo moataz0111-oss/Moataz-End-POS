@@ -168,6 +168,23 @@ export default function Settings() {
   const [newEmail, setNewEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
+  // Payment Settings States - إعدادات الدفع
+  const [paymentSettings, setPaymentSettings] = useState({
+    stripe_enabled: true,
+    stripe_publishable_key: '',
+    stripe_secret_key: '',
+    stripe_currency: 'USD',
+    stripe_mode: 'test',
+    zaincash_enabled: true,
+    zaincash_phone: '',
+    zaincash_name: '',
+    zaincash_qr_image: '',
+    cash_enabled: true,
+    delivery_fee: 5000,
+    min_order_amount: 10000
+  });
+  const [paymentSaving, setPaymentSaving] = useState(false);
+  
   // صلاحيات الميزات المتاحة للعميل
   const [settingsPermissions, setSettingsPermissions] = useState({
     settingsUsers: true,
