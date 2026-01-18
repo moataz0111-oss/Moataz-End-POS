@@ -267,19 +267,19 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      // Fetch branches
-      const branchesRes = await axios.get(`${API}/branches`);
-      setBranches(branchesRes.data);
-      
-      if (!selectedBranch && branchesRes.data.length > 0) {
-        setSelectedBranch(branchesRes.data[0].id);
-      }
+      // استخدام الفرع من Context
+      const branchIdParam = getBranchIdForApi();
 
       // Fetch today's stats
       const today = new Date().toISOString().split('T')[0];
+      const params = { start_date: today, end_date: today };
+      if (branchIdParam) {
+        params.branch_id = branchIdParam;
+      }
+      
       const [salesRes, ordersRes] = await Promise.all([
-        axios.get(`${API}/reports/sales`, { params: { branch_id: selectedBranch, start_date: today, end_date: today } }),
-        axios.get(`${API}/orders`, { params: { branch_id: selectedBranch, date: today } })
+        axios.get(`${API}/reports/sales`, { params }),
+        axios.get(`${API}/orders`, { params: { ...params, date: today } })
       ]);
 
       setStats(salesRes.data);
