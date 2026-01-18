@@ -5398,25 +5398,50 @@ async def get_cancellations_report(
     current_user: dict = Depends(get_current_user)
 ):
     """تقرير الإلغاءات"""
+    tenant_id = get_user_tenant_id(current_user)
+    
     query = {
         "status": "cancelled",
         "created_at": {"$gte": start_date, "$lte": end_date + "T23:59:59"}
     }
-    if branch_id:
+    
+    # فلترة حسب tenant_id
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    else:
+        query["$or"] = [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    
+    # فلترة الفرع - التحقق من صلاحية المستخدم
+    user_branch_id = current_user.get("branch_id")
+    user_role = current_user.get("role")
+    
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        query["branch_id"] = user_branch_id
+    elif branch_id:
         query["branch_id"] = branch_id
     
     cancelled_orders = await db.orders.find(query, {"_id": 0}).to_list(500)
     
     # حساب إجمالي الطلبات للنسبة
     total_query = {"created_at": {"$gte": start_date, "$lte": end_date + "T23:59:59"}}
-    if branch_id:
+    if tenant_id:
+        total_query["tenant_id"] = tenant_id
+    else:
+        total_query["$or"] = [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        total_query["branch_id"] = user_branch_id
+    elif branch_id:
         total_query["branch_id"] = branch_id
     total_orders = await db.orders.count_documents(total_query)
     
     # إلغاءات اليوم
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     today_query = {"status": "cancelled", "created_at": {"$regex": f"^{today}"}}
-    if branch_id:
+    if tenant_id:
+        today_query["tenant_id"] = tenant_id
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        today_query["branch_id"] = user_branch_id
+    elif branch_id:
         today_query["branch_id"] = branch_id
     today_cancelled = await db.orders.count_documents(today_query)
     
@@ -5439,18 +5464,39 @@ async def get_discounts_report(
     current_user: dict = Depends(get_current_user)
 ):
     """تقرير الخصومات"""
+    tenant_id = get_user_tenant_id(current_user)
+    
     query = {
         "discount": {"$gt": 0},
         "created_at": {"$gte": start_date, "$lte": end_date + "T23:59:59"}
     }
-    if branch_id:
+    
+    # فلترة حسب tenant_id
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    else:
+        query["$or"] = [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    
+    # فلترة الفرع - التحقق من صلاحية المستخدم
+    user_branch_id = current_user.get("branch_id")
+    user_role = current_user.get("role")
+    
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        query["branch_id"] = user_branch_id
+    elif branch_id:
         query["branch_id"] = branch_id
     
     orders = await db.orders.find(query, {"_id": 0}).to_list(500)
     
     # حساب إجمالي المبيعات للنسبة
     sales_query = {"created_at": {"$gte": start_date, "$lte": end_date + "T23:59:59"}, "status": {"$ne": "cancelled"}}
-    if branch_id:
+    if tenant_id:
+        sales_query["tenant_id"] = tenant_id
+    else:
+        sales_query["$or"] = [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+    if user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        sales_query["branch_id"] = user_branch_id
+    elif branch_id:
         sales_query["branch_id"] = branch_id
     all_orders = await db.orders.find(sales_query, {"total": 1}).to_list(5000)
     total_sales = sum(o.get("total", 0) for o in all_orders)
