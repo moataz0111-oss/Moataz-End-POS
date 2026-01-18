@@ -50,7 +50,8 @@ import {
   Move,
   Image,
   ShoppingBag,
-  Warehouse
+  Warehouse,
+  Mail
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
