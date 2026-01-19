@@ -1090,8 +1090,10 @@ export default function Dashboard() {
           </div>
           </div>
         </section>
+        )}
 
-        {/* Stats Cards */}
+        {/* Stats Cards - يظهر فقط لمن لديه صلاحية */}
+        {hasDashboardPermission('dashboard_statistics') && (
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base md:text-lg font-bold font-cairo text-foreground">الإحصائيات</h2>
