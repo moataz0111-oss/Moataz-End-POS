@@ -73,7 +73,7 @@ class TestBranchOrdersRecipeDeduction:
         # Delete test finished products
         for product_id in self.test_finished_products:
             try:
-                self.session.delete(f"{API_URL}/inventory/{product_id}")
+                self.session.delete(f"{API_URL}/finished-products/{product_id}")
             except:
                 pass
         
@@ -85,7 +85,7 @@ class TestBranchOrdersRecipeDeduction:
                 pass
     
     def _create_raw_material(self, name, quantity, unit="كغ"):
-        """Helper to create a raw material"""
+        """Helper to create a raw material using /api/inventory"""
         response = self.session.post(f"{API_URL}/inventory", json={
             "name": f"TEST_{name}_{uuid.uuid4().hex[:6]}",
             "unit": unit,
@@ -99,24 +99,43 @@ class TestBranchOrdersRecipeDeduction:
             material = response.json()
             self.test_raw_materials.append(material["id"])
             return material
+        print(f"Failed to create raw material: {response.status_code} - {response.text}")
         return None
     
-    def _create_finished_product(self, name, recipe=None):
-        """Helper to create a finished product with optional recipe"""
-        response = self.session.post(f"{API_URL}/inventory", json={
+    def _create_finished_product_with_recipe(self, name, recipe):
+        """Helper to create a finished product with recipe using /api/finished-products"""
+        response = self.session.post(f"{API_URL}/finished-products", json={
             "name": f"TEST_{name}_{uuid.uuid4().hex[:6]}",
             "unit": "قطعة",
-            "quantity": 0,  # Finished products don't need quantity
+            "quantity": 0,
             "min_quantity": 0,
-            "cost_per_unit": 5000,
-            "branch_id": self.branch_id or "warehouse",
-            "item_type": "finished",
-            "recipe": recipe or []
+            "selling_price": 10000,
+            "recipe": recipe,
+            "category": "test"
         })
         if response.status_code == 200:
             product = response.json()
             self.test_finished_products.append(product["id"])
             return product
+        print(f"Failed to create finished product: {response.status_code} - {response.text}")
+        return None
+    
+    def _create_finished_product_without_recipe(self, name):
+        """Helper to create a finished product WITHOUT recipe using /api/inventory"""
+        response = self.session.post(f"{API_URL}/inventory", json={
+            "name": f"TEST_{name}_{uuid.uuid4().hex[:6]}",
+            "unit": "قطعة",
+            "quantity": 0,
+            "min_quantity": 0,
+            "cost_per_unit": 5000,
+            "branch_id": self.branch_id or "warehouse",
+            "item_type": "finished"
+        })
+        if response.status_code == 200:
+            product = response.json()
+            self.test_finished_products.append(product["id"])
+            return product
+        print(f"Failed to create finished product without recipe: {response.status_code} - {response.text}")
         return None
     
     # ==================== HEALTH CHECK ====================
@@ -132,7 +151,6 @@ class TestBranchOrdersRecipeDeduction:
     
     def test_02_branch_orders_requires_auth(self):
         """Test that branch-orders endpoint requires authentication"""
-        # Create new session without auth
         no_auth_session = requests.Session()
         response = no_auth_session.get(f"{API_URL}/branch-orders")
         assert response.status_code in [401, 403], f"Expected 401/403, got {response.status_code}"
@@ -164,17 +182,15 @@ class TestBranchOrdersRecipeDeduction:
         raw_material = self._create_raw_material("لحم_للوصفة", 100)
         assert raw_material, "Failed to create raw material"
         
-        # Create product WITH recipe
-        product_with_recipe = self._create_finished_product("برغر_مع_وصفة", recipe=[{
+        # Create product WITH recipe using /api/finished-products
+        product_with_recipe = self._create_finished_product_with_recipe("برغر_مع_وصفة", recipe=[{
             "raw_material_id": raw_material["id"],
-            "raw_material_name": raw_material["name"],
-            "quantity": 0.5,
-            "unit": "كغ"
+            "quantity": 0.5
         }])
         assert product_with_recipe, "Failed to create product with recipe"
         
-        # Create product WITHOUT recipe
-        product_without_recipe = self._create_finished_product("برغر_بدون_وصفة", recipe=[])
+        # Create product WITHOUT recipe using /api/inventory
+        product_without_recipe = self._create_finished_product_without_recipe("برغر_بدون_وصفة")
         assert product_without_recipe, "Failed to create product without recipe"
         
         # Get finished products
@@ -191,7 +207,7 @@ class TestBranchOrdersRecipeDeduction:
         
         # Verify recipe status
         assert with_recipe.get("recipe") and len(with_recipe["recipe"]) > 0, "Product should have recipe"
-        assert not without_recipe.get("recipe") or len(without_recipe["recipe"]) == 0, "Product should not have recipe"
+        assert not without_recipe.get("recipe") or len(without_recipe.get("recipe", [])) == 0, "Product should not have recipe"
         
         print("✅ Finished products correctly show recipe status")
     
@@ -201,7 +217,7 @@ class TestBranchOrdersRecipeDeduction:
         """Test POST /api/branch-orders creates order and deducts raw materials"""
         # Create raw materials with known quantities
         raw_material_1 = self._create_raw_material("لحم_صب_اختبار", 50)
-        raw_material_2 = self._create_raw_material("خبز_برغر_اختبار", 200)
+        raw_material_2 = self._create_raw_material("خبز_برغر_اختبار", 200, unit="قطعة")
         
         assert raw_material_1, "Failed to create raw material 1"
         assert raw_material_2, "Failed to create raw material 2"
@@ -209,24 +225,15 @@ class TestBranchOrdersRecipeDeduction:
         initial_qty_1 = raw_material_1["quantity"]
         initial_qty_2 = raw_material_2["quantity"]
         
-        # Create finished product with recipe
+        # Create finished product with recipe using /api/finished-products
         recipe = [
-            {
-                "raw_material_id": raw_material_1["id"],
-                "raw_material_name": raw_material_1["name"],
-                "quantity": 0.5,  # 0.5 kg per burger
-                "unit": "كغ"
-            },
-            {
-                "raw_material_id": raw_material_2["id"],
-                "raw_material_name": raw_material_2["name"],
-                "quantity": 2,  # 2 pieces of bread per burger
-                "unit": "قطعة"
-            }
+            {"raw_material_id": raw_material_1["id"], "quantity": 0.5},  # 0.5 kg per burger
+            {"raw_material_id": raw_material_2["id"], "quantity": 2}     # 2 pieces of bread per burger
         ]
         
-        finished_product = self._create_finished_product("برغر_لحم_اختبار", recipe=recipe)
+        finished_product = self._create_finished_product_with_recipe("برغر_لحم_اختبار", recipe=recipe)
         assert finished_product, "Failed to create finished product"
+        assert finished_product.get("recipe"), "Finished product should have recipe"
         
         # Create branch order for 3 burgers
         order_qty = 3
@@ -255,7 +262,6 @@ class TestBranchOrdersRecipeDeduction:
         print(f"   Raw materials deducted: {len(deducted)} items")
         
         # Verify quantities were deducted correctly
-        # Get updated raw materials
         response_1 = self.session.get(f"{API_URL}/inventory/{raw_material_1['id']}")
         response_2 = self.session.get(f"{API_URL}/inventory/{raw_material_2['id']}")
         
@@ -273,8 +279,8 @@ class TestBranchOrdersRecipeDeduction:
     
     def test_07_prevent_order_for_product_without_recipe(self):
         """Test that order creation fails for products without recipe"""
-        # Create product WITHOUT recipe
-        product_no_recipe = self._create_finished_product("منتج_بدون_وصفة", recipe=[])
+        # Create product WITHOUT recipe using /api/inventory
+        product_no_recipe = self._create_finished_product_without_recipe("منتج_بدون_وصفة")
         assert product_no_recipe, "Failed to create product"
         
         # Try to create order
@@ -301,14 +307,9 @@ class TestBranchOrdersRecipeDeduction:
         assert raw_material, "Failed to create raw material"
         
         # Create product with recipe requiring MORE than available
-        recipe = [{
-            "raw_material_id": raw_material["id"],
-            "raw_material_name": raw_material["name"],
-            "quantity": 2,  # 2 kg per unit
-            "unit": "كغ"
-        }]
+        recipe = [{"raw_material_id": raw_material["id"], "quantity": 2}]  # 2 kg per unit
         
-        finished_product = self._create_finished_product("منتج_يحتاج_كثير", recipe=recipe)
+        finished_product = self._create_finished_product_with_recipe("منتج_يحتاج_كثير", recipe=recipe)
         assert finished_product, "Failed to create finished product"
         
         # Try to create order for 1 unit (needs 2 kg, only 1 kg available)
@@ -372,14 +373,9 @@ class TestBranchOrdersRecipeDeduction:
         assert raw_material, "Failed to create raw material"
         
         # Create product with recipe
-        recipe = [{
-            "raw_material_id": raw_material["id"],
-            "raw_material_name": raw_material["name"],
-            "quantity": 1,
-            "unit": "كغ"
-        }]
+        recipe = [{"raw_material_id": raw_material["id"], "quantity": 1}]
         
-        finished_product = self._create_finished_product("منتج_للتفاصيل", recipe=recipe)
+        finished_product = self._create_finished_product_with_recipe("منتج_للتفاصيل", recipe=recipe)
         assert finished_product, "Failed to create finished product"
         
         # Create order
@@ -418,14 +414,9 @@ class TestBranchOrdersRecipeDeduction:
         raw_material = self._create_raw_material("مادة_للحالة", 50)
         assert raw_material, "Failed to create raw material"
         
-        recipe = [{
-            "raw_material_id": raw_material["id"],
-            "raw_material_name": raw_material["name"],
-            "quantity": 0.5,
-            "unit": "كغ"
-        }]
+        recipe = [{"raw_material_id": raw_material["id"], "quantity": 0.5}]
         
-        finished_product = self._create_finished_product("منتج_للحالة", recipe=recipe)
+        finished_product = self._create_finished_product_with_recipe("منتج_للحالة", recipe=recipe)
         assert finished_product, "Failed to create finished product"
         
         # Create order
@@ -435,7 +426,7 @@ class TestBranchOrdersRecipeDeduction:
             "priority": "normal"
         })
         
-        assert create_response.status_code == 200
+        assert create_response.status_code == 200, f"Failed to create order: {create_response.text}"
         order = create_response.json()
         self.test_orders.append(order["id"])
         
@@ -456,24 +447,24 @@ class TestBranchOrdersRecipeDeduction:
         """Test order with multiple finished products"""
         # Create raw materials
         meat = self._create_raw_material("لحم_متعدد", 100)
-        bread = self._create_raw_material("خبز_متعدد", 200)
+        bread = self._create_raw_material("خبز_متعدد", 200, unit="قطعة")
         cheese = self._create_raw_material("جبن_متعدد", 50)
         
         assert meat and bread and cheese, "Failed to create raw materials"
         
         # Create first product (burger)
         burger_recipe = [
-            {"raw_material_id": meat["id"], "raw_material_name": meat["name"], "quantity": 0.5, "unit": "كغ"},
-            {"raw_material_id": bread["id"], "raw_material_name": bread["name"], "quantity": 2, "unit": "قطعة"}
+            {"raw_material_id": meat["id"], "quantity": 0.5},
+            {"raw_material_id": bread["id"], "quantity": 2}
         ]
-        burger = self._create_finished_product("برغر_متعدد", recipe=burger_recipe)
+        burger = self._create_finished_product_with_recipe("برغر_متعدد", recipe=burger_recipe)
         
         # Create second product (cheese sandwich)
         sandwich_recipe = [
-            {"raw_material_id": bread["id"], "raw_material_name": bread["name"], "quantity": 2, "unit": "قطعة"},
-            {"raw_material_id": cheese["id"], "raw_material_name": cheese["name"], "quantity": 0.1, "unit": "كغ"}
+            {"raw_material_id": bread["id"], "quantity": 2},
+            {"raw_material_id": cheese["id"], "quantity": 0.1}
         ]
-        sandwich = self._create_finished_product("ساندويتش_جبن", recipe=sandwich_recipe)
+        sandwich = self._create_finished_product_with_recipe("ساندويتش_جبن", recipe=sandwich_recipe)
         
         assert burger and sandwich, "Failed to create finished products"
         
@@ -528,26 +519,32 @@ class TestBranchOrdersEdgeCases:
     
     def test_order_with_zero_quantity(self):
         """Test that zero quantity items are ignored"""
-        # Get any finished product
+        # Get any finished product with recipe
         products_response = self.session.get(f"{API_URL}/finished-products")
         if products_response.status_code == 200 and products_response.json():
-            product = products_response.json()[0]
+            # Find a product with recipe
+            products = products_response.json()
+            product_with_recipe = next((p for p in products if p.get("recipe") and len(p.get("recipe", [])) > 0), None)
             
-            # Get branch
-            branches_response = self.session.get(f"{API_URL}/branches")
-            if branches_response.status_code == 200 and branches_response.json():
-                branch_id = branches_response.json()[0]["id"]
-                
-                # Try order with zero quantity
-                response = self.session.post(f"{API_URL}/branch-orders", json={
-                    "to_branch_id": branch_id,
-                    "items": [{"product_id": product["id"], "quantity": 0}],
-                    "priority": "normal"
-                })
-                
-                # Should fail (no valid items)
-                assert response.status_code == 400
-                print("✅ Zero quantity items are rejected")
+            if product_with_recipe:
+                # Get branch
+                branches_response = self.session.get(f"{API_URL}/branches")
+                if branches_response.status_code == 200 and branches_response.json():
+                    branch_id = branches_response.json()[0]["id"]
+                    
+                    # Try order with zero quantity
+                    response = self.session.post(f"{API_URL}/branch-orders", json={
+                        "to_branch_id": branch_id,
+                        "items": [{"product_id": product_with_recipe["id"], "quantity": 0}],
+                        "priority": "normal"
+                    })
+                    
+                    # Should fail (no valid items)
+                    assert response.status_code == 400
+                    print("✅ Zero quantity items are rejected")
+                    return
+        
+        print("⚠️ Skipped - no finished products with recipe found")
     
     def test_order_with_nonexistent_product(self):
         """Test order with non-existent product ID"""
