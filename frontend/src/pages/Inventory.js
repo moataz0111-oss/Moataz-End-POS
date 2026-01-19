@@ -363,6 +363,99 @@ export default function Inventory() {
                         />
                       </div>
                     </div>
+                    
+                    {/* قسم الوصفات - للمنتجات النهائية فقط */}
+                    {formData.item_type === 'finished' && (
+                      <div className="border border-blue-500/30 rounded-lg p-4 bg-blue-500/5">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Beaker className="h-5 w-5 text-blue-500" />
+                          <Label className="text-foreground font-bold">الوصفة (المكونات)</Label>
+                        </div>
+                        
+                        {/* إضافة مكون جديد */}
+                        <div className="flex gap-2 mb-3">
+                          <Select 
+                            value={recipeIngredient.raw_material_id} 
+                            onValueChange={(v) => setRecipeIngredient(prev => ({ ...prev, raw_material_id: v }))}
+                          >
+                            <SelectTrigger className="flex-1">
+                              <SelectValue placeholder="اختر مادة خام..." />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-48 overflow-y-auto">
+                              {rawMaterials.map(material => (
+                                <SelectItem key={material.id} value={material.id}>
+                                  <div className="flex items-center justify-between gap-2 w-full">
+                                    <span>{material.name}</span>
+                                    <span className="text-xs text-muted-foreground">({material.unit})</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="الكمية"
+                            value={recipeIngredient.quantity || ''}
+                            onChange={(e) => setRecipeIngredient(prev => ({ ...prev, quantity: parseFloat(e.target.value) || 0 }))}
+                            className="w-24"
+                          />
+                          <Button
+                            type="button"
+                            size="icon"
+                            className="bg-green-500 hover:bg-green-600"
+                            onClick={addIngredientToRecipe}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        {/* قائمة المكونات المضافة */}
+                        {formData.recipe.length > 0 ? (
+                          <div className="space-y-2 max-h-40 overflow-y-auto">
+                            {formData.recipe.map((ing, index) => (
+                              <div 
+                                key={index} 
+                                className="flex items-center justify-between bg-background rounded-lg px-3 py-2"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Beaker className="h-4 w-4 text-blue-500" />
+                                  <span className="font-medium">{ing.raw_material_name}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground">
+                                    {ing.quantity} {ing.unit}
+                                  </span>
+                                  <span className="text-xs text-primary">
+                                    ({formatPrice(ing.quantity * (ing.cost_per_unit || 0))})
+                                  </span>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-destructive hover:text-destructive"
+                                    onClick={() => removeIngredientFromRecipe(index)}
+                                  >
+                                    <Minus className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                            {/* إجمالي تكلفة الوصفة */}
+                            <div className="flex items-center justify-between pt-2 border-t border-border/50 mt-2">
+                              <span className="font-medium">تكلفة الوحدة (محسوبة):</span>
+                              <span className="font-bold text-primary">{formatPrice(calculateRecipeCost())}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground text-center py-4">
+                            لم تتم إضافة مكونات بعد. اختر مادة خام وحدد الكمية ثم اضغط +
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    
                     <div className="flex gap-2 pt-4">
                       <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
                         إلغاء
