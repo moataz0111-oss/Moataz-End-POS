@@ -704,6 +704,7 @@ class ProductCreate(BaseModel):
     is_available: bool = True
     ingredients: List[Dict[str, Any]] = []
     barcode: Optional[str] = None
+    finished_product_id: Optional[str] = None  # ربط بالمنتج النهائي للخصم التلقائي من الوصفة
 
 class ProductResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -720,6 +721,7 @@ class ProductResponse(BaseModel):
     is_available: bool = True
     ingredients: List[Dict[str, Any]] = []
     barcode: Optional[str] = None
+    finished_product_id: Optional[str] = None  # ربط بالمنتج النهائي
 
 # Inventory Models
 class InventoryItemCreate(BaseModel):
