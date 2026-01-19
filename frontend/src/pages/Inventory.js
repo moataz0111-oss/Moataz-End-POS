@@ -55,6 +55,7 @@ export default function Inventory() {
   
   const [items, setItems] = useState([]);
   const [finishedProducts, setFinishedProducts] = useState([]);
+  const [rawMaterials, setRawMaterials] = useState([]);
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [itemType, setItemType] = useState('raw');
@@ -70,7 +71,12 @@ export default function Inventory() {
     quantity: 0,
     min_quantity: 0,
     cost_per_unit: 0,
-    item_type: 'raw'
+    item_type: 'raw',
+    recipe: []  // الوصفة للمنتجات النهائية
+  });
+  const [recipeIngredient, setRecipeIngredient] = useState({
+    raw_material_id: '',
+    quantity: 0
   });
   const [transactionData, setTransactionData] = useState({
     quantity: 0,
