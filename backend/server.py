@@ -8904,13 +8904,6 @@ async def manufacture_finished_product(
         "product": updated_product
     }
 
-@api_router.get("/raw-materials")
-async def get_raw_materials(current_user: dict = Depends(get_current_user)):
-    """جلب جميع المواد الخام من المخزون"""
-    query = build_tenant_query(current_user, {"item_type": "raw"})
-    materials = await db.inventory.find(query, {"_id": 0}).to_list(500)
-    return materials
-
 # ==================== BRANCH ORDERS - طلبات الفروع ====================
 
 class BranchOrderCreate(BaseModel):
