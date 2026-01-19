@@ -89,15 +89,17 @@ export default function Inventory() {
 
   const fetchData = async () => {
     try {
-      const [itemsRes, branchesRes, finishedRes] = await Promise.all([
+      const [itemsRes, branchesRes, finishedRes, rawRes] = await Promise.all([
         axios.get(`${API}/inventory`, { params: { branch_id: selectedBranch, item_type: itemType } }),
         axios.get(`${API}/branches`),
-        axios.get(`${API}/finished-products`)
+        axios.get(`${API}/finished-products`),
+        axios.get(`${API}/raw-materials`)
       ]);
 
       setItems(itemsRes.data);
       setBranches(branchesRes.data);
       setFinishedProducts(finishedRes.data || []);
+      setRawMaterials(rawRes.data || []);
 
       if (!selectedBranch && branchesRes.data.length > 0) {
         setSelectedBranch(branchesRes.data[0].id);
