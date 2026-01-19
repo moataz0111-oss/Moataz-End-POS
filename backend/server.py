@@ -9077,13 +9077,6 @@ async def create_branch_order(order: BranchOrderCreate, current_user: dict = Dep
             "unit": details["unit"]
         })
     
-    # خصم المنتجات النهائية من المخزون الرئيسي
-    for item in order_items_details:
-        await db.inventory.update_one(
-            {"id": item["product_id"]},
-            {"$inc": {"quantity": -item["quantity"]}}
-        )
-    
     # حساب إجمالي التكلفة
     total_cost = sum(item["quantity"] * item["cost_per_unit"] for item in order_items_details)
     
