@@ -549,20 +549,23 @@ export default function BranchOrders() {
                       <SelectValue placeholder="اختر منتج..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {finishedProducts.map(product => (
-                        <SelectItem 
-                          key={product.id} 
-                          value={product.id}
-                          disabled={product.quantity <= 0}
-                        >
-                          <div className="flex items-center justify-between w-full gap-4">
-                            <span className="font-medium">{product.name}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded ${product.quantity > 0 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100'}`}>
-                              متوفر: {product.quantity} {product.unit}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {finishedProducts.map(product => {
+                        const hasRecipe = product.recipe && product.recipe.length > 0;
+                        return (
+                          <SelectItem 
+                            key={product.id} 
+                            value={product.id}
+                            disabled={!hasRecipe}
+                          >
+                            <div className="flex items-center justify-between w-full gap-4">
+                              <span className="font-medium">{product.name}</span>
+                              <span className={`text-xs px-2 py-0.5 rounded ${hasRecipe ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100'}`}>
+                                {hasRecipe ? `وصفة: ${product.recipe.length} مكونات` : 'بدون وصفة'}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   <Input
