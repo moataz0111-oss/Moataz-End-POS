@@ -449,10 +449,77 @@ export default function Inventory() {
                     سحب
                   </Button>
                 </div>
+                
+                {/* عرض الوصفة للمنتجات النهائية */}
+                {item.item_type === 'finished' && item.recipe && item.recipe.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-border/50">
+                    <button
+                      onClick={() => setSelectedRecipe(selectedRecipe === item.id ? null : item.id)}
+                      className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 w-full"
+                    >
+                      <TreeDeciduous className="h-4 w-4" />
+                      <span>شجرة المواد ({item.recipe.length} مكونات)</span>
+                      {selectedRecipe === item.id ? <ChevronUp className="h-4 w-4 mr-auto" /> : <ChevronDown className="h-4 w-4 mr-auto" />}
+                    </button>
+                    {selectedRecipe === item.id && (
+                      <div className="mt-2 space-y-1 bg-muted/30 rounded-lg p-2">
+                        {item.recipe.map((ing, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <Beaker className="h-3 w-3 text-blue-500" />
+                              <span>{ing.raw_material_name}</span>
+                            </div>
+                            <span className="text-muted-foreground">{ing.quantity} {ing.unit}</span>
+                          </div>
+                        ))}
+                        <div className="flex items-center justify-between text-sm font-medium pt-2 border-t border-border/50 mt-2">
+                          <span>تكلفة الوحدة</span>
+                          <span className="text-primary">{formatPrice(item.cost_per_unit)}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* قسم شجرة المواد - نظرة شاملة */}
+        {itemType === 'finished' && finishedProducts.filter(p => p.recipe && p.recipe.length > 0).length > 0 && (
+          <Card className="border-border/50 bg-card mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <TreeDeciduous className="h-5 w-5 text-primary" />
+                شجرة المواد - نظرة شاملة
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {finishedProducts.filter(p => p.recipe && p.recipe.length > 0).map(product => (
+                  <div key={product.id} className="border border-border/50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <Package className="h-5 w-5 text-primary" />
+                        <span className="font-bold text-foreground">{product.name}</span>
+                      </div>
+                      <span className="text-sm text-muted-foreground">التكلفة: {formatPrice(product.cost_per_unit)}</span>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {product.recipe.map((ing, idx) => (
+                        <div key={idx} className="flex items-center gap-2 bg-blue-500/10 text-blue-600 px-3 py-2 rounded-lg text-sm">
+                          <Beaker className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">{ing.raw_material_name}</span>
+                          <span className="font-bold mr-auto">{ing.quantity} {ing.unit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {filteredItems.length === 0 && (
           <Card className="border-border/50 bg-card">
