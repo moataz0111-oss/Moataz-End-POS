@@ -82,12 +82,14 @@ export default function BranchOrders() {
       setOrders(ordersRes.data);
       setBranches(branchesRes.data);
       
-      // فلترة المنتجات النهائية فقط (type = "finished" أو لا يوجد type)
+      // فلترة المنتجات النهائية فقط (item_type = "finished" أو لا يوجد item_type)
       // المنتجات النهائية هي التي تُرسل للفروع
       const finished = inventoryRes.data.filter(item => 
-        item.type === 'finished' || item.type === null || item.type === undefined
+        item.item_type === 'finished' || item.type === 'finished' || 
+        item.item_type === null || item.item_type === undefined
       );
       setFinishedProducts(finished);
+      console.log('Finished products:', finished);
     } catch (error) {
       // بيانات تجريبية
       setBranches([
