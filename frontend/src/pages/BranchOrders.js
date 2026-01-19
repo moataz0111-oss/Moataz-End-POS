@@ -136,7 +136,6 @@ export default function BranchOrders() {
         quantity: quantity,
         unit: product.unit || 'قطعة',
         cost_per_unit: product.cost_per_unit || 0,
-        available: availableQty,
         recipe: product.recipe || []
       };
       
@@ -156,11 +155,9 @@ export default function BranchOrders() {
   const updateItemQuantity = (index, delta) => {
     const newItems = [...form.items];
     const newQty = newItems[index].quantity + delta;
-    if (newQty > 0 && newQty <= newItems[index].available) {
+    if (newQty > 0) {
       newItems[index].quantity = newQty;
       setForm(prev => ({ ...prev, items: newItems }));
-    } else if (newQty > newItems[index].available) {
-      toast.error('الكمية تتجاوز المتوفر');
     }
   };
 
