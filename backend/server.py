@@ -94,7 +94,7 @@ async def init_database():
                 "full_name": "Owner",
                 "role": "super_admin",
                 "branch_id": None,
-                "tenant_id": None,
+                "tenant_id": "default",
                 "permissions": ["all", "super_admin"],
                 "is_active": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
@@ -112,7 +112,7 @@ async def init_database():
                 "full_name": "مدير النظام",
                 "role": "admin",
                 "branch_id": None,
-                "tenant_id": None,
+                "tenant_id": "default",
                 "permissions": ["all"],
                 "is_active": True,
                 "created_at": datetime.now(timezone.utc).isoformat()
@@ -129,7 +129,7 @@ async def init_database():
                 "phone": "",
                 "is_main": True,
                 "is_active": True,
-                "tenant_id": None,
+                "tenant_id": "default",
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db.branches.insert_one(branch_doc)
