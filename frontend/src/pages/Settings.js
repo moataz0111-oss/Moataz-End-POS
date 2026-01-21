@@ -848,11 +848,13 @@ export default function Settings() {
         ...productForm,
         price: parseFloat(productForm.price) || 0,
         cost: parseFloat(productForm.cost) || 0,
-        operating_cost: parseFloat(productForm.operating_cost) || 0
+        operating_cost: parseFloat(productForm.operating_cost) || 0,
+        packaging_cost: parseFloat(productForm.packaging_cost) || 0,
+        manufactured_product_id: productForm.manufactured_product_id || null
       });
       toast.success('تم إنشاء المنتج');
       setProductDialogOpen(false);
-      setProductForm({ name: '', name_en: '', category_id: '', price: '', cost: '', operating_cost: '', image: '', description: '', barcode: '' });
+      setProductForm({ name: '', name_en: '', category_id: '', price: '', cost: '', operating_cost: '', packaging_cost: '', image: '', description: '', barcode: '', manufactured_product_id: '' });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل في إنشاء المنتج');
@@ -868,10 +870,12 @@ export default function Settings() {
       price: p.price,
       cost: p.cost || 0,
       operating_cost: p.operating_cost || 0,
+      packaging_cost: p.packaging_cost || 0,
       image: p.image || '',
       description: p.description || '',
       barcode: p.barcode || '',
-      is_available: p.is_available !== false
+      is_available: p.is_available !== false,
+      manufactured_product_id: p.manufactured_product_id || ''
     });
     setEditProductDialogOpen(true);
   };
