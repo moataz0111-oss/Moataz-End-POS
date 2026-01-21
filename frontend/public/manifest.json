@@ -1,6 +1,6 @@
 {
-  "short_name": "قائمة الطعام",
-  "name": "قائمة الطعام - اطلب الآن",
+  "short_name": "Maestro EGP",
+  "name": "Maestro EGP - قائمة الطعام",
   "description": "تطبيق طلب الطعام أونلاين",
   "icons": [
     {
@@ -36,6 +36,9 @@
   "background_color": "#000000",
   "lang": "ar",
   "dir": "rtl",
-  "categories": ["food", "shopping"],
+  "categories": [
+    "food",
+    "shopping"
+  ],
   "prefer_related_applications": false
 }
