@@ -422,6 +422,15 @@ export default function WarehouseManufacturing() {
                   تحويل للتصنيع
                 </Button>
                 <Button 
+                  variant="outline"
+                  onClick={() => setShowBranchTransferDialog(true)}
+                  className="border-green-500 text-green-600 hover:bg-green-50"
+                  data-testid="branch-transfer-btn"
+                >
+                  <Building2 className="h-4 w-4 ml-2" />
+                  تحويل للفرع
+                </Button>
+                <Button 
                   onClick={() => setShowAddRawMaterial(true)}
                   className="bg-primary"
                   data-testid="add-material-btn"
