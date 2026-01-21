@@ -141,14 +141,16 @@ export default function WarehouseManufacturing() {
         productsRes, 
         transfersRes, 
         transactionsRes,
-        statsRes
+        statsRes,
+        branchesRes
       ] = await Promise.all([
         axios.get(`${API}/raw-materials-new`, { headers }).catch(() => ({ data: [] })),
         axios.get(`${API}/manufacturing-inventory`, { headers }).catch(() => ({ data: [] })),
         axios.get(`${API}/manufactured-products`, { headers }).catch(() => ({ data: [] })),
         axios.get(`${API}/warehouse-transfers`, { headers }).catch(() => ({ data: [] })),
         axios.get(`${API}/warehouse-transactions`, { headers }).catch(() => ({ data: [] })),
-        axios.get(`${API}/inventory-stats`, { headers }).catch(() => ({ data: null }))
+        axios.get(`${API}/inventory-stats`, { headers }).catch(() => ({ data: null })),
+        axios.get(`${API}/branches`, { headers }).catch(() => ({ data: [] }))
       ]);
       
       setRawMaterials(rawRes.data || []);
@@ -157,6 +159,7 @@ export default function WarehouseManufacturing() {
       setWarehouseTransfers(transfersRes.data || []);
       setWarehouseTransactions(transactionsRes.data || []);
       setStats(statsRes.data);
+      setBranches(branchesRes.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
