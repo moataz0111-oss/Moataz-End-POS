@@ -494,8 +494,12 @@ export default function CustomerMenu() {
         <header className="bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
           <div className="max-w-lg mx-auto px-4 py-6">
             <div className="flex items-center gap-4">
-              {restaurant?.logo && (
+              {restaurant?.logo ? (
                 <img src={restaurant.logo} alt="" className="w-16 h-16 rounded-full object-cover bg-white shadow-lg" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center shadow-lg">
+                  <span className="text-orange-500 text-3xl font-bold">M</span>
+                </div>
               )}
               <div>
                 <h1 className="text-2xl font-bold">{restaurant?.name || 'المطعم'}</h1>
