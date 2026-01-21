@@ -12543,11 +12543,27 @@ async def get_customer_menu(tenant_id: str):
         {"_id": 0}
     ).to_list(50)
     
+    # إذا لم توجد فروع، أنشئ فرع افتراضي
+    if not branches:
+        default_branch = {
+            "id": str(uuid.uuid4()),
+            "name": "الفرع الرئيسي",
+            "code": "MAIN",
+            "address": "",
+            "phone": "",
+            "is_main": True,
+            "is_active": True,
+            "tenant_id": tid,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.branches.insert_one(default_branch)
+        branches = [default_branch]
+    
     # جلب الإعدادات - للحصول على الشعار والاسم
     settings = await db.tenant_settings.find_one({"tenant_id": tid}, {"_id": 0}) or {}
     
     # جلب إعدادات المطعم الرئيسية (fallback)
-    main_settings = await db.settings.find_one({}, {"_id": 0}) or {}
+    main_settings = await db.settings.find_one({"tenant_id": tid}, {"_id": 0}) or {}
     
     # تحديد الشعار والاسم - الأولوية: tenant -> settings -> main_settings
     restaurant_logo = tenant.get("logo") or settings.get("restaurant_logo") or main_settings.get("restaurant_logo", "")
