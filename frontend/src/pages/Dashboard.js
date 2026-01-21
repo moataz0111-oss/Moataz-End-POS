@@ -1980,7 +1980,7 @@ export default function Dashboard() {
                 <p className="text-xs font-medium mb-2 text-orange-700">QR لتثبيت التطبيق ⭐</p>
                 <div className="bg-white p-3 rounded-lg inline-block">
                   <QRCodeSVG 
-                    value={menuLink.replace('/menu/default', '/customer-pwa/')} 
+                    value={menuLink.replace(/\/menu\/.*$/, '/customer-pwa/')} 
                     size={100}
                     level="H"
                     includeMargin={false}
