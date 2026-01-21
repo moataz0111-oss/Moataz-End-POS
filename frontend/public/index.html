@@ -49,7 +49,7 @@
                     if (themeColor) themeColor.content = '#10b981';
                     if (appleTitle) appleTitle.content = 'Maestro Espedo';
                     document.title = 'Maestro Espedo - بوابة السائق';
-                } else if (path.startsWith('/menu')) {
+                } else if (path.startsWith('/menu') || path.startsWith('/install-app') || path.startsWith('/customer')) {
                     // Customer Menu - Orange theme with black icon
                     manifestLink.href = '/manifest-customer.json?v=' + Date.now();
                     if (themeColor) themeColor.content = '#f97316';
