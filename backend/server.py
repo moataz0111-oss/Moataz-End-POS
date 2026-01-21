@@ -12764,6 +12764,10 @@ async def get_payment_transactions(
 # Include router and middleware
 app.include_router(api_router)
 
+# Include new inventory system routes
+from routes.inventory_system import router as inventory_router
+app.include_router(inventory_router)
+
 # Middleware to prevent caching of API responses
 @app.middleware("http")
 async def add_no_cache_headers(request, call_next):
