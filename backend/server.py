@@ -7525,7 +7525,7 @@ async def upload_logo_file(
     tenant_id: str = Form(None),
     current_user: dict = Depends(verify_super_admin)
 ):
-    """رفع شعار للعميل"""
+    """رفع شعار للعميل - للمالك فقط"""
     
     # التحقق من نوع الملف
     allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
@@ -7545,7 +7545,30 @@ async def upload_logo_file(
             {"$set": {"logo_url": logo_url}}
         )
     
-    return {"message": "تم رفع الشعار بنجاح", "logo_url": logo_url}
+    return {"message": "تم رفع الشعار بنجاح", "logo_url": logo_url, "url": logo_url}
+
+@api_router.post("/upload/restaurant-logo")
+async def upload_restaurant_logo(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """رفع شعار المطعم - للمدير"""
+    
+    if current_user["role"] != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    # التحقق من نوع الملف
+    allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="نوع الملف غير مدعوم. يرجى استخدام JPG, PNG, GIF, WebP أو SVG")
+    
+    # معالجة وحفظ الصورة
+    filename = await process_and_save_image(file, LOGOS_DIR, max_size=(512, 512), quality=90)
+    
+    # إنشاء URL نسبي للشعار
+    logo_url = f"/api/uploads/logos/{filename}"
+    
+    return {"message": "تم رفع الشعار بنجاح", "url": logo_url, "logo_url": logo_url}
 
 @api_router.post("/upload/image")
 async def upload_general_image(
