@@ -337,6 +337,24 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* المشتريات الجديدة */}
+      <Route 
+        path="/purchases-new" 
+        element={
+          <ProtectedRoute>
+            <PurchasesPage />
+          </ProtectedRoute>
+        } 
+      />
+      {/* المخزن والتصنيع */}
+      <Route 
+        path="/warehouse-manufacturing" 
+        element={
+          <ProtectedRoute>
+            <WarehouseManufacturing />
+          </ProtectedRoute>
+        } 
+      />
       {/* صفحة السائق - بدون حماية للوصول من الهاتف */}
       <Route path="/driver" element={<DriverPortal />} />
       {/* صفحة Super Admin - لوحة تحكم المالك */}
