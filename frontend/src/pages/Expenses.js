@@ -255,7 +255,7 @@ export default function Expenses() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {EXPENSE_CATEGORIES.map(cat => (
+                          {expenseCategories.map(cat => (
                             <SelectItem key={cat.id} value={cat.id}>
                               {cat.icon} {cat.name}
                             </SelectItem>
@@ -263,6 +263,23 @@ export default function Expenses() {
                         </SelectContent>
                       </Select>
                     </div>
+                    
+                    {/* حقل التصنيف المخصص - يظهر عند اختيار "أخرى" */}
+                    {formData.category === 'other' && (
+                      <div>
+                        <Label className="text-foreground">اسم التصنيف الجديد (اختياري)</Label>
+                        <Input
+                          value={formData.custom_category_name}
+                          onChange={(e) => setFormData({ ...formData, custom_category_name: e.target.value })}
+                          placeholder="مثال: إنترنت، هاتف، تأمين..."
+                          className="mt-1"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          اكتب اسم تصنيف جديد وسيُحفظ تلقائياً للاستخدام المستقبلي
+                        </p>
+                      </div>
+                    )}
+                    
                     <div>
                       <Label className="text-foreground">الوصف</Label>
                       <Input
