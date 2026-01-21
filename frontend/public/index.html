@@ -47,6 +47,12 @@
                     if (themeColor) themeColor.content = '#10b981';
                     if (appleTitle) appleTitle.content = 'Maestro Espedo';
                     document.title = 'Maestro Espedo - بوابة السائق';
+                } else if (path.startsWith('/menu')) {
+                    // Customer Menu - Orange theme
+                    manifestLink.href = '/manifest-customer.json';
+                    if (themeColor) themeColor.content = '#f97316';
+                    if (appleTitle) appleTitle.content = 'قائمة الطعام';
+                    document.title = 'قائمة الطعام - اطلب الآن';
                 } else {
                     // Admin Portal - Gold theme, Maestro EGP
                     manifestLink.href = '/manifest-admin.json';
