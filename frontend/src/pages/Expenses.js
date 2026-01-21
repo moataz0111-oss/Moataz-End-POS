@@ -377,8 +377,8 @@ export default function Expenses() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">جميع التصنيفات</SelectItem>
-              {EXPENSE_CATEGORIES.map(cat => (
-                <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+              {expenseCategories.map(cat => (
+                <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
               ))}
             </SelectContent>
           </Select>
