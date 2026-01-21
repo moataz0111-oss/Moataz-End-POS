@@ -38,6 +38,7 @@ const API = API_URL;
 const EXPENSE_CATEGORIES = [
   { id: 'rent', name: 'إيجار', icon: '🏠' },
   { id: 'utilities', name: 'كهرباء وماء', icon: '💡' },
+  { id: 'gas', name: 'غاز', icon: '🔥' },
   { id: 'salaries', name: 'رواتب', icon: '💰' },
   { id: 'maintenance', name: 'صيانة', icon: '🔧' },
   { id: 'supplies', name: 'مستلزمات', icon: '📦' },
