@@ -2603,7 +2603,7 @@ export default function Settings() {
                                 <SelectValue placeholder="اختر المنتج المصنع (اختياري)" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="">بدون ربط</SelectItem>
+                                <SelectItem value="none">بدون ربط</SelectItem>
                                 {manufacturedProducts.map(mp => (
                                   <SelectItem key={mp.id} value={mp.id}>
                                     {mp.name} ({mp.quantity} {mp.unit})
