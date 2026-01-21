@@ -12525,21 +12525,21 @@ async def get_customer_menu(tenant_id: str):
     
     tid = tenant.get("id", tenant_id)
     
-    # جلب الفئات
+    # جلب الفئات - فقط للعميل المحدد
     categories = await db.categories.find(
-        {"$or": [{"tenant_id": tid}, {"tenant_id": {"$exists": False}}]},
+        {"tenant_id": tid},
         {"_id": 0}
     ).sort("sort_order", 1).to_list(100)
     
-    # جلب المنتجات
+    # جلب المنتجات - فقط للعميل المحدد
     products = await db.products.find(
-        {"$or": [{"tenant_id": tid}, {"tenant_id": {"$exists": False}}], "is_available": {"$ne": False}},
+        {"tenant_id": tid, "is_available": {"$ne": False}},
         {"_id": 0}
     ).to_list(500)
     
-    # جلب الفروع
+    # جلب الفروع - فقط للعميل المحدد
     branches = await db.branches.find(
-        {"$or": [{"tenant_id": tid}, {"tenant_id": {"$exists": False}}], "is_active": {"$ne": False}},
+        {"tenant_id": tid, "is_active": {"$ne": False}},
         {"_id": 0}
     ).to_list(50)
     
