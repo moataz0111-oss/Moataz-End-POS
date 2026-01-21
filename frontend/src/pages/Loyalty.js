@@ -291,61 +291,145 @@ export default function Loyalty() {
         ))}
       </div>
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="بحث عن عضو..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pr-10"
-        />
-      </div>
+      {/* Tabs: الأعضاء و تقييمات العملاء */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsTrigger value="members" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            الأعضاء
+          </TabsTrigger>
+          <TabsTrigger value="reviews" className="flex items-center gap-2">
+            <Star className="h-4 w-4" />
+            تقييمات العملاء
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Members Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredMembers.map((member) => (
-          <Card 
-            key={member.id} 
-            className="border-border/50 hover:shadow-lg transition-all cursor-pointer"
-            onClick={() => viewMemberDetails(member)}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl
-                    ${TIER_COLORS[member.current_tier] || 'bg-gray-500/20'}`}>
-                    {TIER_ICONS[member.current_tier] || '🎖️'}
+        {/* تبويب الأعضاء */}
+        <TabsContent value="members">
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="بحث عن عضو..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pr-10"
+            />
+          </div>
+
+          {/* Members Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredMembers.map((member) => (
+              <Card 
+                key={member.id} 
+                className="border-border/50 hover:shadow-lg transition-all cursor-pointer"
+                onClick={() => viewMemberDetails(member)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl
+                        ${TIER_COLORS[member.current_tier] || 'bg-gray-500/20'}`}>
+                        {TIER_ICONS[member.current_tier] || '🎖️'}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-foreground">{member.customer_name}</h3>
+                        <p className="text-xs text-muted-foreground">{member.phone}</p>
+                      </div>
+                    </div>
+                    <Badge className={TIER_COLORS[member.current_tier]}>
+                      {member.current_tier}
+                    </Badge>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-foreground">{member.customer_name}</h3>
-                    <p className="text-xs text-muted-foreground">{member.phone}</p>
+
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-muted/30 rounded-lg p-2 text-center">
+                      <p className="text-muted-foreground text-xs">النقاط المتاحة</p>
+                      <p className="font-bold text-primary text-lg">{member.available_points || 0}</p>
+                    </div>
+                    <div className="bg-muted/30 rounded-lg p-2 text-center">
+                      <p className="text-muted-foreground text-xs">الطلبات</p>
+                      <p className="font-bold text-foreground text-lg">{member.total_orders || 0}</p>
+                    </div>
                   </div>
-                </div>
-                <Badge className={TIER_COLORS[member.current_tier]}>
-                  {member.current_tier}
-                </Badge>
-              </div>
 
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-muted/30 rounded-lg p-2 text-center">
-                  <p className="text-muted-foreground text-xs">النقاط المتاحة</p>
-                  <p className="font-bold text-primary text-lg">{member.available_points || 0}</p>
-                </div>
-                <div className="bg-muted/30 rounded-lg p-2 text-center">
-                  <p className="text-muted-foreground text-xs">الطلبات</p>
-                  <p className="font-bold text-foreground text-lg">{member.total_orders || 0}</p>
-                </div>
-              </div>
+                  <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>إجمالي الإنفاق: {(member.lifetime_spending || 0).toLocaleString()} د.ع</span>
+                    <span>كود الإحالة: {member.referral_code}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
 
-              <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
-                <span>إجمالي الإنفاق: {(member.lifetime_spending || 0).toLocaleString()} د.ع</span>
-                <span>كود الإحالة: {member.referral_code}</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        {/* تبويب تقييمات العملاء */}
+        <TabsContent value="reviews">
+          {reviewsLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-muted-foreground">جارٍ تحميل التقييمات...</p>
+            </div>
+          ) : customerReviews.length === 0 ? (
+            <div className="text-center py-12">
+              <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-foreground mb-2">لا توجد تقييمات بعد</h3>
+              <p className="text-muted-foreground">سيظهر هنا تقييمات العملاء للطلبات</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {customerReviews.map((review) => (
+                <Card key={review.id} className="border-border/50">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                          <Users className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-foreground">{review.customer_name || 'عميل'}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            طلب #{review.order_number} • {new Date(review.created_at).toLocaleDateString('ar-IQ')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-4 w-4 ${star <= review.rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="mt-3 text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+                        "{review.comment}"
+                      </p>
+                    )}
+                    {review.food_rating && (
+                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                        <div className="bg-muted/30 p-2 rounded text-center">
+                          <p className="text-muted-foreground">الطعام</p>
+                          <p className="font-bold">{review.food_rating}/5</p>
+                        </div>
+                        <div className="bg-muted/30 p-2 rounded text-center">
+                          <p className="text-muted-foreground">الخدمة</p>
+                          <p className="font-bold">{review.service_rating}/5</p>
+                        </div>
+                        <div className="bg-muted/30 p-2 rounded text-center">
+                          <p className="text-muted-foreground">السرعة</p>
+                          <p className="font-bold">{review.speed_rating}/5</p>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Add Member Dialog */}
       <Dialog open={addMemberOpen} onOpenChange={setAddMemberOpen}>
