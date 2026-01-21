@@ -1127,3 +1127,92 @@ async def get_inventory_statistics():
             "pending": pending_orders
         }
     }
+
+
+# ==================== تصفير البيانات (RESET DATA) ====================
+
+class ResetDataRequest(BaseModel):
+    reset_branch_orders: bool = False  # تصفير طلبات الفروع
+    reset_purchases: bool = False  # تصفير طلبات الشراء
+    reset_manufacturing: bool = False  # تصفير طلبات التصنيع
+    reset_raw_materials_qty: bool = False  # تصفير كميات المواد الخام
+    reset_manufactured_qty: bool = False  # تصفير كميات المنتجات المصنعة
+    reset_branch_inventory: bool = False  # تصفير مخزون الفروع
+
+@router.post("/inventory-reset")
+async def reset_inventory_data(data: ResetDataRequest):
+    """
+    تصفير بيانات المخزون والمشتريات
+    يستخدم بعد التجربة لتنظيف البيانات
+    """
+    db = get_db()
+    results = {
+        "reset_counts": {},
+        "success": True,
+        "message": "تم التصفير بنجاح"
+    }
+    
+    try:
+        # تصفير طلبات الفروع (المرسلة والمنفذة)
+        if data.reset_branch_orders:
+            deleted = await db.branch_orders_new.delete_many({})
+            results["reset_counts"]["branch_orders"] = deleted.deleted_count
+        
+        # تصفير طلبات الشراء (المشتريات)
+        if data.reset_purchases:
+            # حذف فواتير الشراء
+            deleted_purchases = await db.purchases_new.delete_many({})
+            results["reset_counts"]["purchases"] = deleted_purchases.deleted_count
+            
+            # حذف طلبات الشراء المعلقة
+            deleted_requests = await db.purchase_requests.delete_many({})
+            results["reset_counts"]["purchase_requests"] = deleted_requests.deleted_count
+        
+        # تصفير سجلات التصنيع
+        if data.reset_manufacturing:
+            deleted = await db.manufacturing_records.delete_many({})
+            results["reset_counts"]["manufacturing_records"] = deleted.deleted_count
+            
+            # حذف حركات المخزون المتعلقة بالتصنيع
+            deleted_movements = await db.inventory_movements.delete_many({"type": {"$in": ["manufacturing", "transfer_to_manufacturing"]}})
+            results["reset_counts"]["manufacturing_movements"] = deleted_movements.deleted_count
+        
+        # تصفير كميات المواد الخام (دون حذف المواد نفسها)
+        if data.reset_raw_materials_qty:
+            updated = await db.raw_materials.update_many(
+                {},
+                {"$set": {"quantity": 0, "last_updated": datetime.now(timezone.utc).isoformat()}}
+            )
+            results["reset_counts"]["raw_materials_qty_reset"] = updated.modified_count
+            
+            # تصفير مخزون التصنيع
+            updated_mfg = await db.manufacturing_inventory.update_many(
+                {},
+                {"$set": {"quantity": 0, "last_updated": datetime.now(timezone.utc).isoformat()}}
+            )
+            results["reset_counts"]["manufacturing_inventory_reset"] = updated_mfg.modified_count
+        
+        # تصفير كميات المنتجات المصنعة
+        if data.reset_manufactured_qty:
+            updated = await db.manufactured_products.update_many(
+                {},
+                {"$set": {"quantity": 0, "last_updated": datetime.now(timezone.utc).isoformat()}}
+            )
+            results["reset_counts"]["manufactured_products_qty_reset"] = updated.modified_count
+        
+        # تصفير مخزون الفروع
+        if data.reset_branch_inventory:
+            deleted = await db.branch_inventory.delete_many({})
+            results["reset_counts"]["branch_inventory"] = deleted.deleted_count
+        
+        # حذف جميع حركات المخزون إذا تم تصفير أي شيء
+        if any([data.reset_branch_orders, data.reset_purchases, data.reset_manufacturing, 
+                data.reset_raw_materials_qty, data.reset_manufactured_qty, data.reset_branch_inventory]):
+            deleted_all_movements = await db.inventory_movements.delete_many({})
+            results["reset_counts"]["inventory_movements"] = deleted_all_movements.deleted_count
+        
+        return results
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"خطأ في تصفير البيانات: {str(e)}")
+
