@@ -205,19 +205,30 @@ export default function CustomerMenu() {
     // تغيير manifest link لاستخدام manifest العملاء
     const manifestLink = document.querySelector('link[rel="manifest"]');
     if (manifestLink) {
-      manifestLink.href = '/manifest-customer.json';
+      // إضافة timestamp لتجاوز الـ cache
+      manifestLink.href = '/manifest-customer.json?v=' + Date.now();
     }
     
+    // تحديث meta tags
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+    if (themeColor) themeColor.content = '#f97316';
+    if (appleTitle) appleTitle.content = restaurant?.name || 'قائمة الطعام';
+    
     // تحديث عنوان الصفحة
-    if (restaurant?.name) {
-      document.title = restaurant.name + ' - اطلب الآن';
+    document.title = (restaurant?.name || 'قائمة الطعام') + ' - اطلب الآن';
+    
+    // إعادة تسجيل Service Worker لمسح الـ cache
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => {
+          registration.update();
+        });
+      });
     }
     
     return () => {
-      // إعادة manifest الأصلي عند الخروج
-      if (manifestLink) {
-        manifestLink.href = '/manifest.json';
-      }
+      // لا نعيد manifest الأصلي - سيتم تحديده من index.html
     };
   }, [restaurant]);
 
