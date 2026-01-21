@@ -190,6 +190,14 @@ export default function Settings() {
   });
   const [paymentSaving, setPaymentSaving] = useState(false);
   
+  // إعدادات المخزون
+  const [inventorySettings, setInventorySettings] = useState({
+    inventory_mode: 'centralized',  // centralized or per_branch
+    auto_deduct_on_sale: true,
+    low_stock_notifications: true
+  });
+  const [savingInventorySettings, setSavingInventorySettings] = useState(false);
+  
   // صلاحيات الميزات المتاحة للعميل
   const [settingsPermissions, setSettingsPermissions] = useState({
     settingsUsers: true,
