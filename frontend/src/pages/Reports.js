@@ -302,10 +302,9 @@ export default function Reports() {
       {/* Report Tabs */}
       <main className="max-w-7xl mx-auto px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 md:grid-cols-10 mb-6">
+          <TabsList className="grid grid-cols-5 md:grid-cols-9 mb-6">
             <TabsTrigger value="sales">المبيعات</TabsTrigger>
             <TabsTrigger value="purchases">المشتريات</TabsTrigger>
-            <TabsTrigger value="inventory">المخزون</TabsTrigger>
             <TabsTrigger value="expenses">المصاريف</TabsTrigger>
             <TabsTrigger value="profit">الأرباح</TabsTrigger>
             <TabsTrigger value="products">الأصناف</TabsTrigger>
