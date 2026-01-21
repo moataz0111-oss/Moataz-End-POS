@@ -1540,6 +1540,238 @@ export default function HR() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Employee Ratings Tab - تقييم الموظفين */}
+          <TabsContent value="ratings">
+            <Card>
+              <CardHeader>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="h-5 w-5 text-amber-500" />
+                    تقييم الموظفين التلقائي
+                  </CardTitle>
+                  <div className="flex items-center gap-3">
+                    <Input
+                      type="month"
+                      value={selectedMonth}
+                      onChange={(e) => setSelectedMonth(e.target.value)}
+                      className="w-40"
+                    />
+                    <Button onClick={fetchEmployeeRatings} variant="outline" size="sm">
+                      <BarChart3 className="h-4 w-4 ml-1" />
+                      تحديث
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {ratingsLoading ? (
+                  <div className="flex justify-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : (
+                  <>
+                    {/* ملخص التقييمات */}
+                    {employeeRatings.summary && (
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                          <CardContent className="p-4 text-center">
+                            <Users className="h-6 w-6 mx-auto mb-2 text-blue-600" />
+                            <p className="text-2xl font-bold text-blue-700">{employeeRatings.summary.total_employees || 0}</p>
+                            <p className="text-xs text-blue-600">إجمالي الموظفين</p>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                          <CardContent className="p-4 text-center">
+                            <CheckCircle className="h-6 w-6 mx-auto mb-2 text-green-600" />
+                            <p className="text-2xl font-bold text-green-700">{employeeRatings.summary.excellent_count || 0}</p>
+                            <p className="text-xs text-green-600">ممتاز (90+)</p>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-br from-sky-50 to-sky-100 border-sky-200">
+                          <CardContent className="p-4 text-center">
+                            <TrendingUp className="h-6 w-6 mx-auto mb-2 text-sky-600" />
+                            <p className="text-2xl font-bold text-sky-700">{employeeRatings.summary.good_count || 0}</p>
+                            <p className="text-xs text-sky-600">جيد جداً (75-89)</p>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+                          <CardContent className="p-4 text-center">
+                            <Timer className="h-6 w-6 mx-auto mb-2 text-amber-600" />
+                            <p className="text-2xl font-bold text-amber-700">{employeeRatings.summary.average_count || 0}</p>
+                            <p className="text-xs text-amber-600">جيد/مقبول (50-74)</p>
+                          </CardContent>
+                        </Card>
+                        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+                          <CardContent className="p-4 text-center">
+                            <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-red-600" />
+                            <p className="text-2xl font-bold text-red-700">{employeeRatings.summary.poor_count || 0}</p>
+                            <p className="text-xs text-red-600">ضعيف (&lt;50)</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+
+                    {/* معدل التقييم */}
+                    {employeeRatings.summary?.average_score > 0 && (
+                      <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg p-4 mb-6 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Award className="h-8 w-8" />
+                          <div>
+                            <p className="text-sm opacity-90">متوسط التقييم العام</p>
+                            <p className="text-2xl font-bold">{employeeRatings.summary.average_score}/100</p>
+                          </div>
+                        </div>
+                        <div className="text-left">
+                          <p className="text-sm opacity-90">شهر</p>
+                          <p className="font-bold">{selectedMonth}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* جدول التقييمات */}
+                    {employeeRatings.ratings?.length > 0 ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="bg-muted/50">
+                              <th className="p-3 text-right border">#</th>
+                              <th className="p-3 text-right border">الموظف</th>
+                              <th className="p-3 text-right border">الوظيفة</th>
+                              <th className="p-3 text-center border">الحضور</th>
+                              <th className="p-3 text-center border">التأخير</th>
+                              <th className="p-3 text-center border">الخصومات</th>
+                              <th className="p-3 text-center border">المكافآت</th>
+                              <th className="p-3 text-center border">التقييم</th>
+                              <th className="p-3 text-center border">المستوى</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {employeeRatings.ratings.map((rating, idx) => (
+                              <tr key={rating.employee_id} className="hover:bg-muted/30">
+                                <td className="p-3 border text-center font-bold">{idx + 1}</td>
+                                <td className="p-3 border">
+                                  <div className="font-medium">{rating.employee_name}</div>
+                                </td>
+                                <td className="p-3 border text-muted-foreground">{rating.position || '-'}</td>
+                                <td className="p-3 border text-center">
+                                  <div className="flex flex-col items-center">
+                                    <span className="font-bold">{rating.attendance_days}/{rating.work_days_expected}</span>
+                                    <span className="text-xs text-muted-foreground">({rating.attendance_percentage}%)</span>
+                                  </div>
+                                </td>
+                                <td className="p-3 border text-center">
+                                  <div className="flex flex-col items-center">
+                                    {rating.late_count > 0 ? (
+                                      <Badge variant="destructive" className="text-xs">{rating.late_count} تأخير</Badge>
+                                    ) : (
+                                      <Badge variant="outline" className="text-xs text-green-600">منتظم</Badge>
+                                    )}
+                                    {rating.early_leave_count > 0 && (
+                                      <Badge variant="secondary" className="text-xs mt-1">{rating.early_leave_count} خروج مبكر</Badge>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="p-3 border text-center">
+                                  {rating.deduction_count > 0 ? (
+                                    <div className="flex flex-col items-center">
+                                      <Badge variant="destructive">{rating.deduction_count}</Badge>
+                                      <span className="text-xs text-red-500">{formatPrice(rating.total_deductions)}</span>
+                                    </div>
+                                  ) : (
+                                    <Badge variant="outline" className="text-green-600">لا يوجد</Badge>
+                                  )}
+                                </td>
+                                <td className="p-3 border text-center">
+                                  {rating.bonus_count > 0 ? (
+                                    <div className="flex flex-col items-center">
+                                      <Badge className="bg-green-500">{rating.bonus_count}</Badge>
+                                      <span className="text-xs text-green-600">{formatPrice(rating.total_bonuses)}</span>
+                                    </div>
+                                  ) : (
+                                    <Badge variant="outline">-</Badge>
+                                  )}
+                                </td>
+                                <td className="p-3 border text-center">
+                                  <div className="flex flex-col items-center gap-1">
+                                    <span className="text-2xl font-bold" style={{
+                                      color: rating.level_color === 'green' ? '#16a34a' :
+                                             rating.level_color === 'blue' ? '#2563eb' :
+                                             rating.level_color === 'yellow' ? '#ca8a04' :
+                                             rating.level_color === 'orange' ? '#ea580c' : '#dc2626'
+                                    }}>
+                                      {rating.total_score}
+                                    </span>
+                                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                      <div 
+                                        className="h-1.5 rounded-full transition-all"
+                                        style={{
+                                          width: `${rating.total_score}%`,
+                                          backgroundColor: rating.level_color === 'green' ? '#16a34a' :
+                                                           rating.level_color === 'blue' ? '#2563eb' :
+                                                           rating.level_color === 'yellow' ? '#ca8a04' :
+                                                           rating.level_color === 'orange' ? '#ea580c' : '#dc2626'
+                                        }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="p-3 border text-center">
+                                  <Badge 
+                                    className="text-white"
+                                    style={{
+                                      backgroundColor: rating.level_color === 'green' ? '#16a34a' :
+                                                       rating.level_color === 'blue' ? '#2563eb' :
+                                                       rating.level_color === 'yellow' ? '#ca8a04' :
+                                                       rating.level_color === 'orange' ? '#ea580c' : '#dc2626'
+                                    }}
+                                  >
+                                    {rating.level}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                        <p>لا توجد بيانات تقييم لهذا الشهر</p>
+                        <p className="text-sm mt-2">تأكد من وجود سجلات حضور للموظفين</p>
+                      </div>
+                    )}
+
+                    {/* شرح معايير التقييم */}
+                    <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+                      <h4 className="font-bold mb-3 flex items-center gap-2">
+                        <FileSpreadsheet className="h-4 w-4" />
+                        معايير التقييم التلقائي
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                          <span>الحضور: 40 نقطة</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                          <span>الالتزام بالمواعيد: 30 نقطة</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                          <span>عدم وجود خصومات: 20 نقطة</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                          <span>المكافآت: 10 نقاط إضافية</span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         {/* Payroll Preview Dialog */}
