@@ -37,6 +37,7 @@ import Purchasing from "./pages/Purchasing";
 import BranchOrders from "./pages/BranchOrders";
 import SystemAdmin from "./pages/SystemAdmin";
 import CustomerMenu from "./pages/CustomerMenu";
+import CustomerInstall from "./pages/CustomerInstall";
 import PurchasesPage from "./pages/PurchasesPage";
 import WarehouseManufacturing from "./pages/WarehouseManufacturing";
 import InventoryReports from "./pages/InventoryReports";
