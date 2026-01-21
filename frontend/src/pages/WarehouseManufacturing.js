@@ -1370,7 +1370,7 @@ export default function WarehouseManufacturing() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-green-500" />
-              تحويل مواد للفرع
+              تحويل منتجات للفرع
             </DialogTitle>
           </DialogHeader>
           
@@ -1395,22 +1395,27 @@ export default function WarehouseManufacturing() {
               </Select>
             </div>
 
-            {/* المواد المتاحة */}
+            {/* المنتجات المصنعة المتاحة */}
             <div>
-              <Label className="mb-2 block">المواد الخام المتاحة</Label>
+              <Label className="mb-2 block">المنتجات المصنعة المتاحة</Label>
               <div className="border rounded-lg max-h-48 overflow-y-auto p-2">
-                {rawMaterials.filter(m => m.quantity > 0).length === 0 ? (
-                  <p className="text-center text-muted-foreground py-4">لا توجد مواد متاحة</p>
+                {manufacturingInventory.filter(m => m.quantity > 0).length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">لا توجد منتجات متاحة</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
-                    {rawMaterials.filter(m => m.quantity > 0).map(material => (
+                    {manufacturingInventory.filter(m => m.quantity > 0).map(product => (
                       <div 
-                        key={material.id}
+                        key={product.id}
                         className="flex items-center justify-between p-2 bg-muted/50 rounded cursor-pointer hover:bg-muted"
-                        onClick={() => addItemToBranchTransfer(material)}
+                        onClick={() => addItemToBranchTransfer({
+                          id: product.id,
+                          name: product.name,
+                          quantity: product.quantity,
+                          unit: product.unit || 'قطعة'
+                        })}
                       >
-                        <span className="text-sm">{material.name}</span>
-                        <Badge variant="outline">{material.quantity} {material.unit}</Badge>
+                        <span className="text-sm">{product.name}</span>
+                        <Badge variant="outline">{product.quantity} {product.unit || 'قطعة'}</Badge>
                       </div>
                     ))}
                   </div>
