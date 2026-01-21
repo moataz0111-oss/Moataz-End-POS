@@ -506,15 +506,6 @@ export default function WarehouseManufacturing() {
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => setShowBranchTransferDialog(true)}
-                  className="border-green-500 text-green-600 hover:bg-green-50"
-                  data-testid="branch-transfer-btn"
-                >
-                  <Building2 className="h-4 w-4 ml-2" />
-                  تحويل للفرع
-                </Button>
-                <Button 
-                  variant="outline"
                   onClick={() => navigate('/purchases-new')}
                   className="border-blue-500 text-blue-600 hover:bg-blue-50"
                   data-testid="purchase-request-btn"
@@ -533,14 +524,25 @@ export default function WarehouseManufacturing() {
               </>
             )}
             {activeTab === 'manufacturing' && (
-              <Button 
-                onClick={() => setShowAddProductDialog(true)}
-                className="bg-primary"
-                data-testid="add-product-btn"
-              >
-                <Plus className="h-4 w-4 ml-2" />
-                منتج مصنع
-              </Button>
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={() => setShowBranchTransferDialog(true)}
+                  className="border-green-500 text-green-600 hover:bg-green-50"
+                  data-testid="branch-transfer-btn"
+                >
+                  <Building2 className="h-4 w-4 ml-2" />
+                  تحويل للفرع
+                </Button>
+                <Button 
+                  onClick={() => setShowAddProductDialog(true)}
+                  className="bg-primary"
+                  data-testid="add-product-btn"
+                >
+                  <Plus className="h-4 w-4 ml-2" />
+                  منتج مصنع
+                </Button>
+              </>
             )}
           </div>
         </div>
