@@ -1352,6 +1352,120 @@ export default function WarehouseManufacturing() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog: تحويل للفرع */}
+      <Dialog open={showBranchTransferDialog} onOpenChange={setShowBranchTransferDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-green-500" />
+              تحويل مواد للفرع
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* اختيار الفرع */}
+            <div>
+              <Label>الفرع المستلم *</Label>
+              <Select 
+                value={branchTransferForm.to_branch_id} 
+                onValueChange={(v) => setBranchTransferForm(prev => ({ ...prev, to_branch_id: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="اختر الفرع" />
+                </SelectTrigger>
+                <SelectContent>
+                  {branches.map(branch => (
+                    <SelectItem key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* المواد المتاحة */}
+            <div>
+              <Label className="mb-2 block">المواد الخام المتاحة</Label>
+              <div className="border rounded-lg max-h-48 overflow-y-auto p-2">
+                {rawMaterials.filter(m => m.quantity > 0).length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">لا توجد مواد متاحة</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {rawMaterials.filter(m => m.quantity > 0).map(material => (
+                      <div 
+                        key={material.id}
+                        className="flex items-center justify-between p-2 bg-muted/50 rounded cursor-pointer hover:bg-muted"
+                        onClick={() => addItemToBranchTransfer(material)}
+                      >
+                        <span className="text-sm">{material.name}</span>
+                        <Badge variant="outline">{material.quantity} {material.unit}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* المواد المختارة */}
+            {branchTransferForm.items.length > 0 && (
+              <div>
+                <Label className="mb-2 block">المواد المختارة للتحويل</Label>
+                <div className="space-y-2">
+                  {branchTransferForm.items.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
+                      <span className="flex-1 font-medium">{item.raw_material_name}</span>
+                      <Input 
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        max={item.available}
+                        value={item.quantity}
+                        onChange={(e) => updateBranchTransferQty(idx, e.target.value)}
+                        className="w-24"
+                      />
+                      <span className="text-sm text-muted-foreground">{item.unit}</span>
+                      <span className="text-xs text-green-600">(متاح: {item.available})</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => removeBranchTransferItem(idx)}
+                      >
+                        <X className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ملاحظات */}
+            <div>
+              <Label>ملاحظات</Label>
+              <Textarea
+                value={branchTransferForm.notes}
+                onChange={(e) => setBranchTransferForm(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder="ملاحظات إضافية..."
+                rows={2}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBranchTransferDialog(false)}>
+              إلغاء
+            </Button>
+            <Button 
+              onClick={handleTransferToBranch}
+              disabled={submitting || branchTransferForm.items.length === 0 || !branchTransferForm.to_branch_id}
+              className="bg-green-500 hover:bg-green-600"
+            >
+              {submitting ? <RefreshCw className="h-4 w-4 animate-spin ml-2" /> : <Send className="h-4 w-4 ml-2" />}
+              تحويل للفرع
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
