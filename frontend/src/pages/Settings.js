@@ -2570,7 +2570,47 @@ export default function Settings() {
                               className="mt-1"
                             />
                           </div>
+                          <div>
+                            <Label className="text-foreground">تكلفة التغليف (للسفري/التوصيل)</Label>
+                            <Input
+                              type="number"
+                              value={productForm.packaging_cost}
+                              onChange={(e) => setProductForm({ ...productForm, packaging_cost: e.target.value })}
+                              placeholder="250"
+                              className="mt-1"
+                            />
+                          </div>
                         </div>
+                        
+                        {/* ربط بالمنتج المصنع */}
+                        {manufacturedProducts.length > 0 && (
+                          <div className="p-3 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                            <Label className="text-foreground font-medium mb-2 flex items-center gap-2">
+                              <Factory className="h-4 w-4 text-purple-500" />
+                              ربط بمنتج مصنع (للخصم التلقائي)
+                            </Label>
+                            <Select 
+                              value={productForm.manufactured_product_id || ''} 
+                              onValueChange={(v) => setProductForm({ ...productForm, manufactured_product_id: v || null })}
+                            >
+                              <SelectTrigger className="mt-2">
+                                <SelectValue placeholder="اختر المنتج المصنع (اختياري)" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="">بدون ربط</SelectItem>
+                                {manufacturedProducts.map(mp => (
+                                  <SelectItem key={mp.id} value={mp.id}>
+                                    {mp.name} ({mp.quantity} {mp.unit})
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground mt-2">
+                              عند ربط المنتج، سيتم خصم الكمية تلقائياً من مخزون الفرع عند البيع
+                            </p>
+                          </div>
+                        )}
+                        
                         <div>
                           <ImageUploader
                             value={productForm.image}
