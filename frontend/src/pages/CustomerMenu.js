@@ -200,6 +200,27 @@ export default function CustomerMenu() {
     }
   };
 
+  // PWA Install handling - تحديث manifest للعملاء
+  useEffect(() => {
+    // تغيير manifest link لاستخدام manifest العملاء
+    const manifestLink = document.querySelector('link[rel="manifest"]');
+    if (manifestLink) {
+      manifestLink.href = '/manifest-customer.json';
+    }
+    
+    // تحديث عنوان الصفحة
+    if (restaurant?.name) {
+      document.title = restaurant.name + ' - اطلب الآن';
+    }
+    
+    return () => {
+      // إعادة manifest الأصلي عند الخروج
+      if (manifestLink) {
+        manifestLink.href = '/manifest.json';
+      }
+    };
+  }, [restaurant]);
+
   // PWA Install handling
   useEffect(() => {
     const handler = (e) => {
