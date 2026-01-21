@@ -307,16 +307,29 @@ export default function CustomerMenu() {
       setRestaurant(res.data.restaurant);
       setCategories(res.data.categories);
       setProducts(res.data.products);
-      setBranches(res.data.branches || []);
+      
+      // فلترة الفروع - إخفاء "الفرع الرئيسي" إذا وُجدت فروع أخرى
+      let fetchedBranches = res.data.branches || [];
+      if (fetchedBranches.length > 1) {
+        // إذا كان هناك أكثر من فرع، أخفِ الفرع الرئيسي
+        const filteredBranches = fetchedBranches.filter(b => 
+          b.name !== 'الفرع الرئيسي' && b.name !== 'Main Branch'
+        );
+        // استخدم الفلترة فقط إذا بقي فرع واحد على الأقل
+        if (filteredBranches.length > 0) {
+          fetchedBranches = filteredBranches;
+        }
+      }
+      setBranches(fetchedBranches);
       
       if (res.data.restaurant?.name) {
         document.title = res.data.restaurant.name + ' - القائمة';
       }
       
       // If only one branch, auto-select it
-      if (res.data.branches?.length === 1) {
-        setSelectedBranch(res.data.branches[0].id);
-        localStorage.setItem(`branch_${tenantId}`, res.data.branches[0].id);
+      if (fetchedBranches.length === 1) {
+        setSelectedBranch(fetchedBranches[0].id);
+        localStorage.setItem(`branch_${tenantId}`, fetchedBranches[0].id);
         setStep('menu');
       }
       
