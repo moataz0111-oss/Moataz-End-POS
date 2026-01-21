@@ -1423,18 +1423,18 @@ export default function WarehouseManufacturing() {
               </div>
             </div>
 
-            {/* المواد المختارة */}
+            {/* المنتجات المختارة */}
             {branchTransferForm.items.length > 0 && (
               <div>
-                <Label className="mb-2 block">المواد المختارة للتحويل</Label>
+                <Label className="mb-2 block">المنتجات المختارة للتحويل</Label>
                 <div className="space-y-2">
                   {branchTransferForm.items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
-                      <span className="flex-1 font-medium">{item.raw_material_name}</span>
+                      <span className="flex-1 font-medium">{item.product_name}</span>
                       <Input 
                         type="number"
-                        min="0.1"
-                        step="0.1"
+                        min="1"
+                        step="1"
                         max={item.available}
                         value={item.quantity}
                         onChange={(e) => updateBranchTransferQty(idx, e.target.value)}
