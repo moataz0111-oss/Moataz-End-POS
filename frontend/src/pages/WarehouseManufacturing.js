@@ -99,6 +99,12 @@ export default function WarehouseManufacturing() {
     notes: ''
   });
   
+  const [branchTransferForm, setBranchTransferForm] = useState({
+    to_branch_id: '',
+    items: [],
+    notes: ''
+  });
+  
   const [productForm, setProductForm] = useState({
     name: '',
     name_en: '',
