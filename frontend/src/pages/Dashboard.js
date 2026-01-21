@@ -1916,7 +1916,8 @@ export default function Dashboard() {
                 <Input 
                   value={menuLink ? menuLink.replace(/\/menu\/.*$/, '/customer-pwa/') : ''} 
                   readOnly 
-                  className="text-left direction-ltr text-sm bg-white"
+                  className="text-left text-sm bg-white text-gray-800"
+                  style={{ direction: 'ltr' }}
                 />
                 <Button 
                   onClick={() => {
