@@ -175,6 +175,16 @@ export default function Settings() {
   const [newEmail, setNewEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
+  // إعدادات المطعم (الاسم والشعار)
+  const [restaurantSettings, setRestaurantSettings] = useState({
+    name: '',
+    name_ar: '',
+    logo_url: ''
+  });
+  const [restaurantLogoFile, setRestaurantLogoFile] = useState(null);
+  const [restaurantLogoPreview, setRestaurantLogoPreview] = useState('');
+  const [savingRestaurant, setSavingRestaurant] = useState(false);
+  
   // Payment Settings States - إعدادات الدفع
   const [paymentSettings, setPaymentSettings] = useState({
     stripe_enabled: true,
