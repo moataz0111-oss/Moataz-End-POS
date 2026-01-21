@@ -39,6 +39,7 @@ import SystemAdmin from "./pages/SystemAdmin";
 import CustomerMenu from "./pages/CustomerMenu";
 import PurchasesPage from "./pages/PurchasesPage";
 import WarehouseManufacturing from "./pages/WarehouseManufacturing";
+import InventoryReports from "./pages/InventoryReports";
 
 // Components
 import IncomingCallPopup from "./components/IncomingCallPopup";
