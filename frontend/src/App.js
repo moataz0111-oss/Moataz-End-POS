@@ -356,6 +356,15 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* تقارير المخزون */}
+      <Route 
+        path="/inventory-reports" 
+        element={
+          <ProtectedRoute>
+            <InventoryReports />
+          </ProtectedRoute>
+        } 
+      />
       {/* صفحة السائق - بدون حماية للوصول من الهاتف */}
       <Route path="/driver" element={<DriverPortal />} />
       {/* صفحة Super Admin - لوحة تحكم المالك */}
