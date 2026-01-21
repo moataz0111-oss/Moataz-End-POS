@@ -1094,6 +1094,14 @@ export default function Settings() {
                   💳 الدفع الإلكتروني
                 </TabsTrigger>
               )}
+              {hasRole(['admin']) && (
+                <TabsTrigger 
+                  value="inventory-settings"
+                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  📦 إعدادات المخزون
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
 
