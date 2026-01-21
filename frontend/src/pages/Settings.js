@@ -252,17 +252,23 @@ export default function Settings() {
   
   // صلاحيات الموظفين المبسطة
   const STAFF_PERMISSIONS = [
-    // صلاحيات الصفحات الرئيسية
+    // صلاحيات الصفحات الرئيسية (القائمة الجانبية)
     { id: 'pos', name: 'نقاط البيع', description: 'إنشاء وإدارة الطلبات', group: 'pages' },
     { id: 'pos_discount', name: 'إعطاء خصومات', description: 'السماح بإعطاء خصومات', group: 'pages' },
     { id: 'orders', name: 'الطلبات', description: 'عرض الطلبات', group: 'pages' },
     { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات', group: 'pages' },
     { id: 'kitchen', name: 'شاشة المطبخ', description: 'عرض طلبات المطبخ', group: 'pages' },
     { id: 'delivery', name: 'التوصيل', description: 'إدارة التوصيل', group: 'pages' },
-    { id: 'inventory', name: 'المخزون', description: 'عرض المخزون', group: 'pages' },
-    { id: 'reports', name: 'التقارير', description: 'عرض التقارير', group: 'pages' },
+    { id: 'inventory', name: 'المخزون والمشتريات', description: 'إدارة المخزون والمشتريات والتصنيع', group: 'pages' },
+    { id: 'reports', name: 'التقارير', description: 'عرض التقارير والتقارير الذكية', group: 'pages' },
     { id: 'expenses', name: 'المصاريف', description: 'عرض وإضافة المصاريف', group: 'pages' },
     { id: 'shifts_close', name: 'إغلاق الصندوق', description: 'إغلاق صندوق الوردية', group: 'pages' },
+    { id: 'hr', name: 'الموارد البشرية', description: 'إدارة الموظفين والرواتب', group: 'pages' },
+    { id: 'reservations', name: 'الحجوزات', description: 'إدارة حجوزات الطاولات', group: 'pages' },
+    { id: 'reviews', name: 'التقييمات', description: 'عرض تقييمات العملاء', group: 'pages' },
+    { id: 'loyalty', name: 'برنامج الولاء', description: 'إدارة نقاط الولاء', group: 'pages' },
+    { id: 'coupons', name: 'الكوبونات', description: 'إدارة الكوبونات والعروض', group: 'pages' },
+    { id: 'call_logs', name: 'سجل المكالمات', description: 'عرض سجل المكالمات', group: 'pages' },
     // صلاحيات الإعدادات
     { id: 'settings', name: 'الإعدادات', description: 'الوصول للإعدادات', group: 'settings' },
     { id: 'settings_appearance', name: 'المظهر', description: 'تغيير مظهر التطبيق', group: 'settings' },
@@ -275,6 +281,7 @@ export default function Settings() {
     { id: 'settings_kitchen', name: 'أقسام المطبخ', description: 'إدارة أقسام المطبخ', group: 'settings' },
     { id: 'settings_delivery', name: 'شركات التوصيل', description: 'إدارة شركات التوصيل', group: 'settings' },
     { id: 'settings_notifications', name: 'الإشعارات', description: 'إعدادات الإشعارات', group: 'settings' },
+    { id: 'settings_users', name: 'المستخدمين', description: 'إدارة المستخدمين والصلاحيات', group: 'settings' },
   ];
   
   // Dialog states
