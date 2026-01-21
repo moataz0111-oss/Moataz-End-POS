@@ -1884,7 +1884,7 @@ export default function Dashboard() {
             
             {/* QR Code */}
             <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-6 text-center border border-orange-200">
-              <div className="bg-white p-4 rounded-xl inline-block shadow-lg">
+              <div id="qr-code-container" className="bg-white p-4 rounded-xl inline-block shadow-lg">
                 <QRCodeSVG 
                   value={menuLink || 'loading'} 
                   size={180}
@@ -1910,24 +1910,64 @@ export default function Dashboard() {
               </Button>
             </div>
             
-            {/* زر المشاركة */}
-            <Button 
-              className="w-full gap-2 bg-orange-500 hover:bg-orange-600" 
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: 'Maestro EGP - قائمة الطعام',
-                    text: '🍽️ اطلع على قائمة الطعام واطلب الآن!',
-                    url: menuLink
-                  });
-                } else {
-                  copyMenuLink();
-                }
-              }}
-            >
-              <Share2 className="h-4 w-4" />
-              مشاركة الرابط
-            </Button>
+            {/* أزرار المشاركة والتنزيل */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button 
+                className="gap-2 bg-orange-500 hover:bg-orange-600" 
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'Maestro EGP - قائمة الطعام',
+                      text: '🍽️ اطلع على قائمة الطعام واطلب الآن!',
+                      url: menuLink
+                    });
+                  } else {
+                    copyMenuLink();
+                  }
+                }}
+              >
+                <Share2 className="h-4 w-4" />
+                مشاركة الرابط
+              </Button>
+              <Button 
+                variant="outline"
+                className="gap-2 border-orange-300 text-orange-600 hover:bg-orange-50" 
+                onClick={() => {
+                  // تحويل QR Code SVG إلى صورة PNG وتنزيلها
+                  const svg = document.querySelector('#qr-code-container svg');
+                  if (svg) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const svgData = new XMLSerializer().serializeToString(svg);
+                    const img = new Image();
+                    
+                    // إضافة padding أبيض حول الصورة
+                    canvas.width = 250;
+                    canvas.height = 250;
+                    
+                    img.onload = () => {
+                      // رسم خلفية بيضاء
+                      ctx.fillStyle = '#ffffff';
+                      ctx.fillRect(0, 0, canvas.width, canvas.height);
+                      // رسم QR Code في المنتصف
+                      ctx.drawImage(img, 35, 35, 180, 180);
+                      
+                      // تنزيل الصورة
+                      const link = document.createElement('a');
+                      link.download = 'maestro-qr-code.png';
+                      link.href = canvas.toDataURL('image/png');
+                      link.click();
+                      toast.success('تم حفظ QR Code!');
+                    };
+                    
+                    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+                  }
+                }}
+              >
+                <Download className="h-4 w-4" />
+                حفظ QR Code
+              </Button>
+            </div>
           </div>
 
           <DialogFooter>
