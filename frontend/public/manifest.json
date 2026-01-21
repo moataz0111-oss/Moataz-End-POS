@@ -61,7 +61,7 @@
   ],
   "id": "/driver",
   "start_url": "/driver",
-  "scope": "/",
+  "scope": "/driver",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#10b981",
