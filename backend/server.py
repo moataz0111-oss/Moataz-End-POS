@@ -11132,6 +11132,45 @@ async def get_member_transactions(member_id: str, current_user: dict = Depends(g
     ).sort("created_at", -1).to_list(100)
     return transactions
 
+# ==================== CUSTOMER REVIEWS ====================
+
+@api_router.get("/customer-reviews")
+async def get_customer_reviews(current_user: dict = Depends(get_current_user)):
+    """جلب تقييمات العملاء"""
+    tenant_id = current_user.get("tenant_id")
+    query = {"tenant_id": tenant_id} if tenant_id else {}
+    
+    reviews = await db.customer_reviews.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return reviews
+
+@api_router.post("/customer-reviews")
+async def create_customer_review(review: Dict[str, Any]):
+    """إضافة تقييم من العميل (بدون توثيق - للعملاء)"""
+    review_doc = {
+        "id": str(uuid.uuid4()),
+        "order_id": review.get("order_id"),
+        "order_number": review.get("order_number"),
+        "customer_name": review.get("customer_name"),
+        "customer_phone": review.get("customer_phone"),
+        "rating": review.get("rating", 5),
+        "comment": review.get("comment", ""),
+        "food_rating": review.get("food_rating"),
+        "service_rating": review.get("service_rating"),
+        "speed_rating": review.get("speed_rating"),
+        "tenant_id": review.get("tenant_id"),
+        "branch_id": review.get("branch_id"),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.customer_reviews.insert_one(review_doc)
+    review_doc.pop("_id", None)
+    
+    return review_doc
+
 # ==================== RECIPES & RAW MATERIALS ROUTES ====================
 
 class RawMaterialCreate(BaseModel):
