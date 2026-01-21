@@ -659,7 +659,6 @@ export default function Dashboard() {
       'showInventoryReports': 'inventory',
       'showDelivery': 'delivery',
       'showReservations': 'reservations',
-      'showReviews': 'reviews',
       'showHR': 'hr',
       'showCallLogs': 'call_logs',
       'showLoyalty': 'loyalty',
