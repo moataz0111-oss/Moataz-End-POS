@@ -147,6 +147,32 @@ export default function HR() {
     }
   };
 
+  // جلب تقييمات الموظفين
+  const fetchEmployeeRatings = async () => {
+    setRatingsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const branchId = getBranchIdForApi();
+      const res = await axios.get(
+        `${API}/employee-ratings?month=${selectedMonth}${branchId ? `&branch_id=${branchId}` : ''}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEmployeeRatings(res.data);
+    } catch (error) {
+      console.error('Error fetching ratings:', error);
+      toast.error('فشل في تحميل التقييمات');
+    } finally {
+      setRatingsLoading(false);
+    }
+  };
+
+  // جلب التقييمات عند فتح تبويب التقييمات
+  useEffect(() => {
+    if (activeTab === 'ratings') {
+      fetchEmployeeRatings();
+    }
+  }, [activeTab, selectedMonth, selectedBranchId]);
+
   // Employee handlers
   const handleCreateEmployee = async (e) => {
     e.preventDefault();
