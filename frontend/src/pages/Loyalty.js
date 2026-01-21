@@ -60,6 +60,10 @@ export default function Loyalty() {
   const [selectedMember, setSelectedMember] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   
+  // تقييمات العملاء
+  const [customerReviews, setCustomerReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  
   const [memberForm, setMemberForm] = useState({
     customer_id: '',
     customer_name: '',
@@ -72,6 +76,28 @@ export default function Loyalty() {
   useEffect(() => {
     fetchData();
   }, []);
+  
+  // جلب تقييمات العملاء عند فتح تبويب التقييمات
+  useEffect(() => {
+    if (activeTab === 'reviews') {
+      fetchCustomerReviews();
+    }
+  }, [activeTab]);
+  
+  const fetchCustomerReviews = async () => {
+    setReviewsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API}/customer-reviews`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCustomerReviews(res.data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
 
   const fetchData = async () => {
     try {
