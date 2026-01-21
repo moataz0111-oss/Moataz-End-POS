@@ -72,11 +72,13 @@ export default function WarehouseManufacturing() {
   const [manufacturedProducts, setManufacturedProducts] = useState([]);
   const [warehouseTransfers, setWarehouseTransfers] = useState([]);
   const [warehouseTransactions, setWarehouseTransactions] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [stats, setStats] = useState(null);
   
   // Dialog states
   const [showAddRawMaterial, setShowAddRawMaterial] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
+  const [showBranchTransferDialog, setShowBranchTransferDialog] = useState(false);
   const [showAddProductDialog, setShowAddProductDialog] = useState(false);
   const [showProduceDialog, setShowProduceDialog] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
