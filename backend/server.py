@@ -4140,10 +4140,42 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
             )
     
     # Deduct inventory - خصم المواد الخام من مخزون الفرع بناءً على الوصفات
+    # جلب إعدادات المخزون
+    inventory_settings = await db.settings.find_one({"type": "inventory_settings"}, {"_id": 0})
+    inventory_mode = inventory_settings.get("inventory_mode", "centralized") if inventory_settings else "centralized"
+    
     for item in order.items:
         product = await db.products.find_one({"id": item.product_id})
         if product:
-            # أولاً: تحقق من وجود وصفة في المنتج النهائي المرتبط
+            # النظام الجديد: المنتجات المصنعة
+            manufactured_product_id = product.get("manufactured_product_id")
+            if manufactured_product_id:
+                # خصم من مخزون الفرع (branch_inventory)
+                branch_item = await db.branch_inventory.find_one({
+                    "branch_id": order.branch_id,
+                    "product_id": manufactured_product_id
+                })
+                
+                if branch_item:
+                    await db.branch_inventory.update_one(
+                        {"id": branch_item["id"]},
+                        {
+                            "$inc": {"quantity": -item.quantity},
+                            "$set": {"last_updated": datetime.now(timezone.utc).isoformat()}
+                        }
+                    )
+                elif inventory_mode == "centralized":
+                    # في حالة المخزون المركزي، خصم من المنتجات المصنعة مباشرة
+                    await db.manufactured_products.update_one(
+                        {"id": manufactured_product_id},
+                        {
+                            "$inc": {"quantity": -item.quantity},
+                            "$set": {"last_updated": datetime.now(timezone.utc).isoformat()}
+                        }
+                    )
+                continue
+            
+            # النظام القديم: المنتجات النهائية
             finished_product_id = product.get("finished_product_id")
             if finished_product_id:
                 finished_product = await db.inventory.find_one(
@@ -4168,7 +4200,7 @@ async def create_order(order: OrderCreate, current_user: dict = Depends(get_curr
                             {"$inc": {"quantity": -total_to_deduct}}
                         )
             
-            # ثانياً: استخدم المكونات القديمة إذا كانت موجودة (للتوافق مع البيانات القديمة)
+            # ثالثاً: استخدم المكونات القديمة إذا كانت موجودة (للتوافق مع البيانات القديمة)
             elif product.get("ingredients"):
                 for ing in product["ingredients"]:
                     await db.inventory.update_one(
