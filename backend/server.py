@@ -12814,7 +12814,7 @@ async def track_customer_order(tenant_id: str, order_id: str):
     }
 
 @api_router.get("/customer/menu-link")
-async def get_menu_link(current_user: dict = Depends(get_current_user)):
+async def get_menu_link(request: Request, current_user: dict = Depends(get_current_user)):
     """جلب رابط القائمة للمستخدم"""
     tenant_id = get_user_tenant_id(current_user) or "default"
     
@@ -12831,7 +12831,18 @@ async def get_menu_link(current_user: dict = Depends(get_current_user)):
         }
         await db.tenants.insert_one(tenant)
     
-    base_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://restoinventory-6.preview.emergentagent.com')
+    # استخدام نفس النطاق الذي جاء منه الطلب
+    # هذا يضمن أن رابط القائمة يعمل على أي نسخة (preview أو production)
+    origin = request.headers.get("origin") or request.headers.get("referer", "")
+    if origin:
+        # استخراج النطاق من origin
+        from urllib.parse import urlparse
+        parsed = urlparse(origin)
+        base_url = f"{parsed.scheme}://{parsed.netloc}"
+    else:
+        # fallback للـ environment variable
+        base_url = os.environ.get('REACT_APP_BACKEND_URL', 'https://restoinventory-6.preview.emergentagent.com')
+    
     menu_url = f"{base_url}/menu/{tenant.get('menu_slug', tenant_id)}"
     
     return {
