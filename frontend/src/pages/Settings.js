@@ -431,10 +431,31 @@ export default function Settings() {
       
       // جلب إعدادات المخزون
       fetchInventorySettings();
+      
+      // جلب إعدادات المطعم
+      fetchRestaurantSettings();
     } catch (error) {
       console.error('Failed to fetch settings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // جلب إعدادات المطعم
+  const fetchRestaurantSettings = async () => {
+    try {
+      const res = await axios.get(`${API}/settings/restaurant`);
+      setRestaurantSettings(res.data);
+      if (res.data.logo_url) {
+        const logoUrl = res.data.logo_url;
+        if (logoUrl.startsWith('/api')) {
+          setRestaurantLogoPreview(`${API}${logoUrl.replace('/api', '')}`);
+        } else {
+          setRestaurantLogoPreview(logoUrl);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch restaurant settings:', error);
     }
   };
 
