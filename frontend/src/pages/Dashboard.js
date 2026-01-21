@@ -1790,6 +1790,128 @@ export default function Dashboard() {
                 </div>
               </div>
             )}
+
+            <Separator className="my-4" />
+
+            {/* قسم تصفير البيانات */}
+            <div className="space-y-3">
+              <h4 className="font-medium text-sm flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 text-orange-500" />
+                تصفير بيانات المخزون (للتجربة)
+              </h4>
+              <p className="text-xs text-muted-foreground">
+                اختر العناصر التي تريد تصفيرها. هذا الإجراء لا يمكن التراجع عنه.
+              </p>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <label className="flex items-center gap-2 p-2 rounded-lg border border-border/50 hover:bg-muted/50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    id="reset_branch_orders" 
+                    className="rounded border-border"
+                    data-testid="reset-branch-orders-checkbox"
+                  />
+                  <span className="text-sm">طلبات الفروع</span>
+                </label>
+                
+                <label className="flex items-center gap-2 p-2 rounded-lg border border-border/50 hover:bg-muted/50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    id="reset_purchases" 
+                    className="rounded border-border"
+                    data-testid="reset-purchases-checkbox"
+                  />
+                  <span className="text-sm">فواتير الشراء</span>
+                </label>
+                
+                <label className="flex items-center gap-2 p-2 rounded-lg border border-border/50 hover:bg-muted/50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    id="reset_manufacturing" 
+                    className="rounded border-border"
+                    data-testid="reset-manufacturing-checkbox"
+                  />
+                  <span className="text-sm">سجلات التصنيع</span>
+                </label>
+                
+                <label className="flex items-center gap-2 p-2 rounded-lg border border-border/50 hover:bg-muted/50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    id="reset_raw_materials" 
+                    className="rounded border-border"
+                    data-testid="reset-raw-materials-checkbox"
+                  />
+                  <span className="text-sm">كميات المواد الخام</span>
+                </label>
+                
+                <label className="flex items-center gap-2 p-2 rounded-lg border border-border/50 hover:bg-muted/50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    id="reset_manufactured" 
+                    className="rounded border-border"
+                    data-testid="reset-manufactured-checkbox"
+                  />
+                  <span className="text-sm">كميات المنتجات المصنعة</span>
+                </label>
+                
+                <label className="flex items-center gap-2 p-2 rounded-lg border border-border/50 hover:bg-muted/50 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    id="reset_branch_inventory" 
+                    className="rounded border-border"
+                    data-testid="reset-branch-inventory-checkbox"
+                  />
+                  <span className="text-sm">مخزون الفروع</span>
+                </label>
+              </div>
+              
+              <Button 
+                variant="destructive"
+                size="sm"
+                className="w-full gap-2"
+                data-testid="inventory-reset-btn"
+                onClick={async () => {
+                  const resetBranchOrders = document.getElementById('reset_branch_orders')?.checked;
+                  const resetPurchases = document.getElementById('reset_purchases')?.checked;
+                  const resetManufacturing = document.getElementById('reset_manufacturing')?.checked;
+                  const resetRawMaterials = document.getElementById('reset_raw_materials')?.checked;
+                  const resetManufactured = document.getElementById('reset_manufactured')?.checked;
+                  const resetBranchInventory = document.getElementById('reset_branch_inventory')?.checked;
+                  
+                  if (!resetBranchOrders && !resetPurchases && !resetManufacturing && 
+                      !resetRawMaterials && !resetManufactured && !resetBranchInventory) {
+                    toast.error('اختر عنصراً واحداً على الأقل للتصفير');
+                    return;
+                  }
+                  
+                  if (!confirm('هل أنت متأكد من تصفير البيانات المحددة؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                    return;
+                  }
+                  
+                  try {
+                    const res = await axios.post(`${API}/inventory-system/inventory-reset`, {
+                      reset_branch_orders: resetBranchOrders,
+                      reset_purchases: resetPurchases,
+                      reset_manufacturing: resetManufacturing,
+                      reset_raw_materials_qty: resetRawMaterials,
+                      reset_manufactured_qty: resetManufactured,
+                      reset_branch_inventory: resetBranchInventory
+                    });
+                    
+                    if (res.data.success) {
+                      toast.success('تم تصفير البيانات بنجاح');
+                      // إلغاء تحديد جميع الخيارات
+                      document.querySelectorAll('input[type="checkbox"][id^="reset_"]').forEach(cb => cb.checked = false);
+                    }
+                  } catch (error) {
+                    toast.error('فشل في تصفير البيانات: ' + (error.response?.data?.detail || error.message));
+                  }
+                }}
+              >
+                <X className="h-4 w-4" />
+                تصفير البيانات المحددة
+              </Button>
+            </div>
           </div>
 
           <DialogFooter className="flex flex-wrap gap-2">
