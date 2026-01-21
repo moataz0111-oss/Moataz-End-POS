@@ -1210,6 +1210,120 @@ export default function Settings() {
             </Card>
           </TabsContent>
 
+          {/* Restaurant Settings - إعدادات المطعم */}
+          {hasRole(['admin']) && (
+            <TabsContent value="restaurant">
+              <Card className="border-border/50 bg-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <Store className="h-5 w-5" />
+                    إعدادات المطعم
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    تظهر هذه البيانات في تطبيق العملاء (قائمة الطعام)
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* اسم المطعم */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-foreground">اسم المطعم (عربي)</Label>
+                      <Input
+                        value={restaurantSettings.name_ar || restaurantSettings.name || ''}
+                        onChange={(e) => setRestaurantSettings({...restaurantSettings, name_ar: e.target.value, name: e.target.value})}
+                        placeholder="مثال: مطعم الشام"
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label className="text-foreground">اسم المطعم (إنجليزي)</Label>
+                      <Input
+                        value={restaurantSettings.name || ''}
+                        onChange={(e) => setRestaurantSettings({...restaurantSettings, name: e.target.value})}
+                        placeholder="Example: Al Sham Restaurant"
+                        className="mt-1"
+                        dir="ltr"
+                      />
+                    </div>
+                  </div>
+
+                  {/* شعار المطعم */}
+                  <div className="space-y-3">
+                    <Label className="text-foreground">شعار المطعم</Label>
+                    <div className="flex items-start gap-4">
+                      <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center overflow-hidden border-2 border-border/50">
+                        {restaurantLogoPreview || restaurantSettings.logo_url ? (
+                          <img 
+                            src={restaurantLogoPreview || (restaurantSettings.logo_url?.startsWith('/api') ? `${API}${restaurantSettings.logo_url.replace('/api', '')}` : restaurantSettings.logo_url)} 
+                            alt="شعار المطعم" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-black text-4xl font-bold">M</span>
+                        )}
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              setRestaurantLogoFile(file);
+                              setRestaurantLogoPreview(URL.createObjectURL(file));
+                            }
+                          }}
+                          className="cursor-pointer"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          يفضل صورة مربعة بحجم 512×512 بكسل. PNG أو JPG
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* زر الحفظ */}
+                  <Button
+                    onClick={async () => {
+                      setSavingRestaurant(true);
+                      try {
+                        let logoUrl = restaurantSettings.logo_url;
+                        
+                        // رفع الشعار إذا تم اختياره
+                        if (restaurantLogoFile) {
+                          const formData = new FormData();
+                          formData.append('file', restaurantLogoFile);
+                          const uploadRes = await axios.post(`${API}/upload`, formData);
+                          logoUrl = uploadRes.data.url;
+                        }
+                        
+                        // حفظ إعدادات المطعم
+                        await axios.put(`${API}/settings/restaurant`, {
+                          name: restaurantSettings.name,
+                          name_ar: restaurantSettings.name_ar,
+                          logo_url: logoUrl
+                        });
+                        
+                        setRestaurantSettings({...restaurantSettings, logo_url: logoUrl});
+                        toast.success('تم حفظ إعدادات المطعم بنجاح');
+                      } catch (error) {
+                        toast.error('فشل في حفظ الإعدادات');
+                        console.error(error);
+                      } finally {
+                        setSavingRestaurant(false);
+                      }
+                    }}
+                    disabled={savingRestaurant}
+                    className="w-full"
+                  >
+                    {savingRestaurant ? 'جارِ الحفظ...' : 'حفظ إعدادات المطعم'}
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
           {/* Dashboard Settings - إعدادات الصفحة الرئيسية */}
           {hasRole(['admin', 'manager', 'branch_manager']) && (
             <TabsContent value="dashboard">
