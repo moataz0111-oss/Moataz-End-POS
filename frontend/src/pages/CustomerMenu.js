@@ -51,7 +51,16 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const API = process.env.REACT_APP_BACKEND_URL + '/api';
+// تحديد رابط الـ API تلقائياً
+const getApiUrl = () => {
+  if (typeof window !== 'undefined') {
+    // في بيئة الإنتاج أو المعاينة، استخدم نفس النطاق
+    return window.location.origin + '/api';
+  }
+  return (process.env.REACT_APP_BACKEND_URL || '') + '/api';
+};
+
+const API = getApiUrl();
 
 // ==================== LOCATION PICKER COMPONENT ====================
 function LocationPicker({ position, setPosition, onClose }) {
