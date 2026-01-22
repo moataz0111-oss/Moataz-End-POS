@@ -1263,7 +1263,8 @@ def get_user_tenant_id(user: dict) -> Optional[str]:
     """الحصول على tenant_id للمستخدم - Super Admin لا يحتاج tenant_id"""
     if user.get("role") == UserRole.SUPER_ADMIN:
         return None
-    return user.get("tenant_id")
+    # إذا لم يكن للمستخدم tenant_id، نستخدم "default"
+    return user.get("tenant_id") or "default"
 
 # دالة مساعدة لبناء query مع tenant_id
 def build_tenant_query(user: dict, base_query: dict = None) -> dict:
@@ -1272,17 +1273,9 @@ def build_tenant_query(user: dict, base_query: dict = None) -> dict:
     tenant_id = get_user_tenant_id(user)
     
     if tenant_id:
-        # المستخدم العميل يرى فقط بياناته
+        # المستخدم يرى فقط بياناته
         query["tenant_id"] = tenant_id
-    else:
-        # المستخدم الرئيسي (بدون tenant_id) يرى فقط البيانات الرئيسية
-        if user.get("role") != UserRole.SUPER_ADMIN:
-            # البيانات الرئيسية هي التي ليس لها tenant_id أو tenant_id فارغ أو None أو ""
-            query["$or"] = [
-                {"tenant_id": {"$exists": False}},
-                {"tenant_id": None},
-                {"tenant_id": ""}
-            ]
+    # Super Admin يرى كل شيء
     
     return query
 
