@@ -1038,6 +1038,67 @@ export default function Settings() {
     }
   };
 
+  // إضافة شركة توصيل جديدة
+  const handleAddDeliveryApp = async () => {
+    if (!newDeliveryApp.name) {
+      toast.error('يرجى إدخال اسم الشركة');
+      return;
+    }
+    
+    setSavingDeliveryApp(true);
+    try {
+      await axios.post(`${API}/delivery-app-settings`, {
+        app_id: `custom_${Date.now()}`,
+        name: newDeliveryApp.name,
+        name_en: newDeliveryApp.name_en || newDeliveryApp.name,
+        commission_type: 'percentage',
+        commission_rate: parseFloat(newDeliveryApp.commission_rate) || 0,
+        is_active: newDeliveryApp.is_active,
+        payment_terms: 'weekly'
+      });
+      toast.success('تم إضافة شركة التوصيل بنجاح');
+      setShowAddDeliveryApp(false);
+      setNewDeliveryApp({ name: '', name_en: '', commission_rate: 0, is_active: true });
+      fetchData();
+    } catch (error) {
+      toast.error('فشل في إضافة شركة التوصيل');
+    } finally {
+      setSavingDeliveryApp(false);
+    }
+  };
+
+  // حذف شركة توصيل
+  const handleDeleteDeliveryApp = async (appId) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذه الشركة؟')) return;
+    
+    try {
+      await axios.delete(`${API}/delivery-app-settings/${appId}`);
+      toast.success('تم حذف شركة التوصيل');
+      fetchData();
+    } catch (error) {
+      toast.error('فشل في حذف شركة التوصيل');
+    }
+  };
+
+  // تفعيل/تعطيل شركة توصيل
+  const handleToggleDeliveryApp = async (app) => {
+    try {
+      await axios.post(`${API}/delivery-app-settings`, {
+        app_id: app.id,
+        name: app.name,
+        name_en: app.name_en,
+        commission_type: 'percentage',
+        commission_rate: app.commission_rate || 0,
+        is_active: !app.is_active,
+        payment_terms: 'weekly'
+      });
+      toast.success(app.is_active ? 'تم تعطيل الشركة' : 'تم تفعيل الشركة');
+      fetchData();
+    } catch (error) {
+      toast.error('فشل في التحديث');
+    }
+  };
+
   const getRoleText = (role) => {
     const roles = {
       admin: 'مدير النظام',
