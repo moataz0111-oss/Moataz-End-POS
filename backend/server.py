@@ -410,6 +410,70 @@ async def apply_automatic_updates():
     logger.info("🔄 Applying automatic updates to all tenants...")
     
     try:
+        # 0. تحديث البيانات القديمة التي ليس لها tenant_id لتصبح "default"
+        # تحديث المستخدمين الرئيسيين
+        await db.users.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        logger.info("   ✅ Updated users without tenant_id")
+        
+        # تحديث السائقين
+        drivers_tenant_result = await db.drivers.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        if drivers_tenant_result.modified_count > 0:
+            logger.info(f"   ✅ Updated {drivers_tenant_result.modified_count} drivers with default tenant_id")
+        
+        # تحديث الموظفين
+        employees_tenant_result = await db.employees.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        if employees_tenant_result.modified_count > 0:
+            logger.info(f"   ✅ Updated {employees_tenant_result.modified_count} employees with default tenant_id")
+        
+        # تحديث الفروع
+        branches_tenant_result = await db.branches.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        if branches_tenant_result.modified_count > 0:
+            logger.info(f"   ✅ Updated {branches_tenant_result.modified_count} branches with default tenant_id")
+        
+        # تحديث الفئات
+        categories_tenant_result = await db.categories.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        if categories_tenant_result.modified_count > 0:
+            logger.info(f"   ✅ Updated {categories_tenant_result.modified_count} categories with default tenant_id")
+        
+        # تحديث المنتجات
+        products_tenant_result = await db.products.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        if products_tenant_result.modified_count > 0:
+            logger.info(f"   ✅ Updated {products_tenant_result.modified_count} products with default tenant_id")
+        
+        # تحديث الطلبات
+        orders_tenant_result = await db.orders.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        if orders_tenant_result.modified_count > 0:
+            logger.info(f"   ✅ Updated {orders_tenant_result.modified_count} orders with default tenant_id")
+        
+        # تحديث المصاريف
+        expenses_tenant_result = await db.expenses.update_many(
+            {"tenant_id": {"$in": [None, ""]}},
+            {"$set": {"tenant_id": "default"}}
+        )
+        if expenses_tenant_result.modified_count > 0:
+            logger.info(f"   ✅ Updated {expenses_tenant_result.modified_count} expenses with default tenant_id")
+        
         # 1. تفعيل جميع السائقين
         drivers_result = await db.drivers.update_many(
             {},
