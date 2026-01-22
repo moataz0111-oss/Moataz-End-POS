@@ -12566,8 +12566,9 @@ async def get_customer_menu(tenant_id: str):
     main_settings = await db.settings.find_one({"tenant_id": tid}, {"_id": 0}) or {}
     
     # تحديد الشعار والاسم - الأولوية: tenant -> settings -> main_settings
-    restaurant_logo = tenant.get("logo") or settings.get("restaurant_logo") or main_settings.get("restaurant_logo", "")
-    restaurant_name = tenant.get("name") or settings.get("restaurant_name") or main_settings.get("restaurant_name", "المطعم")
+    # ملاحظة: في جدول tenants الحقل هو logo_url وليس logo
+    restaurant_logo = tenant.get("logo_url") or tenant.get("logo") or settings.get("restaurant_logo") or main_settings.get("restaurant_logo", "")
+    restaurant_name = tenant.get("name") or tenant.get("name_ar") or settings.get("restaurant_name") or main_settings.get("restaurant_name", "المطعم")
     
     return {
         "restaurant": {
