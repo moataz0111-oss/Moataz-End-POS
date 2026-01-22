@@ -7,6 +7,7 @@ import { useBranch } from '../context/BranchContext';
 import { formatPrice, formatPriceCompact } from '../utils/currency';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
 import BranchSelector from '../components/BranchSelector';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
