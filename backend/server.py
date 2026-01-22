@@ -252,6 +252,88 @@ async def init_database():
         else:
             logger.info("ℹ️ Database already initialized - Super Admin exists")
             
+            # التحقق من وجود البيانات الأساسية وإضافتها إذا كانت ناقصة
+            # تحديث المستخدم admin ليكون له tenant_id
+            admin_user = await db.users.find_one({"email": "admin@maestroegp.com"})
+            if admin_user and not admin_user.get("tenant_id"):
+                await db.users.update_one(
+                    {"email": "admin@maestroegp.com"},
+                    {"$set": {"tenant_id": "default"}}
+                )
+                logger.info("✅ Updated admin user with tenant_id: default")
+            
+            # التحقق من الفئات
+            categories_count = await db.categories.count_documents({"tenant_id": "default"})
+            if categories_count == 0:
+                logger.info("🔧 Adding default categories...")
+                default_categories = [
+                    {"id": str(uuid.uuid4()), "name": "برغر", "name_ar": "برغر", "sort_order": 1, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "بيتزا", "name_ar": "بيتزا", "sort_order": 2, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "مشروبات", "name_ar": "مشروبات", "sort_order": 3, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "حلويات", "name_ar": "حلويات", "sort_order": 4, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "سلطات", "name_ar": "سلطات", "sort_order": 5, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                ]
+                await db.categories.insert_many(default_categories)
+                logger.info("✅ Default categories added")
+            
+            # التحقق من المنتجات
+            products_count = await db.products.count_documents({"tenant_id": "default"})
+            if products_count == 0:
+                logger.info("🔧 Adding default products...")
+                # جلب فئة البرغر للربط
+                burger_cat = await db.categories.find_one({"name": "برغر", "tenant_id": "default"})
+                drinks_cat = await db.categories.find_one({"name": "مشروبات", "tenant_id": "default"})
+                burger_cat_id = burger_cat["id"] if burger_cat else str(uuid.uuid4())
+                drinks_cat_id = drinks_cat["id"] if drinks_cat else str(uuid.uuid4())
+                
+                default_products = [
+                    {"id": str(uuid.uuid4()), "name": "برغر كلاسيك", "price": 5000, "cost": 2000, "category_id": burger_cat_id, "is_available": True, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "برغر دبل", "price": 7500, "cost": 3000, "category_id": burger_cat_id, "is_available": True, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "كولا", "price": 1500, "cost": 500, "category_id": drinks_cat_id, "is_available": True, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                ]
+                await db.products.insert_many(default_products)
+                logger.info("✅ Default products added")
+            
+            # التحقق من السائقين
+            drivers_count = await db.drivers.count_documents({"tenant_id": "default"})
+            if drivers_count == 0:
+                logger.info("🔧 Adding default drivers...")
+                default_drivers = [
+                    {"id": str(uuid.uuid4()), "name": "سائق 1", "phone": "07801111111", "is_active": True, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "سائق 2", "phone": "07802222222", "is_active": True, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                ]
+                await db.drivers.insert_many(default_drivers)
+                logger.info("✅ Default drivers added")
+            
+            # التحقق من الموظفين
+            employees_count = await db.employees.count_documents({"tenant_id": "default"})
+            if employees_count == 0:
+                logger.info("🔧 Adding default employees...")
+                default_employees = [
+                    {"id": str(uuid.uuid4()), "name": "موظف 1", "position": "كاشير", "phone": "07803333333", "salary": 500000, "is_active": True, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                    {"id": str(uuid.uuid4()), "name": "موظف 2", "position": "طباخ", "phone": "07804444444", "salary": 600000, "is_active": True, "tenant_id": "default", "created_at": datetime.now(timezone.utc).isoformat()},
+                ]
+                await db.employees.insert_many(default_employees)
+                logger.info("✅ Default employees added")
+            
+            # التحقق من الفروع
+            branches_count = await db.branches.count_documents({"tenant_id": "default"})
+            if branches_count == 0:
+                logger.info("🔧 Adding default branch...")
+                branch_doc = {
+                    "id": str(uuid.uuid4()),
+                    "name": "الفرع الرئيسي",
+                    "code": "MAIN",
+                    "address": "العنوان الرئيسي",
+                    "phone": "",
+                    "is_main": True,
+                    "is_active": True,
+                    "tenant_id": "default",
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+                await db.branches.insert_one(branch_doc)
+                logger.info("✅ Default branch added")
+            
         # التحقق من وجود خلفيات تسجيل الدخول
         login_bg = await db.settings.find_one({"type": "login_backgrounds"})
         if not login_bg:
