@@ -353,8 +353,7 @@ export default function Dashboard() {
       setShowMenuLinkDialog(true);
     } catch (error) {
       // إذا فشل، نستخدم الرابط الافتراضي
-      const baseUrl = process.env.REACT_APP_BACKEND_URL || window.location.origin;
-      setMenuLink(`${baseUrl}/menu/default`);
+      setMenuLink(`${BACKEND_URL}/menu/default`);
       setShowMenuLinkDialog(true);
     }
   };
