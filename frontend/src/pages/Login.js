@@ -580,7 +580,7 @@ export default function Login() {
               {/* زر بوابة السائقين */}
               <a 
                 href="/driver" 
-                className="flex items-center justify-center gap-2 text-sm text-green-400 hover:text-green-300 transition-colors py-2 px-4 rounded-lg border border-green-500/30 hover:border-green-500/50 hover:bg-green-500/10 mx-auto"
+                className="flex items-center justify-center gap-2 text-sm text-amber-400 hover:text-amber-300 transition-colors py-2 px-4 rounded-lg border border-amber-500/30 hover:border-amber-500/50 hover:bg-amber-500/10 mx-auto"
               >
                 <Truck className="h-4 w-4" />
                 بوابة السائقين
