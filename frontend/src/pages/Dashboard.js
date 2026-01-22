@@ -1532,8 +1532,17 @@ export default function Dashboard() {
                         <span>الرصيد الافتتاحي:</span>
                         <span>{formatPrice(closingResult.opening_cash)}</span>
                       </div>
-                      <div className="flex justify-between">
-                        <span>المتوقع في الصندوق:</span>
+                      <div className="flex justify-between text-green-600">
+                        <span>+ المبيعات النقدية:</span>
+                        <span>{formatPrice(closingResult.cash_sales)}</span>
+                      </div>
+                      <div className="flex justify-between text-red-600">
+                        <span>- المصاريف:</span>
+                        <span>{formatPrice(closingResult.total_expenses)}</span>
+                      </div>
+                      <Separator className="my-2" />
+                      <div className="flex justify-between font-bold">
+                        <span>المتوقع في الصندوق (نقداً):</span>
                         <span>{formatPrice(closingResult.expected_cash)}</span>
                       </div>
                       <div className="flex justify-between font-bold">
@@ -1548,6 +1557,40 @@ export default function Dashboard() {
                             <CheckCircle className="h-5 w-5" />
                           ) : (
                             <XCircle className="h-5 w-5" />
+                          )}
+                          {formatPrice(Math.abs(closingResult.cash_difference))}
+                          {closingResult.cash_difference >= 0 ? ' زيادة' : ' نقص'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* المبالغ غير النقدية - للتوضيح */}
+                  {(closingResult.card_sales > 0 || closingResult.credit_sales > 0) && (
+                    <div className="section mb-4 p-4 bg-gray-500/10 rounded-lg">
+                      <div className="section-title font-bold mb-2 text-gray-600">مبالغ غير نقدية (خارج الصندوق)</div>
+                      <p className="text-xs text-muted-foreground mb-2">هذه المبالغ لا تحتسب في جرد الصندوق لأنها ليست نقداً</p>
+                      <div className="space-y-1">
+                        {closingResult.card_sales > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span>💳 بطاقات:</span>
+                            <span className="text-blue-600">{formatPrice(closingResult.card_sales)}</span>
+                          </div>
+                        )}
+                        {closingResult.credit_sales > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span>📝 آجل:</span>
+                            <span className="text-orange-600">{formatPrice(closingResult.credit_sales)}</span>
+                          </div>
+                        )}
+                        <Separator className="my-2" />
+                        <div className="flex justify-between font-medium">
+                          <span>إجمالي غير نقدي:</span>
+                          <span>{formatPrice((closingResult.card_sales || 0) + (closingResult.credit_sales || 0))}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                           )}
                           {formatPrice(closingResult.cash_difference)}
                           {closingResult.cash_difference > 0 && ' (زيادة)'}
