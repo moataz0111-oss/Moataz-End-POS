@@ -1591,14 +1591,6 @@ export default function Dashboard() {
                       </div>
                     </div>
                   )}
-                          )}
-                          {formatPrice(closingResult.cash_difference)}
-                          {closingResult.cash_difference > 0 && ' (زيادة)'}
-                          {closingResult.cash_difference < 0 && ' (نقص)'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
 
                   {/* صافي الربح */}
                   <div className="section p-4 bg-primary/10 rounded-lg">
