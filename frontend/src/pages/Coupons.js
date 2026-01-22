@@ -211,7 +211,7 @@ export default function Coupons() {
       usage_limit: null, usage_per_customer: 1,
       valid_from: new Date().toISOString().split('T')[0],
       valid_until: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
-      is_active: true, loyalty_tier_required: '', first_order_only: false
+      is_active: true, loyalty_tier_required: 'all', first_order_only: false
     });
     setEditingCoupon(null);
   };
@@ -223,7 +223,7 @@ export default function Coupons() {
       bundle_price: null, start_time: '', end_time: '',
       valid_from: new Date().toISOString().split('T')[0],
       valid_until: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
-      is_active: true, loyalty_tier_required: ''
+      is_active: true, loyalty_tier_required: 'all'
     });
     setEditingPromotion(null);
   };
