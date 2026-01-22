@@ -668,7 +668,7 @@ export default function Coupons() {
               >
                 <SelectTrigger><SelectValue placeholder="للجميع" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">للجميع</SelectItem>
+                  <SelectItem value="all">للجميع</SelectItem>
                   <SelectItem value="bronze">برونزي فأعلى</SelectItem>
                   <SelectItem value="silver">فضي فأعلى</SelectItem>
                   <SelectItem value="gold">ذهبي فأعلى</SelectItem>

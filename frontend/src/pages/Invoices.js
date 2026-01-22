@@ -518,7 +518,7 @@ export default function Invoices() {
                 >
                   <SelectTrigger><SelectValue placeholder="الكل" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">الكل</SelectItem>
+                    <SelectItem value="all">الكل</SelectItem>
                     {branches.map(b => (
                       <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
                     ))}
