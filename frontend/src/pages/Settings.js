@@ -175,6 +175,16 @@ export default function Settings() {
   const [newEmail, setNewEmail] = useState('');
   const [loading, setLoading] = useState(true);
   
+  // حالة إضافة شركة توصيل جديدة
+  const [showAddDeliveryApp, setShowAddDeliveryApp] = useState(false);
+  const [newDeliveryApp, setNewDeliveryApp] = useState({
+    name: '',
+    name_en: '',
+    commission_rate: 0,
+    is_active: true
+  });
+  const [savingDeliveryApp, setSavingDeliveryApp] = useState(false);
+  
   // إعدادات المطعم (الاسم والشعار)
   const [restaurantSettings, setRestaurantSettings] = useState({
     name: '',
