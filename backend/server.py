@@ -5207,7 +5207,12 @@ async def get_cash_register_summary(current_user: dict = Depends(get_current_use
     # Calculate net profit
     net_profit = gross_profit - total_expenses
     
+    # المتوقع في الصندوق = الرصيد الافتتاحي + المبيعات النقدية فقط - المصاريف
+    # البطاقة والآجل لا تحتسب في الكاش لأنها ليست نقداً في يد الكاشير
     expected_cash = shift["opening_cash"] + cash_sales - total_expenses
+    
+    # المبلغ غير النقدي (بطاقة + آجل) - للعرض فقط
+    non_cash_amount = card_sales + credit_sales
     
     return {
         "shift_id": shift["id"],
@@ -5224,6 +5229,7 @@ async def get_cash_register_summary(current_user: dict = Depends(get_current_use
         "cash_sales": cash_sales,
         "card_sales": card_sales,
         "credit_sales": credit_sales,
+        "non_cash_amount": non_cash_amount,
         "delivery_app_sales": delivery_app_sales,
         "driver_sales": driver_sales,
         "discounts_total": discounts_total,
