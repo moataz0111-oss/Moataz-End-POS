@@ -168,6 +168,12 @@ export default function Dashboard() {
   const [lastCheckTime, setLastCheckTime] = useState(null);
   const notificationAudioRef = useRef(null);
   
+  // إشعارات الطلبات المتأخرة
+  const [delayedOrders, setDelayedOrders] = useState([]);
+  const [delayedStats, setDelayedStats] = useState(null);
+  const [showDelayedAlert, setShowDelayedAlert] = useState(false);
+  const delayedAudioRef = useRef(null);
+  
   // حالات خلفية Dashboard
   const [showBackgroundDialog, setShowBackgroundDialog] = useState(false);
   const [dashboardBackgrounds, setDashboardBackgrounds] = useState([]);
@@ -189,6 +195,54 @@ export default function Dashboard() {
     const interval = setInterval(checkNewOrders, 10000);
     return () => clearInterval(interval);
   }, [selectedBranchId]);
+
+  // التحقق من الطلبات المتأخرة كل 30 ثانية
+  useEffect(() => {
+    checkDelayedOrders();
+    const interval = setInterval(checkDelayedOrders, 30000);
+    return () => clearInterval(interval);
+  }, [selectedBranchId]);
+
+  // التحقق من الطلبات المتأخرة
+  const checkDelayedOrders = async () => {
+    try {
+      const params = { delay_minutes: 15 };
+      if (selectedBranchId && selectedBranchId !== 'all') {
+        params.branch_id = selectedBranchId;
+      }
+      
+      const res = await axios.get(`${API}/notifications/delayed-orders`, { params });
+      
+      if (res.data.stats.total_delayed > 0) {
+        setDelayedOrders(res.data.delayed_orders);
+        setDelayedStats(res.data.stats);
+        
+        // إظهار تنبيه إذا كان هناك طلبات حرجة أو عالية
+        if (res.data.stats.critical_count > 0 || res.data.stats.high_count > 0) {
+          setShowDelayedAlert(true);
+          playDelayedSound();
+        }
+      } else {
+        setDelayedOrders([]);
+        setDelayedStats(null);
+        setShowDelayedAlert(false);
+      }
+    } catch (error) {
+      console.error('Failed to check delayed orders:', error);
+    }
+  };
+
+  // تشغيل صوت تنبيه التأخير
+  const playDelayedSound = () => {
+    try {
+      if (!delayedAudioRef.current) {
+        // صوت تنبيه مختلف للتأخير
+        delayedAudioRef.current = new Audio('data:audio/wav;base64,UklGRl4EAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YToEAAAAAAEBAgIDAwQEBQUGBgcHCAgJCQoKCwsMDA0NDg4PDxAQEREMDAcHAgL+//r69/fz8/Dw7e3q6ujo5eXi4uDg3d3b29nZ19fV1dTU0tLS0dHR0NDQ0NDQ0dHR0tLS09PU1NXV1tbX19jY2dna2tvb3Nzd3d7e39/g4OHh4uLj4+Tk5eXm5ufn6Ojp6erq6+vs7O3t7u7v7/Dw8fHy8vPz9PT19fb29/f4+Pn5+vr7+/z8/f3+/v//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAAAAAAAA');
+        delayedAudioRef.current.volume = 0.3;
+      }
+      delayedAudioRef.current.play().catch(() => {});
+    } catch (e) {}
+  };
 
   // التحقق من الطلبات الجديدة من تطبيق العملاء
   const checkNewOrders = async () => {
