@@ -3022,6 +3022,16 @@ export default function Settings() {
                             className="mt-1"
                           />
                         </div>
+                        <div>
+                          <Label className="text-foreground">تكلفة التغليف (للسفري/التوصيل)</Label>
+                          <Input
+                            type="number"
+                            value={editProductForm.packaging_cost}
+                            onChange={(e) => setEditProductForm({ ...editProductForm, packaging_cost: e.target.value })}
+                            className="mt-1"
+                            placeholder="تُحسب فقط للطلبات السفرية والتوصيل"
+                          />
+                        </div>
                       </div>
                       <div>
                         <ImageUploader
