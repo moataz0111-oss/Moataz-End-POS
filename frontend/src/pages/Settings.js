@@ -936,7 +936,8 @@ export default function Settings() {
         ...editProductForm,
         price: parseFloat(editProductForm.price) || 0,
         cost: parseFloat(editProductForm.cost) || 0,
-        operating_cost: parseFloat(editProductForm.operating_cost) || 0
+        operating_cost: parseFloat(editProductForm.operating_cost) || 0,
+        packaging_cost: parseFloat(editProductForm.packaging_cost) || 0
       });
       toast.success('تم تحديث المنتج');
       setEditProductDialogOpen(false);
