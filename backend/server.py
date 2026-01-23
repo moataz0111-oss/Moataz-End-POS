@@ -133,6 +133,9 @@ async def init_database():
     try:
         logger.info("🔍 Checking database initialization...")
         
+        # إنشاء indexes لتسريع الاستعلامات
+        await create_indexes()
+        
         # التحقق من الاتصال بقاعدة البيانات
         await db.command('ping')
         logger.info("✅ Database connection successful")
