@@ -70,6 +70,64 @@ def has_role(user: dict, roles: list) -> bool:
 
 # ==================== DATABASE INITIALIZATION ====================
 
+async def create_indexes():
+    """إنشاء indexes لتسريع الاستعلامات"""
+    try:
+        # Users indexes
+        await db.users.create_index("id", unique=True)
+        await db.users.create_index("email", unique=True)
+        await db.users.create_index("tenant_id")
+        await db.users.create_index("role")
+        
+        # Orders indexes - الأكثر أهمية للأداء
+        await db.orders.create_index("id", unique=True)
+        await db.orders.create_index("tenant_id")
+        await db.orders.create_index("branch_id")
+        await db.orders.create_index("status")
+        await db.orders.create_index("created_at")
+        await db.orders.create_index([("tenant_id", 1), ("status", 1)])
+        await db.orders.create_index([("tenant_id", 1), ("created_at", -1)])
+        await db.orders.create_index([("cashier_id", 1), ("created_at", -1)])
+        
+        # Products indexes
+        await db.products.create_index("id", unique=True)
+        await db.products.create_index("tenant_id")
+        await db.products.create_index("category_id")
+        await db.products.create_index([("tenant_id", 1), ("is_active", 1)])
+        
+        # Categories indexes
+        await db.categories.create_index("id", unique=True)
+        await db.categories.create_index("tenant_id")
+        
+        # Drivers indexes
+        await db.drivers.create_index("id", unique=True)
+        await db.drivers.create_index("tenant_id")
+        await db.drivers.create_index("branch_id")
+        
+        # Employees indexes
+        await db.employees.create_index("id", unique=True)
+        await db.employees.create_index("tenant_id")
+        await db.employees.create_index("branch_id")
+        
+        # Shifts indexes
+        await db.shifts.create_index("id", unique=True)
+        await db.shifts.create_index([("cashier_id", 1), ("status", 1)])
+        await db.shifts.create_index("tenant_id")
+        
+        # Expenses indexes
+        await db.expenses.create_index("id", unique=True)
+        await db.expenses.create_index("tenant_id")
+        await db.expenses.create_index([("branch_id", 1), ("created_at", -1)])
+        
+        # Inventory indexes
+        await db.inventory.create_index("id", unique=True)
+        await db.inventory.create_index("tenant_id")
+        await db.inventory.create_index("branch_id")
+        
+        logger.info("✅ Database indexes created successfully")
+    except Exception as e:
+        logger.warning(f"⚠️ Some indexes may already exist: {e}")
+
 async def init_database():
     """تهيئة قاعدة البيانات بالبيانات الأساسية عند بدء التطبيق"""
     try:
