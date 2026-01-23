@@ -13655,6 +13655,10 @@ async def get_payment_transactions(
 from routes.reports_routes import router as reports_router
 app.include_router(reports_router, prefix="/api")
 
+# Include drivers routes (refactored)
+from routes.drivers_routes import router as drivers_router
+app.include_router(drivers_router, prefix="/api")
+
 # Include router and middleware
 app.include_router(api_router)
 
