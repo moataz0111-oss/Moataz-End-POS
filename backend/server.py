@@ -13659,6 +13659,10 @@ app.include_router(reports_router, prefix="/api")
 from routes.drivers_routes import router as drivers_router
 app.include_router(drivers_router, prefix="/api")
 
+# Include payroll routes (refactored)
+from routes.payroll_routes import router as payroll_router
+app.include_router(payroll_router, prefix="/api")
+
 # Include router and middleware
 app.include_router(api_router)
 
