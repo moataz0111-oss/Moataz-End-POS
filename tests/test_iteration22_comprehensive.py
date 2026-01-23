@@ -255,14 +255,22 @@ class TestCouponsAPIs:
     
     def test_create_coupon(self, auth_headers):
         """Test POST /api/coupons - Create new coupon"""
+        from datetime import datetime, timedelta
+        
         unique_code = f"TEST_{uuid.uuid4().hex[:8].upper()}"
+        valid_from = datetime.now().strftime("%Y-%m-%d")
+        valid_until = (datetime.now() + timedelta(days=30)).strftime("%Y-%m-%d")
+        
         coupon_data = {
             "code": unique_code,
+            "name": f"Test Coupon {unique_code}",
             "discount_type": "percentage",
             "discount_value": 10,
             "min_order_amount": 10000,
             "max_uses": 100,
             "is_active": True,
+            "valid_from": valid_from,
+            "valid_until": valid_until,
             "description": "Test coupon for iteration 22"
         }
         
