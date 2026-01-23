@@ -59,6 +59,9 @@ app = FastAPI(title="Maestro EGP API", version="2.0.0")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
+# إضافة GZip compression لتسريع نقل البيانات
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 # Mount static files directory
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="api_uploads")
