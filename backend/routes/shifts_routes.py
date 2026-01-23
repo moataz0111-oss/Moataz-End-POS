@@ -1,0 +1,564 @@
+"""
+Shifts Routes - إدارة الورديات وإغلاق الصندوق
+"""
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from pydantic import BaseModel, ConfigDict
+from typing import Optional, List, Dict
+from datetime import datetime, timezone
+import uuid
+import logging
+
+from .shared import (
+    get_database, get_current_user, get_user_tenant_id,
+    build_tenant_query, UserRole, OrderStatus, PaymentMethod, OrderType
+)
+
+logger = logging.getLogger(__name__)
+router = APIRouter(tags=["Shifts"])
+
+# ==================== MODELS ====================
+class ShiftCreate(BaseModel):
+    cashier_id: str
+    branch_id: str
+    opening_cash: float
+
+class ShiftClose(BaseModel):
+    closing_cash: float
+    notes: Optional[str] = None
+
+class CashRegisterClose(BaseModel):
+    denominations: Dict[str, int] = {}
+    notes: Optional[str] = None
+
+class ShiftResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str
+    cashier_id: str
+    cashier_name: str
+    branch_id: str
+    opening_cash: float
+    closing_cash: Optional[float] = None
+    expected_cash: Optional[float] = None
+    cash_difference: Optional[float] = None
+    total_sales: float = 0.0
+    total_cost: float = 0.0
+    gross_profit: float = 0.0
+    total_orders: int = 0
+    card_sales: float = 0.0
+    cash_sales: float = 0.0
+    credit_sales: float = 0.0
+    delivery_app_sales: Dict[str, float] = {}
+    driver_sales: float = 0.0
+    total_expenses: float = 0.0
+    net_profit: float = 0.0
+    started_at: str
+    ended_at: Optional[str] = None
+    status: str
+    denominations: Optional[Dict[str, int]] = None
+    cancelled_orders: int = 0
+    cancelled_amount: float = 0.0
+    discounts_total: float = 0.0
+
+# ==================== SHIFT CRUD ====================
+@router.post("/shifts", response_model=ShiftResponse)
+async def open_shift(shift: ShiftCreate, current_user: dict = Depends(get_current_user)):
+    """فتح وردية جديدة"""
+    db = get_database()
+    existing = await db.shifts.find_one({"cashier_id": shift.cashier_id, "status": "open"})
+    if existing:
+        raise HTTPException(status_code=400, detail="يوجد شفت مفتوح بالفعل")
+    
+    cashier = await db.users.find_one({"id": shift.cashier_id}, {"_id": 0, "password": 0})
+    if not cashier:
+        raise HTTPException(status_code=404, detail="الكاشير غير موجود")
+    
+    shift_doc = {
+        "id": str(uuid.uuid4()),
+        "cashier_id": shift.cashier_id,
+        "cashier_name": cashier["full_name"],
+        "branch_id": shift.branch_id,
+        "opening_cash": shift.opening_cash,
+        "closing_cash": None,
+        "expected_cash": shift.opening_cash,
+        "cash_difference": None,
+        "total_sales": 0.0,
+        "total_cost": 0.0,
+        "gross_profit": 0.0,
+        "total_orders": 0,
+        "card_sales": 0.0,
+        "cash_sales": 0.0,
+        "credit_sales": 0.0,
+        "delivery_app_sales": {},
+        "total_expenses": 0.0,
+        "net_profit": 0.0,
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "ended_at": None,
+        "status": "open"
+    }
+    await db.shifts.insert_one(shift_doc)
+    del shift_doc["_id"]
+    return shift_doc
+
+@router.get("/shifts/current")
+async def get_current_shift(current_user: dict = Depends(get_current_user)):
+    """جلب الوردية الحالية للكاشير"""
+    db = get_database()
+    shift = await db.shifts.find_one(
+        {"cashier_id": current_user["id"], "status": "open"},
+        {"_id": 0}
+    )
+    return shift
+
+@router.post("/shifts/auto-open")
+async def auto_open_shift(current_user: dict = Depends(get_current_user)):
+    """فتح وردية تلقائياً للكاشير عند تسجيل الدخول"""
+    db = get_database()
+    tenant_id = get_user_tenant_id(current_user)
+    
+    query = {"cashier_id": current_user["id"], "status": "open"}
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+        
+    existing = await db.shifts.find_one(query, {"_id": 0})
+    
+    if existing:
+        return {"shift": existing, "was_existing": True, "message": "وردية مفتوحة بالفعل"}
+    
+    branch_id = current_user.get("branch_id")
+    if not branch_id:
+        branch_query = {"tenant_id": tenant_id} if tenant_id else {}
+        branch = await db.branches.find_one(branch_query, {"_id": 0, "id": 1})
+        branch_id = branch["id"] if branch else None
+    
+    if not branch_id:
+        default_branch = {
+            "id": str(uuid.uuid4()),
+            "name": "الفرع الرئيسي",
+            "address": "",
+            "phone": "",
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        if tenant_id:
+            default_branch["tenant_id"] = tenant_id
+        await db.branches.insert_one(default_branch)
+        branch_id = default_branch["id"]
+    
+    shift_doc = {
+        "id": str(uuid.uuid4()),
+        "cashier_id": current_user["id"],
+        "cashier_name": current_user.get("full_name") or current_user.get("username"),
+        "branch_id": branch_id,
+        "opening_cash": 0.0,
+        "closing_cash": None,
+        "expected_cash": 0.0,
+        "cash_difference": None,
+        "total_sales": 0.0,
+        "total_cost": 0.0,
+        "gross_profit": 0.0,
+        "total_orders": 0,
+        "card_sales": 0.0,
+        "cash_sales": 0.0,
+        "credit_sales": 0.0,
+        "delivery_app_sales": {},
+        "driver_sales": 0.0,
+        "total_expenses": 0.0,
+        "net_profit": 0.0,
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "ended_at": None,
+        "status": "open"
+    }
+    
+    if tenant_id:
+        shift_doc["tenant_id"] = tenant_id
+    
+    await db.shifts.insert_one(shift_doc)
+    del shift_doc["_id"]
+    
+    return {"shift": shift_doc, "was_existing": False, "message": "تم فتح وردية جديدة تلقائياً"}
+
+@router.post("/shifts/{shift_id}/close")
+async def close_shift(shift_id: str, close_data: ShiftClose, current_user: dict = Depends(get_current_user)):
+    """إغلاق الوردية"""
+    db = get_database()
+    shift = await db.shifts.find_one({"id": shift_id})
+    if not shift:
+        raise HTTPException(status_code=404, detail="الشفت غير موجود")
+    if shift["status"] == "closed":
+        raise HTTPException(status_code=400, detail="الشفت مغلق بالفعل")
+    
+    orders = await db.orders.find({
+        "cashier_id": shift["cashier_id"],
+        "created_at": {"$gte": shift["started_at"]},
+        "status": {"$ne": OrderStatus.CANCELLED}
+    }).to_list(1000)
+    
+    total_sales = sum(o["total"] for o in orders)
+    total_cost = sum(o.get("total_cost", 0) for o in orders)
+    gross_profit = total_sales - total_cost
+    cash_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CASH)
+    card_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CARD)
+    credit_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CREDIT)
+    
+    delivery_app_sales = {}
+    for o in orders:
+        if o.get("delivery_app"):
+            app = o["delivery_app"]
+            if app not in delivery_app_sales:
+                delivery_app_sales[app] = 0
+            delivery_app_sales[app] += o["total"]
+    
+    expenses = await db.expenses.find({
+        "branch_id": shift["branch_id"],
+        "created_at": {"$gte": shift["started_at"]}
+    }).to_list(100)
+    total_expenses = sum(e["amount"] for e in expenses)
+    
+    net_profit = gross_profit - total_expenses
+    expected_cash = shift["opening_cash"] + cash_sales - total_expenses
+    cash_difference = close_data.closing_cash - expected_cash
+    
+    update_data = {
+        "closing_cash": close_data.closing_cash,
+        "expected_cash": expected_cash,
+        "cash_difference": cash_difference,
+        "total_sales": total_sales,
+        "total_cost": total_cost,
+        "gross_profit": gross_profit,
+        "total_orders": len(orders),
+        "cash_sales": cash_sales,
+        "card_sales": card_sales,
+        "credit_sales": credit_sales,
+        "delivery_app_sales": delivery_app_sales,
+        "total_expenses": total_expenses,
+        "net_profit": net_profit,
+        "ended_at": datetime.now(timezone.utc).isoformat(),
+        "status": "closed",
+        "notes": close_data.notes
+    }
+    
+    await db.shifts.update_one({"id": shift_id}, {"$set": update_data})
+    updated_shift = await db.shifts.find_one({"id": shift_id}, {"_id": 0})
+    
+    return updated_shift
+
+@router.get("/shifts", response_model=List[ShiftResponse])
+async def get_shifts(branch_id: Optional[str] = None, date: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    """جلب قائمة الورديات"""
+    db = get_database()
+    query = {}
+    if branch_id:
+        query["branch_id"] = branch_id
+    if date:
+        query["started_at"] = {"$regex": f"^{date}"}
+    
+    shifts = await db.shifts.find(query, {"_id": 0}).sort("started_at", -1).to_list(100)
+    return shifts
+
+# ==================== CASH REGISTER ====================
+@router.get("/cash-register/summary")
+async def get_cash_register_summary(current_user: dict = Depends(get_current_user)):
+    """جلب ملخص الصندوق الحالي للكاشير - قبل إغلاقه"""
+    db = get_database()
+    tenant_id = get_user_tenant_id(current_user)
+    
+    shift_query = {"cashier_id": current_user["id"], "status": "open"}
+    if tenant_id:
+        shift_query["tenant_id"] = tenant_id
+    
+    user_branch_id = current_user.get("branch_id")
+    if user_branch_id:
+        shift_query["branch_id"] = user_branch_id
+    
+    shift = await db.shifts.find_one(shift_query, {"_id": 0})
+    
+    if not shift:
+        raise HTTPException(status_code=404, detail="لا يوجد وردية مفتوحة")
+    
+    branch = await db.branches.find_one({"id": shift["branch_id"]}, {"_id": 0, "name": 1})
+    
+    order_query = {"shift_id": shift["id"], "status": {"$ne": OrderStatus.CANCELLED}}
+    if tenant_id:
+        order_query["tenant_id"] = tenant_id
+    
+    orders = await db.orders.find(order_query).to_list(1000)
+    
+    if not orders:
+        fallback_query = {
+            "cashier_id": shift["cashier_id"],
+            "created_at": {"$gte": shift["started_at"]},
+            "status": {"$ne": OrderStatus.CANCELLED}
+        }
+        if tenant_id:
+            fallback_query["tenant_id"] = tenant_id
+        orders = await db.orders.find(fallback_query).to_list(1000)
+    
+    cancelled_query = {"shift_id": shift["id"], "status": OrderStatus.CANCELLED}
+    if tenant_id:
+        cancelled_query["tenant_id"] = tenant_id
+    
+    cancelled_orders = await db.orders.find(cancelled_query).to_list(1000)
+    
+    if not cancelled_orders:
+        cancelled_fallback = {
+            "cashier_id": shift["cashier_id"],
+            "created_at": {"$gte": shift["started_at"]},
+            "status": OrderStatus.CANCELLED
+        }
+        if tenant_id:
+            cancelled_fallback["tenant_id"] = tenant_id
+        cancelled_orders = await db.orders.find(cancelled_fallback).to_list(1000)
+    
+    total_sales = sum(o["total"] for o in orders)
+    total_cost = sum(o.get("total_cost", 0) for o in orders)
+    gross_profit = total_sales - total_cost
+    cash_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CASH)
+    card_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CARD)
+    credit_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CREDIT)
+    
+    delivery_app_sales = {}
+    for o in orders:
+        if o.get("delivery_app"):
+            app = o["delivery_app"]
+            if app not in delivery_app_sales:
+                delivery_app_sales[app] = 0
+            delivery_app_sales[app] += o["total"]
+    
+    driver_sales = sum(o["total"] for o in orders if o.get("order_type") == OrderType.DELIVERY and o.get("driver_id"))
+    discounts_total = sum(o.get("discount", 0) for o in orders)
+    
+    cancelled_by = {}
+    cancelled_amount = 0
+    for o in cancelled_orders:
+        cancelled_amount += o["total"]
+        cancelled_by_id = o.get("cancelled_by", o.get("cashier_id"))
+        if cancelled_by_id not in cancelled_by:
+            user = await db.users.find_one({"id": cancelled_by_id}, {"_id": 0, "full_name": 1})
+            cancelled_by[cancelled_by_id] = {
+                "user_id": cancelled_by_id,
+                "user_name": user["full_name"] if user else "غير معروف",
+                "count": 0,
+                "total": 0
+            }
+        cancelled_by[cancelled_by_id]["count"] += 1
+        cancelled_by[cancelled_by_id]["total"] += o["total"]
+    
+    expenses = await db.expenses.find({
+        "branch_id": shift["branch_id"],
+        "created_at": {"$gte": shift["started_at"]}
+    }).to_list(100)
+    total_expenses = sum(e["amount"] for e in expenses)
+    
+    net_profit = gross_profit - total_expenses
+    expected_cash = shift["opening_cash"] + cash_sales - total_expenses
+    non_cash_amount = card_sales + credit_sales
+    
+    return {
+        "shift_id": shift["id"],
+        "branch_id": shift["branch_id"],
+        "branch_name": branch["name"] if branch else "",
+        "cashier_id": current_user["id"],
+        "cashier_name": current_user["full_name"],
+        "started_at": shift["started_at"],
+        "opening_cash": shift["opening_cash"],
+        "total_sales": total_sales,
+        "total_cost": total_cost,
+        "gross_profit": gross_profit,
+        "total_orders": len(orders),
+        "cash_sales": cash_sales,
+        "card_sales": card_sales,
+        "credit_sales": credit_sales,
+        "non_cash_amount": non_cash_amount,
+        "delivery_app_sales": delivery_app_sales,
+        "driver_sales": driver_sales,
+        "discounts_total": discounts_total,
+        "cancelled_orders": len(cancelled_orders),
+        "cancelled_amount": cancelled_amount,
+        "cancelled_by": list(cancelled_by.values()),
+        "total_expenses": total_expenses,
+        "net_profit": net_profit,
+        "expected_cash": expected_cash
+    }
+
+@router.post("/cash-register/close")
+async def close_cash_register(close_data: CashRegisterClose, current_user: dict = Depends(get_current_user)):
+    """إغلاق الصندوق مع جرد فئات النقود"""
+    db = get_database()
+    tenant_id = get_user_tenant_id(current_user)
+    
+    shift_query = {"cashier_id": current_user["id"], "status": "open"}
+    if tenant_id:
+        shift_query["tenant_id"] = tenant_id
+    
+    shift = await db.shifts.find_one(shift_query)
+    
+    if not shift:
+        raise HTTPException(status_code=404, detail="لا يوجد وردية مفتوحة")
+    
+    shift_id = shift["id"]
+    branch = await db.branches.find_one({"id": shift["branch_id"]}, {"_id": 0, "name": 1})
+    
+    denomination_values = {
+        "250": 250, "500": 500, "1000": 1000, "5000": 5000,
+        "10000": 10000, "25000": 25000, "50000": 50000
+    }
+    closing_cash = sum(
+        denomination_values.get(denom, int(denom)) * count
+        for denom, count in close_data.denominations.items()
+    )
+    
+    order_query = {"shift_id": shift_id, "status": {"$ne": OrderStatus.CANCELLED}}
+    if tenant_id:
+        order_query["tenant_id"] = tenant_id
+    
+    orders = await db.orders.find(order_query).to_list(1000)
+    
+    if not orders:
+        fallback_query = {
+            "cashier_id": shift["cashier_id"],
+            "created_at": {"$gte": shift["started_at"]},
+            "status": {"$ne": OrderStatus.CANCELLED}
+        }
+        if tenant_id:
+            fallback_query["tenant_id"] = tenant_id
+        orders = await db.orders.find(fallback_query).to_list(1000)
+    
+    cancelled_query = {"shift_id": shift_id, "status": OrderStatus.CANCELLED}
+    if tenant_id:
+        cancelled_query["tenant_id"] = tenant_id
+    
+    cancelled_orders = await db.orders.find(cancelled_query).to_list(1000)
+    
+    if not cancelled_orders:
+        cancelled_fallback = {
+            "cashier_id": shift["cashier_id"],
+            "created_at": {"$gte": shift["started_at"]},
+            "status": OrderStatus.CANCELLED
+        }
+        if tenant_id:
+            cancelled_fallback["tenant_id"] = tenant_id
+        cancelled_orders = await db.orders.find(cancelled_fallback).to_list(1000)
+    
+    total_sales = sum(o["total"] for o in orders)
+    total_cost = sum(o.get("total_cost", 0) for o in orders)
+    gross_profit = total_sales - total_cost
+    cash_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CASH)
+    card_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CARD)
+    credit_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CREDIT)
+    
+    delivery_app_sales = {}
+    for o in orders:
+        if o.get("delivery_app"):
+            app = o["delivery_app"]
+            if app not in delivery_app_sales:
+                delivery_app_sales[app] = 0
+            delivery_app_sales[app] += o["total"]
+    
+    driver_sales = sum(o["total"] for o in orders if o.get("order_type") == OrderType.DELIVERY and o.get("driver_id"))
+    discounts_total = sum(o.get("discount", 0) for o in orders)
+    
+    cancelled_by = {}
+    cancelled_amount = 0
+    for o in cancelled_orders:
+        cancelled_amount += o["total"]
+        cancelled_by_id = o.get("cancelled_by", o.get("cashier_id"))
+        if cancelled_by_id not in cancelled_by:
+            user = await db.users.find_one({"id": cancelled_by_id}, {"_id": 0, "full_name": 1})
+            cancelled_by[cancelled_by_id] = {
+                "user_id": cancelled_by_id,
+                "user_name": user["full_name"] if user else "غير معروف",
+                "count": 0,
+                "total": 0
+            }
+        cancelled_by[cancelled_by_id]["count"] += 1
+        cancelled_by[cancelled_by_id]["total"] += o["total"]
+    
+    expenses = await db.expenses.find({
+        "branch_id": shift["branch_id"],
+        "created_at": {"$gte": shift["started_at"]}
+    }).to_list(100)
+    total_expenses = sum(e["amount"] for e in expenses)
+    
+    net_profit = gross_profit - total_expenses
+    expected_cash = shift["opening_cash"] + cash_sales - total_expenses
+    cash_difference = closing_cash - expected_cash
+    
+    update_data = {
+        "closing_cash": closing_cash,
+        "expected_cash": expected_cash,
+        "cash_difference": cash_difference,
+        "total_sales": total_sales,
+        "total_cost": total_cost,
+        "gross_profit": gross_profit,
+        "total_orders": len(orders),
+        "cash_sales": cash_sales,
+        "card_sales": card_sales,
+        "credit_sales": credit_sales,
+        "delivery_app_sales": delivery_app_sales,
+        "driver_sales": driver_sales,
+        "discounts_total": discounts_total,
+        "cancelled_orders": len(cancelled_orders),
+        "cancelled_amount": cancelled_amount,
+        "cancelled_by": list(cancelled_by.values()),
+        "total_expenses": total_expenses,
+        "net_profit": net_profit,
+        "ended_at": datetime.now(timezone.utc).isoformat(),
+        "status": "closed",
+        "notes": close_data.notes,
+        "denominations": close_data.denominations
+    }
+    
+    await db.shifts.update_one({"id": shift_id}, {"$set": update_data})
+    
+    updated_shift = await db.shifts.find_one({"id": shift_id}, {"_id": 0})
+    updated_shift["branch_name"] = branch["name"] if branch else ""
+    
+    return updated_shift
+
+@router.get("/shifts/active-shift-details")
+async def get_active_shift_details(current_user: dict = Depends(get_current_user)):
+    """جلب تفاصيل الوردية النشطة"""
+    db = get_database()
+    tenant_id = get_user_tenant_id(current_user)
+    
+    shift_query = {"cashier_id": current_user["id"], "status": "open"}
+    if tenant_id:
+        shift_query["tenant_id"] = tenant_id
+    
+    shift = await db.shifts.find_one(shift_query, {"_id": 0})
+    
+    if not shift:
+        return None
+    
+    order_query = {"shift_id": shift["id"], "status": {"$ne": OrderStatus.CANCELLED}}
+    if tenant_id:
+        order_query["tenant_id"] = tenant_id
+    
+    orders = await db.orders.find(order_query).to_list(1000)
+    
+    if not orders:
+        fallback_query = {
+            "cashier_id": shift["cashier_id"],
+            "created_at": {"$gte": shift["started_at"]},
+            "status": {"$ne": OrderStatus.CANCELLED}
+        }
+        if tenant_id:
+            fallback_query["tenant_id"] = tenant_id
+        orders = await db.orders.find(fallback_query).to_list(1000)
+    
+    total_sales = sum(o["total"] for o in orders)
+    cash_sales = sum(o["total"] for o in orders if o["payment_method"] == PaymentMethod.CASH)
+    
+    expenses = await db.expenses.find({
+        "branch_id": shift["branch_id"],
+        "created_at": {"$gte": shift["started_at"]}
+    }).to_list(100)
+    total_expenses = sum(e["amount"] for e in expenses)
+    
+    expected_cash = shift["opening_cash"] + cash_sales - total_expenses
+    
+    shift["total_sales"] = total_sales
+    shift["total_orders"] = len(orders)
+    shift["expected_cash"] = expected_cash
+    
+    return shift
