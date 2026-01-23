@@ -5,7 +5,43 @@
 
 ---
 
-## آخر التحديثات (22 يناير 2025)
+## آخر التحديثات (23 يناير 2026)
+
+### ✅ إعادة هيكلة الكود (Code Refactoring)
+**تم نقل التقارير إلى ملفات منفصلة:**
+
+1. **`/app/backend/routes/shared.py`** - ملف جديد للمشتركات:
+   - اتصال قاعدة البيانات (singleton)
+   - Enums (UserRole, OrderStatus, etc.)
+   - دوال المصادقة (get_current_user, create_token)
+   - دوال بناء الاستعلامات (build_tenant_query, build_branch_query)
+
+2. **`/app/backend/routes/reports_routes.py`** - ملف جديد للتقارير:
+   - `/reports/sales` - تقرير المبيعات
+   - `/reports/purchases` - تقرير المشتريات
+   - `/reports/inventory` - تقرير المخزون
+   - `/reports/expenses` - تقرير المصروفات
+   - `/reports/profit-loss` - تقرير الأرباح والخسائر
+   - `/reports/delivery-credits` - تقرير ديون التوصيل
+   - `/reports/products` - تقرير المنتجات
+   - `/reports/cancellations` - تقرير الإلغاءات
+   - `/reports/discounts` - تقرير الخصومات
+   - `/reports/credit` - تقرير الآجل
+
+3. **`/app/backend/REFACTORING.md`** - توثيق خطة إعادة الهيكلة
+
+### ✅ تنظيف الكود وإصلاح أخطاء Lint
+- إصلاح 7 أخطاء في `/app/frontend/src/pages/Settings.js`
+- إضافة `Loader2` import
+- إصلاح `unescaped entities`
+
+### ✅ الاختبار الشامل
+- **الواجهة الخلفية:** 21/21 اختبار ناجح (100%)
+- **الواجهة الأمامية:** جميع الصفحات تعمل بدون أخطاء
+
+---
+
+## آخر التحديثات (22 يناير 2026)
 
 ### ✅ نظام إشعارات الطلبات المتأخرة - جديد!
 **الميزة:** نظام إشعارات ذكي لإعلام المدير عند تأخر الطلبات، يساعد في تحسين سرعة الخدمة.
