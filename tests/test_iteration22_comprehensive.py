@@ -277,10 +277,17 @@ class TestCouponsAPIs:
         response = requests.post(f"{BASE_URL}/api/coupons", json=coupon_data, headers=auth_headers)
         assert response.status_code in [200, 201]
         data = response.json()
-        assert "id" in data
-        assert data["code"] == unique_code
-        print(f"✅ Coupon created successfully - Code: {unique_code}")
-        return data["id"]
+        
+        # Response can be {"coupon": {...}, "message": "..."} or direct coupon object
+        if "coupon" in data:
+            coupon = data["coupon"]
+            assert "id" in coupon
+            assert coupon["code"] == unique_code
+            print(f"✅ Coupon created successfully - Code: {unique_code}")
+        else:
+            assert "id" in data
+            assert data["code"] == unique_code
+            print(f"✅ Coupon created successfully - Code: {unique_code}")
 
 
 class TestReportsAPIs:
