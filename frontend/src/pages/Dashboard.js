@@ -241,8 +241,10 @@ export default function Dashboard() {
         delayedAudioRef.current = new Audio('data:audio/wav;base64,UklGRl4EAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YToEAAAAAAEBAgIDAwQEBQUGBgcHCAgJCQoKCwsMDA0NDg4PDxAQEREMDAcHAgL+//r69/fz8/Dw7e3q6ujo5eXi4uDg3d3b29nZ19fV1dTU0tLS0dHR0NDQ0NDQ0dHR0tLS09PU1NXV1tbX19jY2dna2tvb3Nzd3d7e39/g4OHh4uLj4+Tk5eXm5ufn6Ojp6erq6+vs7O3t7u7v7/Dw8fHy8vPz9PT19fb29/f4+Pn5+vr7+/z8/f3+/v//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAAAAAAAA');
         delayedAudioRef.current.volume = 0.3;
       }
-      delayedAudioRef.current.play().catch(() => {});
-    } catch (e) {}
+      delayedAudioRef.current.play().catch(() => {/* ignore */});
+    } catch (e) {
+      // تجاهل أخطاء الصوت
+    }
   };
 
   // التحقق من الطلبات الجديدة من تطبيق العملاء
@@ -278,8 +280,10 @@ export default function Dashboard() {
         notificationAudioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleAkFfrzT3MNqIgRfs9PduXYPCnCv0NzAZxQMSrbU38ZjGAZbtNXexWkKDF+z1N7FaQ4NV7TV38dpCw1dtdTfxWkNDFu11N/FaQsNXbXU38VpDQ1ctNXfxWkMDV211N/GaAwNXLTU38VpDA1dtdTfxWkMDVy01N/FaQ0NW7TU38VpDA1ctNXfxWkMDVy01d/FaQwNXbXU38VpDAxctNXfxWkMDV211N/FaQwNXLTV38VpDA1dtdTfxWgNDVy01N/FaQwNXbXU38VpDQxctNXfxWkMDVy01N/FaQ0MXLTV38VpDA1dtNTfxWkMDF201N/FaAwNXLTV38VpDQxdtNTfxWkMDVy01d/FaQ0MXbTU38VpDAxctNXfxWkNDF201N/FaAwNXbTU38VpDQxctNXfxWkMDVy01d/FaQ0MXLTU38VpDAxdtNXfxWkNDFy01N/FaQwNXbTU38VpDA1ctNTfxWkNDF201N/FaQwNXbTU38VoDA1ctNTfxWkMDV201N/FaA0NXLTU38VpDA1dtNTfxWkMDVy01N/FaQ0MXLTU38VoDQ1ctNTfxWkMDV201N/FaQwNXLTU38VoDQ1ctNTfxWkNDFy01N/FaAwNXbTU38VoDQ1ctNXfxWgNDFy01d/FaAwNXbTU38VpDQxctNTfxWgMDV201d/FaAwNXLTU38VpDA1dtNTfxWgMDV201d/FaA0MXLTU38VoDA1dtNXfxWgNDFy01d/FaAwNXbTU38VoDA1ctNXfxWgMDV201N/FaA0NXLTU38VoDA1ctNXfxWgNDFy01N/FaAwNXbTV38VoDA1ctNXfxWgNDFy01N/FaAwNXLTV38VoDA1ctNXfxWgNDFy01d/FaA0MXLTV38VoDA1ctNXfxWgNDFy01d/FaAwNXLTU38VoDQ1ctNXfxWgMDV201d/FaA0MXLTU38VoDA1ctNXfxWgNDFy01d/FaAwNXLTV38VoDQ1ctNXfxWgMDV201d/FaA0MXLTU38VoDA1ctNXfxWgMDV201N/FaA0NXLTU38VoDA1dtNTfxWgMDV201d/FaAwNXLTV38VoDQ1ctNTfxWgMDV201d/FaA0MXLTU38VoDA1ctNXfxWgMDV201d/FaA0MXLTU38VoDA1ctNXfxWgNDFy01d/FaAwNXLTU38VoDQ1ctNXfxWgMDV201N/FaA0NXLTU38VoDA1ctNXfxWgNDFy01d/FaAwNXLTU38VoDA1ctNXfxWgNDFy01d/FaAwNXLTU38VoDQ1ctNXfxWgMDVy01d/FaA0MXLTU38VoDA1ctNXfxWgMDV201N/FaA0NXLTU38VoDA1ctNXfxWgNDFy01d/FaAwNXLTU38VoDA1ctNXfxWgNDFy01d/FaAwAA');
         notificationAudioRef.current.volume = 0.5;
       }
-      notificationAudioRef.current.play().catch(() => {});
-    } catch (e) {}
+      notificationAudioRef.current.play().catch(() => {/* ignore */});
+    } catch (e) {
+      // تجاهل أخطاء الصوت
+    }
   };
 
   // تحديد الطلبات كمشاهدة
