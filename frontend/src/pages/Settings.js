@@ -24,6 +24,8 @@ import {
   ArrowRight,
   Settings as SettingsIcon,
   Users,
+  User,
+  UserCog,
   Store,
   Printer,
   Mail,
