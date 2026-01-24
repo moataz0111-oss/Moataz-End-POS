@@ -103,6 +103,13 @@ export default function POS() {
   const [showCustomerInfo, setShowCustomerInfo] = useState(false);
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
   
+  // حالات الإرجاع
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [refundOrderId, setRefundOrderId] = useState('');
+  const [refundReason, setRefundReason] = useState('');
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [refundOrderInfo, setRefundOrderInfo] = useState(null);
+  
   // إشعارات الطلبات الجديدة
   const prevOrdersCount = useRef(0);
 
