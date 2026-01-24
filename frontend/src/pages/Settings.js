@@ -111,6 +111,7 @@ const AVAILABLE_PERMISSIONS = [
   { id: 'pos', name: 'نقاط البيع', description: 'إنشاء وإدارة الطلبات', group: 'المبيعات' },
   { id: 'pos_discount', name: 'إعطاء خصومات', description: 'السماح بإعطاء خصومات على الطلبات', group: 'المبيعات' },
   { id: 'pos_cancel', name: 'إلغاء الطلبات', description: 'إلغاء الطلبات المعلقة', group: 'المبيعات' },
+  { id: 'can_refund', name: 'إرجاع الطلبات', description: 'إرجاع الطلبات المدفوعة واسترداد المبالغ', group: 'المبيعات' },
   { id: 'orders', name: 'الطلبات', description: 'عرض وتعديل الطلبات', group: 'المبيعات' },
   { id: 'orders_edit', name: 'تعديل الطلبات', description: 'تعديل الطلبات بعد الإنشاء', group: 'المبيعات' },
   { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات', group: 'المبيعات' },
