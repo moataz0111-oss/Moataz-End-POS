@@ -2194,8 +2194,13 @@ export default function Settings() {
 
           {/* Branches */}
           {hasRole(['admin', 'super_admin']) && settingsPermissions.settingsBranches && (
-                                    }}
-                                  >
+            <TabsContent value="branches">
+              <Card className="border-border/50 bg-card">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <Store className="h-5 w-5" />
+                    إدارة الفروع
+                  </CardTitle>
                                     <Edit className="h-4 w-4" />
                                   </Button>
                                   <Button
