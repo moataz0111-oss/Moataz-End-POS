@@ -201,6 +201,12 @@ export default function SuperAdmin() {
   const [selectedBackgroundFile, setSelectedBackgroundFile] = useState(null);
   const [backgroundPreviewUrl, setBackgroundPreviewUrl] = useState('');
   
+  // Login Logo States
+  const [loginLogoFile, setLoginLogoFile] = useState(null);
+  const [loginLogoPreview, setLoginLogoPreview] = useState('');
+  const [loginLogoUploading, setLoginLogoUploading] = useState(false);
+  const [loginLogoMode, setLoginLogoMode] = useState('url'); // 'url' or 'upload'
+  
   // System Branding State
   const [systemBranding, setSystemBranding] = useState({
     name: 'Maestro',
