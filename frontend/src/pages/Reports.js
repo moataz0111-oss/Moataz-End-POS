@@ -932,6 +932,104 @@ export default function Reports() {
             )}
           </TabsContent>
 
+          {/* Refunds Report (الإرجاعات) */}
+          <TabsContent value="refunds">
+            {refundsReport ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <StatCard
+                    title="إجمالي الإرجاعات"
+                    value={formatPrice(refundsReport.total_amount)}
+                    icon={RefreshCw}
+                    color="purple-500"
+                  />
+                  <StatCard
+                    title="عدد الإرجاعات"
+                    value={refundsReport.total_count}
+                    icon={FileText}
+                    color="orange-500"
+                  />
+                  <StatCard
+                    title="متوسط الإرجاع"
+                    value={formatPrice(refundsReport.total_count > 0 ? refundsReport.total_amount / refundsReport.total_count : 0)}
+                    icon={TrendingDown}
+                    color="red-500"
+                  />
+                  <StatCard
+                    title="طلبات مسترجعة"
+                    value={refundsReport.orders_affected || 0}
+                    icon={XCircle}
+                    color="gray-500"
+                  />
+                </div>
+
+                {/* جدول الإرجاعات */}
+                <Card className="border-border/50 bg-card">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-foreground">
+                      <RefreshCw className="h-5 w-5 text-purple-500" />
+                      تفاصيل الإرجاعات
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b border-border">
+                            <th className="py-3 px-4 text-right text-foreground font-medium">#</th>
+                            <th className="py-3 px-4 text-right text-foreground font-medium">رقم الفاتورة</th>
+                            <th className="py-3 px-4 text-right text-foreground font-medium">نوع الطلب</th>
+                            <th className="py-3 px-4 text-right text-foreground font-medium">القيمة الأصلية</th>
+                            <th className="py-3 px-4 text-right text-foreground font-medium">قيمة الإرجاع</th>
+                            <th className="py-3 px-4 text-right text-foreground font-medium">سبب الإرجاع</th>
+                            <th className="py-3 px-4 text-right text-foreground font-medium">بواسطة</th>
+                            <th className="py-3 px-4 text-right text-foreground font-medium">التاريخ</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {refundsReport.refunds && refundsReport.refunds.length > 0 ? (
+                            refundsReport.refunds.map((refund, idx) => (
+                              <tr key={refund.id || idx} className="border-b border-border/50 hover:bg-muted/50">
+                                <td className="py-3 px-4 text-muted-foreground">{refund.refund_number}</td>
+                                <td className="py-3 px-4 font-medium text-foreground">#{refund.order_number}</td>
+                                <td className="py-3 px-4">
+                                  <span className={`px-2 py-1 rounded-full text-xs ${
+                                    refund.order_type === 'dine_in' ? 'bg-blue-500/20 text-blue-400' :
+                                    refund.order_type === 'takeaway' ? 'bg-green-500/20 text-green-400' :
+                                    'bg-orange-500/20 text-orange-400'
+                                  }`}>
+                                    {refund.order_type === 'dine_in' ? 'محلي' : refund.order_type === 'takeaway' ? 'سفري' : 'توصيل'}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-4 text-muted-foreground">{formatPrice(refund.original_total)}</td>
+                                <td className="py-3 px-4 text-red-500 font-bold">{formatPrice(refund.refund_amount)}</td>
+                                <td className="py-3 px-4 text-foreground max-w-xs truncate" title={refund.reason}>{refund.reason}</td>
+                                <td className="py-3 px-4 text-muted-foreground">{refund.refunded_by_name}</td>
+                                <td className="py-3 px-4 text-muted-foreground text-sm">
+                                  {new Date(refund.created_at).toLocaleString('ar-IQ')}
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td colSpan="8" className="py-8 text-center text-muted-foreground">
+                                لا توجد إرجاعات في هذه الفترة
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                جاري تحميل بيانات الإرجاعات...
+              </div>
+            )}
+          </TabsContent>
+
           {/* Credit Report (الآجل) */}
           <TabsContent value="credit">
             {creditReport && (
