@@ -718,6 +718,60 @@ export default function SuperAdmin() {
     }
   };
 
+  // رفع شعار صفحة تسجيل الدخول
+  const uploadLoginLogo = async (file) => {
+    if (!file) return null;
+    setLoginLogoUploading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await axios.post(`${API}/login-backgrounds/upload-logo`, formData);
+      
+      // تحديث الشعار في الإعدادات
+      setBackgroundSettings(prev => ({
+        ...prev,
+        logo_url: res.data.logo_url
+      }));
+      
+      toast.success('تم رفع شعار صفحة تسجيل الدخول بنجاح');
+      setLoginLogoFile(null);
+      setLoginLogoPreview('');
+      return res.data.logo_url;
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في رفع الشعار');
+      return null;
+    } finally {
+      setLoginLogoUploading(false);
+    }
+  };
+
+  // حذف شعار صفحة تسجيل الدخول
+  const deleteLoginLogo = async () => {
+    try {
+      await axios.delete(`${API}/login-backgrounds/logo`);
+      setBackgroundSettings(prev => ({
+        ...prev,
+        logo_url: ''
+      }));
+      setLoginLogoPreview('');
+      toast.success('تم حذف الشعار');
+    } catch (error) {
+      toast.error('فشل في حذف الشعار');
+    }
+  };
+
+  // معاينة ملف شعار صفحة تسجيل الدخول
+  const handleLoginLogoFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLoginLogoFile(file);
+      const url = URL.createObjectURL(file);
+      setLoginLogoPreview(url);
+    }
+  };
+
   const deleteBackground = async (bgId) => {
     try {
       await axios.delete(`${API}/login-backgrounds/${bgId}`);
