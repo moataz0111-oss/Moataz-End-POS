@@ -644,6 +644,14 @@ export default function Settings() {
     }
   };
 
+  const handleEditStaff = (staff) => {
+    setEditStaffForm({
+      ...staff,
+      permissions: staff.permissions || []
+    });
+    setEditStaffDialogOpen(true);
+  };
+
   const handleResetStaffPassword = async (staffId) => {
     const newPassword = window.prompt('أدخل كلمة المرور الجديدة:');
     if (!newPassword) return;
