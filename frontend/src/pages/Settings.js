@@ -2977,6 +2977,53 @@ export default function Settings() {
                           rows={2}
                         />
                       </div>
+                      
+                      {/* اختيار الطابعات */}
+                      <div className="space-y-2">
+                        <Label className="text-foreground">وجهة الطباعة (الطابعات)</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {printers.map(printer => {
+                            const isSelected = (editProductForm.printer_ids || []).includes(printer.id);
+                            return (
+                              <button
+                                key={printer.id}
+                                type="button"
+                                onClick={() => {
+                                  const currentIds = editProductForm.printer_ids || [];
+                                  const newIds = isSelected 
+                                    ? currentIds.filter(id => id !== printer.id)
+                                    : [...currentIds, printer.id];
+                                  setEditProductForm({ ...editProductForm, printer_ids: newIds });
+                                }}
+                                className={`px-3 py-1.5 rounded-full text-sm transition-all border ${
+                                  isSelected 
+                                    ? 'bg-green-500/20 border-green-500 text-green-400' 
+                                    : 'bg-muted/50 border-border text-muted-foreground hover:border-primary/50'
+                                }`}
+                              >
+                                <Printer className="h-3 w-3 inline ml-1" />
+                                {printer.name}
+                                {isSelected && <Check className="h-3 w-3 inline mr-1" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {(editProductForm.printer_ids || []).length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            <span className="text-xs text-muted-foreground">الطابعات المحددة:</span>
+                            {(editProductForm.printer_ids || []).map(printerId => {
+                              const printer = printers.find(p => p.id === printerId);
+                              return printer ? (
+                                <span key={printerId} className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
+                                  {printer.name}
+                                </span>
+                              ) : null;
+                            })}
+                          </div>
+                        )}
+                        <p className="text-xs text-muted-foreground">اختر الطابعات التي سيُرسل إليها هذا المنتج عند الطلب</p>
+                      </div>
+                      
                       <div className="flex items-center gap-3">
                         <Switch
                           checked={editProductForm.is_available !== false}
