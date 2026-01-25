@@ -1575,17 +1575,41 @@ export default function POS() {
 
       {/* Print Bill Dialog - معاينة الفاتورة */}
       <Dialog open={printDialogOpen} onOpenChange={setPrintDialogOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
+        <DialogContent className="max-w-sm no-print">
+          <DialogHeader className="no-print">
             <DialogTitle className="flex items-center gap-2 text-foreground">
               <Receipt className="h-5 w-5 text-blue-500" />
               معاينة الفاتورة
             </DialogTitle>
           </DialogHeader>
           
-          <div className="bg-white text-black p-4 rounded-lg font-mono text-sm" dir="rtl">
-            <div className="text-center mb-4">
-              <h2 className="text-lg font-bold">Maestro EGP</h2>
+          <div className="print-receipt bg-white text-black p-4 rounded-lg font-mono text-sm" dir="rtl">
+            {/* شعار المطعم */}
+            {invoiceSettings.show_logo !== false && (restaurantSettings.logo_url || invoiceSettings.invoice_logo) && (
+              <div className="text-center mb-3">
+                <img 
+                  src={(() => {
+                    const logoUrl = invoiceSettings.invoice_logo || restaurantSettings.logo_url;
+                    if (logoUrl?.startsWith('/api')) {
+                      return `${API}${logoUrl.replace('/api', '')}`;
+                    }
+                    if (logoUrl?.startsWith('/uploads')) {
+                      return `${API}${logoUrl}`;
+                    }
+                    return logoUrl;
+                  })()}
+                  alt="شعار المطعم" 
+                  className="h-14 mx-auto object-contain"
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+              </div>
+            )}
+            
+            <div className="text-center mb-3">
+              <h2 className="text-lg font-bold">{restaurantSettings.name || restaurantSettings.name_ar || 'Maestro EGP'}</h2>
+              {invoiceSettings.address && (
+                <p className="text-xs text-gray-600">{invoiceSettings.address}</p>
+              )}
               <p className="text-xs text-gray-500">
                 {new Date().toLocaleDateString('ar-IQ')} {new Date().toLocaleTimeString('ar-IQ')}
               </p>
@@ -1595,6 +1619,13 @@ export default function POS() {
                 </p>
               )}
             </div>
+            
+            {/* نص أعلى الفاتورة */}
+            {invoiceSettings.custom_header && (
+              <div className="text-center mb-2 text-xs border-b border-dashed pb-2">
+                {invoiceSettings.custom_header}
+              </div>
+            )}
             
             <div className="border-t border-dashed border-gray-300 pt-2 mb-2">
               {orderType === 'dine_in' && selectedTable && (
@@ -1643,12 +1674,27 @@ export default function POS() {
               </div>
             </div>
             
-            <div className="text-center mt-4 text-xs text-gray-500">
-              <p>شكراً لزيارتكم</p>
+            {/* أرقام الهواتف */}
+            {(invoiceSettings.phone || invoiceSettings.phone2) && (
+              <div className="text-center text-xs border-t border-dashed pt-2 mt-2">
+                {invoiceSettings.phone && <p>📞 {invoiceSettings.phone}</p>}
+                {invoiceSettings.phone2 && <p>📞 {invoiceSettings.phone2}</p>}
+              </div>
+            )}
+            
+            {/* الرقم الضريبي */}
+            {invoiceSettings.tax_number && (
+              <div className="text-center text-xs mt-1">
+                <p>الرقم الضريبي: {invoiceSettings.tax_number}</p>
+              </div>
+            )}
+            
+            <div className="text-center mt-3 text-xs text-gray-500 border-t border-dashed pt-2">
+              <p>{invoiceSettings.custom_footer || 'شكراً لزيارتكم ❤️'}</p>
             </div>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 no-print">
             <Button variant="outline" onClick={() => setPrintDialogOpen(false)} className="flex-1">
               إغلاق
             </Button>
