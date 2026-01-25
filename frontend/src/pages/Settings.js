@@ -3356,11 +3356,6 @@ export default function Settings() {
                             ) : null}
                             
                             <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                              printer.printer_type === 'bar' ? 'bg-purple-500/10 text-purple-500' :
-                              printer.printer_type === 'packaging' ? 'bg-green-500/10 text-green-500' :
-                              printer.printer_type === 'label' ? 'bg-pink-500/10 text-pink-500' :
-                              'bg-gray-500/10 text-gray-500'
-                            }`}>
                               {printer.printer_type || 'عام'}
                             </span>
                             
