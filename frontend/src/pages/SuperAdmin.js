@@ -577,6 +577,30 @@ export default function SuperAdmin() {
     toast.success('تم النسخ');
   };
 
+  // ==================== Invoice Settings Functions ====================
+  
+  const fetchInvoiceSettings = async () => {
+    try {
+      const res = await axios.get(`${API}/system/invoice-settings`);
+      setInvoiceSettings(res.data);
+    } catch (error) {
+      console.log('Error fetching invoice settings');
+    }
+  };
+  
+  const saveInvoiceSettings = async () => {
+    setLoading(true);
+    try {
+      await axios.put(`${API}/system/invoice-settings`, invoiceSettings);
+      toast.success('تم حفظ إعدادات الفاتورة بنجاح');
+      setShowInvoiceSettings(false);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في حفظ الإعدادات');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ==================== System Branding Functions ====================
   
   const fetchSystemBranding = async () => {
