@@ -104,6 +104,10 @@ export default function POS() {
   const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [lastOrderNumber, setLastOrderNumber] = useState(null); // آخر رقم فاتورة
   
+  // إعدادات الفاتورة والمطعم
+  const [invoiceSettings, setInvoiceSettings] = useState({});
+  const [restaurantSettings, setRestaurantSettings] = useState({});
+  
   // حالات الإرجاع
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [refundOrderId, setRefundOrderId] = useState('');
