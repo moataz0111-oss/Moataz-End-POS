@@ -1015,6 +1015,7 @@ class ProductCreate(BaseModel):
     barcode: Optional[str] = None
     finished_product_id: Optional[str] = None  # ربط بالمنتج النهائي للخصم التلقائي من الوصفة
     manufactured_product_id: Optional[str] = None  # ربط بالمنتج المصنع من النظام الجديد
+    printer_ids: List[str] = []  # الطابعات المرتبطة بالمنتج
 
 class ProductResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -1034,6 +1035,7 @@ class ProductResponse(BaseModel):
     barcode: Optional[str] = None
     finished_product_id: Optional[str] = None  # ربط بالمنتج النهائي
     manufactured_product_id: Optional[str] = None  # ربط بالمنتج المصنع من النظام الجديد
+    printer_ids: List[str] = []  # الطابعات المرتبطة بالمنتج
 
 # Inventory Models
 class InventoryItemCreate(BaseModel):
