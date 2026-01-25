@@ -3258,18 +3258,51 @@ export default function Settings() {
                       {printers.map(printer => (
                         <div key={printer.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
                           <div className="flex items-center gap-4">
-                            <Printer className="h-8 w-8 text-muted-foreground" />
+                            <div className="relative">
+                              <Printer className="h-8 w-8 text-muted-foreground" />
+                              {/* حالة الاتصال */}
+                              {printerTestStatus[printer.id] === 'online' || printer.is_online ? (
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background" title="متصلة"></span>
+                              ) : printerTestStatus[printer.id] === 'offline' || printer.is_online === false ? (
+                                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-background" title="غير متصلة"></span>
+                              ) : null}
+                            </div>
                             <div>
                               <p className="font-medium text-foreground">{printer.name}</p>
                               <p className="text-sm text-muted-foreground">{printer.ip_address}:{printer.port}</p>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2">
+                            {/* حالة الاتصال النصية */}
+                            {printerTestStatus[printer.id] === 'testing' ? (
+                              <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-500 flex items-center gap-1">
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                جاري الاختبار
+                              </span>
+                            ) : printerTestStatus[printer.id] === 'online' ? (
+                              <span className="text-xs px-2 py-1 rounded-full bg-green-500/10 text-green-500">متصلة ✓</span>
+                            ) : printerTestStatus[printer.id] === 'offline' ? (
+                              <span className="text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500">غير متصلة</span>
+                            ) : null}
+                            
                             <span className={`text-xs px-2 py-1 rounded-full ${
                               printer.printer_type === 'receipt' ? 'bg-blue-500/10 text-blue-500' : 'bg-orange-500/10 text-orange-500'
                             }`}>
                               {printer.printer_type === 'receipt' ? 'إيصالات' : 'مطبخ'}
                             </span>
+                            
+                            {/* زر اختبار الاتصال */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-green-500 hover:bg-green-500/10"
+                              onClick={() => handleTestPrinter(printer.id)}
+                              disabled={printerTestStatus[printer.id] === 'testing'}
+                              title="اختبار الاتصال"
+                            >
+                              <RefreshCw className={`h-4 w-4 ${printerTestStatus[printer.id] === 'testing' ? 'animate-spin' : ''}`} />
+                            </Button>
+                            
                             <Button
                               variant="ghost"
                               size="icon"
