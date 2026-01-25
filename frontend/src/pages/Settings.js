@@ -771,6 +771,48 @@ export default function Settings() {
     }
   };
 
+  const handleEditPrinter = (printer) => {
+    setEditPrinterForm({
+      id: printer.id,
+      name: printer.name,
+      ip_address: printer.ip_address,
+      port: printer.port || 9100,
+      branch_id: printer.branch_id,
+      printer_type: printer.printer_type || 'receipt'
+    });
+    setEditPrinterDialogOpen(true);
+  };
+
+  const handleUpdatePrinter = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API}/printers/${editPrinterForm.id}`, {
+        name: editPrinterForm.name,
+        ip_address: editPrinterForm.ip_address,
+        port: editPrinterForm.port,
+        branch_id: editPrinterForm.branch_id,
+        printer_type: editPrinterForm.printer_type
+      });
+      toast.success('تم تحديث الطابعة');
+      setEditPrinterDialogOpen(false);
+      setEditPrinterForm(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في تحديث الطابعة');
+    }
+  };
+
+  const handleDeletePrinter = async (printerId) => {
+    if (!window.confirm('هل أنت متأكد من حذف هذه الطابعة؟')) return;
+    try {
+      await axios.delete(`${API}/printers/${printerId}`);
+      toast.success('تم حذف الطابعة');
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في حذف الطابعة');
+    }
+  };
+
   const handleAddEmail = async () => {
     if (!newEmail || !newEmail.includes('@')) {
       toast.error('يرجى إدخال بريد إلكتروني صحيح');
