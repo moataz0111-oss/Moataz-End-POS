@@ -3498,7 +3498,10 @@ export default function Settings() {
                         </div>
                         
                         <div className="flex items-center justify-between">
-                          <Label className="text-sm">طباعة كل صنف على حدة</Label>
+                          <div>
+                            <Label className="text-sm">طباعة جميع الطلبات</Label>
+                            <p className="text-xs text-muted-foreground">لمتابعة جميع الأصناف مع الأقسام</p>
+                          </div>
                           <Switch 
                             checked={editPrinterForm.print_individual_items || false} 
                             onCheckedChange={(v) => setEditPrinterForm({ ...editPrinterForm, print_individual_items: v })}
