@@ -6574,7 +6574,7 @@ async def register_super_admin(request: SuperAdminRegisterRequest):
 
 @api_router.get("/super-admin/tenants")
 async def get_all_tenants(current_user: dict = Depends(verify_super_admin)):
-    """جلب جميع المستأجرين (العملاء) بما فيهم النظام الرئيسي"""
+    """جلب جميع العملاء (المستأجرين)"""
     tenants = await db.tenants.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     
     # إضافة إحصائيات لكل مستأجر
@@ -6583,20 +6583,7 @@ async def get_all_tenants(current_user: dict = Depends(verify_super_admin)):
         tenant["branches_count"] = await db.branches.count_documents({"tenant_id": tenant["id"]})
         tenant["orders_count"] = await db.orders.count_documents({"tenant_id": tenant["id"]})
     
-    # إضافة النظام الرئيسي كـ "عميل" وهمي
-    main_system_users = await db.users.count_documents({
-        "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}],
-        "role": {"$ne": UserRole.SUPER_ADMIN}
-    })
-    main_system_branches = await db.branches.count_documents({
-        "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
-    })
-    main_system_orders = await db.orders.count_documents({
-        "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
-    })
-    
-    # إرجاع قائمة العملاء فقط بدون النظام الرئيسي
-    # النظام الرئيسي هو المالك ولا يجب أن يظهر كعميل
+    # إرجاع قائمة العملاء فقط (النظام الرئيسي هو المالك ولا يظهر كعميل)
     return tenants
 
 @api_router.post("/super-admin/tenants")
