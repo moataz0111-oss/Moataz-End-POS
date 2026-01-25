@@ -6020,6 +6020,7 @@ class TenantInvoiceSettings(BaseModel):
     phone2: Optional[str] = None  # رقم هاتف ثاني
     address: Optional[str] = None  # العنوان
     tax_number: Optional[str] = None  # الرقم الضريبي
+    show_tax: bool = True  # إظهار الرقم الضريبي
     custom_header: Optional[str] = None  # نص إضافي في الترويسة
     custom_footer: Optional[str] = None  # نص إضافي في التذييل
 
