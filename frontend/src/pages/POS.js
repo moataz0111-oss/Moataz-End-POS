@@ -1712,12 +1712,11 @@ export default function POS() {
                 <span>المجموع الفرعي:</span>
                 <span className="tabular-nums">{formatPrice(subtotal)}</span>
               </div>
-              {discount > 0 && (
-                <div className="flex justify-between text-xs text-red-600 bg-red-50 p-1 rounded">
-                  <span>🏷️ الخصم:</span>
-                  <span className="tabular-nums font-bold">-{formatPrice(discount)}</span>
-                </div>
-              )}
+              {/* حقل الخصم - يظهر دائماً */}
+              <div className={`flex justify-between text-xs p-1 rounded ${discount > 0 ? 'text-red-600 bg-red-50' : 'text-gray-500'}`}>
+                <span>🏷️ الخصم:</span>
+                <span className="tabular-nums font-bold">{discount > 0 ? `-${formatPrice(discount)}` : '0'}</span>
+              </div>
               <div className="flex justify-between font-bold text-sm border-t-2 border-gray-400 pt-2 mt-2">
                 <span>الإجمالي النهائي:</span>
                 <span className="tabular-nums">{formatPrice(totalBeforeCommission)}</span>
