@@ -922,7 +922,7 @@ export default function Settings() {
       });
       toast.success('تم إنشاء المنتج');
       setProductDialogOpen(false);
-      setProductForm({ name: '', name_en: '', category_id: '', price: '', cost: '', operating_cost: '', packaging_cost: '', image: '', description: '', barcode: '', manufactured_product_id: '' });
+      setProductForm({ name: '', name_en: '', category_id: '', price: '', cost: '', operating_cost: '', packaging_cost: '', image: '', description: '', barcode: '', manufactured_product_id: '', printer_ids: [] });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل في إنشاء المنتج');
