@@ -103,7 +103,7 @@
   },
   
   "test_credentials": {
-    "api_url": "https://cafe-manager-88.preview.emergentagent.com",
+    "api_url": "https://cafe-pilot-1.preview.emergentagent.com",
     "customer_menu_url": "/menu/default"
   },
   
