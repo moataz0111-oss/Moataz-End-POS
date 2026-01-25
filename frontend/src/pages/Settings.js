@@ -4815,12 +4815,6 @@ export default function Settings() {
                         </div>
                       </div>
                     </div>
-                        <Switch 
-                          checked={invoiceSettings.show_logo}
-                          onCheckedChange={(checked) => setInvoiceSettings(prev => ({...prev, show_logo: checked}))}
-                        />
-                      </div>
-                    </div>
 
                     <Button 
                       className="w-full bg-green-500 hover:bg-green-600"
@@ -4838,16 +4832,23 @@ export default function Settings() {
                         معاينة الفاتورة
                       </Label>
                       <div className="mt-4 bg-white text-black p-6 rounded-lg shadow-lg max-w-sm mx-auto" style={{fontFamily: 'monospace'}}>
-                        {/* شعار المطعم */}
-                        {invoiceSettings.show_logo && restaurantSettings.logo_url && (
-                          <div className="text-center mb-4">
-                            <img 
-                              src={restaurantSettings.logo_url.startsWith('/api') 
-                                ? `${API}${restaurantSettings.logo_url.replace('/api', '')}` 
-                                : restaurantSettings.logo_url} 
-                              alt="شعار المطعم" 
-                              className="h-16 mx-auto object-contain"
-                              onError={(e) => e.target.style.display = 'none'}
+                        {/* أعلى الفاتورة - معلومات المطعم */}
+                        <div className="text-center border-b border-dashed border-gray-400 pb-3 mb-3">
+                          <h2 className="text-lg font-bold">{restaurantSettings.name || restaurantSettings.name_ar || 'اسم المطعم'}</h2>
+                          {invoiceSettings.address && (
+                            <p className="text-xs text-gray-600">{invoiceSettings.address}</p>
+                          )}
+                          {(invoiceSettings.phone || invoiceSettings.phone2) && (
+                            <div className="text-xs mt-1">
+                              {invoiceSettings.phone && <span>📞 {invoiceSettings.phone}</span>}
+                              {invoiceSettings.phone && invoiceSettings.phone2 && <span> - </span>}
+                              {invoiceSettings.phone2 && <span>{invoiceSettings.phone2}</span>}
+                            </div>
+                          )}
+                          {invoiceSettings.tax_number && invoiceSettings.show_tax !== false && (
+                            <p className="text-xs text-gray-500 mt-1">الرقم الضريبي: {invoiceSettings.tax_number}</p>
+                          )}
+                        </div>
                             />
                           </div>
                         )}
