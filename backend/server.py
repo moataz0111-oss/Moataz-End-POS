@@ -6595,33 +6595,9 @@ async def get_all_tenants(current_user: dict = Depends(verify_super_admin)):
         "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
     })
     
-    # حساب مبيعات النظام الرئيسي
-    main_sales_cursor = db.orders.aggregate([
-        {"$match": {"$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}], "status": {"$ne": "cancelled"}}},
-        {"$group": {"_id": None, "total": {"$sum": "$total"}}}
-    ])
-    main_sales_result = await main_sales_cursor.to_list(1)
-    main_total_sales = main_sales_result[0]["total"] if main_sales_result else 0
-    
-    main_system = {
-        "id": "main-system",
-        "name": "🏠 النظام الرئيسي",
-        "slug": "main",
-        "owner_name": "المالك",
-        "owner_email": "admin@maestroegp.com",
-        "owner_phone": "",
-        "subscription_type": "premium",
-        "is_active": True,
-        "is_main_system": True,  # علامة خاصة للنظام الرئيسي
-        "users_count": main_system_users,
-        "branches_count": main_system_branches,
-        "orders_count": main_system_orders,
-        "total_sales": main_total_sales,
-        "created_at": "2024-01-01T00:00:00"
-    }
-    
-    # إضافة النظام الرئيسي في أول القائمة
-    return [main_system] + tenants
+    # إرجاع قائمة العملاء فقط بدون النظام الرئيسي
+    # النظام الرئيسي هو المالك ولا يجب أن يظهر كعميل
+    return tenants
 
 @api_router.post("/super-admin/tenants")
 async def create_tenant(tenant: TenantCreate, background_tasks: BackgroundTasks, current_user: dict = Depends(verify_super_admin)):
