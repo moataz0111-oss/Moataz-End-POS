@@ -4925,32 +4925,6 @@ export default function Settings() {
               </div>
             </TabsContent>
           )}
-                          </div>
-                        )}
-                        
-                        {/* نص أسفل الفاتورة */}
-                        {invoiceSettings.custom_footer && (
-                          <div className="text-center text-sm border-t pt-2 mt-2">
-                            {invoiceSettings.custom_footer}
-                          </div>
-                        )}
-                        
-                        {/* رسالة شكر افتراضية */}
-                        {!invoiceSettings.custom_footer && (
-                          <div className="text-center text-sm border-t pt-2 mt-2">
-                            شكراً لزيارتكم ❤️
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-center text-xs text-muted-foreground mt-3">
-                        هذه معاينة تقريبية لشكل الفاتورة المطبوعة
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-          )}
 
           {/* Customers - إدارة العملاء */}
           {hasRole(['admin', 'super_admin', 'manager', 'branch_manager']) && (
