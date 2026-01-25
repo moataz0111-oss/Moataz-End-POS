@@ -3399,7 +3399,7 @@ export default function Settings() {
 
               {/* Edit Printer Dialog */}
               <Dialog open={editPrinterDialogOpen} onOpenChange={setEditPrinterDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle className="text-foreground">تعديل الطابعة</DialogTitle>
                   </DialogHeader>
@@ -3455,11 +3455,64 @@ export default function Settings() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="receipt">طابعة إيصالات</SelectItem>
-                            <SelectItem value="kitchen">طابعة مطبخ</SelectItem>
+                            {printerTypes.length > 0 ? printerTypes.map(type => (
+                              <SelectItem key={type.id} value={type.id}>{type.name}</SelectItem>
+                            )) : (
+                              <>
+                                <SelectItem value="receipt">طابعة إيصالات</SelectItem>
+                                <SelectItem value="kitchen">طابعة مطبخ</SelectItem>
+                                <SelectItem value="bar">طابعة بار/مشروبات</SelectItem>
+                                <SelectItem value="packaging">طابعة تغليف</SelectItem>
+                                <SelectItem value="label">طابعة ملصقات</SelectItem>
+                              </>
+                            )}
                           </SelectContent>
                         </Select>
                       </div>
+                      
+                      {/* صلاحيات الطباعة */}
+                      <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+                        <Label className="text-foreground font-medium">صلاحيات الطباعة</Label>
+                        
+                        <div>
+                          <Label className="text-sm text-muted-foreground">وضع الطباعة</Label>
+                          <Select value={editPrinterForm.print_mode || 'full_receipt'} onValueChange={(v) => setEditPrinterForm({ ...editPrinterForm, print_mode: v })}>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="full_receipt">فاتورة كاملة (مع الأسعار)</SelectItem>
+                              <SelectItem value="orders_only">طلبات فقط (بدون أسعار)</SelectItem>
+                              <SelectItem value="selected_products">المنتجات المحددة فقط</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm">عرض الأسعار</Label>
+                          <Switch 
+                            checked={editPrinterForm.show_prices !== false} 
+                            onCheckedChange={(v) => setEditPrinterForm({ ...editPrinterForm, show_prices: v })}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm">طباعة كل صنف على حدة</Label>
+                          <Switch 
+                            checked={editPrinterForm.print_individual_items || false} 
+                            onCheckedChange={(v) => setEditPrinterForm({ ...editPrinterForm, print_individual_items: v })}
+                          />
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm">طباعة تلقائية عند الطلب</Label>
+                          <Switch 
+                            checked={editPrinterForm.auto_print_on_order !== false} 
+                            onCheckedChange={(v) => setEditPrinterForm({ ...editPrinterForm, auto_print_on_order: v })}
+                          />
+                        </div>
+                      </div>
+                      
                       <div className="flex gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={() => setEditPrinterDialogOpen(false)} className="flex-1">
                           إلغاء
