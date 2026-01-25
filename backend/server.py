@@ -10572,8 +10572,8 @@ async def print_invoice(order_id: str, print_type: str = "customer", printer_id:
     processed_items = []
     for item in items:
         processed_item = {
-            "name": item.get("name"),
-            "name_en": item.get("name_en"),
+            "name": item.get("product_name") or item.get("name"),
+            "name_en": item.get("product_name_en") or item.get("name_en"),
             "quantity": item.get("quantity", 1),
             "notes": item.get("notes"),
         }
