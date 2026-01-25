@@ -1761,36 +1761,6 @@ export default function POS() {
               )}
             </div>
           </div>
-                
-                {/* رسالة الشكر */}
-                <p className="text-xs font-bold">
-                  {systemInvoiceSettings.thank_you_message || 'شكراً لزيارتكم ❤️'}
-                </p>
-                
-                {/* نص إضافي */}
-                {systemInvoiceSettings.footer_text && (
-                  <p className="text-xs mt-1">{systemInvoiceSettings.footer_text}</p>
-                )}
-                
-                {/* أرقام النظام */}
-                {(systemInvoiceSettings.system_phone || systemInvoiceSettings.system_phone2) && (
-                  <div className="text-xs mt-1">
-                    {systemInvoiceSettings.system_phone && <span>📞 {systemInvoiceSettings.system_phone}</span>}
-                    {systemInvoiceSettings.system_phone && systemInvoiceSettings.system_phone2 && <span> - </span>}
-                    {systemInvoiceSettings.system_phone2 && <span>{systemInvoiceSettings.system_phone2}</span>}
-                  </div>
-                )}
-                
-                {/* البريد والموقع */}
-                {systemInvoiceSettings.system_email && (
-                  <p className="text-xs">✉️ {systemInvoiceSettings.system_email}</p>
-                )}
-                {systemInvoiceSettings.system_website && (
-                  <p className="text-xs">🌐 {systemInvoiceSettings.system_website}</p>
-                )}
-              </div>
-            )}
-          </div>
           
           <div className="flex gap-2 no-print">
             <Button variant="outline" onClick={() => setPrintDialogOpen(false)} className="flex-1">
