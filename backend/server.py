@@ -4570,9 +4570,9 @@ async def create_refund(refund: RefundCreate, current_user: dict = Depends(get_c
     if user_role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MANAGER] and "can_refund" not in user_permissions:
         raise HTTPException(status_code=403, detail="ليس لديك صلاحية إرجاع الطلبات")
     
-    # التحقق من وجود سبب الإرجاع
+    # التحقق من وجود سبب الإرجاع (شرط إلزامي)
     if not refund.reason or len(refund.reason.strip()) < 3:
-        raise HTTPException(status_code=400, detail="يجب إدخال سبب الإرجاع (3 أحرف على الأقل)")
+        raise HTTPException(status_code=400, detail="يجب كتابة سبب الإرجاع (3 أحرف على الأقل)")
     
     tenant_id = get_user_tenant_id(current_user)
     
@@ -4589,10 +4589,30 @@ async def create_refund(refund: RefundCreate, current_user: dict = Depends(get_c
     if tenant_id:
         order_query["tenant_id"] = tenant_id
     
-    order = await db.orders.find_one(order_query, {"_id": 0})
+    # جلب آخر طلب بهذا الرقم
+    orders = await db.orders.find(order_query, {"_id": 0}).sort("created_at", -1).to_list(1)
     
-    if not order:
+    if not orders:
         raise HTTPException(status_code=404, detail="الطلب غير موجود. تأكد من رقم الفاتورة")
+    
+    order = orders[0]
+    
+    # التحقق من أن الطلب من نفس اليوم
+    order_date = order.get("created_at", "")
+    if order_date:
+        if isinstance(order_date, str):
+            order_datetime = datetime.fromisoformat(order_date.replace("Z", "+00:00"))
+        else:
+            order_datetime = order_date
+        
+        today = datetime.now(timezone.utc).date()
+        order_day = order_datetime.date()
+        
+        if order_day != today:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"لا يمكن إرجاع هذا الطلب. الإرجاع متاح فقط لطلبات اليوم. تاريخ الطلب: {order_day.strftime('%Y-%m-%d')}"
+            )
     
     # التحقق من أن الطلب مدفوع
     if order.get("payment_status") not in ["paid", "credit"]:
