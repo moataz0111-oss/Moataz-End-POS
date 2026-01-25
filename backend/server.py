@@ -2016,6 +2016,7 @@ async def create_kitchen_section(section: dict, current_user: dict = Depends(get
     if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    tenant_id = get_user_tenant_id(current_user)
     section_doc = {
         "id": str(uuid.uuid4()),
         "name": section.get("name"),
@@ -2024,6 +2025,7 @@ async def create_kitchen_section(section: dict, current_user: dict = Depends(get
         "icon": section.get("icon", "🍳"),
         "printer_id": section.get("printer_id"),
         "branch_id": section.get("branch_id"),
+        "tenant_id": tenant_id,  # فصل البيانات لكل عميل
         "sort_order": section.get("sort_order", 0),
         "is_active": True,
         "created_at": datetime.now(timezone.utc).isoformat()
@@ -2033,8 +2035,10 @@ async def create_kitchen_section(section: dict, current_user: dict = Depends(get
     return section_doc
 
 @api_router.get("/kitchen-sections")
-async def get_kitchen_sections(branch_id: Optional[str] = None):
-    query = {"branch_id": branch_id} if branch_id else {}
+async def get_kitchen_sections(branch_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = build_tenant_query(current_user)  # فلترة حسب tenant_id
+    if branch_id:
+        query["branch_id"] = branch_id
     sections = await db.kitchen_sections.find(query, {"_id": 0}).sort("sort_order", 1).to_list(100)
     return sections
 
@@ -2043,15 +2047,17 @@ async def update_kitchen_section(section_id: str, section: dict, current_user: d
     if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    query = build_tenant_query(current_user, {"id": section_id})
     update_data = {k: v for k, v in section.items() if k != "id"}
-    await db.kitchen_sections.update_one({"id": section_id}, {"$set": update_data})
+    await db.kitchen_sections.update_one(query, {"$set": update_data})
     return await db.kitchen_sections.find_one({"id": section_id}, {"_id": 0})
 
 @api_router.delete("/kitchen-sections/{section_id}")
 async def delete_kitchen_section(section_id: str, current_user: dict = Depends(get_current_user)):
     if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
         raise HTTPException(status_code=403, detail="غير مصرح")
-    await db.kitchen_sections.delete_one({"id": section_id})
+    query = build_tenant_query(current_user, {"id": section_id})
+    await db.kitchen_sections.delete_one(query)
     return {"message": "تم الحذف"}
 
 @api_router.put("/categories/{category_id}/kitchen-section")
