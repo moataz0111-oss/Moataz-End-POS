@@ -3408,8 +3408,9 @@ async def update_coupon(coupon_id: str, coupon: CouponCreate, current_user: dict
     if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    query = build_tenant_query(current_user, {"id": coupon_id})
     await db.coupons.update_one(
-        {"id": coupon_id},
+        query,
         {"$set": {**coupon.model_dump(), "code": coupon.code.upper(), "updated_at": datetime.now(timezone.utc).isoformat()}}
     )
     return {"message": "تم التحديث"}
@@ -3420,7 +3421,8 @@ async def delete_coupon(coupon_id: str, current_user: dict = Depends(get_current
     if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    await db.coupons.delete_one({"id": coupon_id})
+    query = build_tenant_query(current_user, {"id": coupon_id})
+    await db.coupons.delete_one(query)
     return {"message": "تم الحذف"}
 
 @api_router.post("/coupons/validate")
