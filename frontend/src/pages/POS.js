@@ -1765,6 +1765,8 @@ export default function POS() {
                     <span className="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded-full">تم إرجاعه</span>
                   ) : refundOrderInfo.can_refund ? (
                     <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">قابل للإرجاع</span>
+                  ) : !refundOrderInfo.is_today ? (
+                    <span className="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs rounded-full">طلب قديم</span>
                   ) : (
                     <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded-full">غير مدفوع</span>
                   )}
@@ -1779,6 +1781,10 @@ export default function POS() {
                   </div>
                   <div className="text-muted-foreground">المبلغ:</div>
                   <div className="font-medium text-primary">{(refundOrderInfo.total || 0).toLocaleString()} د.ع</div>
+                  <div className="text-muted-foreground">تاريخ الطلب:</div>
+                  <div className={`font-medium ${refundOrderInfo.is_today ? 'text-green-500' : 'text-orange-500'}`}>
+                    {refundOrderInfo.order_date} {refundOrderInfo.is_today ? '(اليوم)' : '(يوم سابق)'}
+                  </div>
                   {refundOrderInfo.customer_name && (
                     <>
                       <div className="text-muted-foreground">العميل:</div>
@@ -1786,6 +1792,13 @@ export default function POS() {
                     </>
                   )}
                 </div>
+                
+                {/* رسالة تحذيرية إذا لم يكن قابل للإرجاع */}
+                {refundOrderInfo.refund_message && (
+                  <div className="mt-3 p-2 bg-red-500/10 border border-red-500/30 rounded text-sm text-red-400">
+                    ⚠️ {refundOrderInfo.refund_message}
+                  </div>
+                )}
                 
                 {refundOrderInfo.refunds && refundOrderInfo.refunds.length > 0 && (
                   <div className="text-sm text-muted-foreground mt-3 pt-3 border-t border-border">
