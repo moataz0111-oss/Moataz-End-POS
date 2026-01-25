@@ -7264,14 +7264,23 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
     
     total_tenants = await db.tenants.count_documents({})
     active_tenants = await db.tenants.count_documents({"is_active": True})
-    total_users = await db.users.count_documents({"role": {"$ne": UserRole.SUPER_ADMIN}})
+    # استبعاد مستخدمي النظام الرئيسي (super_admin و admin و default)
+    total_users = await db.users.count_documents({
+        "role": {"$nin": [UserRole.SUPER_ADMIN, UserRole.ADMIN]},
+        "tenant_id": {"$exists": True, "$ne": None, "$ne": "default"}
+    })
     
-    # حساب الطلبات فقط للعملاء (الذين لديهم tenant_id)
-    total_orders = await db.orders.count_documents({"tenant_id": {"$exists": True, "$ne": None}})
+    # حساب الطلبات فقط للعملاء (استبعاد النظام الرئيسي "default")
+    total_orders = await db.orders.count_documents({
+        "tenant_id": {"$exists": True, "$ne": None, "$ne": "default"}
+    })
     
-    # المبيعات الإجمالية - فقط للعملاء
+    # المبيعات الإجمالية - فقط للعملاء (استبعاد النظام الرئيسي)
     sales_cursor = db.orders.aggregate([
-        {"$match": {"status": {"$ne": "cancelled"}, "tenant_id": {"$exists": True, "$ne": None}}},
+        {"$match": {
+            "status": {"$ne": "cancelled"}, 
+            "tenant_id": {"$exists": True, "$ne": None, "$ne": "default"}
+        }},
         {"$group": {"_id": None, "total": {"$sum": "$total"}}}
     ])
     sales_result = await sales_cursor.to_list(1)
