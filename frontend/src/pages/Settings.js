@@ -473,6 +473,9 @@ export default function Settings() {
       // جلب إعدادات المخزون
       fetchInventorySettings();
       
+      // جلب إعدادات الفاتورة للعميل
+      fetchInvoiceSettings();
+      
       // جلب إعدادات المطعم
       fetchRestaurantSettings();
     } catch (error) {
