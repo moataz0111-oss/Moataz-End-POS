@@ -6464,6 +6464,30 @@ async def get_printers(branch_id: Optional[str] = None):
     printers = await db.printers.find(query, {"_id": 0}).to_list(50)
     return printers
 
+@api_router.put("/printers/{printer_id}")
+async def update_printer(printer_id: str, printer: PrinterCreate, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    existing = await db.printers.find_one({"id": printer_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="الطابعة غير موجودة")
+    
+    update_data = printer.model_dump()
+    await db.printers.update_one({"id": printer_id}, {"$set": update_data})
+    updated = await db.printers.find_one({"id": printer_id}, {"_id": 0})
+    return updated
+
+@api_router.delete("/printers/{printer_id}")
+async def delete_printer(printer_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    result = await db.printers.delete_one({"id": printer_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="الطابعة غير موجودة")
+    return {"message": "تم حذف الطابعة بنجاح"}
+
 # ==================== SUPER ADMIN & TENANT MANAGEMENT ====================
 # نظام إدارة المستأجرين - لوحة تحكم المالك الرئيسي
 
