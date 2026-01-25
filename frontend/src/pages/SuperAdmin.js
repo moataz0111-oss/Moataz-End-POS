@@ -1625,6 +1625,84 @@ export default function SuperAdmin() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* شعار النظام */}
+            <div className="p-4 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 rounded-lg border border-orange-500/30">
+              <Label className="text-sm font-bold text-orange-400 mb-4 flex items-center gap-2">
+                <ImageIcon className="h-5 w-5" />
+                شعار النظام (يظهر في جميع الفواتير)
+              </Label>
+              <div className="flex items-center gap-4 mt-4">
+                {/* عرض الشعار الحالي */}
+                <div className="w-24 h-24 border-2 border-dashed border-orange-500/50 rounded-lg flex items-center justify-center bg-gray-900/50 overflow-hidden">
+                  {invoiceSettings.system_logo_url ? (
+                    <img 
+                      src={invoiceSettings.system_logo_url.startsWith('/') 
+                        ? `${API}${invoiceSettings.system_logo_url}` 
+                        : invoiceSettings.system_logo_url}
+                      alt="شعار النظام"
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <ImageIcon className="h-8 w-8 text-gray-500" />
+                  )}
+                </div>
+                
+                {/* أزرار التحكم */}
+                <div className="flex-1">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        try {
+                          toast.loading('جاري رفع الشعار...');
+                          const res = await axios.post(`${API}/upload/image`, formData, {
+                            headers: { 'Content-Type': 'multipart/form-data' }
+                          });
+                          setInvoiceSettings(prev => ({...prev, system_logo_url: res.data.url}));
+                          toast.dismiss();
+                          toast.success('تم رفع شعار النظام بنجاح');
+                        } catch (error) {
+                          toast.dismiss();
+                          toast.error('فشل في رفع الشعار');
+                        }
+                      }}
+                    />
+                    <Button variant="outline" className="w-full border-orange-500/50 text-orange-400 hover:bg-orange-500/10" asChild>
+                      <span>
+                        <Upload className="h-4 w-4 ml-2" />
+                        رفع شعار النظام
+                      </span>
+                    </Button>
+                  </label>
+                  <p className="text-xs text-gray-400 mt-2">
+                    سيظهر هذا الشعار في جميع فواتير العملاء
+                  </p>
+                  {invoiceSettings.system_logo_url && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-red-400 mt-2 hover:bg-red-500/10"
+                      onClick={() => setInvoiceSettings(prev => ({...prev, system_logo_url: ''}))}
+                    >
+                      <X className="h-4 w-4 ml-1" />
+                      إزالة الشعار
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* رسالة الشكر */}
               <div className="space-y-4">
@@ -1710,20 +1788,37 @@ export default function SuperAdmin() {
             <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
               <Label className="text-sm font-medium mb-4 block">معاينة الفاتورة:</Label>
               <div className="bg-white text-black p-4 rounded-lg text-sm font-mono max-w-xs mx-auto">
+                {/* أعلى الفاتورة - معلومات المطعم */}
                 <div className="text-center border-b border-gray-300 pb-2 mb-2">
-                  <div className="font-bold">[شعار النظام]</div>
                   <div className="font-bold text-lg">[اسم المطعم]</div>
-                  <div className="text-xs">[أرقام المطعم]</div>
+                  <div className="text-xs text-gray-600">[عنوان المطعم]</div>
+                  <div className="text-xs">📞 [أرقام المطعم]</div>
                 </div>
+                
+                {/* محتوى الفاتورة */}
                 <div className="py-2 border-b border-gray-300 mb-2">
-                  <div className="text-xs text-gray-500">... محتوى الفاتورة ...</div>
+                  <div className="text-xs text-gray-500">... الأصناف والأسعار ...</div>
+                  <div className="text-xs text-gray-500">... المجموع والإجمالي ...</div>
                 </div>
-                <div className="text-center pt-2">
-                  <div className="font-bold">{invoiceSettings.thank_you_message || 'شكراً لزيارتكم'}</div>
+                
+                {/* أسفل الفاتورة - معلومات النظام */}
+                <div className="text-center pt-2 border-t border-dashed border-gray-400">
+                  {invoiceSettings.system_logo_url && (
+                    <div className="mb-2">
+                      <img 
+                        src={invoiceSettings.system_logo_url.startsWith('/') 
+                          ? `${API}${invoiceSettings.system_logo_url}` 
+                          : invoiceSettings.system_logo_url}
+                        alt="شعار النظام"
+                        className="h-8 mx-auto object-contain"
+                      />
+                    </div>
+                  )}
+                  <div className="font-bold text-sm">{invoiceSettings.thank_you_message || 'شكراً لزيارتكم'}</div>
                   {invoiceSettings.footer_text && <div className="text-xs mt-1">{invoiceSettings.footer_text}</div>}
                   {invoiceSettings.system_phone && <div className="text-xs mt-1">📞 {invoiceSettings.system_phone}</div>}
                   {invoiceSettings.system_email && <div className="text-xs">✉️ {invoiceSettings.system_email}</div>}
-                  <div className="text-xs mt-2">[شعار النظام]</div>
+                  {invoiceSettings.system_website && <div className="text-xs">🌐 {invoiceSettings.system_website}</div>}
                 </div>
               </div>
             </div>
