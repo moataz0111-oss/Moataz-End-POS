@@ -1598,6 +1598,137 @@ export default function SuperAdmin() {
           </CardContent>
         </Card>
 
+        {/* Invoice Settings Section - إعدادات الفاتورة */}
+        <Card className="bg-gray-800/50 border-gray-700">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center">
+                <Receipt className="h-5 w-5 text-green-400" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">إعدادات الفاتورة</CardTitle>
+                <p className="text-sm text-gray-400">تحكم في مظهر الفواتير المطبوعة لجميع العملاء</p>
+              </div>
+            </div>
+            <Button 
+              onClick={saveInvoiceSettings} 
+              className="bg-green-600 hover:bg-green-700 gap-2"
+              disabled={loading}
+            >
+              {loading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Check className="h-4 w-4" />
+              )}
+              حفظ الإعدادات
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* رسالة الشكر */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">رسالة الشكر (أسفل الفاتورة)</Label>
+                  <Input
+                    placeholder="شكراً لزيارتكم"
+                    value={invoiceSettings.thank_you_message}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, thank_you_message: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                    dir="rtl"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">نص إضافي في التذييل</Label>
+                  <Input
+                    placeholder="مثال: تابعونا على مواقع التواصل"
+                    value={invoiceSettings.footer_text || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, footer_text: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                    dir="rtl"
+                  />
+                </div>
+              </div>
+              
+              {/* بيانات التواصل */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">هاتف النظام 1</Label>
+                    <Input
+                      placeholder="07xxxxxxxxx"
+                      value={invoiceSettings.system_phone || ''}
+                      onChange={(e) => setInvoiceSettings({...invoiceSettings, system_phone: e.target.value})}
+                      className="bg-gray-700/50 border-gray-600"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">هاتف النظام 2</Label>
+                    <Input
+                      placeholder="07xxxxxxxxx"
+                      value={invoiceSettings.system_phone2 || ''}
+                      onChange={(e) => setInvoiceSettings({...invoiceSettings, system_phone2: e.target.value})}
+                      className="bg-gray-700/50 border-gray-600"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">البريد الإلكتروني</Label>
+                  <Input
+                    type="email"
+                    placeholder="info@example.com"
+                    value={invoiceSettings.system_email || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_email: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm">الموقع الإلكتروني</Label>
+                  <Input
+                    placeholder="www.example.com"
+                    value={invoiceSettings.system_website || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_website: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* إظهار شعار النظام */}
+            <div className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg">
+              <div>
+                <Label className="text-sm font-medium">إظهار شعار وبيانات النظام في الفواتير</Label>
+                <p className="text-xs text-gray-400">سيظهر شعار النظام ورسالة الشكر وبيانات التواصل في كل فاتورة</p>
+              </div>
+              <Switch
+                checked={invoiceSettings.show_system_branding}
+                onCheckedChange={(v) => setInvoiceSettings({...invoiceSettings, show_system_branding: v})}
+              />
+            </div>
+            
+            {/* معاينة */}
+            <div className="p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+              <Label className="text-sm font-medium mb-4 block">معاينة الفاتورة:</Label>
+              <div className="bg-white text-black p-4 rounded-lg text-sm font-mono max-w-xs mx-auto">
+                <div className="text-center border-b border-gray-300 pb-2 mb-2">
+                  <div className="font-bold">[شعار النظام]</div>
+                  <div className="font-bold text-lg">[اسم المطعم]</div>
+                  <div className="text-xs">[أرقام المطعم]</div>
+                </div>
+                <div className="py-2 border-b border-gray-300 mb-2">
+                  <div className="text-xs text-gray-500">... محتوى الفاتورة ...</div>
+                </div>
+                <div className="text-center pt-2">
+                  <div className="font-bold">{invoiceSettings.thank_you_message || 'شكراً لزيارتكم'}</div>
+                  {invoiceSettings.footer_text && <div className="text-xs mt-1">{invoiceSettings.footer_text}</div>}
+                  {invoiceSettings.system_phone && <div className="text-xs mt-1">📞 {invoiceSettings.system_phone}</div>}
+                  {invoiceSettings.system_email && <div className="text-xs">✉️ {invoiceSettings.system_email}</div>}
+                  <div className="text-xs mt-2">[شعار النظام]</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Login Backgrounds Section */}
         <Card className="bg-gray-800/50 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
