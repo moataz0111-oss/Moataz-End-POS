@@ -3338,7 +3338,7 @@ export default function Settings() {
                                    printer.print_mode === 'selected_products' ? '🎯 منتجات محددة' : '📄 فاتورة'}
                                 </span>
                                 {!printer.show_prices && <span className="text-xs text-orange-400">• بدون أسعار</span>}
-                                {printer.print_individual_items && <span className="text-xs text-purple-400">• صنف بصنف</span>}
+                                {printer.print_individual_items && <span className="text-xs text-purple-400">• جميع الطلبات</span>}
                               </div>
                             </div>
                           </div>
@@ -3355,9 +3355,7 @@ export default function Settings() {
                               <span className="text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500">غير متصلة</span>
                             ) : null}
                             
-                            <span className={`text-xs px-2 py-1 rounded-full ${
-                              printer.printer_type === 'receipt' ? 'bg-blue-500/10 text-blue-500' : 
-                              printer.printer_type === 'kitchen' ? 'bg-orange-500/10 text-orange-500' :
+                            <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
                               printer.printer_type === 'bar' ? 'bg-purple-500/10 text-purple-500' :
                               printer.printer_type === 'packaging' ? 'bg-green-500/10 text-green-500' :
                               printer.printer_type === 'label' ? 'bg-pink-500/10 text-pink-500' :
