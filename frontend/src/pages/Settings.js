@@ -4775,6 +4775,14 @@ export default function Settings() {
                           className="mt-1"
                           dir="ltr"
                         />
+                        {/* خيار إظهار/إخفاء الرقم الضريبي */}
+                        <div className="flex items-center gap-2 mt-3">
+                          <Switch 
+                            checked={invoiceSettings.show_tax !== false}
+                            onCheckedChange={(checked) => setInvoiceSettings(prev => ({...prev, show_tax: checked}))}
+                          />
+                          <span className="text-sm text-muted-foreground">إظهار الرقم الضريبي في الفاتورة</span>
+                        </div>
                       </div>
                     </div>
 
@@ -4807,17 +4815,6 @@ export default function Settings() {
                         </div>
                       </div>
                     </div>
-
-                    {/* إظهار الشعار */}
-                    <div className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <ImageIcon className="h-5 w-5 text-orange-500" />
-                          <div>
-                            <p className="font-medium">إظهار شعار المطعم في الفاتورة</p>
-                            <p className="text-xs text-muted-foreground">عرض شعار المطعم في أعلى الفاتورة المطبوعة</p>
-                          </div>
-                        </div>
                         <Switch 
                           checked={invoiceSettings.show_logo}
                           onCheckedChange={(checked) => setInvoiceSettings(prev => ({...prev, show_logo: checked}))}
