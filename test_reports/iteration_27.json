@@ -1,0 +1,131 @@
+{
+  "summary": "Iteration 27 - Invoice Settings and Printer Permissions Testing. All 12 backend API tests passed (100%). Frontend UI verified: Invoice Settings tab with all fields (phone, address, tax number, custom header/footer, show logo), Printers tab with permission controls (show_prices, print_mode, print_individual_items, auto_print_on_order).",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  
+  "passed_tests": [
+    "POST /api/auth/login - Customer admin (ahmed@albait.com) login successful",
+    "POST /api/auth/login - Super admin (owner@maestroegp.com) login successful",
+    "GET /api/tenant/invoice-settings - Returns invoice settings with default fields",
+    "PUT /api/tenant/invoice-settings - Updates invoice settings successfully",
+    "POST /api/invoices/print/{order_id} - Basic print returns print_data, print_jobs, printer_settings",
+    "POST /api/invoices/print/{order_id}?printer_id={id} - Print with specific printer applies permissions",
+    "GET /api/invoices/auto-print/{order_id} - Returns auto print data for all active printers",
+    "POST /api/printers - Create printer with show_prices=False works",
+    "POST /api/printers - Create printer with print_individual_items=True works",
+    "PUT /api/printers/{id} - Update printer permissions works",
+    "GET / - Server health check",
+    "GET /api/health - API health check"
+  ],
+  
+  "verified_features": {
+    "tenant_invoice_settings_api": {
+      "status": "Working",
+      "endpoints": ["GET /api/tenant/invoice-settings", "PUT /api/tenant/invoice-settings"],
+      "fields": ["show_logo", "phone", "phone2", "address", "tax_number", "custom_header", "custom_footer"],
+      "notes": "Settings are saved per tenant and retrieved correctly"
+    },
+    "invoice_settings_ui": {
+      "status": "Working",
+      "location": "Settings > إعدادات الفاتورة tab",
+      "sections": [
+        "معلومات الاتصال (Contact Info) - phone, phone2",
+        "العنوان (Address)",
+        "المعلومات الضريبية (Tax Info) - tax_number",
+        "نصوص مخصصة (Custom Texts) - header, footer",
+        "إظهار شعار المطعم (Show Logo) - toggle"
+      ],
+      "notes": "All fields are editable and save correctly"
+    },
+    "print_invoice_with_permissions": {
+      "status": "Working",
+      "endpoint": "POST /api/invoices/print/{order_id}",
+      "permissions_applied": ["show_prices", "print_mode", "print_individual_items"],
+      "notes": "When printer_id is provided, printer permissions are applied to the print output"
+    },
+    "auto_print_data": {
+      "status": "Working",
+      "endpoint": "GET /api/invoices/auto-print/{order_id}",
+      "notes": "Returns print data for all active printers with auto_print_on_order=True, each with their own permissions"
+    },
+    "printer_permissions_ui": {
+      "status": "Working",
+      "location": "Settings > الطابعات tab > Add/Edit Printer Dialog",
+      "fields": [
+        "وضع الطباعة (Print Mode) - dropdown",
+        "عرض الأسعار (Show Prices) - toggle",
+        "طباعة جميع الطلبات (Print All Orders) - toggle",
+        "طباعة تلقائية عند الطلب (Auto Print on Order) - toggle"
+      ],
+      "notes": "Printers list shows permission status (بدون أسعار = no prices)"
+    }
+  },
+  
+  "verified_pages": {
+    "login": {
+      "status": "Working",
+      "notes": "Beautiful login page with restaurant background slideshow"
+    },
+    "dashboard": {
+      "status": "Working",
+      "notes": "Dashboard shows statistics, quick actions, recent orders"
+    },
+    "settings_invoice_tab": {
+      "status": "Working",
+      "notes": "Invoice Settings tab visible for admin/manager roles, all fields functional"
+    },
+    "settings_printers_tab": {
+      "status": "Working",
+      "notes": "Printers tab shows list with permission indicators, add/edit dialogs have all permission fields"
+    }
+  },
+  
+  "test_report_links": [
+    "/app/backend/tests/test_invoice_settings_iter27.py",
+    "/app/test_reports/pytest/pytest_results_iter27.xml"
+  ],
+  
+  "action_items": [],
+  
+  "critical_code_review_comments": [
+    "TenantInvoiceSettings model properly defined with all required fields (server.py lines 6014-6022)",
+    "GET/PUT /api/tenant/invoice-settings endpoints properly secured with authentication (lines 6056-6092)",
+    "print_invoice endpoint correctly applies printer permissions (show_prices, print_mode, print_individual_items) (lines 10531-10636)",
+    "auto_print_data endpoint returns data for all active printers with their individual permissions (lines 10638-10740)",
+    "Frontend Invoice Settings tab properly renders all fields with correct state management",
+    "Printers UI shows permission status in list view and has all permission controls in add/edit dialogs"
+  ],
+  
+  "updated_files": [
+    "/app/backend/tests/test_invoice_settings_iter27.py - Created comprehensive test suite for invoice settings and printer permissions"
+  ],
+  
+  "success_rate": {
+    "backend": "100% (12/12 tests passed)",
+    "frontend": "100% (All pages load without errors, all features verified)"
+  },
+  
+  "test_credentials": {
+    "api_url": "https://cafe-pilot-1.preview.emergentagent.com",
+    "customer_admin_email": "ahmed@albait.com",
+    "customer_admin_password": "123456",
+    "super_admin_email": "owner@maestroegp.com",
+    "super_admin_password": "owner123"
+  },
+  
+  "seed_data_creation": "Created test printers with different permission configurations during testing",
+  
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "Iteration 27 completed successfully. All new features verified: 1) Tenant Invoice Settings API (GET/PUT) working correctly, 2) Invoice Settings UI tab in Settings page with all fields (phone, address, tax, custom texts, show logo), 3) Print Invoice endpoint applies printer permissions (show_prices, print_mode, print_individual_items), 4) Auto Print Data endpoint returns data for all active printers with their permissions, 5) Printers UI shows permission status and has all permission controls. All 12 backend tests passed. No issues found."
+}
