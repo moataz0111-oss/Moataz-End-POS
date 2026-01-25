@@ -6975,34 +6975,39 @@ async def get_tenant_details(tenant_id: str, current_user: dict = Depends(verify
     
     # التحقق إذا كان النظام الرئيسي
     if tenant_id == "main-system":
-        # جلب مستخدمي النظام الرئيسي (بدون tenant_id)
+        # استعلام النظام الرئيسي يشمل: بدون tenant_id أو tenant_id = null أو tenant_id = "default"
+        main_system_query = {
+            "$or": [
+                {"tenant_id": {"$exists": False}}, 
+                {"tenant_id": None},
+                {"tenant_id": "default"}
+            ]
+        }
+        
+        # جلب مستخدمي النظام الرئيسي
         users = await db.users.find({
-            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}],
+            **main_system_query,
             "role": {"$ne": UserRole.SUPER_ADMIN}
         }, {"_id": 0, "password": 0}).to_list(100)
         
-        branches = await db.branches.find({
-            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
-        }, {"_id": 0}).to_list(50)
+        branches = await db.branches.find(main_system_query, {"_id": 0}).to_list(50)
         
         # إحصائيات المبيعات للنظام الرئيسي
         today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
         orders_today = await db.orders.count_documents({
-            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}],
+            **main_system_query,
             "created_at": {"$gte": today}
         })
         
         total_sales_cursor = db.orders.aggregate([
-            {"$match": {"$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}], "status": {"$ne": "cancelled"}}},
+            {"$match": {**main_system_query, "status": {"$ne": "cancelled"}}},
             {"$group": {"_id": None, "total": {"$sum": "$total"}}}
         ])
         total_sales_result = await total_sales_cursor.to_list(1)
         total_sales = total_sales_result[0]["total"] if total_sales_result else 0
         
         # إجمالي الطلبات
-        total_orders = await db.orders.count_documents({
-            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
-        })
+        total_orders = await db.orders.count_documents(main_system_query)
         
         return {
             "tenant": {
