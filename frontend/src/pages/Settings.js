@@ -4853,23 +4853,15 @@ export default function Settings() {
                           </div>
                         )}
                         
-                        {/* اسم المطعم */}
-                        <div className="text-center mb-3">
-                          <h2 className="text-xl font-bold">{restaurantSettings.name || restaurantSettings.name_ar || 'اسم المطعم'}</h2>
-                          {invoiceSettings.address && (
-                            <p className="text-xs text-gray-600">{invoiceSettings.address}</p>
-                          )}
-                        </div>
-                        
                         {/* نص أعلى الفاتورة */}
                         {invoiceSettings.custom_header && (
-                          <div className="text-center mb-3 text-sm border-b pb-2">
+                          <div className="text-center mb-2 text-xs">
                             {invoiceSettings.custom_header}
                           </div>
                         )}
                         
                         {/* معلومات الفاتورة */}
-                        <div className="border-t border-b border-dashed py-2 mb-3 text-xs">
+                        <div className="py-2 mb-2 text-xs">
                           <div className="flex justify-between">
                             <span>رقم الفاتورة:</span>
                             <span>#001234</span>
@@ -4878,56 +4870,61 @@ export default function Settings() {
                             <span>التاريخ:</span>
                             <span>{new Date().toLocaleDateString('ar-IQ')}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>الوقت:</span>
-                            <span>{new Date().toLocaleTimeString('ar-IQ', {hour: '2-digit', minute: '2-digit'})}</span>
-                          </div>
                         </div>
                         
                         {/* الأصناف */}
-                        <div className="mb-3 text-sm">
-                          <div className="flex justify-between font-bold border-b pb-1 mb-2">
+                        <div className="mb-2 text-xs border-t border-b border-dashed py-2">
+                          <div className="flex justify-between font-bold border-b pb-1 mb-1">
                             <span>الصنف</span>
                             <span>المبلغ</span>
                           </div>
-                          <div className="flex justify-between py-1">
+                          <div className="flex justify-between py-0.5">
                             <span>برجر لحم x2</span>
                             <span>30,000</span>
                           </div>
-                          <div className="flex justify-between py-1">
+                          <div className="flex justify-between py-0.5">
                             <span>بطاطس x1</span>
                             <span>5,000</span>
-                          </div>
-                          <div className="flex justify-between py-1">
-                            <span>كولا x2</span>
-                            <span>4,000</span>
                           </div>
                         </div>
                         
                         {/* الإجمالي */}
-                        <div className="border-t border-dashed pt-2 mb-3">
-                          <div className="flex justify-between text-sm">
+                        <div className="mb-3">
+                          <div className="flex justify-between text-xs">
                             <span>المجموع:</span>
-                            <span>39,000</span>
+                            <span>35,000</span>
                           </div>
-                          <div className="flex justify-between font-bold text-lg mt-1">
+                          <div className="flex justify-between font-bold text-sm mt-1">
                             <span>الإجمالي:</span>
-                            <span>39,000 د.ع</span>
+                            <span>35,000 د.ع</span>
                           </div>
                         </div>
                         
-                        {/* أرقام الهواتف */}
-                        {(invoiceSettings.phone || invoiceSettings.phone2) && (
-                          <div className="text-center text-xs border-t pt-2 mb-2">
-                            {invoiceSettings.phone && <p>📞 {invoiceSettings.phone}</p>}
-                            {invoiceSettings.phone2 && <p>📞 {invoiceSettings.phone2}</p>}
+                        {/* نص أسفل من المطعم */}
+                        {invoiceSettings.custom_footer && (
+                          <div className="text-center text-xs mb-2 border-t border-dashed pt-2">
+                            {invoiceSettings.custom_footer}
                           </div>
                         )}
                         
-                        {/* الرقم الضريبي */}
-                        {invoiceSettings.tax_number && (
-                          <div className="text-center text-xs mb-2">
-                            <p>الرقم الضريبي: {invoiceSettings.tax_number}</p>
+                        {/* معلومات النظام - أسفل الفاتورة */}
+                        <div className="text-center border-t-2 border-gray-400 pt-3 mt-3">
+                          <div className="text-xs text-gray-600 mb-1">
+                            [شعار النظام]
+                          </div>
+                          <p className="text-xs font-bold">شكراً لزيارتكم ❤️</p>
+                          <p className="text-xs text-gray-500 mt-1">[أرقام التواصل مع النظام]</p>
+                        </div>
+                      </div>
+                      <p className="text-center text-xs text-muted-foreground mt-3">
+                        هذه معاينة تقريبية لشكل الفاتورة المطبوعة
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          )}
                           </div>
                         )}
                         
