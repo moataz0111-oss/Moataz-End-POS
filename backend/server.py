@@ -4859,33 +4859,45 @@ async def check_order_refund_status(order_id: str, current_user: dict = Depends(
 
 @api_router.post("/delivery-app-settings")
 async def create_delivery_app_setting(setting: DeliveryAppSettingCreate, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != UserRole.ADMIN:
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    # Check if exists
-    existing = await db.delivery_app_settings.find_one({"app_id": setting.app_id})
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # Check if exists for this tenant
+    query = {"app_id": setting.app_id}
+    if tenant_id:
+        query["tenant_id"] = tenant_id
+    
+    existing = await db.delivery_app_settings.find_one(query)
+    
+    setting_data = setting.model_dump()
+    setting_data["tenant_id"] = tenant_id
+    
     if existing:
-        await db.delivery_app_settings.update_one({"app_id": setting.app_id}, {"$set": setting.model_dump()})
+        await db.delivery_app_settings.update_one(query, {"$set": setting_data})
     else:
-        await db.delivery_app_settings.insert_one(setting.model_dump())
+        await db.delivery_app_settings.insert_one(setting_data)
     
     return {"message": "تم الحفظ"}
 
 @api_router.get("/delivery-app-settings")
-async def get_delivery_app_settings():
-    settings = await db.delivery_app_settings.find({}, {"_id": 0}).to_list(20)
+async def get_delivery_app_settings(current_user: dict = Depends(get_current_user)):
+    query = build_tenant_query(current_user)
+    settings = await db.delivery_app_settings.find(query, {"_id": 0}).to_list(20)
     return settings
 
 @api_router.delete("/delivery-app-settings/{app_id}")
 async def delete_delivery_app_setting(app_id: str, current_user: dict = Depends(get_current_user)):
     """حذف شركة توصيل"""
-    result = await db.delivery_app_settings.delete_one({"app_id": app_id})
+    query = build_tenant_query(current_user, {"app_id": app_id})
+    result = await db.delivery_app_settings.delete_one(query)
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="شركة التوصيل غير موجودة")
     return {"success": True, "message": "تم حذف شركة التوصيل بنجاح"}
 
 @api_router.get("/delivery-apps")
-async def get_delivery_apps():
+async def get_delivery_apps(current_user: dict = Depends(get_current_user)):
     # Get default apps
     default_apps = [
         {"id": "toters", "name": "توترز", "name_en": "Toters", "icon": "Truck", "is_default": True},
@@ -4895,8 +4907,9 @@ async def get_delivery_apps():
         {"id": "talabati", "name": "طلباتي", "name_en": "Talabati", "icon": "Box", "is_default": True},
     ]
     
-    # Get all settings from database (includes custom apps)
-    all_settings = await db.delivery_app_settings.find({}, {"_id": 0}).to_list(50)
+    # Get all settings from database for this tenant
+    query = build_tenant_query(current_user)
+    all_settings = await db.delivery_app_settings.find(query, {"_id": 0}).to_list(50)
     
     # Create a map of app_id to settings
     settings_map = {s["app_id"]: s for s in all_settings}
