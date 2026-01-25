@@ -344,6 +344,7 @@ export default function Settings() {
   });
   const [editPrinterForm, setEditPrinterForm] = useState(null);
   const [editPrinterDialogOpen, setEditPrinterDialogOpen] = useState(false);
+  const [printerTestStatus, setPrinterTestStatus] = useState({}); // حالة اختبار الطابعات
   const [categoryForm, setCategoryForm] = useState({
     name: '', name_en: '', icon: '', image: '', color: '#D4AF37', sort_order: 0, kitchen_section_id: ''
   });
