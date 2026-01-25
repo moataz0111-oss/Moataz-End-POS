@@ -6483,7 +6483,13 @@ class PrinterCreate(BaseModel):
     ip_address: str
     port: int = 9100
     branch_id: str
-    printer_type: str = "receipt"
+    printer_type: str = "receipt"  # النوع: receipt, kitchen, bar, packaging, label, custom
+    custom_type_name: Optional[str] = None  # اسم مخصص للنوع إذا كان custom
+    # صلاحيات الطباعة
+    print_mode: str = "full_receipt"  # full_receipt, orders_only, selected_products
+    show_prices: bool = True  # عرض الأسعار في الطباعة
+    print_individual_items: bool = False  # طباعة كل صنف على حدة
+    auto_print_on_order: bool = True  # طباعة تلقائية عند الطلب
 
 @api_router.post("/printers")
 async def create_printer(printer: PrinterCreate, current_user: dict = Depends(get_current_user)):
@@ -6502,6 +6508,50 @@ async def create_printer(printer: PrinterCreate, current_user: dict = Depends(ge
     await db.printers.insert_one(printer_doc)
     del printer_doc["_id"]
     return printer_doc
+
+@api_router.get("/printer-types")
+async def get_printer_types(current_user: dict = Depends(get_current_user)):
+    """جلب أنواع الطابعات المتاحة"""
+    default_types = [
+        {"id": "receipt", "name": "طابعة إيصالات", "name_en": "Receipt Printer", "icon": "Receipt"},
+        {"id": "kitchen", "name": "طابعة مطبخ", "name_en": "Kitchen Printer", "icon": "ChefHat"},
+        {"id": "bar", "name": "طابعة بار/مشروبات", "name_en": "Bar Printer", "icon": "Wine"},
+        {"id": "packaging", "name": "طابعة تغليف", "name_en": "Packaging Printer", "icon": "Package"},
+        {"id": "label", "name": "طابعة ملصقات", "name_en": "Label Printer", "icon": "Tag"},
+    ]
+    
+    # جلب الأنواع المخصصة للعميل
+    tenant_id = get_user_tenant_id(current_user)
+    query = {"tenant_id": tenant_id} if tenant_id else {}
+    custom_types = await db.printer_types.find(query, {"_id": 0}).to_list(50)
+    
+    return {"default": default_types, "custom": custom_types}
+
+@api_router.post("/printer-types")
+async def create_printer_type(type_data: dict, current_user: dict = Depends(get_current_user)):
+    """إضافة نوع طابعة مخصص"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    tenant_id = get_user_tenant_id(current_user)
+    type_doc = {
+        "id": str(uuid.uuid4()),
+        "name": type_data.get("name"),
+        "name_en": type_data.get("name_en", type_data.get("name")),
+        "icon": type_data.get("icon", "Printer"),
+        "tenant_id": tenant_id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.printer_types.insert_one(type_doc)
+    del type_doc["_id"]
+    return type_doc
+
+@api_router.delete("/printer-types/{type_id}")
+async def delete_printer_type(type_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف نوع طابعة مخصص"""
+    query = build_tenant_query(current_user, {"id": type_id})
+    await db.printer_types.delete_one(query)
+    return {"message": "تم الحذف"}
 
 @api_router.get("/printers")
 async def get_printers(branch_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
