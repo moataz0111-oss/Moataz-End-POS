@@ -2871,6 +2871,168 @@ export default function SuperAdmin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog إضافة خلفية جديدة */}
+      <Dialog open={showAddBackground} onOpenChange={setShowAddBackground}>
+        <DialogContent className="bg-gray-800 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ImageIcon className="h-5 w-5 text-purple-400" />
+              إضافة خلفية جديدة
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* اختيار طريقة الإضافة */}
+            <div className="flex gap-2 p-1 bg-gray-700/50 rounded-lg">
+              <button
+                onClick={() => setBackgroundUploadMode('url')}
+                className={`flex-1 py-2 px-3 rounded-md text-sm transition-all ${
+                  backgroundUploadMode === 'url' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                رابط URL
+              </button>
+              <button
+                onClick={() => setBackgroundUploadMode('device')}
+                className={`flex-1 py-2 px-3 rounded-md text-sm transition-all ${
+                  backgroundUploadMode === 'device' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                رفع من الجهاز
+              </button>
+            </div>
+
+            {/* إدخال URL */}
+            {backgroundUploadMode === 'url' && (
+              <div className="space-y-2">
+                <Label className="text-gray-300">رابط الصورة</Label>
+                <Input
+                  value={newBackgroundUrl}
+                  onChange={(e) => setNewBackgroundUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="bg-gray-700/50 border-gray-600 text-white"
+                />
+              </div>
+            )}
+
+            {/* رفع من الجهاز */}
+            {backgroundUploadMode === 'device' && (
+              <div className="space-y-2">
+                <Label className="text-gray-300">اختر صورة</Label>
+                <div 
+                  className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-purple-500 transition-colors"
+                  onClick={() => document.getElementById('background-file-input').click()}
+                >
+                  {backgroundPreviewUrl ? (
+                    <div className="space-y-2">
+                      <img 
+                        src={backgroundPreviewUrl} 
+                        alt="معاينة" 
+                        className="max-h-32 mx-auto rounded-lg object-cover"
+                      />
+                      <p className="text-sm text-gray-400">{selectedBackgroundFile?.name}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Upload className="h-10 w-10 text-gray-500 mx-auto" />
+                      <p className="text-gray-400">اضغط لاختيار صورة</p>
+                      <p className="text-xs text-gray-500">PNG, JPG, WEBP, GIF (حتى 5MB)</p>
+                    </div>
+                  )}
+                </div>
+                <input
+                  id="background-file-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setSelectedBackgroundFile(file);
+                      setBackgroundPreviewUrl(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+              </div>
+            )}
+
+            {/* عنوان الخلفية */}
+            <div className="space-y-2">
+              <Label className="text-gray-300">عنوان الخلفية (اختياري)</Label>
+              <Input
+                value={newBackgroundTitle}
+                onChange={(e) => setNewBackgroundTitle(e.target.value)}
+                placeholder="مثال: خلفية المطعم"
+                className="bg-gray-700/50 border-gray-600 text-white"
+              />
+            </div>
+
+            {/* نوع الحركة */}
+            <div className="space-y-2">
+              <Label className="text-gray-300">نوع الحركة</Label>
+              <Select value={newBackgroundAnimation} onValueChange={setNewBackgroundAnimation}>
+                <SelectTrigger className="bg-gray-700/50 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="fade">تلاشي (Fade)</SelectItem>
+                  <SelectItem value="zoom">تكبير (Zoom)</SelectItem>
+                  <SelectItem value="kenburns">كين بيرنز (Ken Burns)</SelectItem>
+                  <SelectItem value="slide">انزلاق (Slide)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowAddBackground(false);
+                setNewBackgroundUrl('');
+                setNewBackgroundTitle('');
+                setSelectedBackgroundFile(null);
+                setBackgroundPreviewUrl('');
+              }} 
+              className="border-gray-600"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              onClick={async () => {
+                if (backgroundUploadMode === 'url') {
+                  await addNewBackground();
+                } else if (selectedBackgroundFile) {
+                  await uploadBackgroundFromDevice(selectedBackgroundFile);
+                  setSelectedBackgroundFile(null);
+                  setBackgroundPreviewUrl('');
+                } else {
+                  toast.error('الرجاء اختيار صورة');
+                }
+              }}
+              disabled={backgroundsLoading || (backgroundUploadMode === 'url' ? !newBackgroundUrl : !selectedBackgroundFile)}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {backgroundsLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                  جاري الرفع...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 ml-2" />
+                  إضافة الخلفية
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
