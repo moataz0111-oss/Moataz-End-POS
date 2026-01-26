@@ -2253,6 +2253,222 @@ export default function SuperAdmin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Modal: إعدادات الفواتير */}
+      <Dialog open={showInvoiceSettings} onOpenChange={setShowInvoiceSettings}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl flex items-center gap-2">
+              <Receipt className="h-5 w-5 text-purple-400" />
+              إعدادات الفواتير
+            </DialogTitle>
+            <DialogDescription className="text-gray-400">
+              تخصيص مظهر ومحتوى الفواتير لجميع العملاء
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-6">
+            {/* شعار النظام */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-green-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                <ImageIcon className="h-4 w-4" />
+                شعار النظام (يظهر في جميع الفواتير)
+              </h3>
+              <div className="flex items-center gap-4">
+                <div className="w-24 h-24 bg-gray-700/50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-600">
+                  {invoiceSettings.system_logo_url ? (
+                    <img 
+                      src={invoiceSettings.system_logo_url.startsWith('/api') 
+                        ? `${API}${invoiceSettings.system_logo_url.replace('/api', '')}` 
+                        : invoiceSettings.system_logo_url} 
+                      alt="Logo" 
+                      className="w-full h-full object-contain p-2"
+                    />
+                  ) : (
+                    <ImageIcon className="h-8 w-8 text-gray-500" />
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <Input
+                    type="text"
+                    placeholder="رابط الشعار (URL)"
+                    value={invoiceSettings.system_logo_url || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_logo_url: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600 text-white"
+                  />
+                  <p className="text-xs text-gray-500">أدخل رابط صورة الشعار أو قم برفع صورة</p>
+                </div>
+              </div>
+            </div>
+
+            {/* بيانات الاتصال */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-blue-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                <Phone className="h-4 w-4" />
+                بيانات الاتصال
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-300">هاتف النظام 1</Label>
+                  <Input
+                    type="text"
+                    placeholder="01234567890"
+                    value={invoiceSettings.system_phone || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_phone: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600 text-white"
+                    dir="ltr"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">هاتف النظام 2</Label>
+                  <Input
+                    type="text"
+                    placeholder="01234567890"
+                    value={invoiceSettings.system_phone2 || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_phone2: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600 text-white"
+                    dir="ltr"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">البريد الإلكتروني</Label>
+                  <Input
+                    type="email"
+                    placeholder="info@example.com"
+                    value={invoiceSettings.system_email || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_email: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600 text-white"
+                    dir="ltr"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">الموقع الإلكتروني</Label>
+                  <Input
+                    type="url"
+                    placeholder="https://example.com"
+                    value={invoiceSettings.system_website || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_website: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600 text-white"
+                    dir="ltr"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* محتوى الفاتورة */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-yellow-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                <FileText className="h-4 w-4" />
+                محتوى الفاتورة
+              </h3>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-300">رسالة الشكر (أسفل الفاتورة)</Label>
+                  <Input
+                    type="text"
+                    placeholder="شكراً لزيارتكم"
+                    value={invoiceSettings.thank_you_message || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, thank_you_message: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600 text-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-300">نص إضافي في التذييل</Label>
+                  <Input
+                    type="text"
+                    placeholder="مثال: تابعونا على مواقع التواصل"
+                    value={invoiceSettings.footer_text || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, footer_text: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600 text-white"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* خيارات العرض */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-purple-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                <Settings className="h-4 w-4" />
+                خيارات العرض
+              </h3>
+              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                <div>
+                  <p className="font-medium">إظهار شعار وبيانات النظام في الفواتير</p>
+                  <p className="text-sm text-gray-400">سيظهر الشعار وبيانات الاتصال في جميع فواتير العملاء</p>
+                </div>
+                <Switch
+                  checked={invoiceSettings.show_system_branding}
+                  onCheckedChange={(checked) => setInvoiceSettings({...invoiceSettings, show_system_branding: checked})}
+                />
+              </div>
+            </div>
+
+            {/* معاينة الفاتورة */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-green-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                <Eye className="h-4 w-4" />
+                معاينة الفاتورة
+              </h3>
+              <div className="bg-white text-black p-4 rounded-lg text-center" dir="rtl">
+                {invoiceSettings.show_system_branding && (
+                  <>
+                    {invoiceSettings.system_logo_url && (
+                      <img 
+                        src={invoiceSettings.system_logo_url.startsWith('/api') 
+                          ? `${API}${invoiceSettings.system_logo_url.replace('/api', '')}` 
+                          : invoiceSettings.system_logo_url}
+                        alt="Logo" 
+                        className="h-12 mx-auto mb-2"
+                      />
+                    )}
+                    <p className="font-bold text-lg">اسم المطعم</p>
+                    <p className="text-sm text-gray-600">العنوان: شارع المثال، المدينة</p>
+                    {(invoiceSettings.system_phone || invoiceSettings.system_phone2) && (
+                      <p className="text-sm text-gray-600">
+                        هاتف: {invoiceSettings.system_phone || '-'} 
+                        {invoiceSettings.system_phone2 && ` / ${invoiceSettings.system_phone2}`}
+                      </p>
+                    )}
+                  </>
+                )}
+                <hr className="my-2" />
+                <div className="text-right text-sm">
+                  <div className="flex justify-between">
+                    <span>2x</span>
+                    <span>برجر لحم</span>
+                    <span>120 ج.م</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>1x</span>
+                    <span>بطاطس</span>
+                    <span>30 ج.م</span>
+                  </div>
+                </div>
+                <hr className="my-2" />
+                <div className="flex justify-between font-bold">
+                  <span>الإجمالي:</span>
+                  <span>150 ج.م</span>
+                </div>
+                <hr className="my-2" />
+                <p className="text-sm font-medium">{invoiceSettings.thank_you_message || 'شكراً لزيارتكم'}</p>
+                {invoiceSettings.footer_text && (
+                  <p className="text-xs text-gray-500 mt-1">{invoiceSettings.footer_text}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowInvoiceSettings(false)} className="border-gray-600">
+              إلغاء
+            </Button>
+            <Button onClick={saveInvoiceSettings} className="bg-green-600 hover:bg-green-700">
+              <Check className="h-4 w-4 ml-2" />
+              حفظ الإعدادات
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
