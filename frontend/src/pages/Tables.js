@@ -75,20 +75,24 @@ export default function Tables() {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const [tablesRes, branchesRes] = await Promise.all([
-        axios.get(`${API}/tables`, { params: { branch_id: selectedBranch } }),
+        axios.get(`${API}/tables`, { params: { branch_id: selectedBranch || undefined } }),
         axios.get(`${API}/branches`)
       ]);
       
-      setTables(tablesRes.data);
-      setBranches(branchesRes.data);
+      setTables(tablesRes.data || []);
+      setBranches(branchesRes.data || []);
       
-      if (!selectedBranch && branchesRes.data.length > 0) {
+      // تحديد الفرع الأول فقط إذا لم يكن محدداً وهناك فروع
+      if (!selectedBranch && branchesRes.data && branchesRes.data.length > 0) {
         setSelectedBranch(branchesRes.data[0].id);
       }
     } catch (error) {
       console.error('Failed to fetch tables:', error);
       toast.error('فشل في تحميل الطاولات');
+      setTables([]);
+      setBranches([]);
     } finally {
       setLoading(false);
     }
