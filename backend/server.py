@@ -2166,11 +2166,12 @@ async def create_category(category: CategoryCreate, current_user: dict = Depends
 
 @api_router.get("/categories", response_model=List[CategoryResponse])
 async def get_categories(current_user: dict = Depends(get_current_user)):
-    # Super Admin لا يرى فئات (ليس لديه مطعم)
+    # Super Admin يرى الفئات الخاصة به (tenant_id الخاص به)
     if current_user.get("role") == UserRole.SUPER_ADMIN:
-        return []
-    
-    query = build_tenant_query(current_user)  # فلترة حسب tenant_id
+        owner_tenant_id = current_user.get("tenant_id") or "default"
+        query = {"tenant_id": owner_tenant_id}
+    else:
+        query = build_tenant_query(current_user)  # فلترة حسب tenant_id
     categories = await db.categories.find(query, {"_id": 0}).sort("sort_order", 1).to_list(100)
     return categories
 
