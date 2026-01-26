@@ -7348,6 +7348,13 @@ async def update_tenant(tenant_id: str, updates: dict, background_tasks: Backgro
     if update_data:
         await db.tenants.update_one({"id": tenant_id}, {"$set": update_data})
     
+    # تحديث حالة المستخدمين عند تغيير is_active
+    if "is_active" in updates:
+        await db.users.update_many(
+            {"tenant_id": tenant_id},
+            {"$set": {"is_active": updates["is_active"]}}
+        )
+    
     # تحديث بيانات المستخدم الأدمن إذا تم تغيير البريد أو الاسم
     admin_update = {}
     if new_email and email_changed:
