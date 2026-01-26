@@ -255,12 +255,16 @@ export default function POS() {
 
   const fetchPendingOrders = async () => {
     try {
+      // تحديد الفرع النشط
+      const activeBranchId = getBranchIdForApi() || user?.branch_id;
+      const params = activeBranchId ? { branch_id: activeBranchId } : {};
+      
       // جلب جميع الطلبات غير المكتملة:
       // 1. طلبات بحالة pending أو preparing أو ready
       // 2. طلبات غير مدفوعة (payment_status = pending) لأي نوع
       const [activeRes, unpaidRes] = await Promise.all([
-        axios.get(`${API}/orders`, { params: { status: 'pending,preparing,ready' } }),
-        axios.get(`${API}/orders`, { params: { payment_status: 'pending' } })
+        axios.get(`${API}/orders`, { params: { ...params, status: 'pending,preparing,ready' } }),
+        axios.get(`${API}/orders`, { params: { ...params, payment_status: 'pending' } })
       ]);
       
       // دمج الطلبات وإزالة التكرارات
