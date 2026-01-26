@@ -1770,6 +1770,27 @@ export default function SuperAdmin() {
               </div>
             </div>
             
+            {/* حقل مدة الاشتراك - يظهر فقط للاشتراكات غير التجريبية */}
+            {newTenantForm.subscription_type !== 'trial' && newTenantForm.subscription_type !== 'demo' && (
+              <div className="space-y-2">
+                <Label>مدة الاشتراك</Label>
+                <Select 
+                  value={String(newTenantForm.subscription_duration)} 
+                  onValueChange={(v) => setNewTenantForm({...newTenantForm, subscription_duration: parseInt(v)})}
+                >
+                  <SelectTrigger className="bg-gray-700/50 border-gray-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectItem value="1">شهر واحد</SelectItem>
+                    <SelectItem value="3">3 أشهر</SelectItem>
+                    <SelectItem value="6">6 أشهر</SelectItem>
+                    <SelectItem value="12">سنة كاملة</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>الحد الأقصى للفروع</Label>
