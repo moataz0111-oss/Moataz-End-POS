@@ -2203,6 +2203,10 @@ async def create_product(product: ProductCreate, current_user: dict = Depends(ge
 
 @api_router.get("/products", response_model=List[ProductResponse])
 async def get_products(category_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    # Super Admin لا يرى منتجات (ليس لديه مطعم)
+    if current_user.get("role") == UserRole.SUPER_ADMIN:
+        return []
+    
     query = build_tenant_query(current_user)  # فلترة حسب tenant_id
     if category_id:
         query["category_id"] = category_id
