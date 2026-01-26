@@ -7894,19 +7894,27 @@ async def get_subscriptions_dashboard(current_user: dict = Depends(verify_super_
         elif tenant in already_expired:
             subscription_types[sub_type]["expired"] += 1
     
-    # حساب الإيرادات المتوقعة من التجديدات
-    # أسعار الاشتراكات (افتراضية - يمكن تعديلها من الإعدادات)
-    subscription_prices = {
-        "basic": {"monthly": 50000, "name": "أساسي"},      # 50,000 دينار/شهر
-        "premium": {"monthly": 100000, "name": "مميز"},    # 100,000 دينار/شهر
+    # جلب أسعار الاشتراكات من قاعدة البيانات
+    prices_doc = await db.settings.find_one({"type": "subscription_prices"}, {"_id": 0})
+    
+    # الأسعار الافتراضية بالدولار
+    default_prices = {
+        "basic": {"monthly": 25, "name": "أساسي"},       # 25$/شهر
+        "premium": {"monthly": 50, "name": "مميز"},      # 50$/شهر
         "trial": {"monthly": 0, "name": "تجريبي"},
         "demo": {"monthly": 0, "name": "عرض"}
     }
+    
+    if prices_doc and prices_doc.get("value"):
+        subscription_prices = prices_doc["value"]
+    else:
+        subscription_prices = default_prices
     
     expected_revenue = {
         "from_expiring": 0,
         "from_active": 0,
         "total_monthly": 0,
+        "currency": "USD",
         "details": []
     }
     
