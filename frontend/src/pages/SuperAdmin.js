@@ -2586,8 +2586,8 @@ export default function SuperAdmin() {
                       <p className="text-xs text-gray-400">تفعيل حركة الخلفيات</p>
                     </div>
                     <Switch
-                      checked={loginPageSettings.enable_animation}
-                      onCheckedChange={(checked) => setLoginPageSettings({...loginPageSettings, enable_animation: checked})}
+                      checked={backgroundSettings.animation_enabled}
+                      onCheckedChange={(checked) => setBackgroundSettings({...backgroundSettings, animation_enabled: checked})}
                     />
                   </div>
                   <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
@@ -2596,8 +2596,8 @@ export default function SuperAdmin() {
                       <p className="text-xs text-gray-400">تبديل الخلفيات تلقائياً</p>
                     </div>
                     <Switch
-                      checked={loginPageSettings.auto_change}
-                      onCheckedChange={(checked) => setLoginPageSettings({...loginPageSettings, auto_change: checked})}
+                      checked={backgroundSettings.auto_play}
+                      onCheckedChange={(checked) => setBackgroundSettings({...backgroundSettings, auto_play: checked})}
                     />
                   </div>
                 </div>
@@ -2606,8 +2606,8 @@ export default function SuperAdmin() {
                   <div className="space-y-2">
                     <Label className="text-gray-300">نوع الانتقال</Label>
                     <Select 
-                      value={loginPageSettings.transition_type} 
-                      onValueChange={(value) => setLoginPageSettings({...loginPageSettings, transition_type: value})}
+                      value={backgroundSettings.transition_type} 
+                      onValueChange={(value) => setBackgroundSettings({...backgroundSettings, transition_type: value})}
                     >
                       <SelectTrigger className="bg-gray-700/50 border-gray-600">
                         <SelectValue placeholder="اختر نوع الانتقال" />
@@ -2627,16 +2627,16 @@ export default function SuperAdmin() {
                       step="0.5"
                       min="0.5"
                       max="5"
-                      value={loginPageSettings.transition_duration}
-                      onChange={(e) => setLoginPageSettings({...loginPageSettings, transition_duration: parseFloat(e.target.value)})}
+                      value={backgroundSettings.transition_duration}
+                      onChange={(e) => setBackgroundSettings({...backgroundSettings, transition_duration: parseFloat(e.target.value)})}
                       className="bg-gray-700/50 border-gray-600 text-white"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-gray-300">حركة الشعار</Label>
                     <Select 
-                      value={loginPageSettings.logo_animation} 
-                      onValueChange={(value) => setLoginPageSettings({...loginPageSettings, logo_animation: value})}
+                      value={backgroundSettings.logo_animation} 
+                      onValueChange={(value) => setBackgroundSettings({...backgroundSettings, logo_animation: value})}
                     >
                       <SelectTrigger className="bg-gray-700/50 border-gray-600">
                         <SelectValue placeholder="اختر حركة الشعار" />
@@ -2664,19 +2664,19 @@ export default function SuperAdmin() {
                     <p className="text-xs text-gray-400">إظهار شعار مخصص في صفحة تسجيل الدخول</p>
                   </div>
                   <Switch
-                    checked={loginPageSettings.login_logo_enabled}
-                    onCheckedChange={(checked) => setLoginPageSettings({...loginPageSettings, login_logo_enabled: checked})}
+                    checked={backgroundSettings.show_logo}
+                    onCheckedChange={(checked) => setBackgroundSettings({...backgroundSettings, show_logo: checked})}
                   />
                 </div>
                 
-                {loginPageSettings.login_logo_enabled && (
+                {backgroundSettings.show_logo && (
                   <div className="flex items-center gap-4">
                     <div className="w-24 h-24 bg-gray-700/50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-600">
-                      {loginPageSettings.login_logo_url ? (
+                      {backgroundSettings.logo_url ? (
                         <img 
-                          src={loginPageSettings.login_logo_url.startsWith('/api') 
-                            ? `${API}${loginPageSettings.login_logo_url.replace('/api', '')}` 
-                            : loginPageSettings.login_logo_url} 
+                          src={backgroundSettings.logo_url.startsWith('/api') 
+                            ? `${API}${backgroundSettings.logo_url.replace('/api', '')}` 
+                            : backgroundSettings.logo_url} 
                           alt="Login Logo" 
                           className="w-full h-full object-contain p-2"
                         />
@@ -2688,8 +2688,8 @@ export default function SuperAdmin() {
                       <Input
                         type="text"
                         placeholder="رابط خارجي للشعار"
-                        value={loginPageSettings.login_logo_url || ''}
-                        onChange={(e) => setLoginPageSettings({...loginPageSettings, login_logo_url: e.target.value})}
+                        value={backgroundSettings.logo_url || ''}
+                        onChange={(e) => setBackgroundSettings({...backgroundSettings, logo_url: e.target.value})}
                         className="bg-gray-700/50 border-gray-600 text-white"
                         dir="ltr"
                       />
@@ -2708,23 +2708,41 @@ export default function SuperAdmin() {
                   <Palette className="h-4 w-4" />
                   ألوان صفحة الدخول
                 </h3>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">لون التحكم (Accent Color)</Label>
-                  <div className="flex items-center gap-3">
-                    <Input
-                      type="text"
-                      placeholder="rgba(147, 51, 234, 0.5)"
-                      value={loginPageSettings.accent_color || ''}
-                      onChange={(e) => setLoginPageSettings({...loginPageSettings, accent_color: e.target.value})}
-                      className="bg-gray-700/50 border-gray-600 text-white flex-1"
-                      dir="ltr"
-                    />
-                    <div 
-                      className="w-10 h-10 rounded-lg border-2 border-gray-600"
-                      style={{ backgroundColor: loginPageSettings.accent_color || 'rgba(147, 51, 234, 0.5)' }}
-                    />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">لون الغطاء (Overlay Color)</Label>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="text"
+                        placeholder="rgba(0, 0, 0, 0.5)"
+                        value={backgroundSettings.overlay_color || ''}
+                        onChange={(e) => setBackgroundSettings({...backgroundSettings, overlay_color: e.target.value})}
+                        className="bg-gray-700/50 border-gray-600 text-white flex-1"
+                        dir="ltr"
+                      />
+                      <div 
+                        className="w-10 h-10 rounded-lg border-2 border-gray-600"
+                        style={{ backgroundColor: backgroundSettings.overlay_color || 'rgba(0, 0, 0, 0.5)' }}
+                      />
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500">استخدم صيغة RGBA مثل: rgba(147, 51, 234, 0.5)</p>
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">لون النص</Label>
+                    <div className="flex items-center gap-3">
+                      <Input
+                        type="text"
+                        placeholder="#ffffff"
+                        value={backgroundSettings.text_color || ''}
+                        onChange={(e) => setBackgroundSettings({...backgroundSettings, text_color: e.target.value})}
+                        className="bg-gray-700/50 border-gray-600 text-white flex-1"
+                        dir="ltr"
+                      />
+                      <div 
+                        className="w-10 h-10 rounded-lg border-2 border-gray-600"
+                        style={{ backgroundColor: backgroundSettings.text_color || '#ffffff' }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -2732,28 +2750,48 @@ export default function SuperAdmin() {
               <div className="space-y-4">
                 <h3 className="font-bold text-yellow-400 flex items-center gap-2 border-b border-gray-700 pb-2">
                   <ImageIcon className="h-4 w-4" />
-                  الخلفيات ({loginPageSettings.backgrounds?.length || 0})
+                  الخلفيات ({backgroundSettings.backgrounds?.length || 0})
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
-                  {(loginPageSettings.backgrounds || []).map((bg, idx) => (
-                    <div key={idx} className="relative group">
+                  {(backgroundSettings.backgrounds || []).map((bg, idx) => (
+                    <div key={bg.id || idx} className="relative group">
                       <img 
-                        src={bg.url} 
-                        alt={bg.name} 
+                        src={bg.url?.startsWith('/api') ? `${API}${bg.url.replace('/api', '')}` : bg.url} 
+                        alt={bg.title || bg.name} 
                         className="w-full h-24 object-cover rounded-lg"
                       />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                        <Button size="sm" variant="destructive" className="h-8">
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="destructive" 
+                          className="h-8"
+                          onClick={() => {
+                            if (window.confirm('هل تريد حذف هذه الخلفية؟')) {
+                              setBackgroundSettings(prev => ({
+                                ...prev,
+                                backgrounds: prev.backgrounds.filter((_, i) => i !== idx)
+                              }));
+                            }
+                          }}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      <p className="text-xs text-center mt-1 text-gray-400">{bg.name}</p>
-                      {bg.active && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 p-1 rounded-b-lg">
+                        <p className="text-xs text-center text-white truncate">{bg.title || bg.name || 'خلفية'}</p>
+                      </div>
+                      {bg.enabled !== false && (
                         <Badge className="absolute top-1 right-1 bg-green-500 text-xs">مفعّل</Badge>
                       )}
+                      <div className="absolute top-1 left-1">
+                        <Badge className="bg-blue-500/80 text-xs">{bg.animation || 'fade'}</Badge>
+                      </div>
                     </div>
                   ))}
-                  <div className="w-full h-24 bg-gray-700/50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-600 cursor-pointer hover:border-purple-500 transition-colors">
+                  <div 
+                    className="w-full h-24 bg-gray-700/50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-600 cursor-pointer hover:border-purple-500 transition-colors"
+                    onClick={() => setShowAddBackground(true)}
+                  >
                     <div className="text-center">
                       <Plus className="h-6 w-6 text-gray-500 mx-auto" />
                       <p className="text-xs text-gray-500 mt-1">إضافة خلفية</p>
@@ -2768,7 +2806,15 @@ export default function SuperAdmin() {
             <Button variant="outline" onClick={() => setShowInvoiceSettings(false)} className="border-gray-600">
               إلغاء
             </Button>
-            <Button onClick={() => { saveInvoiceSettings(); saveLoginPageSettings(); }} className="bg-green-600 hover:bg-green-700">
+            <Button onClick={async () => { 
+              await saveInvoiceSettings(); 
+              try {
+                await axios.put(`${API}/login-backgrounds`, backgroundSettings);
+                toast.success('تم حفظ إعدادات الخلفيات');
+              } catch (error) {
+                toast.error('فشل في حفظ إعدادات الخلفيات');
+              }
+            }} className="bg-green-600 hover:bg-green-700">
               <Check className="h-4 w-4 ml-2" />
               حفظ جميع الإعدادات
             </Button>
