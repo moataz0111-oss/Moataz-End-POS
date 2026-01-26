@@ -1351,8 +1351,8 @@ export default function SuperAdmin() {
               onClick={() => setShowInvoiceSettings(true)}
               className="border-gray-600 text-gray-300 hover:bg-gray-700"
             >
-              <Receipt className="h-4 w-4 ml-2" />
-              إعدادات الفواتير
+              <Palette className="h-4 w-4 ml-2" />
+              الهوية البصرية
             </Button>
             <span className="text-sm text-gray-400">{user?.full_name}</span>
             <Button variant="ghost" size="icon" onClick={logout} className="text-gray-400 hover:text-white">
