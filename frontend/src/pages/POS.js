@@ -67,6 +67,7 @@ const API = API_URL;
 
 export default function POS() {
   const { user } = useAuth();
+  const { selectedBranchId, branches, getBranchIdForApi } = useBranch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
