@@ -7709,6 +7709,133 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
         "recent_tenants": recent_tenants
     }
 
+# ==================== نقاط نهاية الإشعارات ====================
+
+@api_router.get("/super-admin/notifications")
+async def get_notifications(
+    current_user: dict = Depends(verify_super_admin),
+    unread_only: bool = False,
+    limit: int = 50
+):
+    """جلب إشعارات المالك"""
+    query = {}
+    if unread_only:
+        query["is_read"] = False
+    
+    notifications = await db.notifications.find(
+        query, {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    # عدد الإشعارات غير المقروءة
+    unread_count = await db.notifications.count_documents({"is_read": False})
+    
+    return {
+        "notifications": notifications,
+        "unread_count": unread_count
+    }
+
+@api_router.put("/super-admin/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: dict = Depends(verify_super_admin)):
+    """تعليم إشعار كمقروء"""
+    result = await db.notifications.update_one(
+        {"id": notification_id},
+        {"$set": {"is_read": True}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="الإشعار غير موجود")
+    return {"message": "تم تعليم الإشعار كمقروء"}
+
+@api_router.put("/super-admin/notifications/read-all")
+async def mark_all_notifications_read(current_user: dict = Depends(verify_super_admin)):
+    """تعليم جميع الإشعارات كمقروءة"""
+    await db.notifications.update_many(
+        {"is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    return {"message": "تم تعليم جميع الإشعارات كمقروءة"}
+
+@api_router.delete("/super-admin/notifications/{notification_id}")
+async def delete_notification(notification_id: str, current_user: dict = Depends(verify_super_admin)):
+    """حذف إشعار"""
+    result = await db.notifications.delete_one({"id": notification_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="الإشعار غير موجود")
+    return {"message": "تم حذف الإشعار"}
+
+@api_router.delete("/super-admin/notifications")
+async def clear_all_notifications(current_user: dict = Depends(verify_super_admin)):
+    """حذف جميع الإشعارات"""
+    await db.notifications.delete_many({})
+    return {"message": "تم حذف جميع الإشعارات"}
+
+# ==================== إعدادات الإشعارات ====================
+
+@api_router.get("/super-admin/notification-settings")
+async def get_notification_settings(current_user: dict = Depends(verify_super_admin)):
+    """جلب إعدادات الإشعارات"""
+    settings = await db.settings.find_one({"type": "notification_settings"}, {"_id": 0})
+    
+    if not settings:
+        # إعدادات افتراضية
+        default_settings = {
+            "type": "notification_settings",
+            "value": {
+                "days_before_expiry": 7,
+                "email_notifications": True,
+                "push_notifications": True,
+                "notify_new_tenant": True,
+                "notify_tenant_status": True
+            }
+        }
+        await db.settings.insert_one(default_settings)
+        return default_settings["value"]
+    
+    return settings.get("value", {})
+
+@api_router.put("/super-admin/notification-settings")
+async def update_notification_settings(settings: NotificationSettings, current_user: dict = Depends(verify_super_admin)):
+    """تحديث إعدادات الإشعارات"""
+    await db.settings.update_one(
+        {"type": "notification_settings"},
+        {"$set": {"value": settings.model_dump()}},
+        upsert=True
+    )
+    return {"message": "تم حفظ إعدادات الإشعارات", "settings": settings.model_dump()}
+
+# ==================== فحص الاشتراكات المنتهية ====================
+
+@api_router.get("/super-admin/expiring-subscriptions")
+async def get_expiring_subscriptions(current_user: dict = Depends(verify_super_admin)):
+    """جلب الاشتراكات القريبة من الانتهاء"""
+    
+    # جلب إعدادات الإشعارات
+    settings = await db.settings.find_one({"type": "notification_settings"}, {"_id": 0})
+    days_before = 7
+    if settings and settings.get("value"):
+        days_before = settings["value"].get("days_before_expiry", 7)
+    
+    # حساب التاريخ المستهدف
+    target_date = (datetime.now(timezone.utc) + timedelta(days=days_before)).isoformat()
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # جلب الاشتراكات القريبة من الانتهاء
+    expiring = await db.tenants.find({
+        "is_active": True,
+        "expires_at": {"$lte": target_date, "$gte": now}
+    }, {"_id": 0}).to_list(100)
+    
+    # جلب الاشتراكات المنتهية بالفعل
+    expired = await db.tenants.find({
+        "is_active": True,
+        "expires_at": {"$lt": now}
+    }, {"_id": 0}).to_list(100)
+    
+    return {
+        "expiring_soon": expiring,
+        "already_expired": expired,
+        "days_before_alert": days_before
+    }
+
 @api_router.post("/super-admin/impersonate/{tenant_id}")
 async def impersonate_tenant(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
     """الدخول كعميل - للمشاهدة والتحكم المباشر"""
