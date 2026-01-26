@@ -7098,6 +7098,7 @@ async def create_tenant(tenant: TenantCreate, background_tasks: BackgroundTasks,
         "max_branches": tenant.max_branches,
         "max_users": tenant.max_users,
         "is_active": True,
+        "is_demo": getattr(tenant, 'is_demo', False),
         "created_at": datetime.now(timezone.utc).isoformat(),
         "expires_at": expires_at,
         "created_by": current_user["id"]
