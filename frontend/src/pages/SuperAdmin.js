@@ -820,6 +820,32 @@ export default function SuperAdmin() {
     }
   };
 
+  // رفع شعار النظام
+  const uploadSystemLogo = async (file) => {
+    if (!file) return;
+    
+    setUploadingSystemLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await axios.post(`${API}/upload/logo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const logoUrl = res.data.url || res.data.logo_url;
+      setInvoiceSettings({...invoiceSettings, system_logo_url: logoUrl});
+      setSystemLogoPreview('');
+      setSystemLogoFile(null);
+      toast.success('تم رفع الشعار بنجاح');
+    } catch (error) {
+      toast.error('فشل في رفع الشعار: ' + (error.response?.data?.detail || error.message));
+      console.error('Upload error:', error);
+    } finally {
+      setUploadingSystemLogo(false);
+    }
+  };
+
   const fetchLoginPageSettings = async () => {
     try {
       const res = await axios.get(`${API}/system/login-page-settings`);
