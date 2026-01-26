@@ -40,6 +40,16 @@ import {
 
 const API = API_URL;
 
+// أقسام الطاولات الافتراضية
+const DEFAULT_SECTIONS = [
+  'داخلي',
+  'خارجي',
+  'تراس',
+  'بلكون',
+  'طابق أرضي',
+  'VIP',
+];
+
 export default function Tables() {
   const { user, hasRole, hasPermission } = useAuth();
   const navigate = useNavigate();
@@ -50,7 +60,9 @@ export default function Tables() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTable, setEditingTable] = useState(null);
-  const [formData, setFormData] = useState({ number: '', capacity: 4, section: '' });
+  const [formData, setFormData] = useState({ number: '', capacity: 4, section: 'داخلي' });
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [tableToDelete, setTableToDelete] = useState(null);
   
   // حالات تحويل الطاولة
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
