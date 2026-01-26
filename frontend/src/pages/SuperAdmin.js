@@ -1281,7 +1281,7 @@ export default function SuperAdmin() {
         {/* Tenants List */}
         <Card className="bg-gray-800/50 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">العملاء</CardTitle>
+            <CardTitle className="text-lg">إدارة العملاء</CardTitle>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -1302,52 +1302,194 @@ export default function SuperAdmin() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {filteredTenants.length === 0 ? (
-                <p className="text-center text-gray-400 py-8">لا يوجد عملاء</p>
-              ) : (
-                filteredTenants.map((tenant) => (
-                  <div 
-                    key={tenant.id} 
-                    className="flex items-center justify-between p-4 bg-gray-700/30 rounded-lg hover:bg-gray-700/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-3 h-3 rounded-full ${tenant.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
-                      <div>
-                        <h3 className="font-bold">{tenant.name || tenant.slug || 'بدون اسم'}</h3>
-                        <div className="flex items-center gap-3 text-sm text-gray-400">
-                          <span className="flex items-center gap-1">
-                            <Mail className="h-3 w-3" />
-                            {tenant.owner_email || '-'}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Globe className="h-3 w-3" />
-                            /{tenant.slug || '-'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-400">المستخدمين</p>
-                        <p className="font-bold">{tenant.users_count || 0}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-400">الفروع</p>
-                        <p className="font-bold">{tenant.branches_count || 0}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-400">الطلبات</p>
-                        <p className="font-bold">{tenant.orders_count || 0}</p>
-                      </div>
-                      
-                      {getSubscriptionBadge(tenant.subscription_type)}
-                      
-                      <div className="flex items-center gap-1">
-                        {/* عرض مباشر */}
-                        <Button 
-                          variant="ghost" 
+            {/* تبويبات لفصل العملاء الفعليين عن الحسابات التجريبية */}
+            <Tabs defaultValue="active" className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4 bg-gray-700/50">
+                <TabsTrigger value="active" className="data-[state=active]:bg-green-600">
+                  <Users className="h-4 w-4 ml-2" />
+                  العملاء الفعليين ({tenants.filter(t => !t.is_demo && t.subscription_type !== 'demo').length})
+                </TabsTrigger>
+                <TabsTrigger value="demo" className="data-[state=active]:bg-yellow-600">
+                  <Play className="h-4 w-4 ml-2" />
+                  الحسابات التجريبية ({tenants.filter(t => t.is_demo || t.subscription_type === 'demo').length})
+                </TabsTrigger>
+                <TabsTrigger value="all" className="data-[state=active]:bg-purple-600">
+                  <Layers className="h-4 w-4 ml-2" />
+                  الكل ({tenants.length})
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* العملاء الفعليين */}
+              <TabsContent value="active">
+                <div className="space-y-3">
+                  {filteredTenants.filter(t => !t.is_demo && t.subscription_type !== 'demo').length === 0 ? (
+                    <p className="text-center text-gray-400 py-8">لا يوجد عملاء فعليين</p>
+                  ) : (
+                    filteredTenants.filter(t => !t.is_demo && t.subscription_type !== 'demo').map((tenant) => (
+                      <TenantCard key={tenant.id} tenant={tenant} />
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+              
+              {/* الحسابات التجريبية */}
+              <TabsContent value="demo">
+                <div className="space-y-3">
+                  {filteredTenants.filter(t => t.is_demo || t.subscription_type === 'demo').length === 0 ? (
+                    <p className="text-center text-gray-400 py-8">لا توجد حسابات تجريبية</p>
+                  ) : (
+                    filteredTenants.filter(t => t.is_demo || t.subscription_type === 'demo').map((tenant) => (
+                      <TenantCard key={tenant.id} tenant={tenant} isDemo />
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+              
+              {/* جميع العملاء */}
+              <TabsContent value="all">
+                <div className="space-y-3">
+                  {filteredTenants.length === 0 ? (
+                    <p className="text-center text-gray-400 py-8">لا يوجد عملاء</p>
+                  ) : (
+                    filteredTenants.map((tenant) => (
+                      <TenantCard key={tenant.id} tenant={tenant} isDemo={tenant.is_demo || tenant.subscription_type === 'demo'} />
+                    ))
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
+  // مكون بطاقة العميل
+  const TenantCard = ({ tenant, isDemo = false }) => (
+    <div 
+      className={`flex items-center justify-between p-4 rounded-lg hover:bg-gray-700/50 transition-colors ${
+        isDemo ? 'bg-yellow-900/20 border border-yellow-700/30' : 'bg-gray-700/30'
+      }`}
+    >
+      <div className="flex items-center gap-4">
+        <div className={`w-3 h-3 rounded-full ${tenant.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="font-bold">{tenant.name || tenant.slug || 'بدون اسم'}</h3>
+            {isDemo && (
+              <Badge className="bg-yellow-500/20 text-yellow-400 text-xs">
+                تجريبي
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-3 text-sm text-gray-400">
+            <span className="flex items-center gap-1">
+              <Mail className="h-3 w-3" />
+              {tenant.owner_email || '-'}
+            </span>
+            <span className="flex items-center gap-1">
+              <Globe className="h-3 w-3" />
+              /{tenant.slug || '-'}
+            </span>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex items-center gap-4">
+        <div className="text-center">
+          <p className="text-sm text-gray-400">المستخدمين</p>
+          <p className="font-bold">{tenant.users_count || 0}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm text-gray-400">الفروع</p>
+          <p className="font-bold">{tenant.branches_count || 0}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm text-gray-400">الطلبات</p>
+          <p className="font-bold">{tenant.orders_count || 0}</p>
+        </div>
+        
+        {getSubscriptionBadge(tenant.subscription_type)}
+        
+        <div className="flex items-center gap-1">
+          {/* عرض مباشر */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => handleLiveView(tenant)}
+            className="hover:bg-gray-600"
+            title="عرض مباشر"
+          >
+            <Activity className="h-4 w-4 text-green-400" />
+          </Button>
+          {/* التفاصيل */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => handleViewDetails(tenant)}
+            className="hover:bg-gray-600"
+            title="عرض التفاصيل"
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          {/* التعديل */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => handleEditTenant(tenant)}
+            className="hover:bg-gray-600"
+            title="تعديل"
+          >
+            <Edit className="h-4 w-4 text-blue-400" />
+          </Button>
+          {/* الميزات */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => handleManageFeatures(tenant)}
+            className="hover:bg-gray-600"
+            title="إدارة الميزات"
+          >
+            <Layers className="h-4 w-4 text-purple-400" />
+          </Button>
+          {/* إعادة تعيين كلمة المرور */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => { setSelectedTenant(tenant); setShowResetPassword(true); }}
+            className="hover:bg-gray-600"
+            title="إعادة تعيين كلمة المرور"
+          >
+            <Key className="h-4 w-4 text-yellow-400" />
+          </Button>
+          {/* تفعيل/تعطيل */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => handleToggleActive(tenant)}
+            className="hover:bg-gray-600"
+            title={tenant.is_active ? 'تعطيل' : 'تفعيل'}
+          >
+            {tenant.is_active ? (
+              <PowerOff className="h-4 w-4 text-red-400" />
+            ) : (
+              <Power className="h-4 w-4 text-green-400" />
+            )}
+          </Button>
+          {/* الحذف */}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => { setSelectedTenant(tenant); setShowDeleteConfirm(true); }}
+            className="hover:bg-red-600"
+            title="حذف"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  ); 
                           size="icon"
                           onClick={() => openLiveView(tenant)}
                           className="text-green-400 hover:text-green-300 hover:bg-green-500/10"
