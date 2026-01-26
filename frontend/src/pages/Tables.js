@@ -454,6 +454,20 @@ export default function Tables() {
                         إلغاء الحجز
                       </Button>
                     )}
+                    
+                    {/* زر حذف الطاولة - للمتاحة فقط */}
+                    {table.status === 'available' && (hasRole(['admin', 'manager']) || hasPermission('tables')) && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="w-full mt-2 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                        onClick={(e) => openDeleteConfirm(table, e)}
+                        data-testid={`delete-table-${table.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 ml-1" />
+                        حذف
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               ))}
