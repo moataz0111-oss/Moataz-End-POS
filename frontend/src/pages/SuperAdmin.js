@@ -1206,26 +1206,45 @@ export default function SuperAdmin() {
         {getSubscriptionBadge(tenant.subscription_type)}
         
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => handleLiveView(tenant)} className="hover:bg-gray-600" title="عرض مباشر">
+          {/* عرض مباشر */}
+          <Button variant="ghost" size="icon" onClick={() => openLiveView(tenant)} className="hover:bg-gray-600" title="عرض مباشر">
             <Activity className="h-4 w-4 text-green-400" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => handleViewDetails(tenant)} className="hover:bg-gray-600" title="التفاصيل">
-            <Eye className="h-4 w-4" />
+          {/* الدخول كعميل */}
+          <Button variant="ghost" size="icon" onClick={() => impersonateTenant(tenant)} className="hover:bg-gray-600" title="الدخول كعميل">
+            <ExternalLink className="h-4 w-4 text-blue-400" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => handleEditTenant(tenant)} className="hover:bg-gray-600" title="تعديل">
-            <Edit className="h-4 w-4 text-blue-400" />
+          {/* تعديل */}
+          <Button variant="ghost" size="icon" onClick={() => openEditTenant(tenant)} className="hover:bg-gray-600" title="تعديل">
+            <Edit className="h-4 w-4 text-yellow-400" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => handleManageFeatures(tenant)} className="hover:bg-gray-600" title="الميزات">
-            <Layers className="h-4 w-4 text-purple-400" />
+          {/* الميزات والصلاحيات */}
+          <Button variant="ghost" size="icon" onClick={() => openFeaturesModal(tenant)} className="hover:bg-gray-600" title="الميزات والصلاحيات">
+            <Settings className="h-4 w-4 text-purple-400" />
           </Button>
+          {/* التفاصيل */}
+          <Button variant="ghost" size="icon" onClick={() => viewTenantDetails(tenant)} className="hover:bg-gray-600" title="التفاصيل">
+            <Eye className="h-4 w-4 text-gray-400" />
+          </Button>
+          {/* كلمة المرور */}
           <Button variant="ghost" size="icon" onClick={() => { setSelectedTenant(tenant); setShowResetPassword(true); }} className="hover:bg-gray-600" title="كلمة المرور">
-            <Key className="h-4 w-4 text-yellow-400" />
+            <Key className="h-4 w-4 text-gray-400" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => handleToggleActive(tenant)} className="hover:bg-gray-600" title={tenant.is_active ? 'تعطيل' : 'تفعيل'}>
-            {tenant.is_active ? <PowerOff className="h-4 w-4 text-red-400" /> : <Power className="h-4 w-4 text-green-400" />}
+          {/* تفعيل/تعطيل */}
+          <Button variant="ghost" size="icon" onClick={() => toggleTenantStatus(tenant)} className="hover:bg-gray-600" title={tenant.is_active ? 'تعطيل' : 'تفعيل'}>
+            {tenant.is_active ? <Power className="h-4 w-4 text-green-400" /> : <PowerOff className="h-4 w-4 text-red-400" />}
           </Button>
+          {/* تصفير المبيعات */}
+          <Button variant="ghost" size="icon" onClick={() => { setSelectedTenant(tenant); setShowResetSalesConfirm(true); }} className="hover:bg-gray-600" title="تصفير المبيعات">
+            <RotateCcw className="h-4 w-4 text-orange-400" />
+          </Button>
+          {/* تصفير المخزون */}
+          <Button variant="ghost" size="icon" onClick={() => { setSelectedTenant(tenant); setShowResetInventoryConfirm(true); }} className="hover:bg-gray-600" title="تصفير المخزون">
+            <Package className="h-4 w-4 text-purple-400" />
+          </Button>
+          {/* حذف */}
           <Button variant="ghost" size="icon" onClick={() => { setSelectedTenant(tenant); setShowDeleteConfirm(true); }} className="hover:bg-red-600" title="حذف">
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-4 w-4 text-red-400" />
           </Button>
         </div>
       </div>
