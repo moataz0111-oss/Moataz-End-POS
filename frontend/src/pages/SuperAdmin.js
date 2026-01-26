@@ -1259,11 +1259,23 @@ export default function SuperAdmin() {
   const getSubscriptionBadge = (type) => {
     const styles = {
       trial: 'bg-yellow-500/20 text-yellow-400',
+      demo: 'bg-gray-500/20 text-gray-400',
+      bronze: 'bg-amber-600/20 text-amber-400',
+      silver: 'bg-gray-400/20 text-gray-300',
+      gold: 'bg-yellow-500/20 text-yellow-400',
       basic: 'bg-blue-500/20 text-blue-400',
       premium: 'bg-purple-500/20 text-purple-400'
     };
-    const labels = { trial: 'تجريبي', basic: 'أساسي', premium: 'مميز' };
-    return <Badge className={styles[type]}>{labels[type]}</Badge>;
+    const labels = { 
+      trial: 'تجريبي', 
+      demo: 'عرض',
+      bronze: '🥉 برونزية', 
+      silver: '🥈 فضية', 
+      gold: '🥇 ذهبية',
+      basic: 'أساسي', 
+      premium: 'مميز' 
+    };
+    return <Badge className={styles[type] || 'bg-gray-500/20 text-gray-400'}>{labels[type] || type}</Badge>;
   };
 
   const getStatusBadge = (status) => {
