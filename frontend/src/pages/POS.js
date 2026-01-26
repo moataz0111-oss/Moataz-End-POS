@@ -1061,10 +1061,39 @@ export default function POS() {
           
           {orderType === 'dine_in' && (
             <div className="space-y-2">
+              {/* اختيار القسم */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                <button
+                  onClick={() => { playClick(); setSelectedTableSection(null); }}
+                  className={`px-3 py-1 text-xs rounded-full transition-all ${
+                    selectedTableSection === null 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  }`}
+                >
+                  الكل ({tables.length})
+                </button>
+                {[...new Set(tables.map(t => t.section).filter(Boolean))].map(section => (
+                  <button
+                    key={section}
+                    onClick={() => { playClick(); setSelectedTableSection(section); }}
+                    className={`px-3 py-1 text-xs rounded-full transition-all ${
+                      selectedTableSection === section 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {section} ({tables.filter(t => t.section === section).length})
+                  </button>
+                ))}
+              </div>
+              
               <p className="text-sm text-muted-foreground mb-2">اختر طاولة:</p>
               <div className="max-h-48 overflow-y-auto border border-border/50 rounded-lg p-2 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-muted/20">
                 <div className="grid grid-cols-5 gap-2">
-                  {tables.map(table => {
+                  {tables
+                    .filter(table => !selectedTableSection || table.section === selectedTableSection)
+                    .map(table => {
                     const isOccupied = table.status === 'occupied';
                     const isReserved = table.status === 'reserved';
                     const isAvailable = table.status === 'available';
@@ -1094,6 +1123,7 @@ export default function POS() {
                           ${isOccupied ? 'hover:ring-2 hover:ring-red-400 cursor-pointer' : ''}
                           ${isReserved ? 'cursor-not-allowed opacity-90' : ''}
                         `}
+                        title={table.section || 'عام'}
                         data-testid={`table-btn-${table.number}`}
                       >
                         {table.number}
@@ -1116,12 +1146,12 @@ export default function POS() {
                   محجوزة
                 </span>
                 <span className="text-muted-foreground mr-auto">
-                  ({tables.length} طاولة)
+                  ({selectedTableSection ? tables.filter(t => t.section === selectedTableSection).length : tables.length} طاولة)
                 </span>
               </div>
               {selectedTable && (
                 <p className="text-xs text-primary mt-2">
-                  ✓ تم اختيار طاولة {tables.find(t => t.id === selectedTable)?.number}
+                  ✓ تم اختيار طاولة {tables.find(t => t.id === selectedTable)?.number} ({tables.find(t => t.id === selectedTable)?.section || 'عام'})
                 </p>
               )}
             </div>
