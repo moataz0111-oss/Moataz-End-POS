@@ -7976,6 +7976,65 @@ async def get_subscriptions_dashboard(current_user: dict = Depends(verify_super_
         "subscription_prices": subscription_prices
     }
 
+# ==================== أسعار الاشتراكات ====================
+
+class SubscriptionPriceUpdate(BaseModel):
+    """تحديث سعر اشتراك واحد"""
+    subscription_type: str  # basic, premium
+    monthly_price: float  # السعر الشهري بالدولار
+
+class SubscriptionPricesUpdate(BaseModel):
+    """تحديث جميع أسعار الاشتراكات"""
+    basic: float = 25  # السعر الشهري للأساسي بالدولار
+    premium: float = 50  # السعر الشهري للمميز بالدولار
+
+@api_router.get("/super-admin/subscription-prices")
+async def get_subscription_prices(current_user: dict = Depends(verify_super_admin)):
+    """جلب أسعار الاشتراكات"""
+    prices_doc = await db.settings.find_one({"type": "subscription_prices"}, {"_id": 0})
+    
+    # الأسعار الافتراضية بالدولار
+    default_prices = {
+        "basic": {"monthly": 25, "name": "أساسي"},
+        "premium": {"monthly": 50, "name": "مميز"},
+        "trial": {"monthly": 0, "name": "تجريبي"},
+        "demo": {"monthly": 0, "name": "عرض"}
+    }
+    
+    if prices_doc and prices_doc.get("value"):
+        return {
+            "prices": prices_doc["value"],
+            "currency": "USD"
+        }
+    
+    return {
+        "prices": default_prices,
+        "currency": "USD"
+    }
+
+@api_router.put("/super-admin/subscription-prices")
+async def update_subscription_prices(prices: SubscriptionPricesUpdate, current_user: dict = Depends(verify_super_admin)):
+    """تحديث أسعار الاشتراكات بالدولار"""
+    
+    new_prices = {
+        "basic": {"monthly": prices.basic, "name": "أساسي"},
+        "premium": {"monthly": prices.premium, "name": "مميز"},
+        "trial": {"monthly": 0, "name": "تجريبي"},
+        "demo": {"monthly": 0, "name": "عرض"}
+    }
+    
+    await db.settings.update_one(
+        {"type": "subscription_prices"},
+        {"$set": {"value": new_prices, "updated_at": datetime.now(timezone.utc).isoformat()}},
+        upsert=True
+    )
+    
+    return {
+        "message": "تم تحديث أسعار الاشتراكات",
+        "prices": new_prices,
+        "currency": "USD"
+    }
+
 @api_router.post("/super-admin/impersonate/{tenant_id}")
 async def impersonate_tenant(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
     """الدخول كعميل - للمشاهدة والتحكم المباشر"""
