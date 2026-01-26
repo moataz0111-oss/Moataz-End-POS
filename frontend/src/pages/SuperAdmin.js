@@ -73,6 +73,7 @@ import {
   X,
   Receipt,
   Loader2,
+  Crop,
   // Icons for features modal
   Monitor,
   LayoutGrid,
