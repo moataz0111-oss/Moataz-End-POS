@@ -991,6 +991,42 @@ class TenantResponse(BaseModel):
     created_at: str
     expires_at: Optional[str] = None
     logo_url: Optional[str] = None
+    subscription_duration: Optional[int] = None  # مدة الاشتراك بالأشهر
+
+# ==================== نظام الإشعارات ====================
+
+class NotificationType(str, Enum):
+    NEW_TENANT = "new_tenant"  # عميل جديد
+    SUBSCRIPTION_EXPIRING = "subscription_expiring"  # اشتراك قارب على الانتهاء
+    SUBSCRIPTION_EXPIRED = "subscription_expired"  # اشتراك انتهى
+    TENANT_ACTIVATED = "tenant_activated"  # تفعيل عميل
+    TENANT_DEACTIVATED = "tenant_deactivated"  # تعطيل عميل
+    SYSTEM = "system"  # إشعار نظام عام
+
+class NotificationCreate(BaseModel):
+    type: str
+    title: str
+    message: str
+    tenant_id: Optional[str] = None
+    data: Optional[dict] = None
+
+class NotificationResponse(BaseModel):
+    id: str
+    type: str
+    title: str
+    message: str
+    tenant_id: Optional[str] = None
+    data: Optional[dict] = None
+    is_read: bool = False
+    created_at: str
+
+class NotificationSettings(BaseModel):
+    """إعدادات الإشعارات للمالك"""
+    days_before_expiry: int = 7  # عدد الأيام قبل انتهاء الاشتراك للتنبيه
+    email_notifications: bool = True  # إرسال بريد إلكتروني
+    push_notifications: bool = True  # إشعارات المتصفح
+    notify_new_tenant: bool = True  # إشعار عند إضافة عميل جديد
+    notify_tenant_status: bool = True  # إشعار عند تفعيل/تعطيل عميل
 
 # User Models
 class UserCreate(BaseModel):
