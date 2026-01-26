@@ -2773,19 +2773,22 @@ export default function SuperAdmin() {
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   {(backgroundSettings.backgrounds || []).map((bg, idx) => {
-                    const bgUrl = bg.url?.startsWith('/api') 
-                      ? `${API}${bg.url.replace('/api', '')}` 
-                      : bg.url;
+                    const bgUrl = bg.image_url || bg.url;
+                    const fullUrl = bgUrl?.startsWith('/api') 
+                      ? `${API}${bgUrl.replace('/api', '')}` 
+                      : bgUrl;
+                    const animType = bg.animation_type || bg.animation || 'fade';
+                    const isEnabled = bg.is_active !== false && bg.enabled !== false;
                     return (
                       <div key={bg.id || idx} className="relative group rounded-xl overflow-hidden bg-gray-700/30">
                         {/* صورة الخلفية الكاملة */}
                         <div className="aspect-video relative">
                           <img 
-                            src={bgUrl} 
+                            src={fullUrl} 
                             alt={bg.title || bg.name} 
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              e.target.style.display = 'none';
+                              e.target.src = 'https://via.placeholder.com/400x225?text=No+Image';
                             }}
                           />
                           {/* Overlay عند التحويم */}
@@ -2798,12 +2801,12 @@ export default function SuperAdmin() {
                                 setBackgroundSettings(prev => ({
                                   ...prev,
                                   backgrounds: prev.backgrounds.map((b, i) => 
-                                    i === idx ? {...b, enabled: !b.enabled} : b
+                                    i === idx ? {...b, is_active: !isEnabled, enabled: !isEnabled} : b
                                   )
                                 }));
                               }}
                             >
-                              {bg.enabled !== false ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              {isEnabled ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </Button>
                             <Button 
                               size="sm" 
@@ -2821,13 +2824,13 @@ export default function SuperAdmin() {
                             </Button>
                           </div>
                           {/* علامات الحالة */}
-                          {bg.enabled !== false && (
+                          {isEnabled && (
                             <Badge className="absolute top-2 right-2 bg-green-500/90 text-white text-xs">مفعّل</Badge>
                           )}
-                          {bg.enabled === false && (
+                          {!isEnabled && (
                             <Badge className="absolute top-2 right-2 bg-red-500/90 text-white text-xs">معطّل</Badge>
                           )}
-                          <Badge className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs">{bg.animation || 'fade'}</Badge>
+                          <Badge className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs">{animType}</Badge>
                         </div>
                         {/* معلومات الخلفية */}
                         <div className="p-3 bg-gray-800/80">
