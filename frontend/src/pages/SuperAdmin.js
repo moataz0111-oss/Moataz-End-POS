@@ -376,11 +376,15 @@ export default function SuperAdmin() {
     setLoading(true);
     
     try {
-      const res = await axios.post(`${API}/super-admin/tenants`, newTenantForm);
+      const res = await axios.post(`${API}/super-admin/tenants`, {
+        ...newTenantForm,
+        is_demo: newTenantForm.is_demo
+      });
       toast.success('تم إنشاء العميل بنجاح');
       
       setCopiedCredentials(res.data.admin_credentials);
       fetchData();
+      setShowNewTenant(false);
       
       // Reset form
       setNewTenantForm({
@@ -391,7 +395,8 @@ export default function SuperAdmin() {
         owner_phone: '',
         subscription_type: 'trial',
         max_branches: 1,
-        max_users: 5
+        max_users: 5,
+        is_demo: false
       });
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل إنشاء العميل');
