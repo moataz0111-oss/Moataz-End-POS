@@ -453,6 +453,7 @@ export default function SuperAdmin() {
       
       setCopiedCredentials(res.data.admin_credentials);
       fetchData();
+      fetchNotifications(); // تحديث الإشعارات
       setShowNewTenant(false);
       
       // Reset form
@@ -463,6 +464,7 @@ export default function SuperAdmin() {
         owner_email: '',
         owner_phone: '',
         subscription_type: 'trial',
+        subscription_duration: 1,
         max_branches: 1,
         max_users: 5,
         is_demo: false
