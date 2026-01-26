@@ -127,6 +127,28 @@ export default function Tables() {
     }
   };
 
+  // حذف طاولة
+  const handleDeleteTable = async () => {
+    if (!tableToDelete) return;
+    
+    try {
+      await axios.delete(`${API}/tables/${tableToDelete.id}`);
+      toast.success('تم حذف الطاولة');
+      setDeleteConfirmOpen(false);
+      setTableToDelete(null);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'فشل في حذف الطاولة');
+    }
+  };
+
+  // فتح نافذة تأكيد الحذف
+  const openDeleteConfirm = (table, e) => {
+    e.stopPropagation();
+    setTableToDelete(table);
+    setDeleteConfirmOpen(true);
+  };
+
   // تحويل الطلب من طاولة إلى أخرى
   const handleTransferTable = async () => {
     if (!selectedTableForTransfer || !targetTableId) {
