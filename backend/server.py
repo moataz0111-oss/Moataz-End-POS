@@ -8023,6 +8023,9 @@ async def update_subscription_prices(prices: SubscriptionPricesUpdate, current_u
     """تحديث أسعار الاشتراكات بالدولار"""
     
     new_prices = {
+        "bronze": {"monthly": prices.bronze, "name": "برونزية"},
+        "silver": {"monthly": prices.silver, "name": "فضية"},
+        "gold": {"monthly": prices.gold, "name": "ذهبية"},
         "basic": {"monthly": prices.basic, "name": "أساسي"},
         "premium": {"monthly": prices.premium, "name": "مميز"},
         "trial": {"monthly": 0, "name": "تجريبي"},
