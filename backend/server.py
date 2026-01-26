@@ -602,8 +602,8 @@ async def apply_automatic_updates():
         # 2.5 إصلاح السائقين المرتبطين بفروع غير موجودة
         default_branch = await db.branches.find_one({"tenant_id": "default"})
         if default_branch:
-            # جلب جميع الفروع الصالحة
-            valid_branch_ids = [b["id"] async for b in db.branches.find({}, {"id": 1})]
+            # جلب جميع الفروع الصالحة (مع حد أقصى لتجنب مشاكل الأداء)
+            valid_branch_ids = [b["id"] async for b in db.branches.find({}, {"id": 1}).limit(1000)]
             
             # تحديث السائقين بفروع غير موجودة
             drivers_fixed = await db.drivers.update_many(
@@ -620,7 +620,7 @@ async def apply_automatic_updates():
         )
         
         # 4. إنشاء فرع افتراضي لكل عميل ليس لديه فرع
-        tenants = await db.tenants.find({}, {"_id": 0, "id": 1, "name": 1}).to_list(None)
+        tenants = await db.tenants.find({}, {"_id": 0, "id": 1, "name": 1}).to_list(1000)
         for tenant in tenants:
             tenant_branch = await db.branches.find_one({"tenant_id": tenant["id"]})
             if not tenant_branch:
