@@ -1732,6 +1732,11 @@ export default function POS() {
             
             {/* ========== أسفل الفاتورة - رسالة الشكر ومعلومات التواصل ========== */}
             <div className="text-center mt-4 pt-3 border-t-2 border-gray-400">
+              {/* اسم النظام */}
+              {systemInvoiceSettings.system_name && (
+                <p className="text-sm font-bold mb-1">{systemInvoiceSettings.system_name}</p>
+              )}
+              
               {/* رسالة الشكر */}
               <p className="text-xs font-bold">
                 {systemInvoiceSettings.thank_you_message || 'شكراً لزيارتكم ❤️'}
