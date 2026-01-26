@@ -240,8 +240,8 @@ export default function SuperAdmin() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState({
-    days_before_expiry: 7,
-    email_notifications: true,
+    days_before_expiry: 15,
+    email_notifications: false,
     push_notifications: true,
     notify_new_tenant: true,
     notify_tenant_status: true
