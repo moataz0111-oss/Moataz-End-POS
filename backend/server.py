@@ -7498,32 +7498,45 @@ async def reset_tenant_admin_password(tenant_id: str, new_password: str, current
 async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)):
     """إحصائيات شاملة للـ Super Admin"""
     
-    total_tenants = await db.tenants.count_documents({})
-    active_tenants = await db.tenants.count_documents({"is_active": True})
-    # استبعاد مستخدمي النظام الرئيسي (super_admin و admin و default)
+    # إجمالي العملاء (بدون الحسابات التجريبية)
+    total_tenants = await db.tenants.count_documents({"is_demo": {"$ne": True}})
+    active_tenants = await db.tenants.count_documents({"is_active": True, "is_demo": {"$ne": True}})
+    
+    # عدد الحسابات التجريبية
+    demo_tenants = await db.tenants.count_documents({"$or": [{"is_demo": True}, {"subscription_type": "demo"}]})
+    
+    # استبعاد مستخدمي النظام الرئيسي (super_admin و admin و default) والحسابات التجريبية
+    # جلب IDs الحسابات التجريبية
+    demo_tenant_ids = await db.tenants.find(
+        {"$or": [{"is_demo": True}, {"subscription_type": "demo"}]},
+        {"id": 1}
+    ).to_list(100)
+    demo_ids = [t["id"] for t in demo_tenant_ids]
+    
     total_users = await db.users.count_documents({
         "role": {"$nin": [UserRole.SUPER_ADMIN, UserRole.ADMIN]},
-        "tenant_id": {"$exists": True, "$ne": None, "$ne": "default"}
+        "tenant_id": {"$exists": True, "$ne": None, "$ne": "default", "$nin": demo_ids}
     })
     
-    # حساب الطلبات فقط للعملاء (استبعاد النظام الرئيسي "default")
+    # حساب الطلبات فقط للعملاء الفعليين (استبعاد النظام الرئيسي والتجريبي)
     total_orders = await db.orders.count_documents({
-        "tenant_id": {"$exists": True, "$ne": None, "$ne": "default"}
+        "tenant_id": {"$exists": True, "$ne": None, "$ne": "default", "$nin": demo_ids}
     })
     
-    # المبيعات الإجمالية - فقط للعملاء (استبعاد النظام الرئيسي)
+    # المبيعات الإجمالية - فقط للعملاء الفعليين (استبعاد النظام الرئيسي والتجريبي)
     sales_cursor = db.orders.aggregate([
         {"$match": {
             "status": {"$ne": "cancelled"}, 
-            "tenant_id": {"$exists": True, "$ne": None, "$ne": "default"}
+            "tenant_id": {"$exists": True, "$ne": None, "$ne": "default", "$nin": demo_ids}
         }},
         {"$group": {"_id": None, "total": {"$sum": "$total"}}}
     ])
     sales_result = await sales_cursor.to_list(1)
     total_sales = sales_result[0]["total"] if sales_result else 0
     
-    # المستأجرين حسب نوع الاشتراك
+    # المستأجرين حسب نوع الاشتراك (بدون التجريبي)
     subscription_stats = await db.tenants.aggregate([
+        {"$match": {"is_demo": {"$ne": True}}},
         {"$group": {"_id": "$subscription_type", "count": {"$sum": 1}}}
     ]).to_list(10)
     
@@ -7534,6 +7547,7 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
         "total_tenants": total_tenants,
         "active_tenants": active_tenants,
         "inactive_tenants": total_tenants - active_tenants,
+        "demo_tenants": demo_tenants,
         "total_users": total_users,
         "total_orders": total_orders,
         "total_sales": total_sales,
