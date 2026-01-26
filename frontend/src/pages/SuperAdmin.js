@@ -3119,7 +3119,7 @@ export default function SuperAdmin() {
                       <ImageIcon className="h-8 w-8 text-gray-500" />
                     )}
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 space-y-2">
                     <input
                       type="file"
                       accept="image/*"
@@ -3132,25 +3132,35 @@ export default function SuperAdmin() {
                         }
                       }}
                     />
-                    <Button 
-                      variant="outline" 
-                      className="border-gray-600"
-                      disabled={uploadingSystemLogo}
-                      onClick={() => document.getElementById('system-logo-upload-2').click()}
-                    >
-                      {uploadingSystemLogo ? (
-                        <>
-                          <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                          جاري الرفع...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 ml-2" />
-                          رفع شعار النظام
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-xs text-gray-500 mt-2">سيظهر هذا الشعار في جميع فواتير العملاء</p>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="border-gray-600"
+                        disabled={uploadingSystemLogo}
+                        onClick={() => document.getElementById('system-logo-upload-2').click()}
+                      >
+                        {uploadingSystemLogo ? (
+                          <>
+                            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                            جاري الرفع...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 ml-2" />
+                            رفع مباشر
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        variant="default" 
+                        className="bg-blue-600 hover:bg-blue-700"
+                        onClick={() => openImageCropper('system', 1, 'قص شعار الفواتير')}
+                      >
+                        <Crop className="h-4 w-4 ml-2" />
+                        قص وتعديل
+                      </Button>
+                    </div>
+                    <p className="text-xs text-gray-500">سيظهر هذا الشعار في جميع فواتير العملاء</p>
                   </div>
                 </div>
               </div>
