@@ -184,6 +184,9 @@ export default function POS() {
 
   const fetchData = async () => {
     try {
+      // تحديد الفرع النشط للاستخدام في جميع الطلبات
+      const activeBranchId = getBranchIdForApi() || user?.branch_id;
+      
       const [catRes, prodRes, appsRes, shiftRes, invoiceRes, restaurantRes, sysInvoiceRes, loginBgRes] = await Promise.all([
         axios.get(`${API}/categories`),
         axios.get(`${API}/products`),
@@ -226,20 +229,13 @@ export default function POS() {
         setCurrentShift(shiftRes.data);
       }
 
-      // جلب الطاولات
-      let tablesData = [];
-      if (user?.branch_id) {
-        const tablesRes = await axios.get(`${API}/tables`, { params: { branch_id: user.branch_id } });
-        tablesData = tablesRes.data;
-      }
-      if (tablesData.length === 0) {
-        const allTablesRes = await axios.get(`${API}/tables`);
-        tablesData = allTablesRes.data;
-      }
-      setTables(tablesData);
+      // جلب الطاولات حسب الفرع المحدد
+      const tablesParams = activeBranchId ? { branch_id: activeBranchId } : {};
+      const tablesRes = await axios.get(`${API}/tables`, { params: tablesParams });
+      setTables(tablesRes.data);
 
-      // جلب السائقين
-      const driversParams = user?.branch_id ? { branch_id: user.branch_id } : {};
+      // جلب السائقين حسب الفرع المحدد
+      const driversParams = activeBranchId ? { branch_id: activeBranchId } : {};
       const driversRes = await axios.get(`${API}/drivers`, { params: driversParams });
       setDrivers(driversRes.data);
 
