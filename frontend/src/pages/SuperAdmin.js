@@ -301,8 +301,6 @@ export default function SuperAdmin() {
     name_en: 'Maestro',
     logo_url: null
   });
-  const [systemLogoFile, setSystemLogoFile] = useState(null);
-  const [systemLogoPreview, setSystemLogoPreview] = useState('');
   const [brandingLoading, setBrandingLoading] = useState(false);
 
   // للتعامل مع معاينة الملف المرفوع
