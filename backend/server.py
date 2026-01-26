@@ -2213,11 +2213,12 @@ async def create_product(product: ProductCreate, current_user: dict = Depends(ge
 
 @api_router.get("/products", response_model=List[ProductResponse])
 async def get_products(category_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
-    # Super Admin لا يرى منتجات (ليس لديه مطعم)
+    # Super Admin يرى المنتجات الخاصة به (tenant_id الخاص به)
     if current_user.get("role") == UserRole.SUPER_ADMIN:
-        return []
-    
-    query = build_tenant_query(current_user)  # فلترة حسب tenant_id
+        owner_tenant_id = current_user.get("tenant_id") or "default"
+        query = {"tenant_id": owner_tenant_id}
+    else:
+        query = build_tenant_query(current_user)  # فلترة حسب tenant_id
     if category_id:
         query["category_id"] = category_id
     products = await db.products.find(query, {"_id": 0}).to_list(1000)
