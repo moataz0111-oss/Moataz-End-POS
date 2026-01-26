@@ -1755,6 +1755,188 @@ export default function SuperAdmin() {
                 </div>
               </TabsContent>
               
+              {/* لوحة معلومات الاشتراكات */}
+              <TabsContent value="subscriptions">
+                {loadingDashboard ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+                    <span className="mr-3 text-gray-400">جاري تحميل البيانات...</span>
+                  </div>
+                ) : subscriptionsDashboard ? (
+                  <div className="space-y-6">
+                    {/* ملخص الاشتراكات */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="bg-gradient-to-br from-green-500/20 to-green-600/10 rounded-xl p-4 border border-green-500/20">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-green-500/20 rounded-lg">
+                            <Check className="h-5 w-5 text-green-400" />
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-green-400">{subscriptionsDashboard.summary.active_subscriptions}</p>
+                            <p className="text-xs text-gray-400">اشتراك نشط</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-orange-500/20 to-orange-600/10 rounded-xl p-4 border border-orange-500/20">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-orange-500/20 rounded-lg">
+                            <Clock className="h-5 w-5 text-orange-400" />
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-orange-400">{subscriptionsDashboard.summary.expiring_soon}</p>
+                            <p className="text-xs text-gray-400">قارب على الانتهاء</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-red-500/20 to-red-600/10 rounded-xl p-4 border border-red-500/20">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-red-500/20 rounded-lg">
+                            <AlertTriangle className="h-5 w-5 text-red-400" />
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-red-400">{subscriptionsDashboard.summary.already_expired}</p>
+                            <p className="text-xs text-gray-400">اشتراك منتهي</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl p-4 border border-purple-500/20">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-purple-500/20 rounded-lg">
+                            <DollarSign className="h-5 w-5 text-purple-400" />
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold text-purple-400">
+                              {(subscriptionsDashboard.expected_revenue.total_monthly || 0).toLocaleString()}
+                            </p>
+                            <p className="text-xs text-gray-400">إيراد شهري متوقع (د.ع)</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* الاشتراكات القريبة من الانتهاء */}
+                      <div className="bg-gray-700/30 rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Clock className="h-5 w-5 text-orange-400" />
+                          <h3 className="font-bold">قريبة من الانتهاء</h3>
+                          <span className="text-xs text-gray-400">
+                            (خلال {subscriptionsDashboard.summary.days_before_alert} أيام)
+                          </span>
+                        </div>
+                        
+                        {subscriptionsDashboard.expiring_soon_list.length === 0 ? (
+                          <p className="text-center text-gray-500 py-6">لا توجد اشتراكات قريبة من الانتهاء 🎉</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {subscriptionsDashboard.expiring_soon_list.map((tenant) => (
+                              <div key={tenant.id} className="bg-gray-800/50 rounded-lg p-3 flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium">{tenant.name}</p>
+                                  <p className="text-xs text-gray-400">{tenant.owner_email}</p>
+                                </div>
+                                <div className="text-left">
+                                  <span className={`text-sm px-2 py-1 rounded ${
+                                    tenant.days_left <= 3 ? 'bg-red-500/20 text-red-400' : 'bg-orange-500/20 text-orange-400'
+                                  }`}>
+                                    {tenant.days_left === 0 ? 'ينتهي اليوم!' : `${tenant.days_left} يوم`}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* الاشتراكات المنتهية */}
+                      <div className="bg-gray-700/30 rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <AlertTriangle className="h-5 w-5 text-red-400" />
+                          <h3 className="font-bold">اشتراكات منتهية</h3>
+                        </div>
+                        
+                        {subscriptionsDashboard.expired_list.length === 0 ? (
+                          <p className="text-center text-gray-500 py-6">لا توجد اشتراكات منتهية 🎉</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {subscriptionsDashboard.expired_list.map((tenant) => (
+                              <div key={tenant.id} className="bg-gray-800/50 rounded-lg p-3 flex items-center justify-between">
+                                <div>
+                                  <p className="font-medium">{tenant.name}</p>
+                                  <p className="text-xs text-gray-400">{tenant.owner_email}</p>
+                                </div>
+                                <div className="text-left">
+                                  <span className="text-sm px-2 py-1 rounded bg-red-500/20 text-red-400">
+                                    منذ {tenant.days_expired} يوم
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* الإيرادات المتوقعة من التجديدات */}
+                    {subscriptionsDashboard.expected_revenue.details.length > 0 && (
+                      <div className="bg-gradient-to-br from-green-500/10 to-purple-500/10 rounded-xl p-4 border border-green-500/20">
+                        <div className="flex items-center gap-2 mb-4">
+                          <TrendingUp className="h-5 w-5 text-green-400" />
+                          <h3 className="font-bold">الإيرادات المتوقعة من التجديدات</h3>
+                          <span className="mr-auto text-xl font-bold text-green-400">
+                            {subscriptionsDashboard.expected_revenue.from_expiring.toLocaleString()} د.ع
+                          </span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {subscriptionsDashboard.expected_revenue.details.map((item, idx) => (
+                            <div key={idx} className="bg-gray-800/30 rounded-lg p-3 flex items-center justify-between">
+                              <div>
+                                <p className="font-medium">{item.tenant_name}</p>
+                                <p className="text-xs text-gray-400">
+                                  {item.subscription_type === 'basic' ? 'أساسي' : 'مميز'} - {item.duration_months} شهر
+                                </p>
+                              </div>
+                              <span className="text-green-400 font-medium">
+                                {item.expected_amount.toLocaleString()} د.ع
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* إحصائيات أنواع الاشتراكات */}
+                    <div className="bg-gray-700/30 rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-4">
+                        <BarChart3 className="h-5 w-5 text-blue-400" />
+                        <h3 className="font-bold">توزيع أنواع الاشتراكات</h3>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {Object.entries(subscriptionsDashboard.subscription_types).map(([type, data]) => (
+                          <div key={type} className="bg-gray-800/50 rounded-lg p-3 text-center">
+                            <p className="text-2xl font-bold">{data.count}</p>
+                            <p className="text-xs text-gray-400">
+                              {subscriptionsDashboard.subscription_prices[type]?.name || type}
+                            </p>
+                            <div className="flex justify-center gap-2 mt-2 text-xs">
+                              <span className="text-green-400">{data.active} نشط</span>
+                              <span className="text-red-400">{data.expired} منتهي</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-center text-gray-400 py-8">لا توجد بيانات</p>
+                )}
+              </TabsContent>
+              
               {/* جميع العملاء */}
               <TabsContent value="all">
                 <div className="space-y-3">
