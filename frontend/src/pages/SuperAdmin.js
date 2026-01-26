@@ -96,6 +96,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
+import ImageCropper from '../components/ImageCropper';
 
 const API = API_URL;
 
