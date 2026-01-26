@@ -7985,6 +7985,9 @@ class SubscriptionPriceUpdate(BaseModel):
 
 class SubscriptionPricesUpdate(BaseModel):
     """تحديث جميع أسعار الاشتراكات"""
+    bronze: float = 15  # السعر الشهري للبرونزية بالدولار
+    silver: float = 30  # السعر الشهري للفضية بالدولار
+    gold: float = 50  # السعر الشهري للذهبية بالدولار
     basic: float = 25  # السعر الشهري للأساسي بالدولار
     premium: float = 50  # السعر الشهري للمميز بالدولار
 
