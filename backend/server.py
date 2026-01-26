@@ -1636,9 +1636,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 
 # دالة مساعدة للحصول على tenant_id للمستخدم
 def get_user_tenant_id(user: dict) -> Optional[str]:
-    """الحصول على tenant_id للمستخدم - Super Admin لا يحتاج tenant_id"""
+    """الحصول على tenant_id للمستخدم - Super Admin يستخدم tenant النظام"""
     if user.get("role") == UserRole.SUPER_ADMIN:
-        return None
+        # Super Admin يستخدم tenant النظام الافتراضي
+        return user.get("tenant_id") or "system"
     # إذا لم يكن للمستخدم tenant_id، نستخدم "default"
     return user.get("tenant_id") or "default"
 
@@ -1646,12 +1647,14 @@ def get_user_tenant_id(user: dict) -> Optional[str]:
 def build_tenant_query(user: dict, base_query: dict = None) -> dict:
     """بناء query مع فلترة tenant_id"""
     query = base_query.copy() if base_query else {}
-    tenant_id = get_user_tenant_id(user)
     
-    if tenant_id:
-        # المستخدم يرى فقط بياناته
-        query["tenant_id"] = tenant_id
     # Super Admin يرى كل شيء
+    if user.get("role") == UserRole.SUPER_ADMIN:
+        return query
+    
+    tenant_id = get_user_tenant_id(user)
+    if tenant_id:
+        query["tenant_id"] = tenant_id
     
     return query
 
