@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
         }, 500);
       }
       
-      return { success: true };
+      return { success: true, user: userData };
     } catch (error) {
       return { 
         success: false, 
