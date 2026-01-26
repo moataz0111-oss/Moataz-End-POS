@@ -2031,6 +2031,10 @@ async def create_branch(branch: BranchCreate, current_user: dict = Depends(get_c
 
 @api_router.get("/branches", response_model=List[BranchResponse])
 async def get_branches(current_user: dict = Depends(get_current_user), include_inactive: bool = False):
+    # Super Admin لا يرى فروع (ليس لديه مطعم) - يرى العملاء في لوحة التحكم فقط
+    if current_user.get("role") == UserRole.SUPER_ADMIN:
+        return []
+    
     query = build_tenant_query(current_user)  # فلترة حسب tenant_id
     
     # المستخدمون المرتبطون بفرع معين يرون فقط فرعهم
