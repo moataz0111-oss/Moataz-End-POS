@@ -3329,10 +3329,41 @@ export default function SuperAdmin() {
                         className="bg-gray-700/50 border-gray-600 text-white"
                         dir="ltr"
                       />
-                      <Button variant="outline" className="border-gray-600 w-full">
-                        <Upload className="h-4 w-4 ml-2" />
-                        رفع شعار
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLoginLogoFileChange}
+                        className="hidden"
+                        id="login-logo-upload"
+                      />
+                      <Button 
+                        variant="outline" 
+                        className="border-gray-600 w-full"
+                        onClick={() => document.getElementById('login-logo-upload').click()}
+                        disabled={loginLogoUploading}
+                      >
+                        {loginLogoUploading ? (
+                          <>
+                            <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                            جاري الرفع...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 ml-2" />
+                            رفع شعار
+                          </>
+                        )}
                       </Button>
+                      {loginLogoFile && (
+                        <Button 
+                          variant="default" 
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          onClick={() => uploadLoginLogo(loginLogoFile)}
+                          disabled={loginLogoUploading}
+                        >
+                          تأكيد الرفع
+                        </Button>
+                      )}
                     </div>
                   </div>
                 )}
