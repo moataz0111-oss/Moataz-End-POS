@@ -1706,8 +1706,18 @@ export default function SuperAdmin() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* رسالة الشكر */}
+              {/* اسم النظام ورسالة الشكر */}
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">اسم النظام</Label>
+                  <Input
+                    placeholder="مثال: Maestro EGP"
+                    value={invoiceSettings.system_name || ''}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, system_name: e.target.value})}
+                    className="bg-gray-700/50 border-gray-600"
+                    dir="rtl"
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">رسالة الشكر (أسفل الفاتورة)</Label>
                   <Input
