@@ -1435,6 +1435,182 @@ export default function SuperAdmin() {
           </CardContent>
         </Card>
       </main>
+
+      {/* Modal: إنشاء عميل جديد */}
+      <Dialog open={showNewTenant} onOpenChange={setShowNewTenant}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl">إنشاء عميل جديد</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>اسم المطعم *</Label>
+                <Input
+                  placeholder="مثال: مطعم السعادة"
+                  value={newTenantForm.name}
+                  onChange={(e) => setNewTenantForm({...newTenantForm, name: e.target.value})}
+                  className="bg-gray-700/50 border-gray-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>المعرف (Slug) *</Label>
+                <Input
+                  placeholder="مثال: saada-restaurant"
+                  value={newTenantForm.slug}
+                  onChange={(e) => setNewTenantForm({...newTenantForm, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})}
+                  className="bg-gray-700/50 border-gray-600"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>اسم المالك *</Label>
+                <Input
+                  placeholder="مثال: أحمد محمد"
+                  value={newTenantForm.owner_name}
+                  onChange={(e) => setNewTenantForm({...newTenantForm, owner_name: e.target.value})}
+                  className="bg-gray-700/50 border-gray-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>البريد الإلكتروني *</Label>
+                <Input
+                  type="email"
+                  placeholder="example@email.com"
+                  value={newTenantForm.owner_email}
+                  onChange={(e) => setNewTenantForm({...newTenantForm, owner_email: e.target.value})}
+                  className="bg-gray-700/50 border-gray-600"
+                  dir="ltr"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>رقم الهاتف</Label>
+                <Input
+                  placeholder="009647xxxxxxxxx"
+                  value={newTenantForm.owner_phone}
+                  onChange={(e) => setNewTenantForm({...newTenantForm, owner_phone: e.target.value})}
+                  className="bg-gray-700/50 border-gray-600"
+                  dir="ltr"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>نوع الاشتراك</Label>
+                <Select 
+                  value={newTenantForm.subscription_type} 
+                  onValueChange={(v) => setNewTenantForm({...newTenantForm, subscription_type: v})}
+                >
+                  <SelectTrigger className="bg-gray-700/50 border-gray-600">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="demo">تجريبي</SelectItem>
+                    <SelectItem value="trial">فترة تجريبية</SelectItem>
+                    <SelectItem value="basic">أساسي</SelectItem>
+                    <SelectItem value="premium">مميز</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>الحد الأقصى للفروع</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={newTenantForm.max_branches}
+                  onChange={(e) => setNewTenantForm({...newTenantForm, max_branches: parseInt(e.target.value) || 1})}
+                  className="bg-gray-700/50 border-gray-600"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>الحد الأقصى للمستخدمين</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={newTenantForm.max_users}
+                  onChange={(e) => setNewTenantForm({...newTenantForm, max_users: parseInt(e.target.value) || 5})}
+                  className="bg-gray-700/50 border-gray-600"
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNewTenant(false)} className="border-gray-600">
+              إلغاء
+            </Button>
+            <Button onClick={handleCreateTenant} className="bg-purple-600 hover:bg-purple-700">
+              <Plus className="h-4 w-4 ml-2" />
+              إنشاء العميل
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal: تأكيد الحذف */}
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-red-400">تأكيد الحذف النهائي</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-300">
+              هل أنت متأكد من حذف العميل <span className="font-bold text-white">{selectedTenant?.name}</span>؟
+            </p>
+            <p className="text-red-400 text-sm mt-2">
+              ⚠️ هذا الإجراء نهائي ولا يمكن التراجع عنه. سيتم حذف جميع بيانات العميل.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} className="border-gray-600">
+              إلغاء
+            </Button>
+            <Button onClick={handleDeleteTenant} className="bg-red-600 hover:bg-red-700">
+              <Trash2 className="h-4 w-4 ml-2" />
+              حذف نهائي
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal: إعادة تعيين كلمة المرور */}
+      <Dialog open={showResetPassword} onOpenChange={setShowResetPassword}>
+        <DialogContent className="bg-gray-800 border-gray-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl">إعادة تعيين كلمة المرور</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <p className="text-gray-300">
+              إعادة تعيين كلمة المرور للعميل: <span className="font-bold text-white">{selectedTenant?.owner_email}</span>
+            </p>
+            <div className="space-y-2">
+              <Label>كلمة المرور الجديدة</Label>
+              <Input
+                type="password"
+                placeholder="أدخل كلمة المرور الجديدة"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="bg-gray-700/50 border-gray-600"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowResetPassword(false)} className="border-gray-600">
+              إلغاء
+            </Button>
+            <Button onClick={handleResetPassword} className="bg-yellow-600 hover:bg-yellow-700">
+              <Key className="h-4 w-4 ml-2" />
+              تغيير كلمة المرور
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
