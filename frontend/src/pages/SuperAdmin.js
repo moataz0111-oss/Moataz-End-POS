@@ -2079,28 +2079,28 @@ export default function SuperAdmin() {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">اسم المطعم</span>
-                        <span className="font-medium">{tenantDetails.name || '-'}</span>
+                        <span className="font-medium">{tenantDetails.tenant?.name || selectedTenant?.name || '-'}</span>
                       </div>
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">المعرف (Slug)</span>
-                        <span className="font-medium text-blue-400" dir="ltr">/{tenantDetails.slug || '-'}</span>
+                        <span className="font-medium text-blue-400" dir="ltr">/{tenantDetails.tenant?.slug || selectedTenant?.slug || '-'}</span>
                       </div>
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">نوع الاشتراك</span>
                         <Badge className={
-                          tenantDetails.subscription_type === 'premium' ? 'bg-purple-500/20 text-purple-400' :
-                          tenantDetails.subscription_type === 'basic' ? 'bg-blue-500/20 text-blue-400' :
+                          (tenantDetails.tenant?.subscription_type || selectedTenant?.subscription_type) === 'premium' ? 'bg-purple-500/20 text-purple-400' :
+                          (tenantDetails.tenant?.subscription_type || selectedTenant?.subscription_type) === 'basic' ? 'bg-blue-500/20 text-blue-400' :
                           'bg-yellow-500/20 text-yellow-400'
                         }>
-                          {tenantDetails.subscription_type === 'premium' ? 'مميز' : 
-                           tenantDetails.subscription_type === 'basic' ? 'أساسي' : 
-                           tenantDetails.subscription_type === 'demo' ? 'تجريبي' : 'فترة تجريبية'}
+                          {(tenantDetails.tenant?.subscription_type || selectedTenant?.subscription_type) === 'premium' ? 'مميز' : 
+                           (tenantDetails.tenant?.subscription_type || selectedTenant?.subscription_type) === 'basic' ? 'أساسي' : 
+                           (tenantDetails.tenant?.subscription_type || selectedTenant?.subscription_type) === 'demo' ? 'تجريبي' : 'فترة تجريبية'}
                         </Badge>
                       </div>
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">الحالة</span>
-                        <Badge className={tenantDetails.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>
-                          {tenantDetails.is_active ? 'نشط' : 'معطل'}
+                        <Badge className={(tenantDetails.tenant?.is_active !== false && selectedTenant?.is_active !== false) ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}>
+                          {(tenantDetails.tenant?.is_active !== false && selectedTenant?.is_active !== false) ? 'نشط' : 'معطل'}
                         </Badge>
                       </div>
                     </div>
@@ -2114,19 +2114,23 @@ export default function SuperAdmin() {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">اسم المالك</span>
-                        <span className="font-medium">{tenantDetails.owner_name || '-'}</span>
+                        <span className="font-medium">{tenantDetails.tenant?.owner_name || selectedTenant?.owner_name || '-'}</span>
                       </div>
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">البريد الإلكتروني</span>
-                        <span className="font-medium text-blue-400" dir="ltr">{tenantDetails.owner_email || '-'}</span>
+                        <span className="font-medium text-blue-400" dir="ltr">{tenantDetails.tenant?.owner_email || selectedTenant?.owner_email || '-'}</span>
                       </div>
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">رقم الهاتف</span>
-                        <span className="font-medium" dir="ltr">{tenantDetails.owner_phone || '-'}</span>
+                        <span className="font-medium" dir="ltr">{tenantDetails.tenant?.owner_phone || selectedTenant?.owner_phone || '-'}</span>
                       </div>
                       <div className="flex justify-between items-center p-2 bg-gray-700/30 rounded">
                         <span className="text-gray-400">تاريخ الإنشاء</span>
-                        <span className="font-medium">{tenantDetails.created_at ? new Date(tenantDetails.created_at).toLocaleDateString('ar-EG') : '-'}</span>
+                        <span className="font-medium">
+                          {(tenantDetails.tenant?.created_at || selectedTenant?.created_at) 
+                            ? new Date(tenantDetails.tenant?.created_at || selectedTenant?.created_at).toLocaleDateString('ar-EG') 
+                            : '-'}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -2140,28 +2144,71 @@ export default function SuperAdmin() {
                   </h3>
                   <div className="grid grid-cols-4 gap-4">
                     <div className="text-center p-4 bg-gray-700/30 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-400">{tenantDetails.branches_count || 0}</p>
+                      <p className="text-2xl font-bold text-blue-400">{tenantDetails.stats?.branches_count || tenantDetails.branches?.length || 0}</p>
                       <p className="text-sm text-gray-400">الفروع</p>
-                      <p className="text-xs text-gray-500 mt-1">الحد: {tenantDetails.max_branches || '-'}</p>
+                      <p className="text-xs text-gray-500 mt-1">الحد: {tenantDetails.tenant?.max_branches || selectedTenant?.max_branches || '-'}</p>
                     </div>
                     <div className="text-center p-4 bg-gray-700/30 rounded-lg">
-                      <p className="text-2xl font-bold text-green-400">{tenantDetails.users_count || 0}</p>
+                      <p className="text-2xl font-bold text-green-400">{tenantDetails.stats?.users_count || tenantDetails.users?.length || 0}</p>
                       <p className="text-sm text-gray-400">المستخدمين</p>
-                      <p className="text-xs text-gray-500 mt-1">الحد: {tenantDetails.max_users || '-'}</p>
+                      <p className="text-xs text-gray-500 mt-1">الحد: {tenantDetails.tenant?.max_users || selectedTenant?.max_users || '-'}</p>
                     </div>
                     <div className="text-center p-4 bg-gray-700/30 rounded-lg">
-                      <p className="text-2xl font-bold text-purple-400">{tenantDetails.orders_count || 0}</p>
-                      <p className="text-sm text-gray-400">الطلبات</p>
+                      <p className="text-2xl font-bold text-purple-400">{tenantDetails.stats?.orders_today || 0}</p>
+                      <p className="text-sm text-gray-400">طلبات اليوم</p>
                     </div>
                     <div className="text-center p-4 bg-gray-700/30 rounded-lg">
-                      <p className="text-2xl font-bold text-yellow-400">{tenantDetails.products_count || 0}</p>
-                      <p className="text-sm text-gray-400">المنتجات</p>
+                      <p className="text-2xl font-bold text-yellow-400">{formatPrice(tenantDetails.stats?.total_sales || 0)}</p>
+                      <p className="text-sm text-gray-400">إجمالي المبيعات</p>
                     </div>
                   </div>
                 </div>
 
+                {/* قائمة المستخدمين */}
+                {tenantDetails.users && tenantDetails.users.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-purple-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                      <Users className="h-4 w-4" />
+                      المستخدمين ({tenantDetails.users.length})
+                    </h3>
+                    <div className="max-h-40 overflow-y-auto space-y-2">
+                      {tenantDetails.users.map((user, idx) => (
+                        <div key={idx} className="flex justify-between items-center p-2 bg-gray-700/30 rounded text-sm">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span>{user.full_name || user.username}</span>
+                          </div>
+                          <Badge className="text-xs">
+                            {user.role === 'admin' ? 'مدير' : 
+                             user.role === 'manager' ? 'مشرف' : 
+                             user.role === 'cashier' ? 'كاشير' : user.role}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* قائمة الفروع */}
+                {tenantDetails.branches && tenantDetails.branches.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-green-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                      <Building2 className="h-4 w-4" />
+                      الفروع ({tenantDetails.branches.length})
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {tenantDetails.branches.map((branch, idx) => (
+                        <div key={idx} className="flex items-center gap-2 p-2 bg-gray-700/30 rounded text-sm">
+                          <div className={`w-2 h-2 rounded-full ${branch.is_active ? 'bg-green-500' : 'bg-red-500'}`} />
+                          <span>{branch.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* الشعار إن وجد */}
-                {tenantDetails.logo_url && (
+                {(tenantDetails.tenant?.logo_url || selectedTenant?.logo_url) && (
                   <div className="space-y-4">
                     <h3 className="font-bold text-purple-400 flex items-center gap-2 border-b border-gray-700 pb-2">
                       <ImageIcon className="h-4 w-4" />
@@ -2169,7 +2216,9 @@ export default function SuperAdmin() {
                     </h3>
                     <div className="flex justify-center">
                       <img 
-                        src={tenantDetails.logo_url.startsWith('/api') ? `${API}${tenantDetails.logo_url.replace('/api', '')}` : tenantDetails.logo_url} 
+                        src={(tenantDetails.tenant?.logo_url || selectedTenant?.logo_url).startsWith('/api') 
+                          ? `${API}${(tenantDetails.tenant?.logo_url || selectedTenant?.logo_url).replace('/api', '')}` 
+                          : (tenantDetails.tenant?.logo_url || selectedTenant?.logo_url)} 
                         alt="Logo" 
                         className="h-24 w-24 object-contain bg-gray-700/50 rounded-lg p-2"
                       />
