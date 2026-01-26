@@ -685,6 +685,8 @@ export default function POS() {
         }
       } else {
         // إنشاء طلب جديد أولاً
+        // تحديد الفرع النشط
+        const activeBranchId = getBranchIdForApi() || user?.branch_id;
         const orderData = {
           order_type: orderType,
           table_id: orderType === 'dine_in' ? selectedTable : null,
@@ -693,7 +695,7 @@ export default function POS() {
           delivery_address: orderType === 'delivery' ? deliveryAddress : null,
           buzzer_number: orderType === 'takeaway' ? buzzerNumber : null,
           items: cart,
-          branch_id: user?.branch_id || (await axios.get(`${API}/branches`)).data[0]?.id,
+          branch_id: activeBranchId || (await axios.get(`${API}/branches`)).data[0]?.id,
           payment_method: paymentMethod,
           discount: discount,
           delivery_app: orderType === 'delivery' ? deliveryApp : null,
