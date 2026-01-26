@@ -1545,7 +1545,7 @@ export default function SuperAdmin() {
             <Button variant="outline" onClick={() => setShowNewTenant(false)} className="border-gray-600">
               إلغاء
             </Button>
-            <Button onClick={handleCreateTenant} className="bg-purple-600 hover:bg-purple-700">
+            <Button onClick={createTenant} className="bg-purple-600 hover:bg-purple-700">
               <Plus className="h-4 w-4 ml-2" />
               إنشاء العميل
             </Button>
