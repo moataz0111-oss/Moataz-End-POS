@@ -6174,6 +6174,7 @@ async def delete_login_page_logo(current_user: dict = Depends(verify_super_admin
 
 class SystemInvoiceSettings(BaseModel):
     """إعدادات الفاتورة للنظام (يتحكم فيها المالك)"""
+    system_name: Optional[str] = None  # اسم النظام
     system_logo_url: Optional[str] = None  # شعار النظام
     thank_you_message: str = "شكراً لزيارتكم"  # رسالة الشكر
     system_phone: Optional[str] = None  # رقم هاتف النظام
