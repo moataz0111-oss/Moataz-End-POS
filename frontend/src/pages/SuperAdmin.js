@@ -132,6 +132,11 @@ export default function SuperAdmin() {
   const [showEditTenant, setShowEditTenant] = useState(false);
   const [showInvoiceSettings, setShowInvoiceSettings] = useState(false);
   
+  // System logo upload states
+  const [systemLogoFile, setSystemLogoFile] = useState(null);
+  const [systemLogoPreview, setSystemLogoPreview] = useState('');
+  const [uploadingSystemLogo, setUploadingSystemLogo] = useState(false);
+  
   // Invoice settings for system
   const [invoiceSettings, setInvoiceSettings] = useState({
     system_name: '',
