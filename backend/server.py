@@ -7847,9 +7847,9 @@ async def get_subscriptions_dashboard(current_user: dict = Depends(verify_super_
     
     # جلب إعدادات التنبيه
     settings = await db.settings.find_one({"type": "notification_settings"}, {"_id": 0})
-    days_before = 7
+    days_before = 15
     if settings and settings.get("value"):
-        days_before = settings["value"].get("days_before_expiry", 7)
+        days_before = settings["value"].get("days_before_expiry", 15)
     
     # حساب التواريخ
     target_date = (now + timedelta(days=days_before)).isoformat()
