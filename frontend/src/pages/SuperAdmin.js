@@ -72,6 +72,7 @@ import {
   Maximize,
   X,
   Receipt,
+  Loader2,
   // Icons for features modal
   Monitor,
   LayoutGrid,
