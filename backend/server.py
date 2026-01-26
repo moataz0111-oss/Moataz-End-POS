@@ -7393,17 +7393,36 @@ async def update_tenant(tenant_id: str, updates: dict, background_tasks: Backgro
     return updated
 
 @api_router.delete("/super-admin/tenants/{tenant_id}")
-async def delete_tenant(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
-    """حذف مستأجر (تعطيل)"""
+async def delete_tenant(tenant_id: str, permanent: bool = False, current_user: dict = Depends(verify_super_admin)):
+    """حذف مستأجر (نهائي أو تعطيل)"""
     tenant = await db.tenants.find_one({"id": tenant_id})
     if not tenant:
         raise HTTPException(status_code=404, detail="المستأجر غير موجود")
     
-    # تعطيل بدلاً من الحذف
-    await db.tenants.update_one({"id": tenant_id}, {"$set": {"is_active": False}})
-    await db.users.update_many({"tenant_id": tenant_id}, {"$set": {"is_active": False}})
-    
-    return {"message": "تم تعطيل المستأجر وجميع مستخدميه"}
+    if permanent:
+        # حذف نهائي - حذف جميع بيانات العميل
+        await db.users.delete_many({"tenant_id": tenant_id})
+        await db.branches.delete_many({"tenant_id": tenant_id})
+        await db.categories.delete_many({"tenant_id": tenant_id})
+        await db.products.delete_many({"tenant_id": tenant_id})
+        await db.orders.delete_many({"tenant_id": tenant_id})
+        await db.tables.delete_many({"tenant_id": tenant_id})
+        await db.shifts.delete_many({"tenant_id": tenant_id})
+        await db.inventory.delete_many({"tenant_id": tenant_id})
+        await db.customers.delete_many({"tenant_id": tenant_id})
+        await db.drivers.delete_many({"tenant_id": tenant_id})
+        await db.suppliers.delete_many({"tenant_id": tenant_id})
+        await db.recipes.delete_many({"tenant_id": tenant_id})
+        await db.printers.delete_many({"tenant_id": tenant_id})
+        await db.tenants.delete_one({"id": tenant_id})
+        
+        return {"message": "تم حذف المستأجر نهائياً مع جميع بياناته"}
+    else:
+        # تعطيل بدلاً من الحذف
+        await db.tenants.update_one({"id": tenant_id}, {"$set": {"is_active": False}})
+        await db.users.update_many({"tenant_id": tenant_id}, {"$set": {"is_active": False}})
+        
+        return {"message": "تم تعطيل المستأجر وجميع مستخدميه"}
 
 @api_router.put("/super-admin/tenants/{tenant_id}/reactivate")
 async def reactivate_tenant(tenant_id: str, current_user: dict = Depends(verify_super_admin)):
