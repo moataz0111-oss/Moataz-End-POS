@@ -1940,11 +1940,22 @@ export default function SuperAdmin() {
                       </div>
                     )}
 
-                    {/* إحصائيات أنواع الاشتراكات */}
+                    {/* إحصائيات أنواع الاشتراكات وأسعارها */}
                     <div className="bg-gray-700/30 rounded-xl p-4">
-                      <div className="flex items-center gap-2 mb-4">
-                        <BarChart3 className="h-5 w-5 text-blue-400" />
-                        <h3 className="font-bold">توزيع أنواع الاشتراكات</h3>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="h-5 w-5 text-blue-400" />
+                          <h3 className="font-bold">توزيع أنواع الاشتراكات</h3>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => setShowPricesModal(true)}
+                          className="border-purple-500 text-purple-400 hover:bg-purple-500/20"
+                        >
+                          <DollarSign className="h-4 w-4 ml-1" />
+                          تعديل الأسعار
+                        </Button>
                       </div>
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1953,6 +1964,9 @@ export default function SuperAdmin() {
                             <p className="text-2xl font-bold">{data.count}</p>
                             <p className="text-xs text-gray-400">
                               {subscriptionsDashboard.subscription_prices[type]?.name || type}
+                            </p>
+                            <p className="text-sm text-purple-400 mt-1">
+                              ${subscriptionsDashboard.subscription_prices[type]?.monthly || 0}/شهر
                             </p>
                             <div className="flex justify-center gap-2 mt-2 text-xs">
                               <span className="text-green-400">{data.active} نشط</span>
