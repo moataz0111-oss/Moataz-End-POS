@@ -3954,6 +3954,10 @@ async def create_table(table: TableCreate, current_user: dict = Depends(get_curr
 
 @api_router.get("/tables", response_model=List[TableResponse])
 async def get_tables(branch_id: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    # Super Admin لا يرى طاولات (ليس لديه مطعم)
+    if current_user.get("role") == UserRole.SUPER_ADMIN:
+        return []
+    
     query = build_tenant_query(current_user)  # فلترة حسب tenant_id
     if branch_id:
         query["branch_id"] = branch_id
