@@ -450,7 +450,7 @@ export default function SuperAdmin() {
 
   const deleteTenant = async () => {
     try {
-      await axios.delete(`${API}/super-admin/tenants/${selectedTenant.id}/permanent?confirm=true`);
+      await axios.delete(`${API}/super-admin/tenants/${selectedTenant.id}?permanent=true`);
       toast.success('تم حذف العميل نهائياً');
       setShowDeleteConfirm(false);
       setSelectedTenant(null);
