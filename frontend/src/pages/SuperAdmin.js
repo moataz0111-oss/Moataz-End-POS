@@ -134,6 +134,8 @@ export default function SuperAdmin() {
   // Invoice settings for system
   const [invoiceSettings, setInvoiceSettings] = useState({
     system_name: '',
+    system_name_ar: '',
+    system_name_en: '',
     system_logo_url: '',
     thank_you_message: 'شكراً لزيارتكم',
     system_phone: '',
@@ -142,6 +144,19 @@ export default function SuperAdmin() {
     system_website: '',
     footer_text: '',
     show_system_branding: true
+  });
+
+  // Login page settings
+  const [loginPageSettings, setLoginPageSettings] = useState({
+    enable_animation: true,
+    transition_type: 'fade',
+    transition_duration: 1.5,
+    auto_change: true,
+    logo_animation: 'pulse',
+    backgrounds: [],
+    login_logo_enabled: true,
+    login_logo_url: '',
+    accent_color: 'rgba(147, 51, 234, 0.5)'
   });
   
   // New tenant form
