@@ -3489,7 +3489,7 @@ export default function SuperAdmin() {
                 <SelectContent className="bg-gray-800 border-gray-700">
                   <SelectItem value="3">قبل 3 أيام</SelectItem>
                   <SelectItem value="7">قبل أسبوع</SelectItem>
-                  <SelectItem value="14">قبل أسبوعين</SelectItem>
+                  <SelectItem value="15">قبل 15 يوم</SelectItem>
                   <SelectItem value="30">قبل شهر</SelectItem>
                 </SelectContent>
               </Select>
@@ -3499,14 +3499,16 @@ export default function SuperAdmin() {
             <div className="space-y-4">
               <Label className="text-gray-300">أنواع الإشعارات</Label>
               
-              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg opacity-50">
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-blue-400" />
                   <span className="text-sm">إشعارات البريد الإلكتروني</span>
+                  <span className="text-xs text-gray-500">(غير مفعل)</span>
                 </div>
                 <Switch 
                   checked={notificationSettings.email_notifications}
                   onCheckedChange={(v) => setNotificationSettings({...notificationSettings, email_notifications: v})}
+                  disabled
                 />
               </div>
               
