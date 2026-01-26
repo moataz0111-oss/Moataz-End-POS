@@ -10,14 +10,15 @@ import {
 } from './ui/select';
 import { Building2 } from 'lucide-react';
 
-export default function BranchSelector({ className = '', showLabel = false }) {
+export default function BranchSelector({ className = '', showLabel = false, showPendingCount = true }) {
   const { user, hasRole } = useAuth();
   const { 
     branches, 
     selectedBranchId, 
     selectBranch, 
     canSelectAllBranches,
-    loading 
+    loading,
+    pendingOrdersCounts
   } = useBranch();
 
   // الموظفون المقيدون بفرع لا يمكنهم تغيير الفرع
@@ -26,6 +27,9 @@ export default function BranchSelector({ className = '', showLabel = false }) {
   if (loading || branches.length === 0) {
     return null;
   }
+
+  // حساب إجمالي الطلبات المعلقة لجميع الفروع
+  const totalPendingOrders = Object.values(pendingOrdersCounts).reduce((sum, count) => sum + count, 0);
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -38,15 +42,33 @@ export default function BranchSelector({ className = '', showLabel = false }) {
         disabled={isRestricted}
       >
         <SelectTrigger 
-          className="w-[160px] h-9 bg-card/50 border-border/50 text-sm"
+          className="w-[180px] h-9 bg-card/50 border-border/50 text-sm relative"
           data-testid="branch-selector"
         >
           <SelectValue placeholder="اختر الفرع" />
+          {/* عرض عدد الطلبات المعلقة للفرع المحدد */}
+          {showPendingCount && selectedBranchId === 'all' && totalPendingOrders > 0 && (
+            <span className="absolute -top-2 -left-2 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+              {totalPendingOrders}
+            </span>
+          )}
+          {showPendingCount && selectedBranchId !== 'all' && (pendingOrdersCounts[selectedBranchId] || 0) > 0 && (
+            <span className="absolute -top-2 -left-2 min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+              {pendingOrdersCounts[selectedBranchId]}
+            </span>
+          )}
         </SelectTrigger>
         <SelectContent>
           {canSelectAllBranches() && (
             <SelectItem value="all" data-testid="branch-option-all">
-              جميع الفروع
+              <div className="flex items-center justify-between w-full gap-3">
+                <span>جميع الفروع</span>
+                {showPendingCount && totalPendingOrders > 0 && (
+                  <span className="min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                    {totalPendingOrders}
+                  </span>
+                )}
+              </div>
             </SelectItem>
           )}
           {branches.map(branch => (
@@ -55,7 +77,14 @@ export default function BranchSelector({ className = '', showLabel = false }) {
               value={branch.id}
               data-testid={`branch-option-${branch.id}`}
             >
-              {branch.name}
+              <div className="flex items-center justify-between w-full gap-3">
+                <span>{branch.name}</span>
+                {showPendingCount && (pendingOrdersCounts[branch.id] || 0) > 0 && (
+                  <span className="min-w-[20px] h-5 px-1.5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                    {pendingOrdersCounts[branch.id]}
+                  </span>
+                )}
+              </div>
             </SelectItem>
           ))}
         </SelectContent>
