@@ -3123,6 +3123,103 @@ export default function SuperAdmin() {
         </DialogContent>
       </Dialog>
 
+      {/* Dialog إعدادات الإشعارات */}
+      <Dialog open={showNotificationSettings} onOpenChange={setShowNotificationSettings}>
+        <DialogContent className="bg-gray-800 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-purple-400" />
+              إعدادات الإشعارات
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* التنبيه قبل انتهاء الاشتراك */}
+            <div className="space-y-3">
+              <Label className="text-gray-300">التنبيه قبل انتهاء الاشتراك</Label>
+              <Select 
+                value={String(notificationSettings.days_before_expiry)} 
+                onValueChange={(v) => setNotificationSettings({...notificationSettings, days_before_expiry: parseInt(v)})}
+              >
+                <SelectTrigger className="bg-gray-700/50 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectItem value="3">قبل 3 أيام</SelectItem>
+                  <SelectItem value="7">قبل أسبوع</SelectItem>
+                  <SelectItem value="14">قبل أسبوعين</SelectItem>
+                  <SelectItem value="30">قبل شهر</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* أنواع الإشعارات */}
+            <div className="space-y-4">
+              <Label className="text-gray-300">أنواع الإشعارات</Label>
+              
+              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-blue-400" />
+                  <span className="text-sm">إشعارات البريد الإلكتروني</span>
+                </div>
+                <Switch 
+                  checked={notificationSettings.email_notifications}
+                  onCheckedChange={(v) => setNotificationSettings({...notificationSettings, email_notifications: v})}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Bell className="h-4 w-4 text-purple-400" />
+                  <span className="text-sm">إشعارات المتصفح (Push)</span>
+                </div>
+                <Switch 
+                  checked={notificationSettings.push_notifications}
+                  onCheckedChange={(v) => setNotificationSettings({...notificationSettings, push_notifications: v})}
+                />
+              </div>
+            </div>
+
+            {/* أحداث الإشعارات */}
+            <div className="space-y-4">
+              <Label className="text-gray-300">أحداث الإشعارات</Label>
+              
+              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Plus className="h-4 w-4 text-green-400" />
+                  <span className="text-sm">إشعار عند إضافة عميل جديد</span>
+                </div>
+                <Switch 
+                  checked={notificationSettings.notify_new_tenant}
+                  onCheckedChange={(v) => setNotificationSettings({...notificationSettings, notify_new_tenant: v})}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Power className="h-4 w-4 text-orange-400" />
+                  <span className="text-sm">إشعار عند تفعيل/تعطيل عميل</span>
+                </div>
+                <Switch 
+                  checked={notificationSettings.notify_tenant_status}
+                  onCheckedChange={(v) => setNotificationSettings({...notificationSettings, notify_tenant_status: v})}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowNotificationSettings(false)} className="border-gray-600">
+              إلغاء
+            </Button>
+            <Button onClick={saveNotificationSettings} className="bg-purple-600 hover:bg-purple-700">
+              <Check className="h-4 w-4 ml-2" />
+              حفظ الإعدادات
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Dialog إضافة خلفية جديدة */}
       <Dialog open={showAddBackground} onOpenChange={setShowAddBackground}>
         <DialogContent className="bg-gray-800 text-white max-w-lg">
