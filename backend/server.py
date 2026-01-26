@@ -7649,7 +7649,7 @@ async def impersonate_tenant(tenant_id: str, current_user: dict = Depends(verify
         "user": {
             "id": admin["id"],
             "email": admin["email"],
-            "full_name": admin["full_name"],
+            "full_name": admin.get("full_name") or admin.get("name", ""),
             "role": admin["role"],
             "tenant_id": tenant_id
         },
