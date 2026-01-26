@@ -1473,6 +1473,108 @@ export default function SuperAdmin() {
           </div>
           
           <div className="flex items-center gap-4">
+            {/* زر الإشعارات */}
+            <div className="relative">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="text-gray-400 hover:text-white relative"
+              >
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Button>
+              
+              {/* قائمة الإشعارات المنسدلة */}
+              {showNotifications && (
+                <div className="absolute left-0 top-12 w-96 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                  <div className="p-4 border-b border-gray-700 flex items-center justify-between">
+                    <h3 className="font-bold flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-purple-400" />
+                      الإشعارات
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" variant="ghost" onClick={() => setShowNotificationSettings(true)} className="text-gray-400 hover:text-white">
+                        <Settings className="h-4 w-4" />
+                      </Button>
+                      {unreadCount > 0 && (
+                        <Button size="sm" variant="ghost" onClick={markAllNotificationsAsRead} className="text-xs text-purple-400">
+                          تعليم الكل كمقروء
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* تنبيه الاشتراكات المنتهية */}
+                  {(expiringSubscriptions.expiring_soon.length > 0 || expiringSubscriptions.already_expired.length > 0) && (
+                    <div className="p-3 bg-orange-500/10 border-b border-gray-700">
+                      <p className="text-xs text-orange-400 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {expiringSubscriptions.already_expired.length > 0 && (
+                          <span>{expiringSubscriptions.already_expired.length} اشتراك منتهي</span>
+                        )}
+                        {expiringSubscriptions.expiring_soon.length > 0 && (
+                          <span>{expiringSubscriptions.expiring_soon.length} اشتراك قارب على الانتهاء</span>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                  
+                  <ScrollArea className="max-h-80">
+                    {notifications.length === 0 ? (
+                      <div className="p-8 text-center text-gray-500">
+                        <Bell className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                        <p>لا توجد إشعارات</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-700">
+                        {notifications.map((notification) => (
+                          <div 
+                            key={notification.id} 
+                            className={`p-3 hover:bg-gray-700/50 cursor-pointer ${!notification.is_read ? 'bg-purple-500/5' : ''}`}
+                            onClick={() => markNotificationAsRead(notification.id)}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <p className={`text-sm ${!notification.is_read ? 'font-bold' : ''}`}>
+                                  {notification.title}
+                                </p>
+                                <p className="text-xs text-gray-400 mt-1">{notification.message}</p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {new Date(notification.created_at).toLocaleString('ar-IQ')}
+                                </p>
+                              </div>
+                              <Button 
+                                size="icon" 
+                                variant="ghost" 
+                                className="h-6 w-6 text-gray-500 hover:text-red-400"
+                                onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
+                  
+                  {notifications.length > 0 && (
+                    <div className="p-3 border-t border-gray-700">
+                      <Button size="sm" variant="ghost" onClick={clearAllNotifications} className="w-full text-red-400 hover:text-red-300">
+                        <Trash2 className="h-4 w-4 ml-2" />
+                        حذف جميع الإشعارات
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
             <Button 
               variant="outline" 
               size="sm" 
