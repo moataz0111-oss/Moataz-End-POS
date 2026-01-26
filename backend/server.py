@@ -7998,6 +7998,9 @@ async def get_subscription_prices(current_user: dict = Depends(verify_super_admi
     
     # الأسعار الافتراضية بالدولار
     default_prices = {
+        "bronze": {"monthly": 15, "name": "برونزية"},
+        "silver": {"monthly": 30, "name": "فضية"},
+        "gold": {"monthly": 50, "name": "ذهبية"},
         "basic": {"monthly": 25, "name": "أساسي"},
         "premium": {"monthly": 50, "name": "مميز"},
         "trial": {"monthly": 0, "name": "تجريبي"},
