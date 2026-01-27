@@ -1491,11 +1491,20 @@ export default function Settings() {
                     <Label className="text-foreground">شعار المطعم</Label>
                     <div className="flex items-start gap-4">
                       <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center overflow-hidden border-2 border-border/50">
-                        {restaurantLogoPreview || restaurantSettings.logo_url ? (
+                        {(restaurantLogoPreview || restaurantSettings.logo_url) ? (
                           <img 
-                            src={restaurantLogoPreview || (restaurantSettings.logo_url?.startsWith('/api') ? `${API}${restaurantSettings.logo_url.replace('/api', '')}` : restaurantSettings.logo_url)} 
+                            src={restaurantLogoPreview || 
+                              (restaurantSettings.logo_url?.startsWith('http') 
+                                ? restaurantSettings.logo_url 
+                                : restaurantSettings.logo_url?.startsWith('/api') 
+                                  ? `${API}${restaurantSettings.logo_url.replace('/api', '')}` 
+                                  : `${API}/uploads/logos/${restaurantSettings.logo_url}`)} 
                             alt="شعار المطعم" 
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              console.error('Logo load error:', e.target.src);
+                              e.target.style.display = 'none';
+                            }}
                           />
                         ) : (
                           <span className="text-black text-4xl font-bold">M</span>
