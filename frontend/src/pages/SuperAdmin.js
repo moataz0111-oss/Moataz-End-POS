@@ -3951,7 +3951,7 @@ export default function SuperAdmin() {
 
             {/* رفع من الجهاز */}
             {backgroundUploadMode === 'device' && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <Label className="text-gray-300">اختر صورة</Label>
                 <div 
                   className="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-purple-500 transition-colors"
@@ -3987,6 +3987,16 @@ export default function SuperAdmin() {
                     }
                   }}
                 />
+                {/* زر قص وتعديل الخلفية */}
+                <Button 
+                  variant="default" 
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  onClick={() => openImageCropper('background', 16/9, 'قص خلفية صفحة الدخول')}
+                >
+                  <Crop className="h-4 w-4 ml-2" />
+                  قص وتعديل صورة
+                </Button>
+                <p className="text-xs text-gray-500 text-center">استخدم أداة القص للحصول على أبعاد مثالية للخلفية</p>
               </div>
             )}
 
