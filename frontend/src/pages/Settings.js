@@ -1549,7 +1549,18 @@ export default function Settings() {
                           logo_url: logoUrl
                         });
                         
+                        // تحديث الإعدادات مع الشعار الجديد
                         setRestaurantSettings({...restaurantSettings, logo_url: logoUrl});
+                        
+                        // تحديث معاينة الشعار بالـ URL الصحيح
+                        if (logoUrl) {
+                          if (logoUrl.startsWith('/api')) {
+                            setRestaurantLogoPreview(`${API}${logoUrl.replace('/api', '')}`);
+                          } else {
+                            setRestaurantLogoPreview(logoUrl);
+                          }
+                        }
+                        
                         setRestaurantLogoFile(null);
                         toast.success('تم حفظ إعدادات المطعم بنجاح');
                       } catch (error) {
