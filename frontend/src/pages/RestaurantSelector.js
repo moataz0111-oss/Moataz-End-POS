@@ -15,7 +15,7 @@ export default function RestaurantSelector() {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  // تحديث manifest للعملاء
+  // تحديث manifest للعملاء وتسجيل Service Worker
   useEffect(() => {
     const manifestLink = document.querySelector('link[rel="manifest"]');
     if (manifestLink) {
@@ -26,6 +26,17 @@ export default function RestaurantSelector() {
     if (themeColor) themeColor.content = '#f97316';
     
     document.title = 'اطلب طعامك - اختر مطعمك المفضل';
+    
+    // تسجيل Service Worker للعملاء
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw-customer.js')
+        .then((registration) => {
+          console.log('Customer SW registered:', registration);
+        })
+        .catch((error) => {
+          console.log('Customer SW registration failed:', error);
+        });
+    }
   }, []);
 
   useEffect(() => {
