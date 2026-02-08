@@ -1,0 +1,107 @@
+{
+  "summary": "Iteration 46 - Bug fix verification for branches, reports search button, customer menu flow, and logo display. Fixed customer menu API to hide default branches. All tests passed.",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  
+  "passed_tests": [
+    "Backend: POST /api/auth/login as demo@maestroegp.com - PASSED (200)",
+    "Backend: GET /api/branches - hides default branches (الفرع الرئيسي, Main Branch) - PASSED",
+    "Backend: GET /api/customer/menu/{tenant_id} - hides default branches - PASSED (FIXED)",
+    "Backend: GET /api/reports/sales - returns report data - PASSED",
+    "Backend: GET /api/tables - returns tables list - PASSED",
+    "Backend: POST /api/tables - creates new table for Aljadreia branch - PASSED",
+    "Frontend: Login as demo@maestroegp.com - PASSED",
+    "Frontend: Reports page has search button (بحث) with data-testid='search-btn' - PASSED",
+    "Frontend: Reports page has date filters and branch selector - PASSED",
+    "Frontend: Customer menu /menu/{tenant_id} shows branch selection first - PASSED",
+    "Frontend: Customer menu shows only real branches (Aljadreia, Alsaydaia) - PASSED",
+    "Frontend: Logo displays first letter of restaurant name when no logo set - PASSED",
+    "Frontend: Tables page shows real branches, hides default branches - PASSED",
+    "Frontend: Add table button visible and functional - PASSED"
+  ],
+  
+  "bug_fixes_verified": [
+    {
+      "issue": "الفروع تعرض فروع افتراضية (الفرع الرئيسي)",
+      "fix_location": "/app/backend/server.py lines 2094-2096 and 12306-12316",
+      "fix_description": "Added $nin filter to hide default branch names in both /api/branches and /api/customer/menu/{tenant_id} endpoints",
+      "status": "VERIFIED"
+    },
+    {
+      "issue": "التقارير تحتاج زر بحث",
+      "fix_location": "/app/frontend/src/pages/Reports.js lines 311-326",
+      "fix_description": "Added search button with data-testid='search-btn' that triggers fetchReports()",
+      "status": "VERIFIED"
+    },
+    {
+      "issue": "تطبيق الزبائن يذهب للقائمة مباشرة بدلاً من اختيار الفروع",
+      "fix_location": "/app/frontend/src/pages/CustomerMenu.js",
+      "fix_description": "Customer menu now shows branch selection first when multiple branches exist",
+      "status": "VERIFIED"
+    },
+    {
+      "issue": "الشعار يظهر كمربع برتقالي",
+      "fix_location": "/app/frontend/src/pages/CustomerMenu.js lines 546-566",
+      "fix_description": "Logo displays first letter of restaurant name if no logo URL is set",
+      "status": "VERIFIED"
+    }
+  ],
+  
+  "code_changes_made": [
+    {
+      "file": "/app/backend/server.py",
+      "change": "Added default branch filtering to /api/customer/menu/{tenant_id} endpoint",
+      "lines": "12306-12316",
+      "reason": "Customer menu was returning default branches which should be hidden"
+    }
+  ],
+  
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_46.py",
+    "/app/test_reports/pytest/pytest_results_iter46.xml"
+  ],
+  
+  "action_items": [],
+  
+  "critical_code_review_comments": [
+    "Customer menu API now correctly filters out default branches using $nin operator",
+    "Reports page search button properly triggers data refresh",
+    "Logo fallback to first letter works correctly when no logo URL is set"
+  ],
+  
+  "updated_files": [
+    "/app/backend/server.py - Fixed customer menu API to hide default branches"
+  ],
+  
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  
+  "test_credentials": {
+    "demo_client": {
+      "email": "demo@maestroegp.com",
+      "password": "demo123",
+      "role": "admin",
+      "tenant_id": "82092f09-0381-4879-a90b-31dab76cce97"
+    }
+  },
+  
+  "seed_data_creation": "Created test table #388 for Aljadreia branch during testing",
+  
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "Iteration 46 verified all bug fixes: 1) Branches API and Customer Menu API now hide default branches (الفرع الرئيسي, Main Branch, etc.) using $nin filter. 2) Reports page has search button with data-testid='search-btn'. 3) Customer menu shows branch selection first when multiple branches exist. 4) Logo displays first letter of restaurant name when no logo is set. Reports are empty because no orders exist in database - this is expected behavior, not a bug.",
+  
+  "notes": "التقارير فارغة لأنه لا توجد طلبات في قاعدة البيانات - هذا ليس خطأ برمجي"
+}
