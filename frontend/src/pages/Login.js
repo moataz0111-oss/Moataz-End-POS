@@ -193,12 +193,10 @@ export default function Login() {
     const result = await login(email, password);
     
     if (result.success) {
-      // توجيه المالك والأدمن مباشرة للوحة التحكم
-      if (result.user?.role === 'super_admin') {
-        navigate('/super-admin');
-      } else {
-        navigate('/');
-      }
+      navigate('/');
+    } else if (result.redirectToSuperAdmin) {
+      // تحويل مالك النظام إلى بوابة المالك
+      navigate('/super-admin');
     } else {
       setError(result.error);
       // After 2 failed login attempts, show database initialization option
