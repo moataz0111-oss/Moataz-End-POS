@@ -58,7 +58,8 @@ import {
   Copy,
   Link,
   QrCode,
-  Smartphone
+  Smartphone,
+  ClipboardList
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
