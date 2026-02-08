@@ -269,7 +269,51 @@ export default function CustomerMenu() {
   useEffect(() => {
     fetchMenu();
     loadSavedData();
+    fetchOrderHistory();
+    // تحديد الموقع تلقائياً عند فتح التطبيق
+    autoDetectLocation();
   }, [tenantId]);
+
+  // تحديد الموقع تلقائياً
+  const autoDetectLocation = () => {
+    if (!deliveryLocation && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setDeliveryLocation([pos.coords.latitude, pos.coords.longitude]);
+          // حفظ الموقع في localStorage
+          const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
+          const customerData = savedCustomer ? JSON.parse(savedCustomer) : {};
+          customerData.location = [pos.coords.latitude, pos.coords.longitude];
+          localStorage.setItem(`customer_${tenantId}`, JSON.stringify(customerData));
+        },
+        (error) => {
+          console.log('Could not auto-detect location:', error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  };
+
+  // جلب سجل الطلبات السابقة
+  const fetchOrderHistory = async () => {
+    const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
+    if (!savedCustomer) return;
+    
+    const customerData = JSON.parse(savedCustomer);
+    if (!customerData.phone) return;
+    
+    try {
+      const res = await axios.get(`${API}/customer/orders/history`, {
+        params: {
+          tenant_id: tenantId,
+          phone: customerData.phone
+        }
+      });
+      setOrderHistory(res.data || []);
+    } catch (error) {
+      console.log('Could not fetch order history:', error.message);
+    }
+  };
 
   const loadSavedData = () => {
     // Load cart
