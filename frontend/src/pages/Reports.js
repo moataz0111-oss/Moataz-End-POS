@@ -307,6 +307,22 @@ export default function Reports() {
               className="mt-1 w-[150px]"
             />
           </div>
+          {/* زر البحث */}
+          <div className="flex items-end">
+            <Button 
+              onClick={fetchReports} 
+              disabled={loading}
+              className="bg-primary hover:bg-primary/90 gap-2"
+              data-testid="search-btn"
+            >
+              {loading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Search className="h-4 w-4" />
+              )}
+              بحث
+            </Button>
+          </div>
         </div>
       </div>
 
