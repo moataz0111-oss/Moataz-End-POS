@@ -162,7 +162,7 @@ async def get_purchases_report(
     by_payment_status = {"paid": 0, "pending": 0, "partial": 0}
     
     for p in purchases:
-        supplier = p.get("supplier_name", "Unknown")
+        supplier = p.get("supplier_name", "غير محدد")
         by_supplier[supplier] = by_supplier.get(supplier, 0) + p["total_amount"]
         
         date = p["created_at"][:10]
