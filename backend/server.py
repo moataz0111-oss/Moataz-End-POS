@@ -12597,11 +12597,21 @@ async def get_menu_link(request: Request, current_user: dict = Depends(get_curre
     tenant = await db.tenants.find_one({"id": tenant_id})
     
     if not tenant:
+        # جلب اسم المطعم من الإعدادات
+        restaurant_settings = await db.settings.find_one({"tenant_id": tenant_id, "type": "restaurant"})
+        restaurant_name = None
+        if restaurant_settings:
+            restaurant_name = restaurant_settings.get("value", {}).get("name")
+        
+        # إذا لم يوجد اسم، استخدم اسم المستخدم أو البريد الإلكتروني
+        if not restaurant_name:
+            restaurant_name = current_user.get("restaurant_name") or current_user.get("full_name") or current_user.get("email", "").split("@")[0]
+        
         # إنشاء tenant جديد
         tenant = {
             "id": tenant_id,
-            "name": current_user.get("restaurant_name", "مطعمي"),
-            "menu_slug": generate_menu_slug(current_user.get("restaurant_name", tenant_id)),
+            "name": restaurant_name,
+            "menu_slug": generate_menu_slug(restaurant_name or tenant_id),
             "created_at": datetime.now(timezone.utc).isoformat()
         }
         await db.tenants.insert_one(tenant)
