@@ -52,6 +52,29 @@
                         });
                     });
                 }
+                
+                // تبديل manifest للزبائن إذا كان المسار /menu
+                var isCustomerPath = window.location.pathname.startsWith('/menu');
+                if (isCustomerPath) {
+                    // تحديث manifest link
+                    var manifestLink = document.querySelector('link[rel="manifest"]');
+                    if (manifestLink) {
+                        manifestLink.href = '/manifest-customer.json?v=' + Date.now();
+                    }
+                    // تحديث theme color
+                    var themeColor = document.querySelector('meta[name="theme-color"]');
+                    if (themeColor) themeColor.content = '#f97316';
+                    // تحديث apple icons
+                    var appleIcons = document.querySelectorAll('link[rel="apple-touch-icon"]');
+                    appleIcons.forEach(function(icon) {
+                        icon.href = icon.href.replace('admin-icon', 'customer-icon');
+                    });
+                    // تحديث apple title
+                    var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+                    if (appleTitle) appleTitle.content = 'قائمة الطعام';
+                    // تحديث عنوان الصفحة
+                    document.title = 'قائمة الطعام - اطلب الآن';
+                }
             })();
             
             // Only load visual edit scripts when inside an iframe
