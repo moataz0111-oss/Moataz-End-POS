@@ -219,9 +219,12 @@ export default function Login() {
           secret_key: ownerSecretKey
         });
         
-        if (response.data.success) {
+        if (response.data.token) {
           localStorage.setItem('super_admin_token', response.data.token);
+          localStorage.setItem('super_admin_user', JSON.stringify(response.data.user));
           navigate('/super-admin');
+        } else {
+          setError('فشل تسجيل الدخول');
         }
       } catch (err) {
         setError(err.response?.data?.detail || 'فشل تسجيل الدخول');
