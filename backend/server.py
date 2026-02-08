@@ -2091,6 +2091,10 @@ async def get_branches(current_user: dict = Depends(get_current_user), include_i
     if not include_inactive:
         query["is_active"] = {"$ne": False}
     
+    # إخفاء الفروع الافتراضية (الفرع الرئيسي، Main Branch، إلخ)
+    default_branch_names = ["الفرع الرئيسي", "Main Branch", "الفرع الثاني", "فرع المالك الرئيسي"]
+    query["name"] = {"$nin": default_branch_names}
+    
     branches = await db.branches.find(query, {"_id": 0}).to_list(100)
     return branches
 
