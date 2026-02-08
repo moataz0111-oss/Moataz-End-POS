@@ -709,6 +709,7 @@ export default function Dashboard() {
     const permissionMap = {
       'showPOS': 'pos',
       'showTables': 'tables',
+      'showOrders': 'orders',
       'showKitchen': 'kitchen',
       'showReports': 'reports',
       'showSmartReports': 'reports',
