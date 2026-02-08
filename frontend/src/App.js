@@ -375,6 +375,7 @@ function AppRoutes() {
       {/* صفحة إدارة النظام */}
       <Route path="/system-admin" element={<ProtectedRoute><SystemAdmin /></ProtectedRoute>} />
       {/* قائمة العملاء - بدون حماية */}
+      <Route path="/menu" element={<RestaurantSelector />} />
       <Route path="/menu/:tenantId" element={<CustomerMenu />} />
       <Route path="/install-app" element={<CustomerInstall />} />
       <Route path="*" element={<Navigate to="/" />} />
