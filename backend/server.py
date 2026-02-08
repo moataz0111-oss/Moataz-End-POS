@@ -9607,14 +9607,19 @@ async def get_reports_sales(
     
     # أكثر المنتجات مبيعاً
     product_sales = {}
+    logger.info(f"Processing {len(orders)} orders for top products")
     for order in orders:
-        for item in order.get("items", []):
+        items = order.get("items", [])
+        logger.info(f"Order items: {items}")
+        for item in items:
             name = item.get("name", "غير معروف")
+            logger.info(f"Processing item: {name}")
             if name not in product_sales:
                 product_sales[name] = {"quantity": 0, "revenue": 0}
             product_sales[name]["quantity"] += item.get("quantity", 1)
             product_sales[name]["revenue"] += item.get("price", 0) * item.get("quantity", 1)
     
+    logger.info(f"Product sales result: {product_sales}")
     top_products = dict(sorted(product_sales.items(), key=lambda x: x[1]["revenue"], reverse=True)[:10])
     
     # تقسيم حسب التاريخ
