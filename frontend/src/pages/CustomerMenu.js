@@ -1046,14 +1046,59 @@ export default function CustomerMenu() {
                   />
                 </div>
 
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => setShowMap(true)}
-                >
-                  <Navigation className="h-4 w-4 ml-2" />
-                  {deliveryLocation ? 'تم تحديد الموقع ✓' : 'تحديد الموقع على الخريطة'}
-                </Button>
+                {/* زر تحديد الموقع الحالي */}
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="default"
+                    className="bg-green-500 hover:bg-green-600"
+                    onClick={() => {
+                      if (navigator.geolocation) {
+                        toast.info('جاري تحديد موقعك...');
+                        navigator.geolocation.getCurrentPosition(
+                          (pos) => {
+                            setDeliveryLocation([pos.coords.latitude, pos.coords.longitude]);
+                            const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
+                            const customerData = savedCustomer ? JSON.parse(savedCustomer) : {};
+                            customerData.location = [pos.coords.latitude, pos.coords.longitude];
+                            localStorage.setItem(`customer_${tenantId}`, JSON.stringify(customerData));
+                            toast.success('تم تحديد موقعك بنجاح!');
+                          },
+                          (error) => {
+                            if (error.code === error.PERMISSION_DENIED) {
+                              toast.error('يرجى السماح بالوصول للموقع من إعدادات المتصفح');
+                            } else {
+                              toast.error('فشل في تحديد الموقع، حاول مرة أخرى');
+                            }
+                          },
+                          { enableHighAccuracy: true, timeout: 15000 }
+                        );
+                      } else {
+                        toast.error('المتصفح لا يدعم تحديد الموقع');
+                      }
+                    }}
+                    data-testid="get-location-btn"
+                  >
+                    <Navigation className="h-4 w-4 ml-2" />
+                    📍 موقعي الحالي
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowMap(true)}
+                  >
+                    <MapPin className="h-4 w-4 ml-2" />
+                    اختر من الخريطة
+                  </Button>
+                </div>
+
+                {/* عرض حالة الموقع */}
+                {deliveryLocation && (
+                  <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <MapPin className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm text-green-700 font-medium">✓ تم تحديد موقعك على الخريطة</span>
+                  </div>
+                )}
 
                 <div>
                   <label className="text-sm font-medium mb-1 block">ملاحظات للسائق (اختياري)</label>
