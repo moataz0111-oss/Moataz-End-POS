@@ -7,7 +7,7 @@ import { Store, Search, MapPin, Phone, Star, Loader2, ChefHat } from 'lucide-rea
 import axios from 'axios';
 import { toast } from 'sonner';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
 export default function RestaurantSelector() {
   const [restaurants, setRestaurants] = useState([]);
