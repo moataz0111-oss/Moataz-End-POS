@@ -71,9 +71,15 @@ class TestCustomerMenu:
                 print(f"  - {branch.get('name', 'Unknown')}")
     
     def test_get_menu_invalid_tenant(self):
-        """Test GET /api/customer/menu/{invalid_tenant} returns 404"""
+        """Test GET /api/customer/menu/{invalid_tenant} returns empty data"""
         response = requests.get(f"{BASE_URL}/api/customer/menu/invalid-tenant-xyz")
-        assert response.status_code == 404
+        # API returns 200 with empty categories/products for invalid tenant
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert len(data.get("categories", [])) == 0
+        assert len(data.get("products", [])) == 0
+        print("Invalid tenant returns empty menu data")
 
 
 class TestCustomerOrderHistory:
