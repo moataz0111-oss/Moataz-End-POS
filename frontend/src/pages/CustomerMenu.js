@@ -723,6 +723,19 @@ export default function CustomerMenu() {
                   </button>
                 )}
               </div>
+              {/* زر سجل الطلبات */}
+              {orderHistory.length > 0 && (
+                <button
+                  onClick={() => setStep('history')}
+                  className="relative p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                  title="طلباتي السابقة"
+                >
+                  <History className="h-5 w-5" />
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 text-black text-xs rounded-full flex items-center justify-center font-bold">
+                    {orderHistory.length}
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         </header>
