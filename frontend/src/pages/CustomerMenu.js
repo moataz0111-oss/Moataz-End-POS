@@ -1305,6 +1305,110 @@ export default function CustomerMenu() {
     );
   }
 
+  // ==================== ORDER HISTORY VIEW ====================
+  if (step === 'history') {
+    return (
+      <div className="min-h-screen bg-gray-50" dir="rtl">
+        {/* Header */}
+        <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg">
+          <div className="max-w-lg mx-auto px-4 py-4">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setStep('menu')}
+                className="p-2 rounded-full bg-white/20 hover:bg-white/30"
+              >
+                <ArrowRight className="h-5 w-5" />
+              </button>
+              <div className="flex-1">
+                <h1 className="text-xl font-bold">طلباتي السابقة</h1>
+                <p className="text-sm text-blue-100">{orderHistory.length} طلب</p>
+              </div>
+              <History className="h-8 w-8 opacity-50" />
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-lg mx-auto px-4 py-4 space-y-3">
+          {orderHistory.length === 0 ? (
+            <div className="text-center py-12">
+              <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">لا توجد طلبات سابقة</p>
+              <Button onClick={() => setStep('menu')} className="mt-4">
+                اطلب الآن
+              </Button>
+            </div>
+          ) : (
+            orderHistory.map((order) => (
+              <Card key={order.id} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="font-bold text-lg">طلب #{order.order_number}</p>
+                      <p className="text-sm text-gray-500 flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(order.created_at).toLocaleDateString('ar-IQ', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      order.status === 'delivered' || order.status === 'completed'
+                        ? 'bg-green-100 text-green-700'
+                        : order.status === 'cancelled'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      {order.status_label}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between border-t pt-3">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Package className="h-4 w-4" />
+                      <span>{order.items_count} منتج</span>
+                    </div>
+                    <p className="font-bold text-lg text-orange-500">
+                      {order.total?.toLocaleString()} د.ع
+                    </p>
+                  </div>
+                  
+                  {/* إعادة الطلب */}
+                  <Button
+                    onClick={() => {
+                      // إعادة الطلب - إضافة نفس المنتجات للسلة
+                      if (order.items && order.items.length > 0) {
+                        const newCart = order.items.map(item => ({
+                          id: item.product_id || item.id,
+                          name: item.name,
+                          price: item.price,
+                          quantity: item.quantity,
+                          image: item.image
+                        }));
+                        setCart(newCart);
+                        setStep('cart');
+                        toast.success('تمت إضافة المنتجات للسلة');
+                      }
+                    }}
+                    variant="outline"
+                    className="w-full mt-3"
+                    size="sm"
+                  >
+                    <ShoppingCart className="h-4 w-4 ml-2" />
+                    إعادة الطلب
+                  </Button>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </main>
+      </div>
+    );
+  }
+
   // ==================== TRACKING VIEW ====================
   if (step === 'tracking' && currentOrder) {
     const statusSteps = [
