@@ -334,13 +334,18 @@ export default function CustomerMenu() {
       }
       
       // If only one branch or no branches, skip branch selection
-      if (fetchedBranches.length <= 1) {
-        if (fetchedBranches.length === 1) {
-          setSelectedBranch(fetchedBranches[0].id);
-          localStorage.setItem(`branch_${tenantId}`, fetchedBranches[0].id);
-        }
+      // لكن فقط إذا كان الفرع الوحيد ليس "الفرع الرئيسي"
+      if (fetchedBranches.length === 1 && 
+          fetchedBranches[0].name !== 'الفرع الرئيسي' && 
+          fetchedBranches[0].name !== 'Main Branch') {
+        setSelectedBranch(fetchedBranches[0].id);
+        localStorage.setItem(`branch_${tenantId}`, fetchedBranches[0].id);
+        setStep('menu');
+      } else if (fetchedBranches.length === 0) {
+        // لا يوجد فروع - اذهب للقائمة مباشرة
         setStep('menu');
       }
+      // إذا كان هناك أكثر من فرع، ابق في صفحة اختيار الفروع
       
       if (res.data.categories?.length > 0) {
         setSelectedCategory(res.data.categories[0].id);
