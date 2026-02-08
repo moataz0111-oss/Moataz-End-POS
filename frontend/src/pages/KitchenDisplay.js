@@ -267,14 +267,15 @@ export default function KitchenDisplay() {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`${API}/orders/${orderId}/status`, 
-        { status: newStatus },
+      await axios.put(`${API}/orders/${orderId}/status?status=${newStatus}`, 
+        {},
         { headers: { Authorization: `Bearer ${token}` }}
       );
       
       toast.success(newStatus === 'ready' ? 'تم تجهيز الطلب!' : 'تم تحديث الحالة');
       fetchOrders();
     } catch (error) {
+      console.error('Error updating status:', error);
       toast.error('فشل في تحديث الحالة');
     }
   };
