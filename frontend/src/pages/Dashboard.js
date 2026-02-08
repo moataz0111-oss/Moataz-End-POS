@@ -734,9 +734,9 @@ export default function Dashboard() {
       return user.permissions.includes(requiredPermission);
     }
     
-    // الكاشير يرى فقط: نقاط البيع، الطاولات، المصاريف، التوصيل (افتراضياً)
+    // الكاشير يرى فقط: نقاط البيع، الطاولات، إدارة الطلبات، المصاريف، التوصيل (افتراضياً)
     if (user?.role === 'cashier') {
-      const allowedForCashier = ['showPOS', 'showTables', 'showExpenses', 'showDelivery'];
+      const allowedForCashier = ['showPOS', 'showTables', 'showOrders', 'showExpenses', 'showDelivery'];
       return allowedForCashier.includes(action.key);
     }
     
