@@ -16,8 +16,8 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/customer.html",
-  "scope": "/",
+  "start_url": "/menu",
+  "scope": "/menu",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#f97316",
