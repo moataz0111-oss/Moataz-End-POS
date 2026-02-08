@@ -194,13 +194,50 @@ export default function Login() {
     setError('');
     setLoading(true);
 
+    // التحقق إذا كان البريد الإلكتروني للمالك
+    const ownerEmails = ['owner@maestroegp.com', 'hanialdujaili@gmail.com'];
+    if (ownerEmails.includes(email.toLowerCase())) {
+      // إذا لم يتم إدخال المفتاح السري، اطلبه
+      if (!isOwnerLogin) {
+        setIsOwnerLogin(true);
+        setLoading(false);
+        return;
+      }
+      
+      // التحقق من المفتاح السري
+      if (ownerSecretKey !== '271018') {
+        setError('المفتاح السري غير صحيح');
+        setLoading(false);
+        return;
+      }
+      
+      // التحقق من كلمة المرور عبر API super-admin/login
+      try {
+        const response = await axios.post(`${API}/super-admin/login`, {
+          email,
+          password,
+          secret_key: ownerSecretKey
+        });
+        
+        if (response.data.success) {
+          localStorage.setItem('super_admin_token', response.data.token);
+          navigate('/super-admin');
+        }
+      } catch (err) {
+        setError(err.response?.data?.detail || 'فشل تسجيل الدخول');
+      }
+      setLoading(false);
+      return;
+    }
+
     const result = await login(email, password);
     
     if (result.success) {
       navigate('/');
     } else if (result.redirectToSuperAdmin) {
       // تحويل مالك النظام إلى بوابة المالك
-      navigate('/super-admin');
+      setIsOwnerLogin(true);
+      setError('يرجى إدخال المفتاح السري');
     } else {
       setError(result.error);
       // After 2 failed login attempts, show database initialization option
