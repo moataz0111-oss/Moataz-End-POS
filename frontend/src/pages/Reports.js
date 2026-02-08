@@ -28,7 +28,8 @@ import {
   Percent,
   CreditCard,
   Clock,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Search
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
