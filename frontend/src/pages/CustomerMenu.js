@@ -127,7 +127,7 @@ export default function CustomerMenu() {
   const [searchParams] = useSearchParams();
   
   // App States
-  const [step, setStep] = useState('branches'); // branches, menu, cart, checkout, tracking
+  const [step, setStep] = useState('branches'); // branches, menu, cart, checkout, tracking, history
   const [restaurant, setRestaurant] = useState(null);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -137,6 +137,7 @@ export default function CustomerMenu() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentOrder, setCurrentOrder] = useState(null);
+  const [orderHistory, setOrderHistory] = useState([]);
   
   // Customer Info
   const [customerName, setCustomerName] = useState('');
