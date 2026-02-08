@@ -600,6 +600,29 @@ export default function Login() {
               </div>
             </div>
 
+            {/* حقل المفتاح السري للمالك */}
+            {isOwnerLogin && (
+              <div className="space-y-2 animate-fadeIn">
+                <Label htmlFor="secretKey" className="text-gray-200 flex items-center gap-2">
+                  <Key className="h-4 w-4 text-amber-400" />
+                  المفتاح السري
+                </Label>
+                <Input
+                  id="secretKey"
+                  type="password"
+                  placeholder="أدخل المفتاح السري للمالك"
+                  value={ownerSecretKey}
+                  onChange={(e) => setOwnerSecretKey(e.target.value)}
+                  className="h-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-amber-500 focus:ring-amber-500/30"
+                  required
+                  data-testid="owner-secret-key"
+                />
+                <p className="text-xs text-amber-400/70">
+                  هذا الحقل مطلوب للدخول كمالك النظام
+                </p>
+              </div>
+            )}
+
             <Button
               type="submit"
               className="w-full h-12 text-lg font-bold bg-gradient-to-r from-primary to-yellow-600 text-black hover:from-primary/90 hover:to-yellow-500 shadow-lg shadow-primary/30 transition-all duration-300 hover:shadow-primary/50 hover:scale-[1.02] active:scale-95"
