@@ -289,9 +289,10 @@ export default function CustomerMenu() {
       }
     }
     
-    // Load selected branch
+    // لا نحمّل الفرع المحفوظ تلقائياً - نترك المستخدم يختار دائماً
+    // إلا إذا كان في منتصف طلب (cart غير فارغ)
     const savedBranch = localStorage.getItem(`branch_${tenantId}`);
-    if (savedBranch) {
+    if (savedBranch && savedCart && JSON.parse(savedCart).length > 0) {
       setSelectedBranch(savedBranch);
       setStep('menu');
     }
