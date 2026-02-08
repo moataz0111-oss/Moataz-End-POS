@@ -64,6 +64,15 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.post(`${API}/auth/login`, { email, password });
       const { user: userData, token: newToken } = response.data;
       
+      // التحقق إذا كان المستخدم هو super_admin - تحويله إلى /super-admin
+      if (userData.role === 'super_admin') {
+        return { 
+          success: false, 
+          error: 'يرجى استخدام بوابة مالك النظام للدخول',
+          redirectToSuperAdmin: true
+        };
+      }
+      
       localStorage.setItem('token', newToken);
       axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
       setToken(newToken);
