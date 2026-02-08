@@ -107,6 +107,10 @@ export default function Login() {
   // Secret key for database initialization
   const [initSecretKey, setInitSecretKey] = useState('');
   
+  // Owner login states - المفتاح السري للمالك
+  const [isOwnerLogin, setIsOwnerLogin] = useState(false);
+  const [ownerSecretKey, setOwnerSecretKey] = useState('');
+  
   const { login } = useAuth();
   const navigate = useNavigate();
   
