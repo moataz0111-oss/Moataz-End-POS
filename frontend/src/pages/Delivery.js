@@ -524,25 +524,44 @@ export default function Delivery() {
                     </DialogHeader>
                     <form onSubmit={handleCreateDriver} className="space-y-4">
                       <div>
-                        <Label className="text-foreground">اسم السائق</Label>
+                        <Label className="text-foreground">اسم السائق *</Label>
                         <Input
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           required
                           className="mt-1"
+                          placeholder="الاسم الكامل للسائق"
                         />
                       </div>
                       <div>
-                        <Label className="text-foreground">رقم الهاتف</Label>
+                        <Label className="text-foreground">رقم الهاتف *</Label>
                         <Input
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           required
                           className="mt-1"
+                          placeholder="07xxxxxxxxx"
                         />
                       </div>
                       <div>
-                        <Label className="text-foreground">الرمز السري (PIN)</Label>
+                        <Label className="text-foreground">الفرع *</Label>
+                        <Select 
+                          value={formData.branch_id || selectedBranch || ''} 
+                          onValueChange={(val) => setFormData({ ...formData, branch_id: val })}
+                        >
+                          <SelectTrigger className="mt-1 bg-background border-input">
+                            <SelectValue placeholder="اختر الفرع" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {branches.map(branch => (
+                              <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground mt-1">السائق سيرى طلبات هذا الفرع فقط</p>
+                      </div>
+                      <div>
+                        <Label className="text-foreground">الرمز السري (PIN) *</Label>
                         <Input
                           type="password"
                           value={formData.pin}
