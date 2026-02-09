@@ -2036,16 +2036,16 @@ export default function Dashboard() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 justify-center">
               <Share2 className="h-5 w-5 text-orange-500" />
-              رمز QR للتطبيق
+              رمز QR للقائمة
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            {/* QR Code للتطبيق */}
+            {/* QR Code للقائمة */}
             <div className="bg-white rounded-xl p-6 text-center">
               <div id="qr-code-container" className="bg-white p-4 rounded-xl inline-block border-4 border-orange-100">
                 <QRCodeSVG 
-                  value={`${window.location.origin}/customer-app/?restaurant=${menuLink?.split('/menu/')[1] || 'default'}`} 
+                  value={menuLink || `${window.location.origin}/menu`} 
                   size={200}
                   level="H"
                   includeMargin={false}
@@ -2053,8 +2053,7 @@ export default function Dashboard() {
                   fgColor="#000000"
                 />
               </div>
-              <p className="text-sm font-medium mt-4 text-gray-600">امسح الكود لتثبيت التطبيق</p>
-              <p className="text-xs text-orange-500 mt-1">سيفتح على قائمة الطعام مباشرة</p>
+              <p className="text-sm font-medium mt-4 text-gray-600">امسح الكود للوصول للقائمة</p>
             </div>
             
             {/* زر تنزيل فقط */}
