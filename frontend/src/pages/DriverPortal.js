@@ -310,7 +310,8 @@ export default function DriverPortal() {
 
   const markAsDelivered = async (orderId) => {
     try {
-      await axios.put(`${API}/drivers/portal/${driver.id}/complete?order_id=${orderId}`);
+      // استخدام API الجديد بدون JWT
+      await axios.put(`${API}/driver/orders/${orderId}/status?status=delivered&driver_id=${driver.id}`);
       
       // تشغيل صوت إتمام التوصيل
       if (soundEnabled) {
@@ -320,7 +321,18 @@ export default function DriverPortal() {
       toast.success('تم تسليم الطلب بنجاح!');
       fetchDriverData();
     } catch (err) {
-      toast.error('فشل في تحديث الحالة');
+      toast.error(err.response?.data?.detail || 'فشل في تحديث الحالة');
+    }
+  };
+
+  // بدء التوصيل (في الطريق)
+  const startDelivery = async (orderId) => {
+    try {
+      await axios.put(`${API}/driver/orders/${orderId}/status?status=out_for_delivery&driver_id=${driver.id}`);
+      toast.success('تم تحديث الحالة - أنت الآن في الطريق');
+      fetchDriverData();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'فشل في تحديث الحالة');
     }
   };
 
