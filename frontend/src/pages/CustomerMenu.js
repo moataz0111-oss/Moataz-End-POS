@@ -302,13 +302,16 @@ export default function CustomerMenu() {
   const autoDetectLocation = () => {
     if (!deliveryLocation && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        async (pos) => {
           setDeliveryLocation([pos.coords.latitude, pos.coords.longitude]);
           // حفظ الموقع في localStorage
           const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
           const customerData = savedCustomer ? JSON.parse(savedCustomer) : {};
           customerData.location = [pos.coords.latitude, pos.coords.longitude];
           localStorage.setItem(`customer_${tenantId}`, JSON.stringify(customerData));
+          
+          // تحويل الإحداثيات لعنوان تلقائياً
+          await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
           toast.success('تم تحديد موقعك تلقائياً');
         },
         (error) => {
@@ -318,6 +321,68 @@ export default function CustomerMenu() {
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
     }
+  };
+
+  // تحويل الإحداثيات لعنوان (Reverse Geocoding)
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const res = await axios.get(`${API}/geocode/reverse`, {
+        params: { lat, lng }
+      });
+      if (res.data.address) {
+        // استخدام عنوان مختصر
+        const shortAddress = [
+          res.data.neighbourhood,
+          res.data.street,
+          res.data.city
+        ].filter(Boolean).join('، ');
+        setDeliveryAddress(shortAddress || res.data.address);
+      }
+    } catch (error) {
+      console.log('Reverse geocoding error:', error);
+    }
+  };
+
+  // البحث عن عنوان (Address Autocomplete)
+  const searchAddress = async (query) => {
+    if (!query || query.length < 3) {
+      setAddressSuggestions([]);
+      setShowAddressSuggestions(false);
+      return;
+    }
+    
+    setSearchingAddress(true);
+    try {
+      const params = { query };
+      if (deliveryLocation) {
+        params.lat = deliveryLocation[0];
+        params.lng = deliveryLocation[1];
+      }
+      
+      const res = await axios.get(`${API}/geocode/search`, { params });
+      setAddressSuggestions(res.data.results || []);
+      setShowAddressSuggestions(true);
+    } catch (error) {
+      console.log('Address search error:', error);
+    } finally {
+      setSearchingAddress(false);
+    }
+  };
+
+  // اختيار عنوان من الاقتراحات
+  const selectAddress = (suggestion) => {
+    setDeliveryAddress(suggestion.address);
+    setDeliveryLocation([suggestion.lat, suggestion.lng]);
+    setShowAddressSuggestions(false);
+    
+    // حفظ في localStorage
+    const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
+    const customerData = savedCustomer ? JSON.parse(savedCustomer) : {};
+    customerData.location = [suggestion.lat, suggestion.lng];
+    customerData.address = suggestion.address;
+    localStorage.setItem(`customer_${tenantId}`, JSON.stringify(customerData));
+    
+    toast.success('تم اختيار العنوان');
   };
 
   // جلب سجل الطلبات السابقة
