@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useBranch } from '../context/BranchContext';
 import { formatPrice } from '../utils/currency';
 import { playClick, playSuccess } from '../utils/sound';
+import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent } from '../components/ui/card';
