@@ -1,19 +1,7 @@
 // Currency Context - إدارة العملة في كل النظام
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { setCurrency as setLocalCurrency, refreshCurrencyCache } from '../utils/currency';
-
-// العملات المدعومة
-export const CURRENCIES = {
-  IQD: { code: 'IQD', name: 'دينار عراقي', symbol: 'د.ع', rate: 1, decimals: 0 },
-  USD: { code: 'USD', name: 'دولار أمريكي', symbol: '$', rate: 1460, decimals: 2 },
-  SAR: { code: 'SAR', name: 'ريال سعودي', symbol: 'ر.س', rate: 389, decimals: 2 },
-  AED: { code: 'AED', name: 'درهم إماراتي', symbol: 'د.إ', rate: 398, decimals: 2 },
-  EGP: { code: 'EGP', name: 'جنيه مصري', symbol: 'ج.م', rate: 30, decimals: 2 },
-  JOD: { code: 'JOD', name: 'دينار أردني', symbol: 'د.أ', rate: 2060, decimals: 3 },
-  KWD: { code: 'KWD', name: 'دينار كويتي', symbol: 'د.ك', rate: 4750, decimals: 3 },
-  EUR: { code: 'EUR', name: 'يورو', symbol: '€', rate: 1580, decimals: 2 },
-};
+import { setCurrency as setLocalCurrency, refreshCurrencyCache, CURRENCIES } from '../utils/currency';
 
 // اللغات المدعومة
 export const LANGUAGES = {
