@@ -489,6 +489,9 @@ export default function Settings() {
       // جلب إعدادات الفاتورة للعميل
       fetchInvoiceSettings();
       
+      // جلب إعدادات المنطقة والعملة
+      fetchRegionalSettings();
+      
       // جلب إعدادات المطعم
       fetchRestaurantSettings();
     } catch (error) {
