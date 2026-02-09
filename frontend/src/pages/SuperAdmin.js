@@ -979,6 +979,56 @@ export default function SuperAdmin() {
     }
   };
 
+  // جلب إعدادات المالك
+  const fetchOwnerSettings = async () => {
+    try {
+      const res = await axios.get(`${API}/super-admin/owner-settings`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      setOwnerSettings(res.data);
+    } catch (error) {
+      console.log('Error fetching owner settings');
+    }
+  };
+
+  // تحديث إعدادات المالك
+  const updateOwnerSettings = async () => {
+    if (newOwnerPassword && newOwnerPassword !== confirmOwnerPassword) {
+      toast.error('كلمات المرور غير متطابقة');
+      return;
+    }
+    
+    setSavingOwnerSettings(true);
+    try {
+      const updateData = {};
+      if (newOwnerPassword) {
+        updateData.password = newOwnerPassword;
+      }
+      if (newOwnerSecretKey) {
+        updateData.secret_key = newOwnerSecretKey;
+      }
+      
+      if (Object.keys(updateData).length === 0) {
+        toast.info('لم يتم إجراء أي تغييرات');
+        setSavingOwnerSettings(false);
+        return;
+      }
+      
+      await axios.put(`${API}/super-admin/owner-settings`, updateData, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      
+      toast.success('تم تحديث إعدادات المالك بنجاح');
+      setNewOwnerPassword('');
+      setConfirmOwnerPassword('');
+      setNewOwnerSecretKey('');
+    } catch (error) {
+      toast.error('فشل في تحديث إعدادات المالك');
+    } finally {
+      setSavingOwnerSettings(false);
+    }
+  };
+
   const saveSystemBranding = async () => {
     setBrandingLoading(true);
     try {
