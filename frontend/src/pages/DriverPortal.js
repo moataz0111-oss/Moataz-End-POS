@@ -181,7 +181,8 @@ export default function DriverPortal() {
         // Send location to server
         if (driver?.id) {
           try {
-            await axios.put(`${API}/drivers/portal/${driver.id}/location`, {
+            // استخدام API الجديد بدون JWT
+            await axios.post(`${API}/driver/update-location?driver_id=${driver.id}`, {
               latitude,
               longitude
             });
@@ -217,7 +218,7 @@ export default function DriverPortal() {
       // Update location every 30 seconds
       const locationInterval = setInterval(() => {
         if (currentLocation && driver?.id) {
-          axios.put(`${API}/drivers/portal/${driver.id}/location`, currentLocation)
+          axios.post(`${API}/driver/update-location?driver_id=${driver.id}`, currentLocation)
             .catch(console.error);
         }
       }, 30000);
