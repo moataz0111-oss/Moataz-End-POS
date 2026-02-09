@@ -12597,6 +12597,12 @@ async def get_menu_link(request: Request, current_user: dict = Depends(get_curre
     # التحقق من وجود tenant أو إنشائه
     tenant = await db.tenants.find_one({"id": tenant_id})
     
+    # التحقق من صلاحية قائمة الطعام للعملاء
+    if tenant:
+        enabled_features = tenant.get("enabled_features", {})
+        if enabled_features.get("showCustomerMenu") == False:
+            raise HTTPException(status_code=403, detail="قائمة الطعام للعملاء غير مفعلة")
+    
     if not tenant:
         # جلب اسم المطعم من الإعدادات
         restaurant_settings = await db.settings.find_one({"tenant_id": tenant_id, "type": "restaurant"})
