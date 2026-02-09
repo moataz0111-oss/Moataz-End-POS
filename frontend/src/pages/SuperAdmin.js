@@ -369,6 +369,8 @@ export default function SuperAdmin() {
       fetchExpiringSubscriptions();
       fetchSubscriptionsDashboard();
       fetchOwnerSettings();
+      fetchCurrencySettings();
+      fetchSalesSummary();
     }
   }, [isAuthenticated]);
 
