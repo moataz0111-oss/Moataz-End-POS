@@ -3243,6 +3243,67 @@ export default function SuperAdmin() {
                   )}
                 </Button>
               </div>
+
+              {/* إعدادات عرض العملة للمالك */}
+              <div className="space-y-4 mt-6 pt-6 border-t border-gray-700">
+                <h3 className="font-bold text-green-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                  <DollarSign className="h-4 w-4" />
+                  إعدادات عرض المبيعات
+                </h3>
+                <p className="text-sm text-gray-400">تحديد العملة التي تريد عرض المبيعات بها (سيتم تحويل جميع العملات تلقائياً)</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                    <Label className="text-gray-300 flex items-center gap-2 mb-3">
+                      <Globe className="h-4 w-4 text-blue-400" />
+                      عملة العرض الرئيسية
+                    </Label>
+                    <select
+                      value={localStorage.getItem('owner_display_currency') || 'IQD'}
+                      onChange={(e) => {
+                        localStorage.setItem('owner_display_currency', e.target.value);
+                        toast.success(`تم تغيير عملة العرض إلى ${e.target.value}`);
+                      }}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    >
+                      <option value="IQD">🇮🇶 دينار عراقي (د.ع)</option>
+                      <option value="USD">🇺🇸 دولار أمريكي ($)</option>
+                      <option value="SAR">🇸🇦 ريال سعودي (ر.س)</option>
+                      <option value="AED">🇦🇪 درهم إماراتي (د.إ)</option>
+                      <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-2">جميع المبيعات ستُعرض بهذه العملة</p>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                    <Label className="text-gray-300 flex items-center gap-2 mb-3">
+                      <Languages className="h-4 w-4 text-purple-400" />
+                      لغة لوحة التحكم
+                    </Label>
+                    <select
+                      value={localStorage.getItem('owner_language') || 'ar'}
+                      onChange={(e) => {
+                        localStorage.setItem('owner_language', e.target.value);
+                        toast.success('تم تغيير اللغة - سيتم تحديث الصفحة');
+                        setTimeout(() => window.location.reload(), 1000);
+                      }}
+                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
+                    >
+                      <option value="ar">العربية</option>
+                      <option value="en">English</option>
+                      <option value="ku">کوردی</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-2">لغة واجهة لوحة التحكم</p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                  <p className="text-sm text-blue-400 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <strong>ملاحظة:</strong> عند استخدام عملاء بعملات مختلفة، سيتم تحويل جميع المبالغ تلقائياً إلى العملة المحددة أعلاه
+                  </p>
+                </div>
+              </div>
             </TabsContent>
 
             {/* تبويب إعدادات الفواتير */}
