@@ -28,7 +28,8 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": "/login",
+  "id": "/admin",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
@@ -40,5 +41,19 @@
     "business",
     "productivity"
   ],
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "نقطة البيع",
+      "short_name": "POS",
+      "url": "/pos",
+      "icons": [{ "src": "/icons/admin-icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "الطلبات",
+      "short_name": "طلبات",
+      "url": "/orders",
+      "icons": [{ "src": "/icons/admin-icon-192.png", "sizes": "192x192" }]
+    }
+  ]
 }
