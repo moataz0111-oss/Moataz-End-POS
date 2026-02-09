@@ -838,6 +838,19 @@ export default function CustomerMenu() {
                   </button>
                 )}
               </div>
+              {/* زر المفضلة */}
+              <button
+                onClick={() => setShowFavoritesDialog(true)}
+                className="relative p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                title="طلباتي المفضلة"
+              >
+                <Heart className="h-5 w-5" />
+                {favorites.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-pink-400 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                    {favorites.length}
+                  </span>
+                )}
+              </button>
               {/* زر سجل الطلبات */}
               {orderHistory.length > 0 && (
                 <button
