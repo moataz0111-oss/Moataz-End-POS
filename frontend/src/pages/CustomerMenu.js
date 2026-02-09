@@ -377,13 +377,11 @@ export default function CustomerMenu() {
         notes: item.notes || ''
       }));
 
-      await axios.post(`${API}/customer/favorites/add`, null, {
-        params: {
-          tenant_id: tenantId,
-          phone: customerData.phone,
-          name: favoriteName || `طلبي المفضل`
-        },
-        data: items
+      await axios.post(`${API}/customer/favorites/add`, {
+        tenant_id: tenantId,
+        phone: customerData.phone,
+        name: favoriteName || `طلبي المفضل`,
+        items: items
       });
 
       toast.success('تم حفظ الطلب في المفضلة ⭐');
