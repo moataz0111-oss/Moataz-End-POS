@@ -987,7 +987,7 @@ export default function SuperAdmin() {
   const fetchOwnerSettings = async () => {
     try {
       const res = await axios.get(`${API}/super-admin/owner-settings`, {
-        headers: { Authorization: `Bearer ${user.token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
       setOwnerSettings(res.data);
     } catch (error) {
