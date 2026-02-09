@@ -2109,9 +2109,8 @@ export default function CustomerMenu() {
       React.useEffect(() => {
         const fetchDriverInfo = async () => {
           try {
-            const res = await axios.get(`${API}/customer/order-driver/${currentOrder.id}`, {
-              params: { phone: customerPhone }
-            });
+            // استخدام API الجديد بدون مصادقة
+            const res = await axios.get(`${API}/driver/order-driver-info/${currentOrder.id}`);
             setDriverInfo(res.data);
           } catch (error) {
             console.log('Could not fetch driver info:', error);
