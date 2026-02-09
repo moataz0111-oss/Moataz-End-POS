@@ -77,6 +77,10 @@ export default function Delivery() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', phone: '', pin: '1234' });
   
+  // حالات تحديد ومسح السائقين
+  const [selectedDrivers, setSelectedDrivers] = useState([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  
   // حالات تعديل السائق
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editFormData, setEditFormData] = useState({ id: '', name: '', phone: '', pin: '', is_active: true });
