@@ -7308,7 +7308,6 @@ async def super_admin_login(request: SuperAdminLoginRequest):
     
     # التحقق من المفتاح السري (من قاعدة البيانات أو القيمة الافتراضية)
     stored_secret = user.get("secret_key") or SUPER_ADMIN_SECRET
-    logger.info(f"Super Admin Login - stored_secret: '{stored_secret}', request_secret: '{request.secret_key}', SUPER_ADMIN_SECRET: '{SUPER_ADMIN_SECRET}'")
     if request.secret_key != stored_secret:
         raise HTTPException(status_code=403, detail="المفتاح السري غير صحيح")
     
