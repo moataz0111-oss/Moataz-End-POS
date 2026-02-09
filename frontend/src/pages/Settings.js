@@ -589,9 +589,17 @@ export default function Settings() {
     setSavingRegionalSettings(true);
     try {
       await axios.put(`${API}/tenant/regional-settings`, regionalSettings);
-      toast.success('تم حفظ إعدادات المنطقة والعملة بنجاح');
+      
+      // حفظ العملة في localStorage لتطبيقها على كل النظام
+      localStorage.setItem('app_currency', regionalSettings.currency);
+      localStorage.setItem('app_language', regionalSettings.language);
+      localStorage.setItem('app_country', regionalSettings.country);
+      
+      // إعادة تحميل الصفحة لتطبيق التغييرات
+      toast.success('تم حفظ إعدادات النظام بنجاح - سيتم تحديث الصفحة');
+      setTimeout(() => window.location.reload(), 1500);
     } catch (error) {
-      toast.error('فشل في حفظ إعدادات المنطقة');
+      toast.error('فشل في حفظ إعدادات النظام');
     } finally {
       setSavingRegionalSettings(false);
     }
