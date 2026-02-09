@@ -283,14 +283,22 @@ export default function DriverPortal() {
     if (!driver?.id) return;
     
     try {
-      const res = await axios.get(`${API}/drivers/portal/${driver.id}`);
-      const newOrders = res.data.orders || [];
+      // استخدام API الجديد بدون JWT
+      const ordersRes = await axios.get(`${API}/driver/orders?driver_id=${driver.id}`);
+      const newOrders = ordersRes.data || [];
       
       // التحقق من الطلبات الجديدة
       checkForNewOrders(newOrders);
       
       setOrders(newOrders);
-      setStats(res.data.stats || { unpaid_total: 0, paid_today: 0, pending_orders: 0 });
+      
+      // حساب الإحصائيات محلياً
+      const stats = {
+        unpaid_total: newOrders.filter(o => !o.is_paid).reduce((sum, o) => sum + (o.total || 0), 0),
+        paid_today: newOrders.filter(o => o.is_paid).reduce((sum, o) => sum + (o.total || 0), 0),
+        pending_orders: newOrders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled').length
+      };
+      setStats(stats);
       setError(null);
     } catch (err) {
       console.error('Error fetching driver data:', err);
