@@ -13270,6 +13270,9 @@ async def create_driver(
     
     tenant_id = get_user_tenant_id(current_user)
     
+    # Debug logging
+    logger.info(f"Creating driver with PIN: {driver_data.pin}")
+    
     driver = {
         "id": str(uuid.uuid4()),
         "tenant_id": tenant_id,
@@ -13283,6 +13286,8 @@ async def create_driver(
         "last_location_update": None,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
+    
+    logger.info(f"Driver dict before insert: pin={driver.get('pin')}")
     
     await db.drivers.insert_one(driver)
     driver.pop("_id", None)
