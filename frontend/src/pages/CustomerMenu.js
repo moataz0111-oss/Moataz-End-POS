@@ -2037,6 +2037,146 @@ export default function CustomerMenu() {
     const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
     const currentIdx = statusOrder.indexOf(currentOrder.status);
 
+    // مكون عرض موقع السائق
+    const DriverTrackingMap = () => {
+      const [driverInfo, setDriverInfo] = React.useState(null);
+      const [loadingDriver, setLoadingDriver] = React.useState(true);
+
+      React.useEffect(() => {
+        const fetchDriverInfo = async () => {
+          try {
+            const res = await axios.get(`${API}/customer/order-driver/${currentOrder.id}`, {
+              params: { phone: customerPhone }
+            });
+            setDriverInfo(res.data);
+          } catch (error) {
+            console.log('Could not fetch driver info:', error);
+          } finally {
+            setLoadingDriver(false);
+          }
+        };
+
+        // جلب معلومات السائق كل 10 ثواني
+        fetchDriverInfo();
+        const interval = setInterval(fetchDriverInfo, 10000);
+        return () => clearInterval(interval);
+      }, []);
+
+      if (loadingDriver) {
+        return (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-green-500" />
+          </div>
+        );
+      }
+
+      if (!driverInfo?.driver) {
+        return (
+          <div className="text-center py-6 text-gray-500">
+            <Truck className="h-12 w-12 mx-auto mb-2 opacity-50" />
+            <p>لم يتم تخصيص سائق بعد</p>
+            <p className="text-sm">سيتم تخصيص سائق قريباً</p>
+          </div>
+        );
+      }
+
+      const driver = driverInfo.driver;
+      const hasLocation = driver.current_location?.latitude && driver.current_location?.longitude;
+
+      return (
+        <div className="space-y-4">
+          {/* معلومات السائق */}
+          <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-100">
+            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white text-xl font-bold shadow-lg">
+              {driver.name?.[0] || '🚚'}
+            </div>
+            <div className="flex-1">
+              <p className="font-bold text-lg">{driver.name}</p>
+              <p className="text-sm text-gray-500">السائق المخصص لطلبك</p>
+              {driver.last_location_update && (
+                <p className="text-xs text-green-600">
+                  آخر تحديث: {new Date(driver.last_location_update).toLocaleTimeString('ar-IQ')}
+                </p>
+              )}
+            </div>
+            <a
+              href={`tel:${driver.phone}`}
+              className="w-12 h-12 rounded-full bg-green-500 hover:bg-green-600 flex items-center justify-center text-white shadow-lg transition-transform hover:scale-110"
+            >
+              <Phone className="h-5 w-5" />
+            </a>
+          </div>
+
+          {/* خريطة تتبع السائق */}
+          {hasLocation && (
+            <div className="rounded-xl overflow-hidden shadow-lg border-2 border-green-200">
+              <div className="bg-green-500 text-white px-4 py-2 flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span className="font-medium">موقع السائق على الخريطة</span>
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full mr-auto">مباشر</span>
+              </div>
+              <div className="h-64">
+                <MapContainer
+                  center={[driver.current_location.latitude, driver.current_location.longitude]}
+                  zoom={15}
+                  style={{ height: '100%', width: '100%' }}
+                  zoomControl={false}
+                >
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  
+                  {/* موقع السائق */}
+                  <Marker 
+                    position={[driver.current_location.latitude, driver.current_location.longitude]}
+                    icon={L.divIcon({
+                      className: 'driver-marker',
+                      html: '<div style="background: linear-gradient(135deg, #3b82f6, #10b981); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">🛵</div>',
+                      iconSize: [40, 40],
+                      iconAnchor: [20, 20]
+                    })}
+                  >
+                    <Popup>
+                      <div className="text-center">
+                        <p className="font-bold">{driver.name}</p>
+                        <p className="text-sm text-green-600">السائق</p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                  
+                  {/* موقع التوصيل */}
+                  {driverInfo.delivery_location && (
+                    <Marker 
+                      position={[driverInfo.delivery_location.latitude, driverInfo.delivery_location.longitude]}
+                      icon={L.divIcon({
+                        className: 'delivery-marker',
+                        html: '<div style="background: linear-gradient(135deg, #f97316, #ef4444); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">📍</div>',
+                        iconSize: [36, 36],
+                        iconAnchor: [18, 18]
+                      })}
+                    >
+                      <Popup>
+                        <div className="text-center">
+                          <p className="font-bold">موقع التوصيل</p>
+                          <p className="text-sm text-orange-600">عنوانك</p>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  )}
+                </MapContainer>
+              </div>
+            </div>
+          )}
+
+          {!hasLocation && (
+            <div className="text-center py-6 bg-yellow-50 rounded-xl border border-yellow-200">
+              <Navigation className="h-10 w-10 mx-auto mb-2 text-yellow-500" />
+              <p className="text-yellow-700 font-medium">موقع السائق غير متاح حالياً</p>
+              <p className="text-sm text-yellow-600">سيتم تحديث الموقع عند تحركه</p>
+            </div>
+          )}
+        </div>
+      );
+    };
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50" dir="rtl">
         {/* Header */}
@@ -2049,6 +2189,19 @@ export default function CustomerMenu() {
         </header>
 
         <main className="max-w-lg mx-auto px-4 py-6 space-y-4">
+          {/* Driver Tracking - يظهر عندما يكون الطلب في مرحلة التوصيل */}
+          {(currentOrder.status === 'out_for_delivery' || currentOrder.driver_id) && (
+            <Card className="border-2 border-green-200">
+              <CardContent className="p-4">
+                <h2 className="font-bold mb-4 flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-green-500" />
+                  تتبع السائق
+                </h2>
+                <DriverTrackingMap />
+              </CardContent>
+            </Card>
+          )}
+
           {/* Status Timeline */}
           <Card>
             <CardContent className="p-4">
@@ -2106,6 +2259,17 @@ export default function CustomerMenu() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Rate Order Button - يظهر عند التسليم */}
+          {(currentOrder.status === 'delivered' || currentOrder.status === 'completed') && (
+            <Button 
+              className="w-full h-12 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black"
+              onClick={() => openRatingDialog(currentOrder)}
+            >
+              <Star className="h-5 w-5 ml-2" />
+              قيّم طلبك
+            </Button>
+          )}
 
           {/* New Order Button */}
           <Button 
