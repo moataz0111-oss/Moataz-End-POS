@@ -368,15 +368,15 @@ export default function DriverPortal() {
             {/* Login Form */}
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <Label className="text-gray-300">البريد الإلكتروني</Label>
+                <Label className="text-gray-300">رقم الهاتف</Label>
                 <div className="relative mt-1">
-                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+                  <Phone className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                   <Input
-                    type="email"
-                    value={loginForm.email}
-                    onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                    className="pr-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
-                    placeholder="example@maestroegp.com"
+                    type="tel"
+                    value={loginForm.phone}
+                    onChange={(e) => setLoginForm({ ...loginForm, phone: e.target.value })}
+                    className="pr-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-500 text-center tracking-wider"
+                    placeholder="07xxxxxxxxx"
                     required
                     dir="ltr"
                   />
@@ -384,15 +384,16 @@ export default function DriverPortal() {
               </div>
               
               <div>
-                <Label className="text-gray-300">كلمة المرور</Label>
+                <Label className="text-gray-300">الرمز السري (PIN)</Label>
                 <div className="relative mt-1">
                   <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
                   <Input
                     type="password"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    className="pr-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
-                    placeholder="••••••••"
+                    value={loginForm.pin}
+                    onChange={(e) => setLoginForm({ ...loginForm, pin: e.target.value })}
+                    className="pr-10 bg-gray-700 border-gray-600 text-white placeholder:text-gray-500 text-center tracking-widest"
+                    placeholder="••••"
+                    maxLength={6}
                     required
                   />
                 </div>
