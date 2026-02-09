@@ -208,17 +208,27 @@ class TestAddDriverForm:
         """Test creating driver with only name, phone, and PIN"""
         headers = {"Authorization": f"Bearer {auth_token}"}
         
+        # First get a branch_id
+        branches_response = requests.get(f"{BASE_URL}/api/branches", headers=headers)
+        branches = branches_response.json()
+        branch_id = branches[0]["id"] if branches else None
+        
+        if not branch_id:
+            pytest.skip("No branches found")
+        
         import time
         unique_phone = f"079{int(time.time()) % 10000000:07d}"
         
+        # The form only requires name, phone, PIN - branch_id is auto-selected
         driver_data = {
             "name": "سائق اختبار",
             "phone": unique_phone,
-            "pin": "5678"
+            "pin": "5678",
+            "branch_id": branch_id  # This is auto-selected in the UI
         }
         
         response = requests.post(f"{BASE_URL}/api/drivers", json=driver_data, headers=headers)
-        assert response.status_code in [200, 201], f"Expected 200/201, got {response.status_code}"
+        assert response.status_code in [200, 201], f"Expected 200/201, got {response.status_code}: {response.text}"
         
         data = response.json()
         assert "id" in data or "driver" in data, "Response should contain driver data"
