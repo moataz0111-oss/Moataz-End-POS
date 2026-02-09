@@ -481,6 +481,19 @@ export default function Delivery() {
                         className="mt-1"
                       />
                     </div>
+                    <div>
+                      <Label className="text-foreground">الرمز السري (PIN)</Label>
+                      <Input
+                        type="password"
+                        value={formData.pin}
+                        onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
+                        required
+                        maxLength={6}
+                        placeholder="4-6 أرقام"
+                        className="mt-1"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">يستخدم السائق هذا الرمز لتسجيل الدخول</p>
+                    </div>
                     <div className="flex gap-2 pt-4">
                       <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
                         إلغاء
