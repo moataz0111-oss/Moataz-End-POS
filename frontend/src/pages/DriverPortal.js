@@ -41,7 +41,7 @@ const API = API_URL;
 export default function DriverPortal() {
   // حالة تسجيل الدخول
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [loginForm, setLoginForm] = useState({ phone: '', pin: '' });
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   
