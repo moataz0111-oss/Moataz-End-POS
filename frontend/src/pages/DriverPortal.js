@@ -120,46 +120,31 @@ export default function DriverPortal() {
     setLoginError('');
     
     try {
-      // تسجيل الدخول للحصول على بيانات المستخدم
-      const loginRes = await axios.post(`${API}/auth/login`, {
-        email: loginForm.email,
-        password: loginForm.password
-      });
+      // تسجيل دخول السائق برقم الهاتف و PIN
+      const loginRes = await axios.post(`${API}/driver/login?phone=${loginForm.phone}&pin=${loginForm.pin}`);
       
-      const userData = loginRes.data.user;
+      const driverData = loginRes.data.driver;
       
-      // التحقق من أن المستخدم سائق توصيل
-      if (userData.role !== 'delivery') {
-        setLoginError('هذا الحساب ليس حساب سائق توصيل');
+      if (!driverData) {
+        setLoginError('رقم الهاتف أو الرمز السري غير صحيح');
         setLoginLoading(false);
         return;
       }
       
-      // جلب بيانات السائق المرتبط بالمستخدم
-      const driverRes = await axios.get(`${API}/drivers/by-user/${userData.id}`, {
-        headers: { Authorization: `Bearer ${loginRes.data.token}` }
-      });
-      
-      const driverData = {
-        ...driverRes.data,
-        token: loginRes.data.token,
-        user_id: userData.id
-      };
-      
       // حفظ الجلسة - استخدام مفاتيح خاصة ببوابة السائق
       localStorage.setItem('maestro_driver_session', JSON.stringify(driverData));
-      localStorage.setItem('maestro_driver_token', loginRes.data.token);
+      localStorage.setItem('maestro_driver_phone', loginForm.phone);
       
       setDriver(driverData);
       setIsLoggedIn(true);
-      toast.success('تم تسجيل الدخول بنجاح!');
+      toast.success(`مرحباً ${driverData.name}!`);
       
     } catch (err) {
       console.error('Login error:', err);
       if (err.response?.status === 401) {
-        setLoginError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+        setLoginError('الرمز السري غير صحيح');
       } else if (err.response?.status === 404) {
-        setLoginError('لم يتم ربط حسابك بسائق. تواصل مع الإدارة');
+        setLoginError('رقم الهاتف غير مسجل كسائق');
       } else {
         setLoginError(err.response?.data?.detail || 'فشل تسجيل الدخول');
       }
@@ -171,7 +156,7 @@ export default function DriverPortal() {
   // تسجيل الخروج
   const handleLogout = () => {
     localStorage.removeItem('maestro_driver_session');
-    localStorage.removeItem('maestro_driver_token');
+    localStorage.removeItem('maestro_driver_phone');
     setDriver(null);
     setIsLoggedIn(false);
     setOrders([]);
