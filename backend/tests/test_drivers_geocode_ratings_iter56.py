@@ -114,11 +114,11 @@ class TestDriversAPI:
         assert create_response.status_code == 200
         driver_id = create_response.json()["id"]
         
-        # Update the driver
+        # Update the driver - using query params as per API definition
         update_response = requests.put(
             f"{BASE_URL}/api/drivers/{driver_id}",
             headers=headers,
-            json={"name": "TEST_سائق_محدث", "is_available": False}
+            params={"name": "TEST_سائق_محدث", "is_available": "false"}
         )
         assert update_response.status_code == 200, f"Failed to update driver: {update_response.text}"
         print(f"✓ PUT /api/drivers/{driver_id} - Driver updated successfully")
@@ -305,8 +305,8 @@ class TestDriverAssignment:
             headers=headers,
             json={"driver_id": "some-driver-id"}
         )
-        # Should return 404 for invalid order or 520 for server error
-        assert response.status_code in [404, 400, 500, 520], f"Expected 404/400/500/520, got {response.status_code}"
+        # Should return 404 for invalid order or 422 for validation error
+        assert response.status_code in [404, 400, 422, 500, 520], f"Expected 404/400/422/500/520, got {response.status_code}"
         print(f"✓ POST /api/orders/invalid/assign-driver returns {response.status_code}")
     
     def test_get_customer_order_driver_invalid(self):
@@ -342,7 +342,7 @@ class TestDriverLocationUpdate:
         return {"Authorization": f"Bearer {auth_token}"}
     
     def test_update_driver_location(self, headers):
-        """Test PUT /api/drivers/{id}/location - Update driver location"""
+        """Test POST /api/drivers/{id}/location - Update driver location"""
         # First get a branch_id
         branches_response = requests.get(f"{BASE_URL}/api/branches", headers=headers)
         if branches_response.status_code != 200:
@@ -363,18 +363,18 @@ class TestDriverLocationUpdate:
         
         driver_id = create_response.json()["id"]
         
-        # Update location
+        # Update location - using POST as per API definition
         location_data = {
             "latitude": 33.3152,
             "longitude": 44.3661
         }
-        response = requests.put(
+        response = requests.post(
             f"{BASE_URL}/api/drivers/{driver_id}/location",
             headers=headers,
             json=location_data
         )
         assert response.status_code == 200, f"Failed to update location: {response.text}"
-        print(f"✓ PUT /api/drivers/{driver_id}/location - Location updated")
+        print(f"✓ POST /api/drivers/{driver_id}/location - Location updated")
         
         # Cleanup - delete driver
         requests.delete(f"{BASE_URL}/api/drivers/{driver_id}", headers=headers)
