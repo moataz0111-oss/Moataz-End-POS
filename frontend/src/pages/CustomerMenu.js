@@ -681,6 +681,151 @@ export default function CustomerMenu() {
     return branch?.name || '';
   };
 
+  // دالة لعرض الـ Dialogs العامة في كل الخطوات
+  const renderGlobalDialogs = () => (
+    <>
+      {/* Favorites List Dialog */}
+      <Dialog open={showFavoritesDialog} onOpenChange={setShowFavoritesDialog}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-pink-500" />
+              طلباتي المفضلة
+            </DialogTitle>
+          </DialogHeader>
+          
+          {favorites.length === 0 ? (
+            <div className="text-center py-8">
+              <Heart className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+              <p className="text-gray-500">لا توجد طلبات مفضلة</p>
+              <p className="text-sm text-gray-400 mt-1">أضف طلبك للمفضلة من صفحة السلة</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {favorites.map((favorite) => (
+                <Card key={favorite.id} className="overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-bold text-lg">{favorite.name}</h3>
+                        <p className="text-sm text-gray-500 flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {new Date(favorite.created_at).toLocaleDateString('ar-IQ')}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeFromFavorites(favorite.id)}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-2 mb-3">
+                      {favorite.items?.map((item, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span>{item.product_name} × {item.quantity}</span>
+                          <span>{formatPrice(item.price * item.quantity)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-3 border-t">
+                      <span className="font-bold text-orange-500">
+                        {formatPrice(favorite.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0)}
+                      </span>
+                      <Button
+                        onClick={() => addFavoriteToCart(favorite)}
+                        size="sm"
+                        className="bg-pink-500 hover:bg-pink-600"
+                      >
+                        <ShoppingCart className="h-4 w-4 ml-2" />
+                        إضافة للسلة
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowFavoritesDialog(false)}>
+              إغلاق
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save Favorite Dialog */}
+      <Dialog open={showSaveFavoriteDialog} onOpenChange={setShowSaveFavoriteDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bookmark className="h-5 w-5 text-pink-500" />
+              حفظ الطلب كمفضل
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">اسم الطلب المفضل</label>
+              <Input
+                placeholder="مثال: طلبي المعتاد"
+                value={favoriteName}
+                onChange={(e) => setFavoriteName(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-sm font-medium mb-2">محتويات الطلب:</p>
+              <div className="space-y-1">
+                {cart.map((item, idx) => (
+                  <div key={idx} className="flex justify-between text-sm">
+                    <span>{item.name} × {item.quantity}</span>
+                    <span>{formatPrice(item.price * item.quantity)}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="border-t pt-2 mt-2">
+                <div className="flex justify-between font-bold">
+                  <span>الإجمالي</span>
+                  <span className="text-orange-600">{formatPrice(cartTotal)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSaveFavoriteDialog(false)}>
+              إلغاء
+            </Button>
+            <Button 
+              onClick={saveToFavorites}
+              disabled={savingFavorite}
+              className="bg-pink-500 hover:bg-pink-600"
+            >
+              {savingFavorite ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                  جاري الحفظ...
+                </>
+              ) : (
+                <>
+                  <Heart className="h-4 w-4 ml-2" />
+                  حفظ
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
