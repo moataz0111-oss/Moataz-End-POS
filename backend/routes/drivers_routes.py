@@ -21,6 +21,7 @@ class DriverCreate(BaseModel):
     name: str
     phone: str
     branch_id: str
+    pin: str = "1234"  # الرمز السري للسائق
     user_id: Optional[str] = None
 
 class DriverResponse(BaseModel):
