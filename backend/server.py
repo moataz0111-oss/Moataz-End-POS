@@ -7550,24 +7550,33 @@ async def update_owner_settings(
     current_user: dict = Depends(verify_super_admin)
 ):
     """تحديث إعدادات المالك (كلمة المرور والمفتاح السري)"""
-    update_data = {}
-    
-    if settings.get("password"):
-        hashed_password = bcrypt.hashpw(settings["password"].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        update_data["password"] = hashed_password
-    
-    if settings.get("secret_key"):
-        update_data["secret_key"] = settings["secret_key"]
-    
-    if not update_data:
-        raise HTTPException(status_code=400, detail="لم يتم تقديم أي بيانات للتحديث")
-    
-    await db.users.update_one(
-        {"role": "super_admin"},
-        {"$set": update_data}
-    )
-    
-    return {"message": "تم تحديث إعدادات المالك بنجاح"}
+    try:
+        update_data = {}
+        
+        if settings.get("password"):
+            hashed_password = bcrypt.hashpw(settings["password"].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            update_data["password"] = hashed_password
+        
+        if settings.get("secret_key"):
+            update_data["secret_key"] = settings["secret_key"]
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="لم يتم تقديم أي بيانات للتحديث")
+        
+        result = await db.users.update_one(
+            {"role": "super_admin"},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="لم يتم العثور على حساب المالك")
+        
+        return {"message": "تم تحديث إعدادات المالك بنجاح"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating owner settings: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"خطأ في التحديث: {str(e)}")
 
 @api_router.get("/super-admin/stats")
 async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)):
