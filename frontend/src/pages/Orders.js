@@ -472,7 +472,7 @@ export default function Orders() {
                 <div className="space-y-2">
                   {selectedOrder.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between text-sm">
-                      <span className="text-foreground">{item.product_name} x{item.quantity}</span>
+                      <span className="text-foreground">{item.product_name || item.name || 'منتج'} x{item.quantity}</span>
                       <span className="font-medium tabular-nums text-foreground">{formatPrice(item.price * item.quantity)}</span>
                     </div>
                   ))}
