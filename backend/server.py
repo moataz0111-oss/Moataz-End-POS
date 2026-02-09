@@ -13521,6 +13521,60 @@ class PushSubscription(BaseModel):
     phone: Optional[str] = None
     user_type: str = "customer"  # customer, driver, admin
 
+# ==================== DRIVER APP ROUTES (بدون مصادقة JWT) ====================
+
+class DriverLocationUpdate(BaseModel):
+    latitude: float
+    longitude: float
+
+@api_router.post("/driver/update-location")
+async def driver_update_location(driver_id: str, location: DriverLocationUpdate):
+    """تحديث موقع السائق - للاستخدام من تطبيق السائق (بدون JWT)"""
+    result = await db.drivers.update_one(
+        {"id": driver_id},
+        {"$set": {
+            "current_location": {
+                "latitude": location.latitude,
+                "longitude": location.longitude
+            },
+            "last_location_update": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return {"message": "تم تحديث الموقع", "success": True}
+
+@api_router.get("/driver/order-driver-info/{order_id}")
+async def get_driver_info_for_customer(order_id: str):
+    """جلب معلومات السائق وموقعه للزبون - بدون مصادقة"""
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    driver_id = order.get("driver_id")
+    if not driver_id:
+        return {
+            "driver": None,
+            "message": "لم يتم تخصيص سائق بعد",
+            "order_status": order.get("status")
+        }
+    
+    driver = await db.drivers.find_one(
+        {"id": driver_id},
+        {"_id": 0, "id": 1, "name": 1, "phone": 1, "current_location": 1, "last_location_update": 1}
+    )
+    
+    return {
+        "driver": driver,
+        "delivery_location": order.get("delivery_location"),
+        "order_status": order.get("status"),
+        "delivery_address": order.get("delivery_address")
+    }
+
+# ==================== PUSH NOTIFICATIONS ROUTES ====================
+
 @api_router.post("/push/subscribe")
 async def subscribe_push(subscription: PushSubscription):
     """تسجيل اشتراك في إشعارات Push"""
