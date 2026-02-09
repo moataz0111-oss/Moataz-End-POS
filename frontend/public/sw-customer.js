@@ -1,8 +1,9 @@
 // Service Worker for Customer Menu PWA
-const CACHE_NAME = 'customer-menu-v1';
+const CACHE_NAME = 'customer-menu-v2';
 const urlsToCache = [
   '/menu',
-  '/manifest-customer.json',
+  '/menu.html',
+  '/manifest-menu.json',
   '/icons/customer-icon-192.png',
   '/icons/customer-icon-512.png'
 ];
