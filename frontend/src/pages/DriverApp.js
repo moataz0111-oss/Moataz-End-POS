@@ -107,7 +107,8 @@ export default function DriverApp() {
 
     if (driver) {
       try {
-        await axios.post(`${API}/drivers/${driver.id}/location`, {
+        // استخدام API بدون JWT للسائقين
+        await axios.post(`${API}/driver/update-location?driver_id=${driver.id}`, {
           latitude,
           longitude
         });
