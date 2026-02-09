@@ -6943,12 +6943,14 @@ class SuperAdminLoginRequest(BaseModel):
 @api_router.post("/super-admin/login")
 async def super_admin_login(request: SuperAdminLoginRequest):
     """تسجيل دخول Super Admin"""
-    if request.secret_key != SUPER_ADMIN_SECRET:
-        raise HTTPException(status_code=403, detail="مفتاح السر غير صحيح")
-    
     user = await db.users.find_one({"email": request.email, "role": UserRole.SUPER_ADMIN})
     if not user:
         raise HTTPException(status_code=401, detail="المستخدم غير موجود")
+    
+    # التحقق من المفتاح السري (من قاعدة البيانات أو القيمة الافتراضية)
+    stored_secret = user.get("secret_key") or SUPER_ADMIN_SECRET
+    if request.secret_key != stored_secret:
+        raise HTTPException(status_code=403, detail="المفتاح السري غير صحيح")
     
     # التحقق من كلمة المرور (الحقل قد يكون password أو password_hash)
     password_field = user.get("password") or user.get("password_hash")
