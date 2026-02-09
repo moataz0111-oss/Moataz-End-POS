@@ -1019,7 +1019,7 @@ export default function SuperAdmin() {
       }
       
       await axios.put(`${API}/super-admin/owner-settings`, updateData, {
-        headers: { Authorization: `Bearer ${user.token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
       
       toast.success('تم تحديث إعدادات المالك بنجاح');
