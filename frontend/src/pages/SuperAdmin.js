@@ -2957,10 +2957,14 @@ export default function SuperAdmin() {
           </DialogHeader>
           
           <Tabs defaultValue="identity" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-700/50">
+            <TabsList className="grid w-full grid-cols-4 bg-gray-700/50">
               <TabsTrigger value="identity" className="data-[state=active]:bg-purple-600">
                 <Crown className="h-4 w-4 ml-2" />
                 هوية النظام
+              </TabsTrigger>
+              <TabsTrigger value="owner" className="data-[state=active]:bg-purple-600">
+                <User className="h-4 w-4 ml-2" />
+                إعدادات المالك
               </TabsTrigger>
               <TabsTrigger value="invoice" className="data-[state=active]:bg-purple-600">
                 <Receipt className="h-4 w-4 ml-2" />
