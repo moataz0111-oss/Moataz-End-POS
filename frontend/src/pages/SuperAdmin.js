@@ -282,6 +282,19 @@ export default function SuperAdmin() {
   });
   const [savingPrices, setSavingPrices] = useState(false);
   
+  // Currency Conversion States - حالات تحويل العملات
+  const [currencySettings, setCurrencySettings] = useState({
+    preferred_currency: 'USD',
+    use_live_rates: false,
+    custom_rates: {}
+  });
+  const [salesSummary, setSalesSummary] = useState(null);
+  const [loadingSalesSummary, setLoadingSalesSummary] = useState(false);
+  const [liveRates, setLiveRates] = useState(null);
+  const [loadingLiveRates, setLoadingLiveRates] = useState(false);
+  const [showCurrencySettingsModal, setShowCurrencySettingsModal] = useState(false);
+  const [savingCurrencySettings, setSavingCurrencySettings] = useState(false);
+  
   const [newPassword, setNewPassword] = useState('');
   const [copiedCredentials, setCopiedCredentials] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
