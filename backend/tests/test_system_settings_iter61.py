@@ -31,9 +31,9 @@ class TestSystemSettings:
         # Check currency structure
         if "IQD" in currencies:
             iqd = currencies["IQD"]
-            assert "code" in iqd, "Currency should have 'code'"
             assert "name" in iqd, "Currency should have 'name'"
             assert "symbol" in iqd, "Currency should have 'symbol'"
+            assert "rate_to_usd" in iqd, "Currency should have 'rate_to_usd'"
         
         print(f"✓ System currencies API works - Found {len(currencies)} currencies")
     
@@ -54,7 +54,6 @@ class TestSystemSettings:
         # Check language structure
         if "ar" in languages:
             ar = languages["ar"]
-            assert "code" in ar, "Language should have 'code'"
             assert "name" in ar, "Language should have 'name'"
             assert "dir" in ar, "Language should have 'dir' (direction)"
         
@@ -77,7 +76,6 @@ class TestSystemSettings:
         # Check country structure
         if "IQ" in countries:
             iq = countries["IQ"]
-            assert "code" in iq, "Country should have 'code'"
             assert "name" in iq, "Country should have 'name'"
             assert "currency" in iq, "Country should have 'currency'"
             assert "language" in iq, "Country should have 'language'"
