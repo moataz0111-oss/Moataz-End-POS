@@ -1744,7 +1744,7 @@ export default function POS() {
                 <tbody>
                   {cart.map((item, i) => (
                     <tr key={i}>
-                      <td className="py-1">{item.product_name}</td>
+                      <td className="py-1">{item.product_name || item.name || 'منتج'}</td>
                       <td className="text-center">{item.quantity}</td>
                       <td className="text-left tabular-nums">{formatPrice(item.price * item.quantity)}</td>
                     </tr>
@@ -2213,7 +2213,7 @@ function OrderCard({ order, onSelect }) {
           <div className="flex flex-wrap gap-1">
             {order.items.slice(0, 3).map((item, i) => (
               <span key={i} className="text-xs bg-muted px-2 py-1 rounded">
-                {item.product_name} x{item.quantity}
+                {item.product_name || item.name || 'منتج'} x{item.quantity}
               </span>
             ))}
             {order.items.length > 3 && (
