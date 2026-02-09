@@ -237,6 +237,7 @@ export default function SuperAdmin() {
     showSmartReports: true,
     showPurchasing: false,
     showBranchOrders: false,
+    showCustomerMenu: true,
     // خيارات الإعدادات
     settingsUsers: true,
     settingsCustomers: true,
