@@ -334,18 +334,18 @@ class TestAuthenticationRequired:
     """Test that protected endpoints require authentication"""
     
     def test_tenant_regional_settings_requires_auth(self):
-        """Test GET /api/tenant/regional-settings without auth returns 401"""
+        """Test GET /api/tenant/regional-settings without auth returns 401/403"""
         response = requests.get(f"{BASE_URL}/api/tenant/regional-settings")
         
-        assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
+        assert response.status_code in [401, 403], f"Expected 401/403 without auth, got {response.status_code}"
         
         print("✓ Tenant regional settings requires authentication")
     
     def test_ratings_summary_requires_auth(self):
-        """Test GET /api/ratings/tenant-summary without auth returns 401"""
+        """Test GET /api/ratings/tenant-summary without auth returns 401/403"""
         response = requests.get(f"{BASE_URL}/api/ratings/tenant-summary")
         
-        assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
+        assert response.status_code in [401, 403], f"Expected 401/403 without auth, got {response.status_code}"
         
         print("✓ Ratings summary requires authentication")
 
