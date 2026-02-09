@@ -160,6 +160,13 @@ export default function SuperAdmin() {
     show_system_branding: true
   });
 
+  // Owner settings
+  const [ownerSettings, setOwnerSettings] = useState(null);
+  const [newOwnerPassword, setNewOwnerPassword] = useState('');
+  const [confirmOwnerPassword, setConfirmOwnerPassword] = useState('');
+  const [newOwnerSecretKey, setNewOwnerSecretKey] = useState('');
+  const [savingOwnerSettings, setSavingOwnerSettings] = useState(false);
+
   // Login page settings
   const [loginPageSettings, setLoginPageSettings] = useState({
     enable_animation: true,
