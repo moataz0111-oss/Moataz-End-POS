@@ -3101,6 +3101,86 @@ export default function SuperAdmin() {
               </div>
             </TabsContent>
 
+            {/* تبويب إعدادات المالك */}
+            <TabsContent value="owner" className="space-y-6 mt-4">
+              <div className="space-y-4">
+                <h3 className="font-bold text-blue-400 flex items-center gap-2 border-b border-gray-700 pb-2">
+                  <User className="h-4 w-4" />
+                  بيانات المالك (Super Admin)
+                </h3>
+                <p className="text-sm text-gray-400">تغيير بيانات تسجيل الدخول للمالك</p>
+                
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">البريد الإلكتروني الحالي</Label>
+                    <Input
+                      type="email"
+                      value={ownerSettings?.email || ''}
+                      disabled
+                      className="bg-gray-700/30 border-gray-600 text-gray-400"
+                      dir="ltr"
+                    />
+                    <p className="text-xs text-gray-500">لا يمكن تغيير البريد الإلكتروني</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">كلمة المرور الجديدة</Label>
+                    <Input
+                      type="password"
+                      placeholder="اترك فارغاً إذا لم ترغب بالتغيير"
+                      value={newOwnerPassword}
+                      onChange={(e) => setNewOwnerPassword(e.target.value)}
+                      className="bg-gray-700/50 border-gray-600 text-white"
+                      dir="ltr"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">تأكيد كلمة المرور الجديدة</Label>
+                    <Input
+                      type="password"
+                      placeholder="أعد كتابة كلمة المرور"
+                      value={confirmOwnerPassword}
+                      onChange={(e) => setConfirmOwnerPassword(e.target.value)}
+                      className="bg-gray-700/50 border-gray-600 text-white"
+                      dir="ltr"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">المفتاح السري الجديد</Label>
+                    <Input
+                      type="text"
+                      placeholder="اترك فارغاً إذا لم ترغب بالتغيير"
+                      value={newOwnerSecretKey}
+                      onChange={(e) => setNewOwnerSecretKey(e.target.value)}
+                      className="bg-gray-700/50 border-gray-600 text-white"
+                      dir="ltr"
+                    />
+                    <p className="text-xs text-gray-500">المفتاح السري يُستخدم لتسجيل الدخول كمالك</p>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={updateOwnerSettings}
+                  disabled={savingOwnerSettings}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                >
+                  {savingOwnerSettings ? (
+                    <>
+                      <Loader2 className="h-4 w-4 ml-2 animate-spin" />
+                      جاري الحفظ...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 ml-2" />
+                      حفظ إعدادات المالك
+                    </>
+                  )}
+                </Button>
+              </div>
+            </TabsContent>
+
             {/* تبويب إعدادات الفواتير */}
             <TabsContent value="invoice" className="space-y-6 mt-4">
               {/* شعار الفواتير */}
