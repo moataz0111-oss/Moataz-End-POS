@@ -191,7 +191,7 @@ export default function Delivery() {
       });
       toast.success('تم إضافة السائق');
       setDialogOpen(false);
-      setFormData({ name: '', phone: '' });
+      setFormData({ name: '', phone: '', pin: '1234' });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل في إضافة السائق');
@@ -201,14 +201,19 @@ export default function Delivery() {
   const handleEditDriver = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${API}/drivers/${editFormData.id}`, {
+      const updateData = {
         name: editFormData.name,
         phone: editFormData.phone,
         is_active: editFormData.is_active
-      });
+      };
+      // إضافة PIN فقط إذا تم تعديله
+      if (editFormData.pin) {
+        updateData.pin = editFormData.pin;
+      }
+      await axios.put(`${API}/drivers/${editFormData.id}`, updateData);
       toast.success('تم تعديل السائق');
       setEditDialogOpen(false);
-      setEditFormData({ id: '', name: '', phone: '', is_active: true });
+      setEditFormData({ id: '', name: '', phone: '', pin: '', is_active: true });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'فشل في تعديل السائق');
