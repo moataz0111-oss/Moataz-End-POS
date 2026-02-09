@@ -6701,10 +6701,12 @@ STAFF_ROLES = {
     "branch_manager": "مدير فرع",
     "supervisor": "مشرف",
     "cashier": "كاشير",
-    "delivery": "سائق توصيل",
     "waiter": "جرسون",
     "kitchen": "مطبخ"
 }
+
+# ملاحظة: تم إزالة دور "delivery" (سائق توصيل) من هنا
+# السائقين يتم إنشاؤهم وإدارتهم فقط من قسم التوصيل (Delivery)
 
 @api_router.get("/staff/roles")
 async def get_staff_roles(current_user: dict = Depends(get_current_user)):
