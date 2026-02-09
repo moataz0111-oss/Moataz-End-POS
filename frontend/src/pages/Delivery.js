@@ -75,11 +75,11 @@ export default function Delivery() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', phone: '' });
+  const [formData, setFormData] = useState({ name: '', phone: '', pin: '1234' });
   
   // حالات تعديل السائق
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editFormData, setEditFormData] = useState({ id: '', name: '', phone: '', is_active: true });
+  const [editFormData, setEditFormData] = useState({ id: '', name: '', phone: '', pin: '', is_active: true });
   
   // حالات ربط السائق بمستخدم
   const [linkUserDialogOpen, setLinkUserDialogOpen] = useState(false);
