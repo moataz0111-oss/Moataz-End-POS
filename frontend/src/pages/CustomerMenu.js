@@ -1553,15 +1553,41 @@ export default function CustomerMenu() {
                   عنوان التوصيل
                 </h2>
                 
-                <div>
+                <div className="relative">
                   <label className="text-sm font-medium mb-1 block">العنوان التفصيلي *</label>
-                  <Textarea
-                    placeholder="المنطقة، الشارع، أقرب نقطة دالة..."
-                    value={deliveryAddress}
-                    onChange={(e) => setDeliveryAddress(e.target.value)}
-                    rows={2}
-                    data-testid="delivery-address-input"
-                  />
+                  <div className="relative">
+                    <Textarea
+                      placeholder="ابحث عن عنوانك أو اكتبه يدوياً..."
+                      value={deliveryAddress}
+                      onChange={(e) => {
+                        setDeliveryAddress(e.target.value);
+                        searchAddress(e.target.value);
+                      }}
+                      onFocus={() => deliveryAddress.length >= 3 && setShowAddressSuggestions(true)}
+                      rows={2}
+                      data-testid="delivery-address-input"
+                      className="pr-10"
+                    />
+                    {searchingAddress && (
+                      <Loader2 className="absolute left-3 top-3 h-4 w-4 animate-spin text-gray-400" />
+                    )}
+                  </div>
+                  
+                  {/* اقتراحات العناوين */}
+                  {showAddressSuggestions && addressSuggestions.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-white rounded-lg shadow-lg border max-h-48 overflow-y-auto">
+                      {addressSuggestions.map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => selectAddress(suggestion)}
+                          className="w-full p-3 text-right hover:bg-orange-50 border-b last:border-b-0 text-sm flex items-start gap-2"
+                        >
+                          <MapPin className="h-4 w-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                          <span className="line-clamp-2">{suggestion.address}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* زر تحديد الموقع الحالي */}
@@ -1569,16 +1595,19 @@ export default function CustomerMenu() {
                   <Button 
                     variant="default"
                     className="bg-green-500 hover:bg-green-600"
-                    onClick={() => {
+                    onClick={async () => {
                       if (navigator.geolocation) {
                         toast.info('جاري تحديد موقعك...');
                         navigator.geolocation.getCurrentPosition(
-                          (pos) => {
+                          async (pos) => {
                             setDeliveryLocation([pos.coords.latitude, pos.coords.longitude]);
                             const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
                             const customerData = savedCustomer ? JSON.parse(savedCustomer) : {};
                             customerData.location = [pos.coords.latitude, pos.coords.longitude];
                             localStorage.setItem(`customer_${tenantId}`, JSON.stringify(customerData));
+                            
+                            // تحويل الإحداثيات لعنوان
+                            await reverseGeocode(pos.coords.latitude, pos.coords.longitude);
                             toast.success('تم تحديد موقعك بنجاح!');
                           },
                           (error) => {
