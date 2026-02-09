@@ -94,6 +94,70 @@
                 height: 50px;
                 fill: #f97316;
             }
+            #install-prompt {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 20px;
+                border-radius: 20px 20px 0 0;
+                box-shadow: 0 -5px 30px rgba(0,0,0,0.2);
+                z-index: 10000;
+                display: none;
+            }
+            #install-prompt.show {
+                display: block;
+            }
+            #install-prompt h3 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 18px;
+            }
+            #install-prompt p {
+                color: #666;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            #install-prompt .steps {
+                margin-top: 15px;
+                padding: 15px;
+                background: #f5f5f5;
+                border-radius: 10px;
+            }
+            #install-prompt .step {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 10px;
+                color: #333;
+                font-size: 14px;
+            }
+            #install-prompt .step:last-child {
+                margin-bottom: 0;
+            }
+            #install-prompt .step-number {
+                width: 24px;
+                height: 24px;
+                background: #f97316;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+            }
+            #close-prompt {
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: #999;
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
@@ -107,12 +171,53 @@
             <p>جاري تحميل القائمة...</p>
         </div>
         
-        <iframe id="app-frame" src="/menu" allow="geolocation"></iframe>
+        <iframe id="app-frame" src="" allow="geolocation"></iframe>
+        
+        <!-- Install Prompt for iOS -->
+        <div id="install-prompt">
+            <button id="close-prompt" onclick="document.getElementById('install-prompt').classList.remove('show')">×</button>
+            <h3>📲 تثبيت التطبيق</h3>
+            <p>لتجربة أفضل، أضف التطبيق للشاشة الرئيسية:</p>
+            <div class="steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <span>اضغط على زر المشاركة <strong>⬆️</strong> في الأسفل</span>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <span>اختر <strong>"إضافة للشاشة الرئيسية"</strong></span>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <span>اضغط <strong>"إضافة"</strong> في الأعلى</span>
+                </div>
+            </div>
+        </div>
         
         <script>
-            // إخفاء شاشة التحميل عند تحميل الإطار
+            // قراءة parameter المطعم من URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var restaurant = urlParams.get('restaurant');
+            
+            // تحديد رابط الإطار
+            var menuUrl = '/menu';
+            if (restaurant) {
+                menuUrl = '/menu/' + restaurant;
+                // حفظ المطعم المفضل
+                localStorage.setItem('preferred_restaurant', restaurant);
+            } else {
+                // محاولة استرجاع المطعم المحفوظ
+                var saved = localStorage.getItem('preferred_restaurant');
+                if (saved) {
+                    menuUrl = '/menu/' + saved;
+                }
+            }
+            
+            // تحميل الإطار
             var frame = document.getElementById('app-frame');
             var loading = document.getElementById('loading-screen');
+            
+            frame.src = menuUrl;
             
             frame.onload = function() {
                 setTimeout(function() {
@@ -124,6 +229,22 @@
             setTimeout(function() {
                 loading.classList.add('hidden');
             }, 3000);
+            
+            // إظهار تعليمات التثبيت على iOS إذا لم يكن التطبيق مثبتاً
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            
+            if (isIOS && !isStandalone) {
+                // إظهار التعليمات بعد ثانيتين
+                setTimeout(function() {
+                    // التحقق مما إذا كان المستخدم قد رأى التعليمات من قبل
+                    var promptShown = localStorage.getItem('install_prompt_shown');
+                    if (!promptShown) {
+                        document.getElementById('install-prompt').classList.add('show');
+                        localStorage.setItem('install_prompt_shown', 'true');
+                    }
+                }, 2000);
+            }
         </script>
     </body>
 </html>
