@@ -54,15 +54,23 @@ async def create_driver(driver: DriverCreate, current_user: dict = Depends(get_c
     
     driver_doc = {
         "id": str(uuid.uuid4()),
-        **driver.model_dump(),
+        "name": driver.name,
+        "phone": driver.phone,
+        "branch_id": driver.branch_id,
+        "pin": driver.pin,  # حفظ الرمز السري
+        "user_id": driver.user_id,
         "tenant_id": get_user_tenant_id(current_user),
         "is_active": True,
         "is_available": True,
         "current_order_id": None,
-        "total_deliveries": 0
+        "total_deliveries": 0,
+        "current_location": None,
+        "last_location_update": None,
+        "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.drivers.insert_one(driver_doc)
     del driver_doc["_id"]
+    del driver_doc["pin"]  # لا ترجع PIN في الاستجابة
     return driver_doc
 
 @router.get("", response_model=List[DriverResponse])
