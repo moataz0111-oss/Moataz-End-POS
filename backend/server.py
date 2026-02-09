@@ -12201,6 +12201,11 @@ async def get_customer_restaurants():
     
     restaurants = []
     for tenant in tenants:
+        # التحقق من أن ميزة قائمة الطعام مفعلة
+        enabled_features = tenant.get("enabled_features", {})
+        if enabled_features.get("showCustomerMenu") == False:
+            continue  # تخطي هذا المطعم
+        
         # جلب إعدادات المطعم
         settings = await db.settings.find_one(
             {"tenant_id": tenant.get("id"), "type": "restaurant"},
@@ -12238,6 +12243,11 @@ async def get_customer_menu(tenant_id: str):
         # إذا لم يوجد tenant، نستخدم tenant_id كـ query للمنتجات
         # هذا للتوافق مع الأنظمة التي لا تستخدم tenants
         tenant = {"id": tenant_id, "name": "المطعم"}
+    
+    # التحقق من أن ميزة قائمة الطعام مفعلة
+    enabled_features = tenant.get("enabled_features", {})
+    if enabled_features.get("showCustomerMenu") == False:
+        raise HTTPException(status_code=403, detail="قائمة الطعام غير متاحة لهذا المطعم")
     
     tid = tenant.get("id", tenant_id)
     
