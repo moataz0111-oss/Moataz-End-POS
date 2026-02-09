@@ -7314,6 +7314,7 @@ async def get_tenant_features(tenant_id: str, current_user: dict = Depends(verif
         "showSmartReports": True,
         "showPurchasing": False,
         "showBranchOrders": False,
+        "showCustomerMenu": True,
         # خيارات الإعدادات
         "settingsUsers": True,
         "settingsCustomers": True,
