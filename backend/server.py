@@ -6377,6 +6377,111 @@ async def convert_currency(
         "exchange_rate": from_rate / to_rate
     }
 
+# ==================== Owner Currency Settings ====================
+
+class OwnerCurrencySettings(BaseModel):
+    """إعدادات تحويل العملات للمالك"""
+    preferred_currency: str = "USD"
+    use_live_rates: bool = False
+    custom_rates: Optional[dict] = None  # {"IQD_USD": 0.00076, "SAR_USD": 0.27}
+
+@api_router.get("/super-admin/currency-settings")
+async def get_owner_currency_settings(current_user: dict = Depends(verify_super_admin)):
+    """جلب إعدادات العملة للمالك"""
+    settings = await db.settings.find_one({"type": "owner_currency_settings"}, {"_id": 0})
+    
+    if not settings:
+        return {
+            "preferred_currency": "USD",
+            "use_live_rates": False,
+            "custom_rates": {},
+            "supported_currencies": list(SUPPORTED_CURRENCIES.keys())
+        }
+    
+    return {
+        **settings,
+        "supported_currencies": list(SUPPORTED_CURRENCIES.keys())
+    }
+
+@api_router.put("/super-admin/currency-settings")
+async def update_owner_currency_settings(
+    settings: OwnerCurrencySettings,
+    current_user: dict = Depends(verify_super_admin)
+):
+    """تحديث إعدادات العملة للمالك"""
+    await db.settings.update_one(
+        {"type": "owner_currency_settings"},
+        {"$set": {
+            "type": "owner_currency_settings",
+            "preferred_currency": settings.preferred_currency,
+            "use_live_rates": settings.use_live_rates,
+            "custom_rates": settings.custom_rates or {},
+            "updated_at": datetime.utcnow()
+        }},
+        upsert=True
+    )
+    return {"message": "تم حفظ إعدادات العملة"}
+
+@api_router.put("/super-admin/custom-exchange-rate")
+async def update_custom_exchange_rate(
+    from_currency: str,
+    to_currency: str,
+    rate: float,
+    current_user: dict = Depends(verify_super_admin)
+):
+    """تحديث سعر صرف مخصص"""
+    rate_key = f"{from_currency}_{to_currency}"
+    
+    await db.settings.update_one(
+        {"type": "owner_currency_settings"},
+        {"$set": {f"custom_rates.{rate_key}": rate, "updated_at": datetime.utcnow()}},
+        upsert=True
+    )
+    return {"message": f"تم تحديث سعر صرف {from_currency} إلى {to_currency}"}
+
+@api_router.get("/super-admin/live-exchange-rates")
+async def get_live_exchange_rates(current_user: dict = Depends(verify_super_admin)):
+    """جلب أسعار الصرف الحية (من الإنترنت)"""
+    import httpx
+    
+    try:
+        # استخدام API مجاني لأسعار الصرف
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.exchangerate-api.com/v4/latest/USD",
+                timeout=10.0
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                rates = data.get("rates", {})
+                
+                # تحويل الأسعار للعملات المدعومة
+                live_rates = {}
+                for code in SUPPORTED_CURRENCIES.keys():
+                    if code in rates:
+                        live_rates[code] = {
+                            "rate_to_usd": 1 / rates[code] if rates[code] > 0 else 0,
+                            "rate_from_usd": rates[code]
+                        }
+                
+                return {
+                    "success": True,
+                    "base": "USD",
+                    "rates": live_rates,
+                    "fetched_at": datetime.utcnow().isoformat()
+                }
+    except Exception as e:
+        logger.error(f"Error fetching live rates: {str(e)}")
+    
+    # إرجاع الأسعار الثابتة في حالة الفشل
+    return {
+        "success": False,
+        "message": "تعذر جلب الأسعار الحية، يتم استخدام الأسعار الثابتة",
+        "rates": {code: {"rate_to_usd": info["rate_to_usd"], "rate_from_usd": 1/info["rate_to_usd"] if info["rate_to_usd"] > 0 else 0} 
+                 for code, info in SUPPORTED_CURRENCIES.items()}
+    }
+
 # ==================== Super Admin Currency Dashboard ====================
 
 @api_router.get("/super-admin/sales-summary")
