@@ -78,6 +78,9 @@ export const AuthProvider = ({ children }) => {
       setToken(newToken);
       setUser(userData);
       
+      // إرسال حدث تسجيل الدخول لتحديث إعدادات العملة
+      window.dispatchEvent(new CustomEvent('userLoggedIn'));
+      
       // فتح وردية تلقائياً للكاشير أو المدير
       if (['cashier', 'manager', 'admin'].includes(userData.role)) {
         setTimeout(async () => {
