@@ -13231,6 +13231,293 @@ async def get_menu_link(request: Request, current_user: dict = Depends(get_curre
     }
 
 
+# ==================== DRIVER TRACKING ROUTES ====================
+
+class DriverLocation(BaseModel):
+    latitude: float
+    longitude: float
+
+@api_router.get("/drivers")
+async def get_drivers(current_user: dict = Depends(get_current_user)):
+    """جلب قائمة السائقين"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    drivers = await db.drivers.find(
+        {"tenant_id": tenant_id},
+        {"_id": 0}
+    ).sort("name", 1).to_list(100)
+    
+    return drivers
+
+@api_router.post("/drivers")
+async def create_driver(
+    name: str,
+    phone: str,
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """إنشاء سائق جديد"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    tenant_id = get_user_tenant_id(current_user)
+    
+    driver = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": tenant_id,
+        "branch_id": branch_id,
+        "name": name,
+        "phone": phone,
+        "is_active": True,
+        "is_available": True,
+        "current_location": None,
+        "last_location_update": None,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.drivers.insert_one(driver)
+    driver.pop("_id", None)
+    
+    return {"message": "تم إضافة السائق", "driver": driver}
+
+@api_router.put("/drivers/{driver_id}")
+async def update_driver(
+    driver_id: str,
+    name: Optional[str] = None,
+    phone: Optional[str] = None,
+    is_active: Optional[bool] = None,
+    is_available: Optional[bool] = None,
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """تحديث بيانات سائق"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    tenant_id = get_user_tenant_id(current_user)
+    
+    update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    if name: update_data["name"] = name
+    if phone: update_data["phone"] = phone
+    if is_active is not None: update_data["is_active"] = is_active
+    if is_available is not None: update_data["is_available"] = is_available
+    if branch_id: update_data["branch_id"] = branch_id
+    
+    result = await db.drivers.update_one(
+        {"id": driver_id, "tenant_id": tenant_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return {"message": "تم تحديث بيانات السائق"}
+
+@api_router.delete("/drivers/{driver_id}")
+async def delete_driver(driver_id: str, current_user: dict = Depends(get_current_user)):
+    """حذف سائق"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    tenant_id = get_user_tenant_id(current_user)
+    
+    result = await db.drivers.delete_one({"id": driver_id, "tenant_id": tenant_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return {"message": "تم حذف السائق"}
+
+@api_router.post("/drivers/{driver_id}/location")
+async def update_driver_location(
+    driver_id: str,
+    location: DriverLocation,
+    current_user: dict = Depends(get_current_user)
+):
+    """تحديث موقع السائق (يستخدمها تطبيق السائق)"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    result = await db.drivers.update_one(
+        {"id": driver_id, "tenant_id": tenant_id},
+        {"$set": {
+            "current_location": {
+                "latitude": location.latitude,
+                "longitude": location.longitude
+            },
+            "last_location_update": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return {"message": "تم تحديث الموقع"}
+
+@api_router.get("/drivers/{driver_id}/location")
+async def get_driver_location(driver_id: str):
+    """جلب موقع السائق (للزبون)"""
+    driver = await db.drivers.find_one(
+        {"id": driver_id},
+        {"_id": 0, "current_location": 1, "last_location_update": 1, "name": 1, "phone": 1}
+    )
+    
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    return driver
+
+@api_router.post("/orders/{order_id}/assign-driver")
+async def assign_driver_to_order(
+    order_id: str,
+    driver_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """تخصيص سائق للطلب"""
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.MANAGER, UserRole.BRANCH_MANAGER, UserRole.CASHIER]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # التحقق من وجود السائق
+    driver = await db.drivers.find_one({"id": driver_id, "tenant_id": tenant_id})
+    if not driver:
+        raise HTTPException(status_code=404, detail="السائق غير موجود")
+    
+    # تحديث الطلب
+    result = await db.orders.update_one(
+        {"id": order_id, "tenant_id": tenant_id},
+        {"$set": {
+            "driver_id": driver_id,
+            "driver_assigned_at": datetime.now(timezone.utc).isoformat(),
+            "status": "out_for_delivery"
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # تحديث حالة السائق
+    await db.drivers.update_one(
+        {"id": driver_id},
+        {"$set": {"is_available": False}}
+    )
+    
+    return {
+        "message": "تم تخصيص السائق للطلب",
+        "driver": {
+            "id": driver["id"],
+            "name": driver["name"],
+            "phone": driver["phone"]
+        }
+    }
+
+@api_router.get("/customer/order-driver/{order_id}")
+async def get_order_driver_info(order_id: str, phone: str = None):
+    """جلب معلومات سائق الطلب للزبون"""
+    # جلب الطلب
+    order = await db.orders.find_one({"id": order_id})
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    # التحقق من رقم الهاتف
+    if phone and order.get("customer_phone") != phone:
+        raise HTTPException(status_code=403, detail="غير مصرح بالوصول لهذا الطلب")
+    
+    if not order.get("driver_id"):
+        return {"driver": None, "message": "لم يتم تخصيص سائق بعد"}
+    
+    # جلب معلومات السائق
+    driver = await db.drivers.find_one(
+        {"id": order["driver_id"]},
+        {"_id": 0, "id": 1, "name": 1, "phone": 1, "photo": 1, "current_location": 1, "last_location_update": 1}
+    )
+    
+    if not driver:
+        return {"driver": None, "message": "السائق غير متاح"}
+    
+    # إضافة موقع التوصيل
+    delivery_location = order.get("delivery_location")
+    
+    return {
+        "driver": driver,
+        "delivery_location": delivery_location,
+        "order_status": order.get("status")
+    }
+
+
+# ==================== ADDRESS AUTOCOMPLETE ROUTES ====================
+
+@api_router.get("/geocode/reverse")
+async def reverse_geocode(lat: float, lng: float):
+    """تحويل إحداثيات لعنوان (Reverse Geocoding)"""
+    try:
+        import httpx
+        
+        # استخدام Nominatim API المجاني
+        url = f"https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lng}&format=json&accept-language=ar"
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers={"User-Agent": "MaestroEGP/1.0"})
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                address = data.get("display_name", "")
+                address_parts = data.get("address", {})
+                
+                return {
+                    "address": address,
+                    "street": address_parts.get("road", ""),
+                    "neighbourhood": address_parts.get("neighbourhood", address_parts.get("suburb", "")),
+                    "city": address_parts.get("city", address_parts.get("town", address_parts.get("village", ""))),
+                    "country": address_parts.get("country", ""),
+                    "lat": lat,
+                    "lng": lng
+                }
+            else:
+                return {"address": "", "lat": lat, "lng": lng}
+                
+    except Exception as e:
+        logger.error(f"Reverse geocoding error: {str(e)}")
+        return {"address": "", "lat": lat, "lng": lng}
+
+@api_router.get("/geocode/search")
+async def search_address(query: str, lat: Optional[float] = None, lng: Optional[float] = None):
+    """البحث عن عنوان (Address Autocomplete)"""
+    try:
+        import httpx
+        
+        # استخدام Nominatim API للبحث
+        url = f"https://nominatim.openstreetmap.org/search?q={query}&format=json&limit=5&accept-language=ar"
+        
+        # إضافة تفضيل للموقع الحالي إذا متاح
+        if lat and lng:
+            url += f"&viewbox={lng-0.5},{lat-0.5},{lng+0.5},{lat+0.5}&bounded=0"
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers={"User-Agent": "MaestroEGP/1.0"})
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                results = []
+                for item in data:
+                    results.append({
+                        "address": item.get("display_name", ""),
+                        "lat": float(item.get("lat", 0)),
+                        "lng": float(item.get("lon", 0)),
+                        "type": item.get("type", "")
+                    })
+                
+                return {"results": results}
+            else:
+                return {"results": []}
+                
+    except Exception as e:
+        logger.error(f"Address search error: {str(e)}")
+        return {"results": []}
+
+
 # ==================== PAYMENT ROUTES ====================
 
 @api_router.post("/payments/create-checkout/{tenant_id}")
