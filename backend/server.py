@@ -12552,6 +12552,88 @@ async def get_customer_order_history(
     return orders
 
 
+
+# ==================== الطلبات المفضلة للزبائن ====================
+
+@api_router.post("/customer/favorites/add")
+async def add_to_favorites(
+    tenant_id: str = None,
+    phone: str = None,
+    name: str = None,
+    items: list = None
+):
+    """إضافة طلب للمفضلة"""
+    if not phone or not items:
+        raise HTTPException(status_code=400, detail="رقم الهاتف والمنتجات مطلوبة")
+    
+    # التحقق من وجود المستأجر
+    tenant = None
+    if tenant_id:
+        tenant = await db.tenants.find_one({"menu_slug": tenant_id})
+        if not tenant:
+            tenant = await db.tenants.find_one({"id": tenant_id})
+    
+    actual_tenant_id = tenant.get("id") if tenant else tenant_id
+    
+    favorite = {
+        "id": str(uuid.uuid4()),
+        "tenant_id": actual_tenant_id,
+        "phone": phone,
+        "name": name or f"طلبي المفضل #{datetime.now().strftime('%d/%m')}",
+        "items": items,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.customer_favorites.insert_one(favorite)
+    
+    # إرجاع بدون _id
+    return {"message": "تمت الإضافة للمفضلة", "favorite": {k: v for k, v in favorite.items() if k != '_id'}}
+
+@api_router.get("/customer/favorites")
+async def get_favorites(
+    tenant_id: str = None,
+    phone: str = None
+):
+    """جلب الطلبات المفضلة للزبون"""
+    if not phone:
+        return []
+    
+    query = {"phone": phone}
+    
+    if tenant_id:
+        tenant = await db.tenants.find_one({"menu_slug": tenant_id})
+        if tenant:
+            query["tenant_id"] = tenant.get("id")
+        else:
+            query["tenant_id"] = tenant_id
+    
+    favorites = await db.customer_favorites.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).limit(10).to_list(10)
+    
+    return favorites
+
+@api_router.delete("/customer/favorites/{favorite_id}")
+async def remove_from_favorites(
+    favorite_id: str,
+    phone: str = None
+):
+    """حذف طلب من المفضلة"""
+    if not phone:
+        raise HTTPException(status_code=400, detail="رقم الهاتف مطلوب")
+    
+    result = await db.customer_favorites.delete_one({
+        "id": favorite_id,
+        "phone": phone
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="لم يتم العثور على الطلب المفضل")
+    
+    return {"message": "تم الحذف من المفضلة"}
+
+
 @api_router.get("/customer/orders/{tenant_id}")
 async def get_customer_orders(tenant_id: str, customer_token: str):
     """جلب طلبات العميل"""
