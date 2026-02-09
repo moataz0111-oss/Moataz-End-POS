@@ -2121,53 +2121,70 @@ export default function Settings() {
                             />
                           </div>
                           
-                          {/* صلاحيات الموظف */}
-                          <div>
-                            <Label className="text-foreground mb-2 block">الصلاحيات</Label>
-                            <div className="border rounded-lg p-3 max-h-64 overflow-y-auto bg-muted/30 space-y-4">
-                              {/* صلاحيات الصفحات */}
-                              <div>
-                                <h4 className="text-sm font-medium text-foreground mb-2 border-b pb-1">📄 الصفحات الرئيسية</h4>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {STAFF_PERMISSIONS.filter(p => p.group === 'pages').map(perm => (
-                                    <div key={perm.id} className="flex items-center gap-2">
-                                      <Switch
-                                        checked={staffForm.permissions?.includes(perm.id)}
-                                        onCheckedChange={(checked) => {
-                                          const newPerms = checked 
-                                            ? [...(staffForm.permissions || []), perm.id]
-                                            : (staffForm.permissions || []).filter(p => p !== perm.id);
-                                          setStaffForm({ ...staffForm, permissions: newPerms });
-                                        }}
-                                      />
-                                      <span className="text-sm text-foreground">{perm.name}</span>
-                                    </div>
-                                  ))}
+                          {/* صلاحيات الموظف - تظهر فقط للأدوار التي تحتاجها */}
+                          {['cashier', 'supervisor', 'manager', 'admin'].includes(staffForm.role) && (
+                            <div>
+                              <Label className="text-foreground mb-2 block">الصلاحيات</Label>
+                              <div className="border rounded-lg p-3 max-h-64 overflow-y-auto bg-muted/30 space-y-4">
+                                {/* صلاحيات الصفحات */}
+                                <div>
+                                  <h4 className="text-sm font-medium text-foreground mb-2 border-b pb-1">📄 الصفحات الرئيسية</h4>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {STAFF_PERMISSIONS.filter(p => p.group === 'pages').map(perm => (
+                                      <div key={perm.id} className="flex items-center gap-2">
+                                        <Switch
+                                          checked={staffForm.permissions?.includes(perm.id)}
+                                          onCheckedChange={(checked) => {
+                                            const newPerms = checked 
+                                              ? [...(staffForm.permissions || []), perm.id]
+                                              : (staffForm.permissions || []).filter(p => p !== perm.id);
+                                            setStaffForm({ ...staffForm, permissions: newPerms });
+                                          }}
+                                        />
+                                        <span className="text-sm text-foreground">{perm.name}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                {/* صلاحيات الإعدادات */}
+                                <div>
+                                  <h4 className="text-sm font-medium text-foreground mb-2 border-b pb-1">⚙️ الإعدادات</h4>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {STAFF_PERMISSIONS.filter(p => p.group === 'settings').map(perm => (
+                                      <div key={perm.id} className="flex items-center gap-2">
+                                        <Switch
+                                          checked={staffForm.permissions?.includes(perm.id)}
+                                          onCheckedChange={(checked) => {
+                                            const newPerms = checked 
+                                              ? [...(staffForm.permissions || []), perm.id]
+                                              : (staffForm.permissions || []).filter(p => p !== perm.id);
+                                            setStaffForm({ ...staffForm, permissions: newPerms });
+                                          }}
+                                        />
+                                        <span className="text-sm text-foreground">{perm.name}</span>
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
                               </div>
-                              {/* صلاحيات الإعدادات */}
-                              <div>
-                                <h4 className="text-sm font-medium text-foreground mb-2 border-b pb-1">⚙️ الإعدادات</h4>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {STAFF_PERMISSIONS.filter(p => p.group === 'settings').map(perm => (
-                                    <div key={perm.id} className="flex items-center gap-2">
-                                      <Switch
-                                        checked={staffForm.permissions?.includes(perm.id)}
-                                        onCheckedChange={(checked) => {
-                                          const newPerms = checked 
-                                            ? [...(staffForm.permissions || []), perm.id]
-                                            : (staffForm.permissions || []).filter(p => p !== perm.id);
-                                          setStaffForm({ ...staffForm, permissions: newPerms });
-                                        }}
-                                      />
-                                      <span className="text-sm text-foreground">{perm.name}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">حدد الصفحات والإعدادات التي يمكن للموظف رؤيتها</p>
                             </div>
-                            <p className="text-xs text-muted-foreground mt-1">حدد الصفحات والإعدادات التي يمكن للموظف رؤيتها</p>
-                          </div>
+                          )}
+                          
+                          {/* رسالة للأدوار التي لا تحتاج صلاحيات */}
+                          {['delivery', 'waiter', 'kitchen'].includes(staffForm.role) && (
+                            <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                              <p className="text-sm text-blue-500 flex items-center gap-2">
+                                <AlertCircle className="h-4 w-4" />
+                                هذا الدور له صلاحيات محددة مسبقاً ولا يحتاج تخصيص إضافي
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {staffForm.role === 'delivery' && 'سائق التوصيل يرى فقط الطلبات المسندة إليه من تطبيق السائق'}
+                                {staffForm.role === 'waiter' && 'الويتر يرى فقط الطاولات والطلبات'}
+                                {staffForm.role === 'kitchen' && 'المطبخ يرى فقط شاشة المطبخ'}
+                              </p>
+                            </div>
+                          )}
                           
                           <div className="flex gap-2 pt-4">
                             <Button type="button" variant="outline" onClick={() => setStaffDialogOpen(false)} className="flex-1">
