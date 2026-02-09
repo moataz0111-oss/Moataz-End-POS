@@ -1262,6 +1262,17 @@ export default function Delivery() {
                 required
               />
             </div>
+            <div>
+              <Label className="text-foreground">الرمز السري الجديد (PIN)</Label>
+              <Input
+                type="password"
+                value={editFormData.pin}
+                onChange={(e) => setEditFormData({ ...editFormData, pin: e.target.value })}
+                placeholder="اتركه فارغاً للإبقاء على الرمز الحالي"
+                maxLength={6}
+              />
+              <p className="text-xs text-muted-foreground mt-1">اتركه فارغاً إذا لم ترد تغيير الرمز</p>
+            </div>
             <div className="flex gap-2">
               <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)} className="flex-1">
                 إلغاء
