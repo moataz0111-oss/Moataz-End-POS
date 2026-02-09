@@ -1510,6 +1510,42 @@ export default function Delivery() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* نافذة تأكيد حذف السائقين المحددين */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-foreground flex items-center gap-2 text-red-500">
+              <AlertCircle className="h-5 w-5" />
+              تأكيد الحذف
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-foreground">
+              هل أنت متأكد من حذف <span className="font-bold text-red-500">{selectedDrivers.length}</span> سائق؟
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              هذا الإجراء لا يمكن التراجع عنه.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setDeleteConfirmOpen(false)}
+              className="flex-1"
+            >
+              إلغاء
+            </Button>
+            <Button 
+              onClick={handleDeleteSelectedDrivers}
+              className="flex-1 bg-red-500 text-white hover:bg-red-600"
+            >
+              <Trash2 className="h-4 w-4 ml-2" />
+              حذف نهائي
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
