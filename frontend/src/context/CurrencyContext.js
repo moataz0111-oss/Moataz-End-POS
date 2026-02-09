@@ -72,14 +72,17 @@ export const CurrencyProvider = ({ children }) => {
             headers: { Authorization: `Bearer ${token}` }
           });
           if (res.data) {
+            const newCurrency = res.data.currency || 'IQD';
             setSettings(prev => ({
               ...prev,
-              currency: res.data.currency || 'IQD',
+              currency: newCurrency,
               language: res.data.language || 'ar',
               country: res.data.country || 'IQ',
               showSecondary: res.data.show_secondary_currency || false,
               secondaryCurrency: res.data.secondary_currency || 'USD',
             }));
+            // تحديث localStorage و cache في currency.js
+            setLocalCurrency(newCurrency);
           }
         }
       } catch (error) {
