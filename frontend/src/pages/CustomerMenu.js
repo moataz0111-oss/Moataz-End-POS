@@ -1141,6 +1141,9 @@ export default function CustomerMenu() {
             </div>
           </div>
         )}
+
+        {/* Global Dialogs - تعرض في كل الخطوات */}
+        {renderGlobalDialogs()}
       </div>
     );
   }
