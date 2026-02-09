@@ -153,6 +153,13 @@ export default function CustomerMenu() {
   const [submitting, setSubmitting] = useState(false);
   const [showMap, setShowMap] = useState(false);
   
+  // المفضلة
+  const [favorites, setFavorites] = useState([]);
+  const [showFavoritesDialog, setShowFavoritesDialog] = useState(false);
+  const [savingFavorite, setSavingFavorite] = useState(false);
+  const [favoriteName, setFavoriteName] = useState('');
+  const [showSaveFavoriteDialog, setShowSaveFavoriteDialog] = useState(false);
+  
   // PWA
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
