@@ -996,16 +996,19 @@ export default function Dashboard() {
             </Button>
 
             {/* Share Menu Link Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={fetchMenuLink}
-              className="gap-2 border-green-500 text-green-500 hover:bg-green-500/10"
-              data-testid="share-menu-btn"
-            >
-              <Share2 className="h-4 w-4" />
-              قائمة العملاء
-            </Button>
+            {/* قائمة العملاء - يظهر فقط إذا كانت الميزة مفعلة */}
+            {dashboardSettings.showCustomerMenu && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchMenuLink}
+                className="gap-2 border-green-500 text-green-500 hover:bg-green-500/10"
+                data-testid="share-menu-btn"
+              >
+                <Share2 className="h-4 w-4" />
+                قائمة العملاء
+              </Button>
+            )}
 
             {/* PWA Install Button */}
             <PWAInstallButton variant="outline" className="gap-2" />
