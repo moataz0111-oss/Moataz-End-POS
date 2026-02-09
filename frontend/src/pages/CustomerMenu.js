@@ -1561,6 +1561,71 @@ export default function CustomerMenu() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Save Favorite Dialog */}
+        <Dialog open={showSaveFavoriteDialog} onOpenChange={setShowSaveFavoriteDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Bookmark className="h-5 w-5 text-pink-500" />
+                حفظ الطلب كمفضل
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">اسم الطلب المفضل</label>
+                <Input
+                  placeholder="مثال: طلبي المعتاد"
+                  value={favoriteName}
+                  onChange={(e) => setFavoriteName(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm font-medium mb-2">محتويات الطلب:</p>
+                <div className="space-y-1">
+                  {cart.map(item => (
+                    <div key={item.product_id} className="flex justify-between text-sm">
+                      <span>{item.name} × {item.quantity}</span>
+                      <span>{formatPrice(item.price * item.quantity)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between font-bold">
+                    <span>الإجمالي</span>
+                    <span className="text-orange-600">{formatPrice(cartTotal)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowSaveFavoriteDialog(false)}>
+                إلغاء
+              </Button>
+              <Button 
+                onClick={saveToFavorites}
+                disabled={savingFavorite}
+                className="bg-pink-500 hover:bg-pink-600"
+              >
+                {savingFavorite ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
+                    جاري الحفظ...
+                  </>
+                ) : (
+                  <>
+                    <Heart className="h-4 w-4 ml-2" />
+                    حفظ
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
