@@ -1,5 +1,5 @@
 // Currency formatting utilities for Maestro EGP
-// هذا الملف للتوافق مع الكود القديم - استخدم useCurrency() من CurrencyContext للتطبيقات الجديدة
+// يعمل هذا الملف مع CurrencyContext لتطبيق العملة بشكل ديناميكي
 
 // العملات المدعومة
 export const CURRENCIES = {
@@ -13,16 +13,37 @@ export const CURRENCIES = {
   EUR: { code: 'EUR', name: 'يورو', symbol: '€', rate: 1580, decimals: 2 },
 };
 
-// جلب العملة من localStorage (للتوافق)
+// متغير لتخزين العملة الحالية
+let cachedCurrency = null;
+
+// جلب العملة من localStorage مع تخزين مؤقت
 const getCurrentCurrency = () => {
   try {
     const saved = localStorage.getItem('app_currency');
     if (saved && CURRENCIES[saved]) {
-      return CURRENCIES[saved];
+      cachedCurrency = CURRENCIES[saved];
+      return cachedCurrency;
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error('Error reading currency from localStorage:', e);
+  }
   return CURRENCIES.IQD;
 };
+
+// دالة لتحديث العملة المخزنة مؤقتاً (تستدعى من CurrencyContext)
+export const refreshCurrencyCache = () => {
+  cachedCurrency = null;
+  getCurrentCurrency();
+};
+
+// الاستماع لتغييرات localStorage من نوافذ أخرى
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'app_currency') {
+      refreshCurrencyCache();
+    }
+  });
+}
 
 /**
  * Format price with current system currency
@@ -31,9 +52,11 @@ const getCurrentCurrency = () => {
  * @returns {string} Formatted price
  */
 export const formatPrice = (amount, showSymbol = true) => {
-  if (amount === null || amount === undefined || isNaN(amount)) return showSymbol ? '0 د.ع' : '0';
-  
   const currency = getCurrentCurrency();
+  
+  if (amount === null || amount === undefined || isNaN(amount)) {
+    return showSymbol ? `0 ${currency.symbol}` : '0';
+  }
   
   const formatted = new Intl.NumberFormat('ar-IQ', {
     minimumFractionDigits: currency.decimals || 0,
@@ -93,13 +116,32 @@ export const parsePrice = (priceString) => {
 };
 
 /**
- * Set the current currency (saves to localStorage)
+ * Set the current currency (saves to localStorage and refreshes cache)
  * @param {string} currencyCode - Currency code (IQD, USD, etc.)
  */
 export const setCurrency = (currencyCode) => {
   if (CURRENCIES[currencyCode]) {
     localStorage.setItem('app_currency', currencyCode);
+    refreshCurrencyCache();
+    // إرسال حدث مخصص لإعلام المكونات بتغيير العملة
+    window.dispatchEvent(new CustomEvent('currencyChanged', { detail: currencyCode }));
   }
+};
+
+/**
+ * Get current currency code
+ * @returns {string} Currency code
+ */
+export const getCurrencyCode = () => {
+  return getCurrentCurrency().code;
+};
+
+/**
+ * Get current currency info
+ * @returns {object} Currency object with code, name, symbol, rate, decimals
+ */
+export const getCurrencyInfo = () => {
+  return getCurrentCurrency();
 };
 
 export default {
@@ -108,5 +150,8 @@ export default {
   convertCurrency,
   parsePrice,
   setCurrency,
+  getCurrencyCode,
+  getCurrencyInfo,
+  refreshCurrencyCache,
   CURRENCIES,
 };
