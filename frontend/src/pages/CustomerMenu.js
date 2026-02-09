@@ -1089,15 +1089,25 @@ export default function CustomerMenu() {
                   <div className="aspect-square relative bg-gray-100">
                     {product.image ? (
                       <img 
-                        src={product.image} 
+                        src={product.image.startsWith('/api') 
+                          ? `${API}${product.image.replace('/api', '')}` 
+                          : product.image.startsWith('http') 
+                            ? product.image 
+                            : `${API}/uploads/products/${product.image}`} 
                         alt={product.name}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'flex';
+                        }}
                       />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-orange-100 to-red-100">
-                        🍽️
-                      </div>
-                    )}
+                    ) : null}
+                    <div 
+                      className={`w-full h-full items-center justify-center text-4xl bg-gradient-to-br from-orange-100 to-red-100 ${product.image ? 'hidden' : 'flex'}`}
+                      style={{ display: product.image ? 'none' : 'flex' }}
+                    >
+                      🍽️
+                    </div>
                     {!product.is_available && (
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                         <span className="text-white font-bold">غير متوفر</span>
