@@ -352,6 +352,7 @@ export default function SuperAdmin() {
       fetchNotificationSettings();
       fetchExpiringSubscriptions();
       fetchSubscriptionsDashboard();
+      fetchOwnerSettings();
     }
   }, [isAuthenticated]);
 
