@@ -105,7 +105,7 @@ export default function Tables() {
     try {
       if (editingTable) {
         // Update logic would go here
-        toast.success('تم تحديث الطاولة');
+        toast.success(t('تم تحديث الطاولة'));
       } else {
         await axios.post(`${API}/tables`, {
           ...formData,
