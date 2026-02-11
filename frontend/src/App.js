@@ -401,20 +401,22 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider>
-        <AuthProvider>
-          <CurrencyProvider>
-            <BranchProvider>
-              <div className="App" dir="rtl">
-                <BrowserRouter>
-                  <AppRoutes />
-                  <Toaster position="top-center" richColors />
-                  {/* Incoming Call Popup - يظهر في جميع الصفحات */}
-                  <IncomingCallPopup />
-                </BrowserRouter>
-              </div>
-            </BranchProvider>
-          </CurrencyProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <CurrencyProvider>
+              <BranchProvider>
+                <div className="App">
+                  <BrowserRouter>
+                    <AppRoutes />
+                    <Toaster position="top-center" richColors />
+                    {/* Incoming Call Popup - يظهر في جميع الصفحات */}
+                    <IncomingCallPopup />
+                  </BrowserRouter>
+                </div>
+              </BranchProvider>
+            </CurrencyProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
