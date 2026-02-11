@@ -1705,7 +1705,7 @@ export default function Settings() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <p className="text-sm text-muted-foreground">
-                    تحكم في الصفحات والأقسام التي تظهر في الصفحة الرئيسية للمستخدمين
+                    تحكم في الصفحات والأقسام التي تظهر في الصفحة الرئيسية للمستخدمين (19 أيقونة)
                   </p>
                   
                   <div className="grid grid-cols-2 gap-4">
