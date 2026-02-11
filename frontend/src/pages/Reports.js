@@ -258,24 +258,12 @@ export default function Reports() {
               <ArrowRight className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold font-cairo text-foreground">التقارير</h1>
-              <p className="text-sm text-muted-foreground">تقارير شاملة للمبيعات والمصاريف والأرباح</p>
+              <h1 className="text-xl font-bold font-cairo text-foreground">{t('التقارير')}</h1>
+              <p className="text-sm text-muted-foreground">{t('تقارير شاملة للمبيعات والمصاريف والأرباح')}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Export Button */}
-            <div className="relative group">
-              <Button 
-                variant="outline" 
-                className="gap-2"
-                onClick={() => exportToExcel(activeTab === 'sales' ? 'sales' : activeTab === 'products' ? 'products' : 'expenses')}
-              >
-                <Download className="h-4 w-4" />
-                تصدير Excel
-              </Button>
-            </div>
-            
             <Button variant="outline" size="icon" onClick={fetchReports} data-testid="refresh-btn">
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
@@ -287,13 +275,13 @@ export default function Reports() {
       <div className="max-w-7xl mx-auto px-6 py-4 border-b border-border">
         <div className="flex flex-wrap items-center gap-4">
           <div>
-            <Label className="text-xs text-muted-foreground">الفرع</Label>
+            <Label className="text-xs text-muted-foreground">{t('الفرع')}</Label>
             <div className="mt-1">
               <BranchSelector />
             </div>
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">من تاريخ</Label>
+            <Label className="text-xs text-muted-foreground">{t('من تاريخ')}</Label>
             <Input
               type="date"
               value={startDate}
@@ -302,7 +290,7 @@ export default function Reports() {
             />
           </div>
           <div>
-            <Label className="text-xs text-muted-foreground">إلى تاريخ</Label>
+            <Label className="text-xs text-muted-foreground">{t('إلى تاريخ')}</Label>
             <Input
               type="date"
               value={endDate}
@@ -323,7 +311,7 @@ export default function Reports() {
               ) : (
                 <Search className="h-4 w-4" />
               )}
-              بحث
+              {t('بحث')}
             </Button>
           </div>
         </div>
@@ -333,16 +321,16 @@ export default function Reports() {
       <main className="max-w-7xl mx-auto px-6 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-5 md:grid-cols-10 mb-6">
-            <TabsTrigger value="sales">المبيعات</TabsTrigger>
-            <TabsTrigger value="purchases">المشتريات</TabsTrigger>
-            <TabsTrigger value="expenses">المصاريف</TabsTrigger>
-            <TabsTrigger value="profit">الأرباح</TabsTrigger>
-            <TabsTrigger value="products">الأصناف</TabsTrigger>
-            <TabsTrigger value="delivery">التوصيل</TabsTrigger>
-            <TabsTrigger value="cancellations" className="text-red-500">الإلغاءات</TabsTrigger>
-            <TabsTrigger value="discounts" className="text-orange-500">الخصومات</TabsTrigger>
-            <TabsTrigger value="refunds" className="text-purple-500">الإرجاعات</TabsTrigger>
-            <TabsTrigger value="credit" className="text-blue-500">الآجل</TabsTrigger>
+            <TabsTrigger value="sales">{t('المبيعات')}</TabsTrigger>
+            <TabsTrigger value="purchases">{t('المشتريات')}</TabsTrigger>
+            <TabsTrigger value="expenses">{t('المصاريف')}</TabsTrigger>
+            <TabsTrigger value="profit">{t('الأرباح')}</TabsTrigger>
+            <TabsTrigger value="products">{t('الأصناف')}</TabsTrigger>
+            <TabsTrigger value="delivery">{t('التوصيل')}</TabsTrigger>
+            <TabsTrigger value="cancellations" className="text-red-500">{t('الإلغاءات')}</TabsTrigger>
+            <TabsTrigger value="discounts" className="text-orange-500">{t('الخصومات')}</TabsTrigger>
+            <TabsTrigger value="refunds" className="text-purple-500">{t('الإرجاعات')}</TabsTrigger>
+            <TabsTrigger value="credit" className="text-blue-500">{t('الآجل')}</TabsTrigger>
           </TabsList>
 
           {/* Sales Report */}
@@ -351,28 +339,28 @@ export default function Reports() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <StatCard
-                    title="إجمالي المبيعات"
+                    title={t('إجمالي المبيعات')}
                     value={formatPrice(salesReport.total_sales)}
                     icon={DollarSign}
                     color="green-500"
                   />
                   <StatCard
-                    title="إجمالي التكاليف"
+                    title={t('إجمالي التكاليف')}
                     value={formatPrice(salesReport.total_cost)}
                     icon={TrendingDown}
                     color="red-500"
                   />
                   <StatCard
-                    title="إجمالي الأرباح"
+                    title={t('إجمالي الأرباح')}
                     value={formatPrice(salesReport.total_profit)}
-                    subtitle={`هامش الربح: ${salesReport.profit_margin?.toFixed(1)}%`}
+                    subtitle={`${t('هامش الربح')}: ${salesReport.profit_margin?.toFixed(1)}%`}
                     icon={TrendingUp}
                     color="primary"
                   />
                   <StatCard
-                    title="عدد الطلبات"
+                    title={t('عدد الطلبات')}
                     value={salesReport.total_orders}
-                    subtitle={`متوسط: ${formatPrice(salesReport.average_order_value)}`}
+                    subtitle={`${t('متوسط')}: ${formatPrice(salesReport.average_order_value)}`}
                     icon={ShoppingCart}
                     color="blue-500"
                   />
@@ -382,14 +370,14 @@ export default function Reports() {
                   {/* By Payment Method */}
                   <Card className="border-border/50 bg-card">
                     <CardHeader>
-                      <CardTitle className="text-lg text-foreground">حسب طريقة الدفع</CardTitle>
+                      <CardTitle className="text-lg text-foreground">{t('حسب طريقة الدفع')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {Object.entries(salesReport.by_payment_method || {}).map(([method, amount]) => (
                           <div key={method} className="flex justify-between items-center">
                             <span className="text-muted-foreground">
-                              {method === 'cash' ? 'نقدي' : method === 'card' ? 'بطاقة' : method === 'credit' ? 'آجل' : method}
+                              {method === 'cash' ? t('نقدي') : method === 'card' ? t('بطاقة') : method === 'credit' ? t('آجل') : method}
                             </span>
                             <span className="font-bold text-foreground tabular-nums">{formatPrice(amount)}</span>
                           </div>
@@ -401,14 +389,14 @@ export default function Reports() {
                   {/* By Order Type */}
                   <Card className="border-border/50 bg-card">
                     <CardHeader>
-                      <CardTitle className="text-lg text-foreground">حسب نوع الطلب</CardTitle>
+                      <CardTitle className="text-lg text-foreground">{t('حسب نوع الطلب')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         {Object.entries(salesReport.by_order_type || {}).map(([type, amount]) => (
                           <div key={type} className="flex justify-between items-center">
                             <span className="text-muted-foreground">
-                              {type === 'dine_in' ? 'داخلي' : type === 'takeaway' ? 'سفري' : 'توصيل'}
+                              {type === 'dine_in' ? t('داخلي') : type === 'takeaway' ? t('سفري') : t('توصيل')}
                             </span>
                             <span className="font-bold text-foreground tabular-nums">{formatPrice(amount)}</span>
                           </div>
@@ -421,7 +409,7 @@ export default function Reports() {
                 {/* Top Products */}
                 <Card className="border-border/50 bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg text-foreground">أكثر المنتجات مبيعاً</CardTitle>
+                    <CardTitle className="text-lg text-foreground">{t('أكثر المنتجات مبيعاً')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
@@ -435,7 +423,7 @@ export default function Reports() {
                           </div>
                           <div className="text-left">
                             <p className="font-bold text-foreground tabular-nums">{formatPrice(data.revenue)}</p>
-                            <p className="text-xs text-muted-foreground">{data.quantity} وحدة</p>
+                            <p className="text-xs text-muted-foreground">{data.quantity} {t('وحدة')}</p>
                           </div>
                         </div>
                       ))}
@@ -443,13 +431,9 @@ export default function Reports() {
                   </CardContent>
                 </Card>
                 <div className="flex justify-end gap-2 mt-4">
-                  <Button variant="outline" onClick={() => exportToExcel('sales')}>
-                    <FileSpreadsheet className="h-4 w-4 ml-2" />
-                    تصدير Excel
-                  </Button>
-                  <Button variant="outline" onClick={() => exportToPDF('sales')}>
+                  <Button variant="outline" onClick={() => window.print()}>
                     <FileText className="h-4 w-4 ml-2" />
-                    تصدير PDF
+                    {t('طباعة')}
                   </Button>
                 </div>
               </div>
