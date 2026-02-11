@@ -119,7 +119,7 @@ export default function Tables() {
       setFormData({ number: '', capacity: 4, section: '' });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في حفظ الطاولة');
+      toast.error(error.response?.data?.detail || t('فشل في حفظ الطاولة'));
     }
   };
 
