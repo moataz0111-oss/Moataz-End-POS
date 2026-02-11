@@ -358,7 +358,7 @@ export default function KitchenDisplay() {
                 <ChefHat className="h-6 w-6 text-yellow-500" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">شاشة المطبخ</h1>
+                <h1 className="text-xl font-bold">{t('kitchen_display')}</h1>
                 <p className="text-sm text-gray-400">Kitchen Display System</p>
               </div>
             </div>
@@ -369,12 +369,12 @@ export default function KitchenDisplay() {
             <div className="flex items-center gap-4 px-4 py-2 bg-gray-700/50 rounded-xl">
               <div className="text-center">
                 <p className="text-2xl font-bold text-yellow-400">{pendingOrders.length}</p>
-                <p className="text-xs text-gray-400">جديد</p>
+                <p className="text-xs text-gray-400">{t('new_orders')}</p>
               </div>
               <div className="w-px h-8 bg-gray-600" />
               <div className="text-center">
                 <p className="text-2xl font-bold text-blue-400">{preparingOrders.length}</p>
-                <p className="text-xs text-gray-400">قيد التحضير</p>
+                <p className="text-xs text-gray-400">{t('in_progress')}</p>
               </div>
             </div>
             
