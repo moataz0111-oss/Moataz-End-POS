@@ -434,13 +434,13 @@ export default function Login() {
           </div>
           
           <CardTitle 
-435|            className="text-3xl font-black font-cairo"
-436|            style={{ color: backgroundSettings?.text_color || '#ffffff' }}
-437|          >
-438|            Maestro EGP
-439|          </CardTitle>
-440|          <CardDescription className="text-gray-300 mt-2">
-441|            {t('نظام نقاط البيع والتحكم بالتكاليف')}
+            className="text-3xl font-black font-cairo"
+            style={{ color: backgroundSettings?.text_color || '#ffffff' }}
+          >
+            Maestro EGP
+          </CardTitle>
+          <CardDescription className="text-gray-300 mt-2">
+            {t('نظام نقاط البيع والتحكم بالتكاليف')}
           </CardDescription>
           
           {/* Background indicator dots */}
