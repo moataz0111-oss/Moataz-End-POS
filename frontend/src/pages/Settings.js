@@ -1411,14 +1411,14 @@ export default function Settings() {
                 value="appearance" 
                 className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
-                المظهر
+                {t('المظهر')}
               </TabsTrigger>
               {hasRole(['admin', 'super_admin']) && (
                 <TabsTrigger 
                   value="restaurant"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  المطعم
+                  {t('المطعم')}
                 </TabsTrigger>
               )}
               {hasRole(['admin', 'super_admin', 'manager', 'branch_manager']) && (
@@ -1426,7 +1426,7 @@ export default function Settings() {
                   value="dashboard"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  الرئيسية
+                  {t('الرئيسية')}
                 </TabsTrigger>
               )}
               {/* super_admin يدير المستخدمين من لوحة تحكم المالك فقط */}
@@ -1436,7 +1436,7 @@ export default function Settings() {
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   <Users className="h-4 w-4 ml-1" />
-                  المستخدمين والموظفين
+                  {t('المستخدمين والموظفين')}
                 </TabsTrigger>
               )}
               {(hasRole(['admin', 'super_admin', 'manager', 'branch_manager']) || hasSettingsPermission('settings_customers')) && settingsPermissions.settingsCustomers && (
@@ -1444,7 +1444,7 @@ export default function Settings() {
                   value="customers"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  العملاء
+                  {t('العملاء')}
                 </TabsTrigger>
               )}
               {hasRole(['admin', 'super_admin']) && settingsPermissions.settingsBranches && (
@@ -1452,7 +1452,7 @@ export default function Settings() {
                   value="branches"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  الفروع
+                  {t('الفروع')}
                 </TabsTrigger>
               )}
               {(hasRole(['admin', 'super_admin', 'manager', 'branch_manager']) || hasSettingsPermission('settings_categories')) && settingsPermissions.settingsCategories && (
@@ -1460,7 +1460,7 @@ export default function Settings() {
                   value="categories"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  الفئات
+                  {t('الفئات')}
                 </TabsTrigger>
               )}
               {(hasRole(['admin', 'super_admin', 'manager', 'branch_manager']) || hasSettingsPermission('settings_products')) && settingsPermissions.settingsProducts && (
@@ -1468,7 +1468,7 @@ export default function Settings() {
                   value="products"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  المنتجات
+                  {t('المنتجات')}
                 </TabsTrigger>
               )}
               {(hasRole(['admin', 'super_admin', 'manager', 'branch_manager']) || hasSettingsPermission('settings_printers')) && settingsPermissions.settingsPrinters && (
@@ -1476,7 +1476,7 @@ export default function Settings() {
                   value="printers"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  الطابعات
+                  {t('الطابعات')}
                 </TabsTrigger>
               )}
               {(hasRole(['admin', 'super_admin']) || hasSettingsPermission('settings_delivery')) && settingsPermissions.settingsDeliveryCompanies && (
@@ -1484,7 +1484,7 @@ export default function Settings() {
                   value="delivery"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  شركات التوصيل
+                  {t('شركات التوصيل')}
                 </TabsTrigger>
               )}
               {hasRole(['admin', 'super_admin']) && settingsPermissions.settingsCallCenter && (
@@ -1492,7 +1492,7 @@ export default function Settings() {
                   value="callcenter"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  الكول سنتر
+                  {t('الكول سنتر')}
                 </TabsTrigger>
               )}
               {(hasRole(['admin', 'super_admin']) || hasSettingsPermission('settings_notifications')) && settingsPermissions.settingsNotifications && (
@@ -1500,7 +1500,7 @@ export default function Settings() {
                   value="notifications"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  الإشعارات
+                  {t('الإشعارات')}
                 </TabsTrigger>
               )}
               {hasRole(['admin', 'super_admin']) && (
@@ -1508,7 +1508,7 @@ export default function Settings() {
                   value="payments"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  💳 الدفع الإلكتروني
+                  {t('الدفع الإلكتروني')}
                 </TabsTrigger>
               )}
               {hasRole(['admin', 'super_admin']) && (
@@ -1516,7 +1516,7 @@ export default function Settings() {
                   value="inventory-settings"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  📦 إعدادات المخزون
+                  {t('إعدادات المخزون')}
                 </TabsTrigger>
               )}
               {hasRole(['admin', 'super_admin']) && (
@@ -1524,7 +1524,7 @@ export default function Settings() {
                   value="system-settings"
                   className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
-                  ⚙️ إعدادات النظام
+                  {t('إعدادات النظام')}
                 </TabsTrigger>
               )}
               {hasRole(['admin', 'super_admin', 'manager']) && (
