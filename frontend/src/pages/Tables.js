@@ -158,7 +158,7 @@ export default function Tables() {
   // تحويل الطلب من طاولة إلى أخرى
   const handleTransferTable = async () => {
     if (!selectedTableForTransfer || !targetTableId) {
-      toast.error('الرجاء اختيار الطاولة المستهدفة');
+      toast.error(t('الرجاء اختيار الطاولة المستهدفة'));
       return;
     }
     
