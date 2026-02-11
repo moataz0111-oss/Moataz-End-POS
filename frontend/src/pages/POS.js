@@ -1032,9 +1032,9 @@ export default function POS() {
         <div className="p-4 border-b border-border">
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'dine_in', label: 'داخل المطعم', icon: UtensilsCrossed },
-              { id: 'takeaway', label: 'سفري', icon: Package },
-              { id: 'delivery', label: 'توصيل', icon: Truck },
+              { id: 'dine_in', label: t('داخل المطعم'), icon: UtensilsCrossed },
+              { id: 'takeaway', label: t('سفري'), icon: Package },
+              { id: 'delivery', label: t('توصيل'), icon: Truck },
             ].map(type => (
               <Button
                 key={type.id}
@@ -1074,12 +1074,12 @@ export default function POS() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                {customerData.total_orders} طلب سابق | {formatPrice(customerData.total_spent)}
+                {customerData.total_orders} {t('طلب سابق')} | {formatPrice(customerData.total_spent)}
               </p>
               {customerData.is_blocked && (
                 <div className="flex items-center gap-1 text-red-500 text-xs">
                   <AlertCircle className="h-3 w-3" />
-                  عميل محظور
+                  {t('عميل محظور')}
                 </div>
               )}
             </div>
@@ -1198,7 +1198,7 @@ export default function POS() {
                 data-testid="customer-phone"
               />
               <Input
-                placeholder="رقم جهاز التنبيه (اختياري)"
+                placeholder={t('رقم جهاز التنبيه (اختياري)')}
                 value={buzzerNumber}
                 onChange={(e) => setBuzzerNumber(e.target.value)}
                 data-testid="buzzer-number"
@@ -1209,19 +1209,19 @@ export default function POS() {
           {orderType === 'delivery' && (
             <div className="space-y-2">
               <Input
-                placeholder="اسم العميل"
+                placeholder={t('اسم العميل')}
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 data-testid="delivery-name"
               />
               <Input
-                placeholder="رقم الهاتف"
+                placeholder={t('رقم الهاتف')}
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 data-testid="delivery-phone"
               />
               <Input
-                placeholder="عنوان التوصيل"
+                placeholder={t('عنوان التوصيل')}
                 value={deliveryAddress}
                 onChange={(e) => setDeliveryAddress(e.target.value)}
                 data-testid="delivery-address"
@@ -1229,7 +1229,7 @@ export default function POS() {
               
               {/* اختيار السائق أولاً */}
               <div>
-                <p className="text-sm text-muted-foreground mb-2">اختر السائق: <span className="text-red-500">*</span></p>
+                <p className="text-sm text-muted-foreground mb-2">{t('اختر السائق')}: <span className="text-red-500">*</span></p>
                 <div className="grid grid-cols-2 gap-2">
                   {drivers.filter(d => d.is_available).map(driver => (
                     <button
@@ -1246,19 +1246,19 @@ export default function POS() {
                     </button>
                   ))}
                   {drivers.filter(d => d.is_available).length === 0 && (
-                    <p className="text-sm text-red-500 col-span-2 text-center py-2">لا يوجد سائقين متاحين</p>
+                    <p className="text-sm text-red-500 col-span-2 text-center py-2">{t('لا يوجد سائقين متاحين')}</p>
                   )}
                 </div>
                 {selectedDriver && (
                   <p className="text-xs text-green-500 mt-1">
-                    ✓ سيتم تحويل الطلب مباشرة للسائق
+                    ✓ {t('سيتم تحويل الطلب مباشرة للسائق')}
                   </p>
                 )}
               </div>
               
               {/* شركة التوصيل */}
               <div>
-                <p className="text-sm text-muted-foreground mb-2">شركة التوصيل:</p>
+                <p className="text-sm text-muted-foreground mb-2">{t('شركة التوصيل')}:</p>
                 <div className="grid grid-cols-3 gap-1">
                   <button
                     onClick={() => { setDeliveryApp(''); playClick(); }}
@@ -1268,8 +1268,7 @@ export default function POS() {
                         : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                     }`}
                   >
-                    بدون
-                  </button>
+                    {t('بدون')}
                   {deliveryApps.map(app => (
                     <button
                       key={app.id}
@@ -1295,7 +1294,7 @@ export default function POS() {
             {cart.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground">
                 <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>السلة فارغة</p>
+                <p>{t('السلة فارغة')}</p>
               </div>
             ) : (
               cart.map((item, index) => (
@@ -1344,7 +1343,7 @@ export default function POS() {
         <div className="p-4 border-t border-border bg-muted/30 space-y-4">
           {/* Discount */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">خصم:</span>
+            <span className="text-sm text-muted-foreground">{t('خصم')}:</span>
             <Input
               type="number"
               value={discount}
@@ -1358,28 +1357,28 @@ export default function POS() {
           {/* Subtotal & Total */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">المجموع الفرعي:</span>
+              <span className="text-muted-foreground">{t('المجموع الفرعي')}:</span>
               <span className="tabular-nums text-foreground">{formatPrice(subtotal)}</span>
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-sm text-destructive">
-                <span>الخصم:</span>
+                <span>{t('الخصم')}:</span>
                 <span className="tabular-nums">-{formatPrice(discount)}</span>
               </div>
             )}
             {commissionAmount > 0 && (
               <div className="flex justify-between text-sm text-amber-500">
-                <span>عمولة {selectedDeliveryApp?.name} ({commissionRate}%):</span>
+                <span>{t('عمولة')} {selectedDeliveryApp?.name} ({commissionRate}%):</span>
                 <span className="tabular-nums">-{formatPrice(commissionAmount)}</span>
               </div>
             )}
             <div className="flex justify-between text-lg font-bold pt-2 border-t border-border">
-              <span className="text-foreground">الإجمالي:</span>
+              <span className="text-foreground">{t('الإجمالي')}:</span>
               <span className="text-primary tabular-nums">{formatPrice(totalBeforeCommission)}</span>
             </div>
             {commissionAmount > 0 && (
               <div className="flex justify-between text-base font-bold bg-green-500/10 p-2 rounded-lg">
-                <span className="text-green-600">الصافي بعد العمولة:</span>
+                <span className="text-green-600">{t('الصافي بعد العمولة')}:</span>
                 <span className="text-green-600 tabular-nums">{formatPrice(netTotal)}</span>
               </div>
             )}
@@ -1388,9 +1387,9 @@ export default function POS() {
           {/* Payment Method */}
           <div className="flex gap-2">
             {[
-              { id: 'cash', label: 'نقدي', icon: Banknote },
-              { id: 'card', label: 'بطاقة', icon: CreditCard },
-              { id: 'credit', label: 'آجل', icon: Clock },
+              { id: 'cash', label: t('نقدي'), icon: Banknote },
+              { id: 'card', label: t('بطاقة'), icon: CreditCard },
+              { id: 'credit', label: t('آجل'), icon: Clock },
             ].map(method => (
               <Button
                 key={method.id}
