@@ -717,7 +717,7 @@ export default function POS() {
       await axios.put(`${API}/orders/${orderId}/payment?payment_method=${paymentMethod}`);
       await axios.put(`${API}/orders/${orderId}/status?status=delivered`);
       
-      // إغلاق الطاولة تلقائياً إذا كان طلب محلي
+      // إغلاق الطاولة تلقائياً إذا كان طلب داخل المطعم
       if (orderType === 'dine_in' && (selectedTable || editingOrder?.table_id)) {
         const tableId = selectedTable || editingOrder?.table_id;
         try {
@@ -1025,7 +1025,7 @@ export default function POS() {
         <div className="p-4 border-b border-border">
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'dine_in', label: 'محلي', icon: UtensilsCrossed },
+              { id: 'dine_in', label: 'داخل المطعم', icon: UtensilsCrossed },
               { id: 'takeaway', label: 'سفري', icon: Package },
               { id: 'delivery', label: 'توصيل', icon: Truck },
             ].map(type => (
@@ -1497,7 +1497,7 @@ export default function POS() {
                 )}
               </TabsTrigger>
               <TabsTrigger value="dine_in" className="relative">
-                محلي
+                داخل المطعم
                 {pendingDineInOrders.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     {pendingDineInOrders.length}
@@ -1555,7 +1555,7 @@ export default function POS() {
                 {pendingDineInOrders.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد طلبات محلية معلقة</p>
+                    <p>لا توجد طلبات داخل المطعمة معلقة</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -2054,7 +2054,7 @@ export default function POS() {
                 <div className="grid grid-cols-2 gap-2 text-sm mt-3">
                   <div className="text-muted-foreground">نوع الطلب:</div>
                   <div className="font-medium">
-                    {refundOrderInfo.order_type === 'dine_in' ? 'محلي' : 
+                    {refundOrderInfo.order_type === 'dine_in' ? 'داخل المطعم' : 
                      refundOrderInfo.order_type === 'takeaway' ? 'سفري' : 'توصيل'}
                   </div>
                   <div className="text-muted-foreground">المبلغ:</div>
@@ -2158,7 +2158,7 @@ function OrderCard({ order, onSelect }) {
     switch (type) {
       case 'takeaway': return 'سفري';
       case 'delivery': return 'توصيل';
-      default: return 'محلي';
+      default: return 'داخل المطعم';
     }
   };
   
