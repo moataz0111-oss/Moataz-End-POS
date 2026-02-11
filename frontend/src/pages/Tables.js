@@ -129,7 +129,7 @@ export default function Tables() {
       toast.success(t('تم تحديث حالة الطاولة'));
       fetchData();
     } catch (error) {
-      toast.error('فشل في تحديث الحالة');
+      toast.error(t('فشل في تحديث الحالة'));
     }
   };
 
