@@ -260,11 +260,27 @@ export default function KitchenDisplay() {
     return () => clearInterval(interval);
   }, [fetchOrders]);
 
-  // Sound effect
+  // Sound effect - صوت إشعار واضح
   const playNewOrderSound = () => {
-    if (audioRef.current) {
+    if (audioRef.current && soundEnabled) {
       audioRef.current.currentTime = 0;
+      audioRef.current.volume = 1.0;
       audioRef.current.play().catch(() => {});
+      
+      // تشغيل الصوت 3 مرات للتنبيه
+      let playCount = 0;
+      const playAgain = () => {
+        playCount++;
+        if (playCount < 3 && soundEnabled) {
+          setTimeout(() => {
+            if (audioRef.current) {
+              audioRef.current.currentTime = 0;
+              audioRef.current.play().catch(() => {});
+            }
+          }, 800);
+        }
+      };
+      audioRef.current.onended = playAgain;
     }
   };
 
