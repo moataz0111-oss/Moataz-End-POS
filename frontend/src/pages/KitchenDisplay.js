@@ -127,6 +127,13 @@ const KitchenOrderCard = ({ order, onStatusChange, onItemComplete }) => {
             </div>
           </div>
           
+          {/* Branch Name */}
+          {order.branch_name && (
+            <div className="mt-2 px-2 py-1 bg-white/10 rounded-lg inline-block">
+              <span className="text-xs text-white/90 font-medium">📍 {order.branch_name}</span>
+            </div>
+          )}
+          
           {/* Customer/Table Info */}
           {(order.table_number || order.customer_name) && (
             <div className="mt-3 pt-3 border-t border-white/20 flex items-center gap-4">
