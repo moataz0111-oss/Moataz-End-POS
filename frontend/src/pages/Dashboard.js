@@ -1179,16 +1179,16 @@ export default function Dashboard() {
         {hasDashboardPermission('dashboard_statistics') && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base md:text-lg font-bold font-cairo text-foreground">{t('quick_stats')}</h2>
+            <h2 className="text-base md:text-lg font-bold font-cairo text-foreground">{t('الإحصائيات')}</h2>
             <div className="flex items-center gap-2">
               {/* فلتر الفترة الزمنية - يظهر فقط لمن لديه صلاحية */}
               {hasDashboardPermission('dashboard_stats_filters') && (
                 <div className="flex bg-muted rounded-lg p-1 gap-1">
                   {[
-                    { key: 'today', label: t('today') },
-                    { key: 'week', label: t('this_week') },
-                    { key: 'month', label: t('this_month') },
-                    { key: 'all_time', label: t('all') }
+                    { key: 'today', label: t('اليوم') },
+                    { key: 'week', label: t('الأسبوع') },
+                    { key: 'month', label: t('الشهر') },
+                    { key: 'all_time', label: t('الكل') }
                   ].map(period => (
                     <Button
                       key={period.key}
