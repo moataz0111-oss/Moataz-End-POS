@@ -1012,6 +1012,8 @@ const translationMap = {
   'تظهر هذه البيانات في تطبيق العملاء': { en: 'This data appears in the customer app', ku: 'ئەم داتایانە لە ئەپلیکەیشنی کڕیاران دەردەکەون' },
   'اسم المطعم (عربي)': { en: 'Restaurant Name (Arabic)', ku: 'ناوی چێشتخانە (عەرەبی)' },
   'مثال: مطعم الشام': { en: 'Example: Al-Sham Restaurant', ku: 'نمونە: چێشتخانەی شام' },
+  'الآجل': { en: 'Credit', ku: 'قەرز' },
+  'عدد الطلبات': { en: 'Orders Count', ku: 'ژمارەی داواکارییەکان' },
 };
 
 // الحصول على اللغة الحالية
