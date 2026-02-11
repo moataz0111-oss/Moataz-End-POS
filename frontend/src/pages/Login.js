@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../hooks/useTranslation';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -87,6 +88,7 @@ const animationStyles = {
 };
 
 export default function Login() {
+  const { t, isRTL } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -272,7 +274,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" dir="rtl">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Custom CSS for animations */}
       <style>{`
         @keyframes kenburns {
