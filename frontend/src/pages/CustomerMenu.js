@@ -1,4 +1,3 @@
-
 import { useTranslation } from '../hooks/useTranslation';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';

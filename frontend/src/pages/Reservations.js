@@ -1,4 +1,3 @@
-
 import { useTranslation } from '../hooks/useTranslation';
 import React, { useState, useEffect } from 'react';
 import { BACKEND_URL } from '../utils/api';
