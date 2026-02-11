@@ -782,6 +782,9 @@ export default function POS() {
     
     if (!confirm('هل أنت متأكد من إلغاء هذا الطلب؟')) return;
     
+    // تحديد الفرع النشط
+    const currentBranchId = getBranchIdForApi() || user?.branch_id;
+    
     setSubmitting(true);
     try {
       const res = await axios.put(`${API}/orders/${editingOrder.id}/cancel`);
@@ -794,7 +797,7 @@ export default function POS() {
       await fetchPendingOrders();
       
       // تحديث الطاولات
-      const tablesParams = activeBranchId ? { branch_id: activeBranchId } : {};
+      const tablesParams = currentBranchId ? { branch_id: currentBranchId } : {};
       const tablesRes = await axios.get(`${API}/tables`, { params: tablesParams });
       setTables(tablesRes.data);
     } catch (error) {
