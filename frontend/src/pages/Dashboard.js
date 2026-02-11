@@ -881,21 +881,21 @@ export default function Dashboard() {
       bg: 'bg-green-500/10'
     },
     { 
-      label: 'عدد الطلبات', 
+      label: t('orders_count'), 
       value: periodStats?.total_orders || 0, 
       icon: ShoppingCart,
       color: 'text-blue-500',
       bg: 'bg-blue-500/10'
     },
     { 
-      label: 'متوسط الطلب', 
+      label: t('average_order'), 
       value: formatPrice(periodStats?.average_order_value || 0), 
       icon: TrendingUp,
       color: 'text-primary',
       bg: 'bg-primary/10'
     },
     { 
-      label: 'صافي الربح', 
+      label: t('net_profit'), 
       value: formatPriceCompact(periodStats?.total_profit || 0), 
       icon: Wallet,
       color: 'text-purple-500',
