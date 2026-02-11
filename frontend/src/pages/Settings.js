@@ -1051,6 +1051,7 @@ export default function Settings() {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
+      // تحديث بيانات المستخدم
       await axios.put(`${API}/users/${editUserForm.id}`, {
         username: editUserForm.username,
         email: editUserForm.email,
@@ -1060,7 +1061,17 @@ export default function Settings() {
         permissions: editUserForm.permissions,
         is_active: editUserForm.is_active
       });
-      toast.success('تم تحديث المستخدم');
+      
+      // تغيير كلمة المرور إذا تم إدخالها
+      if (editUserForm.new_password && editUserForm.new_password.length >= 4) {
+        await axios.put(`${API}/users/${editUserForm.id}/reset-password`, {
+          new_password: editUserForm.new_password
+        });
+        toast.success('تم تحديث المستخدم وكلمة المرور');
+      } else {
+        toast.success('تم تحديث المستخدم');
+      }
+      
       setEditUserDialogOpen(false);
       setEditUserForm(null);
       fetchData();
