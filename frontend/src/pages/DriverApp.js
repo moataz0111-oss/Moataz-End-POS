@@ -459,7 +459,7 @@ export default function DriverApp() {
 
   // الصفحة الرئيسية للسائق
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <div className="min-h-screen bg-gray-50" dir={isRTL ? 'rtl' : 'ltr'}>
       <Toaster position="top-center" richColors />
       
       {/* Header */}
@@ -518,14 +518,14 @@ export default function DriverApp() {
           <div className="bg-white rounded-xl p-4 shadow-sm border">
             <div className="flex items-center gap-2 text-blue-600 mb-1">
               <Package className="h-4 w-4" />
-              <span className="text-sm">طلبات نشطة</span>
+              <span className="text-sm">{t('طلبات نشطة')}</span>
             </div>
             <p className="text-2xl font-bold">{stats.pending_orders}</p>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border">
             <div className="flex items-center gap-2 text-green-600 mb-1">
               <CheckCircle className="h-4 w-4" />
-              <span className="text-sm">مكتملة اليوم</span>
+              <span className="text-sm">{t('طلبات مكتملة اليوم')}</span>
             </div>
             <p className="text-2xl font-bold">{stats.completed_today}</p>
           </div>
@@ -540,9 +540,9 @@ export default function DriverApp() {
                   <Navigation className={`h-6 w-6 ${isTracking ? 'animate-pulse' : ''}`} />
                 </div>
                 <div>
-                  <p className="font-bold">{isTracking ? 'التتبع نشط' : 'التتبع متوقف'}</p>
+                  <p className="font-bold">{isTracking ? t('التتبع نشط') : t('التتبع متوقف')}</p>
                   <p className="text-sm text-gray-500">
-                    {isTracking ? 'يتم إرسال موقعك للعملاء' : 'اضغط للبدء'}
+                    {isTracking ? t('يتم إرسال موقعك للعملاء') : t('اضغط للبدء')}
                   </p>
                 </div>
               </div>
@@ -553,13 +553,13 @@ export default function DriverApp() {
               >
                 {isTracking ? (
                   <>
-                    <Pause className="h-4 w-4 ml-2" />
-                    إيقاف
+                    <Pause className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                    {t('إيقاف')}
                   </>
                 ) : (
                   <>
-                    <Play className="h-4 w-4 ml-2" />
-                    بدء
+                    <Play className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                    {t('بدء')}
                   </>
                 )}
               </Button>
@@ -573,22 +573,22 @@ export default function DriverApp() {
             onClick={() => setActiveTab('orders')}
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === 'orders' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
           >
-            <Package className="h-4 w-4 inline ml-1" />
-            الطلبات ({activeOrders.length})
+            <Package className={`h-4 w-4 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
+            {t('الطلبات')} ({activeOrders.length})
           </button>
           <button
             onClick={() => setActiveTab('map')}
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === 'map' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
           >
-            <Map className="h-4 w-4 inline ml-1" />
-            الخريطة
+            <Map className={`h-4 w-4 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
+            {t('الخريطة')}
           </button>
           <button
             onClick={() => setActiveTab('history')}
             className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === 'history' ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
           >
-            <History className="h-4 w-4 inline ml-1" />
-            السجل
+            <History className={`h-4 w-4 inline ${isRTL ? 'ml-1' : 'mr-1'}`} />
+            {t('السجل')}
           </button>
         </div>
 
