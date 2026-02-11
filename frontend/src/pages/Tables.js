@@ -169,7 +169,7 @@ export default function Tables() {
         order_id: selectedTableForTransfer.current_order_id
       });
       
-      toast.success('تم تحويل الطلب بنجاح');
+      toast.success(t('تم تحويل الطلب بنجاح'));
       setTransferDialogOpen(false);
       setSelectedTableForTransfer(null);
       setTargetTableId('');
