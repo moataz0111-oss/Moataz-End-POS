@@ -602,14 +602,14 @@ export default function Reports() {
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
-                          هامش الربح: {profitLossReport.gross_profit?.margin?.toFixed(1)}%
+                          {t('هامش الربح')}: {profitLossReport.gross_profit?.margin?.toFixed(1)}%
                         </p>
                       </div>
 
                       {/* Operating Expenses */}
                       <div className="p-4 bg-red-500/10 rounded-lg">
                         <div className="flex justify-between items-center">
-                          <span className="text-red-600 font-medium">المصاريف التشغيلية</span>
+                          <span className="text-red-600 font-medium">{t('المصاريف التشغيلية')}</span>
                           <span className="text-lg font-bold text-red-600 tabular-nums">
                             -{formatPrice(profitLossReport.operating_expenses?.total || 0)}
                           </span>
@@ -626,7 +626,7 @@ export default function Reports() {
                           <span className={`font-bold ${
                             (profitLossReport.net_profit?.amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
                           }`}>
-                            صافي الربح
+                            {t('صافي الربح')}
                           </span>
                           <span className={`text-3xl font-bold tabular-nums ${
                             (profitLossReport.net_profit?.amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
@@ -635,12 +635,18 @@ export default function Reports() {
                           </span>
                         </div>
                         <p className="text-sm text-muted-foreground mt-1">
-                          هامش الربح الصافي: {profitLossReport.net_profit?.margin?.toFixed(1)}%
+                          {t('هامش الربح الصافي')}: {profitLossReport.net_profit?.margin?.toFixed(1)}%
                         </p>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => window.print()}>
+                    <FileText className="h-4 w-4 ml-2" />
+                    {t('طباعة')}
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
@@ -651,20 +657,20 @@ export default function Reports() {
               <div className="space-y-6">
                 <Card className="border-border/50 bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg text-foreground">تقرير الأصناف</CardTitle>
+                    <CardTitle className="text-lg text-foreground">{t('تقرير الأصناف')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-border">
-                            <th className="text-right p-3 text-muted-foreground">الصنف</th>
-                            <th className="text-right p-3 text-muted-foreground">السعر</th>
-                            <th className="text-right p-3 text-muted-foreground">التكلفة</th>
-                            <th className="text-right p-3 text-muted-foreground">الربح/وحدة</th>
-                            <th className="text-right p-3 text-muted-foreground">الكمية المباعة</th>
-                            <th className="text-right p-3 text-muted-foreground">إجمالي الإيرادات</th>
-                            <th className="text-right p-3 text-muted-foreground">إجمالي الربح</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('الصنف')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('السعر')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('التكلفة')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('الربح/وحدة')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('الكمية المباعة')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('إجمالي الإيرادات')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('إجمالي الربح')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -684,6 +690,12 @@ export default function Reports() {
                     </div>
                   </CardContent>
                 </Card>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => window.print()}>
+                    <FileText className="h-4 w-4 ml-2" />
+                    {t('طباعة')}
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
@@ -694,25 +706,25 @@ export default function Reports() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <StatCard
-                    title="إجمالي المبيعات"
+                    title={t('إجمالي المبيعات')}
                     value={formatPrice(deliveryCreditsReport.total_sales || deliveryCreditsReport.total_credit)}
                     icon={DollarSign}
                     color="blue-500"
                   />
                   <StatCard
-                    title="إجمالي العمولات"
+                    title={t('إجمالي العمولات')}
                     value={formatPrice(deliveryCreditsReport.total_commission)}
                     icon={TrendingDown}
                     color="red-500"
                   />
                   <StatCard
-                    title="صافي المستحق"
+                    title={t('صافي المستحق')}
                     value={formatPrice(deliveryCreditsReport.net_receivable)}
                     icon={TrendingUp}
                     color="green-500"
                   />
                   <StatCard
-                    title="عدد الطلبات"
+                    title={t('عدد الطلبات')}
                     value={deliveryCreditsReport.total_orders}
                     icon={Truck}
                     color="purple-500"
@@ -721,7 +733,7 @@ export default function Reports() {
 
                 <Card className="border-border/50 bg-card">
                   <CardHeader>
-                    <CardTitle className="text-lg text-foreground">تفاصيل كل شركة توصيل</CardTitle>
+                    <CardTitle className="text-lg text-foreground">{t('تفاصيل كل شركة توصيل')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -734,17 +746,17 @@ export default function Reports() {
                                 {appName}
                               </h4>
                               <p className="text-sm text-muted-foreground">
-                                نسبة العمولة: {data.commission_rate || 0}%
+                                {t('نسبة العمولة')}: {data.commission_rate || 0}%
                               </p>
                             </div>
                             <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-bold">
-                              {data.count} طلب
+                              {data.count} {t('طلب')}
                             </span>
                           </div>
                           
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div className="text-center p-3 bg-background rounded-lg">
-                              <p className="text-xs text-muted-foreground">إجمالي المبيعات</p>
+                              <p className="text-xs text-muted-foreground">{t('إجمالي المبيعات')}</p>
                               <p className="text-lg font-bold text-foreground tabular-nums">{formatPrice(data.total)}</p>
                             </div>
                             <div className="text-center p-3 bg-red-500/10 rounded-lg">
