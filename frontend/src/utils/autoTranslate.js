@@ -486,6 +486,7 @@ const translationMap = {
   'لوحة تحكم المالك': { en: 'Owner Dashboard', ku: 'داشبۆردی خاوەن' },
   'إغلاق الصندوق': { en: 'Close Register', ku: 'داخستنی سندوق' },
   'قائمة العملاء': { en: 'Customer Menu', ku: 'مینیوی کڕیار' },
+  'الخلفيات': { en: 'Backgrounds', ku: 'پاشبنەمەکان' },
   'طباعة': { en: 'Print', ku: 'چاپکردن' },
 };
 
