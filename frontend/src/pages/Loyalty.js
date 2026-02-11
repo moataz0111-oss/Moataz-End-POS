@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
@@ -32,23 +33,19 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-
 const API = API_URL;
-
 const TIER_ICONS = {
   bronze: '🥉',
   silver: '🥈',
   gold: '🥇',
   platinum: '💎'
 };
-
 const TIER_COLORS = {
   bronze: 'bg-amber-700/20 text-amber-600 border-amber-600/30',
   silver: 'bg-gray-400/20 text-gray-400 border-gray-400/30',
   gold: 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30',
   platinum: 'bg-purple-400/20 text-purple-400 border-purple-400/30'
 };
-
 export default function Loyalty() {
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
@@ -72,7 +69,6 @@ export default function Loyalty() {
     birthday: '',
     referred_by: ''
   });
-
   useEffect(() => {
     fetchData();
   }, []);
@@ -98,7 +94,6 @@ export default function Loyalty() {
       setReviewsLoading(false);
     }
   };
-
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -117,7 +112,6 @@ export default function Loyalty() {
       setLoading(false);
     }
   };
-
   const handleAddMember = async (e) => {
     e.preventDefault();
     
@@ -125,7 +119,6 @@ export default function Loyalty() {
       toast.error('الاسم ورقم الهاتف مطلوبان');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(`${API}/loyalty/members`, {
@@ -143,7 +136,6 @@ export default function Loyalty() {
       toast.error(error.response?.data?.detail || 'فشل في إضافة العضو');
     }
   };
-
   const handleSaveSettings = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -156,7 +148,6 @@ export default function Loyalty() {
       toast.error('فشل في حفظ الإعدادات');
     }
   };
-
   const viewMemberDetails = async (member) => {
     try {
       const token = localStorage.getItem('token');
@@ -168,19 +159,16 @@ export default function Loyalty() {
       setSelectedMember({ ...member, transactions: [] });
     }
   };
-
   const filteredMembers = members.filter(m => 
     m.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.phone?.includes(searchTerm)
   );
-
   const stats = {
     totalMembers: members.length,
     totalPoints: members.reduce((sum, m) => sum + (m.total_points || 0), 0),
     avgPoints: members.length > 0 ? Math.round(members.reduce((sum, m) => sum + (m.total_points || 0), 0) / members.length) : 0,
     goldMembers: members.filter(m => m.current_tier === 'gold' || m.current_tier === 'platinum').length
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -188,7 +176,6 @@ export default function Loyalty() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background p-6" dir="rtl">
       {/* Header */}
@@ -217,7 +204,6 @@ export default function Loyalty() {
           </Button>
         </div>
       </div>
-
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
@@ -233,7 +219,6 @@ export default function Loyalty() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-gradient-to-br from-yellow-500/10 to-yellow-600/5 border-yellow-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -247,7 +232,6 @@ export default function Loyalty() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -261,7 +245,6 @@ export default function Loyalty() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -276,7 +259,6 @@ export default function Loyalty() {
           </CardContent>
         </Card>
       </div>
-
       {/* Tiers Display */}
       <div className="grid grid-cols-4 gap-3 mb-6">
         {settings?.tiers?.map((tier) => (
@@ -290,7 +272,6 @@ export default function Loyalty() {
           </Card>
         ))}
       </div>
-
       {/* Tabs: الأعضاء و تقييمات العملاء */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
         <TabsList className="grid w-full grid-cols-2 mb-4">
@@ -303,7 +284,6 @@ export default function Loyalty() {
             تقييمات العملاء
           </TabsTrigger>
         </TabsList>
-
         {/* تبويب الأعضاء */}
         <TabsContent value="members">
           {/* Search */}
@@ -316,7 +296,6 @@ export default function Loyalty() {
               className="pr-10"
             />
           </div>
-
           {/* Members Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredMembers.map((member) => (
@@ -341,7 +320,6 @@ export default function Loyalty() {
                       {member.current_tier}
                     </Badge>
                   </div>
-
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-muted/30 rounded-lg p-2 text-center">
                       <p className="text-muted-foreground text-xs">النقاط المتاحة</p>
@@ -352,7 +330,6 @@ export default function Loyalty() {
                       <p className="font-bold text-foreground text-lg">{member.total_orders || 0}</p>
                     </div>
                   </div>
-
                   <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
                     <span>إجمالي الإنفاق: {(member.lifetime_spending || 0).toLocaleString()} د.ع</span>
                     <span>كود الإحالة: {member.referral_code}</span>
@@ -362,7 +339,6 @@ export default function Loyalty() {
             ))}
           </div>
         </TabsContent>
-
         {/* تبويب تقييمات العملاء */}
         <TabsContent value="reviews">
           {reviewsLoading ? (
@@ -430,7 +406,6 @@ export default function Loyalty() {
           )}
         </TabsContent>
       </Tabs>
-
       {/* Add Member Dialog */}
       <Dialog open={addMemberOpen} onOpenChange={setAddMemberOpen}>
         <DialogContent className="max-w-md">
@@ -440,7 +415,6 @@ export default function Loyalty() {
               إضافة عضو جديد
             </DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleAddMember} className="space-y-4">
             <div>
               <Label>اسم العميل *</Label>
@@ -451,7 +425,6 @@ export default function Loyalty() {
                 required
               />
             </div>
-
             <div>
               <Label>رقم الهاتف *</Label>
               <Input
@@ -462,7 +435,6 @@ export default function Loyalty() {
                 required
               />
             </div>
-
             <div>
               <Label>البريد الإلكتروني</Label>
               <Input
@@ -473,7 +445,6 @@ export default function Loyalty() {
                 dir="ltr"
               />
             </div>
-
             <div>
               <Label>تاريخ الميلاد</Label>
               <Input
@@ -482,7 +453,6 @@ export default function Loyalty() {
                 onChange={(e) => setMemberForm({ ...memberForm, birthday: e.target.value })}
               />
             </div>
-
             <div>
               <Label>كود الإحالة (اختياري)</Label>
               <Input
@@ -493,7 +463,6 @@ export default function Loyalty() {
                 maxLength={8}
               />
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setAddMemberOpen(false)} className="flex-1">
                 إلغاء
@@ -505,7 +474,6 @@ export default function Loyalty() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Member Details Dialog */}
       <Dialog open={!!selectedMember} onOpenChange={() => setSelectedMember(null)}>
         <DialogContent className="max-w-lg">
@@ -515,7 +483,6 @@ export default function Loyalty() {
               تفاصيل العضو
             </DialogTitle>
           </DialogHeader>
-
           {selectedMember && (
             <div className="space-y-4">
               <div className="flex items-center gap-4">
@@ -531,7 +498,6 @@ export default function Loyalty() {
                   </Badge>
                 </div>
               </div>
-
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-primary/10 rounded-lg p-3 text-center">
                   <Coins className="h-5 w-5 text-primary mx-auto mb-1" />
@@ -549,7 +515,6 @@ export default function Loyalty() {
                   <p className="text-xl font-bold text-foreground">{selectedMember.redeemed_points}</p>
                 </div>
               </div>
-
               <div>
                 <h4 className="font-bold text-foreground mb-2 flex items-center gap-2">
                   <History className="h-4 w-4" />
@@ -588,7 +553,6 @@ export default function Loyalty() {
           )}
         </DialogContent>
       </Dialog>
-
       {/* Settings Dialog */}
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
         <DialogContent className="max-w-lg">
@@ -598,7 +562,6 @@ export default function Loyalty() {
               إعدادات برنامج الولاء
             </DialogTitle>
           </DialogHeader>
-
           {settings && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -621,7 +584,6 @@ export default function Loyalty() {
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>الحد الأدنى للاستبدال</Label>
@@ -640,7 +602,6 @@ export default function Loyalty() {
                   />
                 </div>
               </div>
-
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label>نقاط الترحيب</Label>
@@ -667,7 +628,6 @@ export default function Loyalty() {
                   />
                 </div>
               </div>
-
               <Button onClick={handleSaveSettings} className="w-full">
                 حفظ الإعدادات
               </Button>
@@ -677,4 +637,3 @@ export default function Loyalty() {
       </Dialog>
     </div>
   );
-}

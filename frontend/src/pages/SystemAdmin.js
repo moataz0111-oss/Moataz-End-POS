@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL, BACKEND_URL } from '../utils/api';
@@ -19,35 +20,29 @@ import {
   Shield,
   Clock
 } from 'lucide-react';
-
 const API = API_URL;
-
 // إعداد axios مع token
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
-
 export default function SystemAdmin() {
   const [health, setHealth] = useState(null);
   const [stats, setStats] = useState(null);
   const [backups, setBackups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backupLoading, setBackupLoading] = useState(false);
-
   useEffect(() => {
     fetchData();
     // تحديث كل دقيقة
     const interval = setInterval(fetchHealth, 60000);
     return () => clearInterval(interval);
   }, []);
-
   const fetchData = async () => {
     setLoading(true);
     await Promise.all([fetchHealth(), fetchStats(), fetchBackups()]);
     setLoading(false);
   };
-
   const fetchHealth = async () => {
     try {
       const res = await axios.get(`${API}/system/health`);
@@ -56,7 +51,6 @@ export default function SystemAdmin() {
       console.error('Failed to fetch health:', error);
     }
   };
-
   const fetchStats = async () => {
     try {
       const res = await axios.get(`${API}/system/stats`, { headers: getAuthHeaders() });
@@ -65,7 +59,6 @@ export default function SystemAdmin() {
       console.error('Failed to fetch stats:', error);
     }
   };
-
   const fetchBackups = async () => {
     try {
       const res = await axios.get(`${API}/system/backup/list`, { headers: getAuthHeaders() });
@@ -74,7 +67,6 @@ export default function SystemAdmin() {
       console.error('Failed to fetch backups:', error);
     }
   };
-
   const createBackup = async () => {
     setBackupLoading(true);
     try {
@@ -87,7 +79,6 @@ export default function SystemAdmin() {
       setBackupLoading(false);
     }
   };
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'healthy': return <CheckCircle className="h-5 w-5 text-green-500" />;
@@ -97,7 +88,6 @@ export default function SystemAdmin() {
       default: return <Activity className="h-5 w-5 text-muted-foreground" />;
     }
   };
-
   const getStatusBadge = (status) => {
     const variants = {
       healthy: 'bg-green-500/10 text-green-500 border-green-500/30',
@@ -107,7 +97,6 @@ export default function SystemAdmin() {
     };
     return variants[status] || 'bg-muted text-muted-foreground';
   };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -115,7 +104,6 @@ export default function SystemAdmin() {
       </div>
     );
   }
-
   return (
     <div className="space-y-6 p-6" data-testid="system-admin-page">
       {/* Header */}
@@ -139,7 +127,6 @@ export default function SystemAdmin() {
           </Button>
         </div>
       </div>
-
       {/* Health Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Database Health */}
@@ -174,7 +161,6 @@ export default function SystemAdmin() {
             )}
           </CardContent>
         </Card>
-
         {/* Disk Health */}
         <Card>
           <CardHeader className="pb-2">
@@ -206,7 +192,6 @@ export default function SystemAdmin() {
             </div>
           </CardContent>
         </Card>
-
         {/* Capacity Status */}
         <Card>
           <CardHeader className="pb-2">
@@ -247,7 +232,6 @@ export default function SystemAdmin() {
           </CardContent>
         </Card>
       </div>
-
       {/* Business Stats */}
       <Card>
         <CardHeader>
@@ -275,7 +259,6 @@ export default function SystemAdmin() {
           </div>
         </CardContent>
       </Card>
-
       {/* Collections Stats */}
       {stats?.database?.collections && (
         <Card>
@@ -299,7 +282,6 @@ export default function SystemAdmin() {
           </CardContent>
         </Card>
       )}
-
       {/* Backups */}
       <Card>
         <CardHeader>
@@ -336,11 +318,9 @@ export default function SystemAdmin() {
           )}
         </CardContent>
       </Card>
-
       {/* Last Updated */}
       <p className="text-center text-sm text-muted-foreground">
         آخر تحديث: {health?.timestamp ? new Date(health.timestamp).toLocaleString('ar-IQ') : 'غير متاح'}
       </p>
     </div>
   );
-}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -55,9 +56,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '../components/ui/tabs';
-
 const API = API_URL;
-
 export default function PurchasesPage() {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
@@ -106,14 +105,11 @@ export default function PurchasesPage() {
   
   const [filterStatus, setFilterStatus] = useState('all');
   const [uploadFile, setUploadFile] = useState(null);
-
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
-
   useEffect(() => {
     fetchData();
   }, [activeTab]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -136,7 +132,6 @@ export default function PurchasesPage() {
       setLoading(false);
     }
   };
-
   // إضافة مورد جديد
   const handleAddSupplier = async (e) => {
     e.preventDefault();
@@ -158,7 +153,6 @@ export default function PurchasesPage() {
       setSubmitting(false);
     }
   };
-
   // إضافة صنف للفاتورة
   const addItemToPurchase = () => {
     if (!newItem.name || newItem.quantity <= 0 || newItem.cost_per_unit <= 0) {
@@ -180,7 +174,6 @@ export default function PurchasesPage() {
     setNewItem({ name: '', quantity: 1, unit: 'كغم', cost_per_unit: 0 });
     toast.success(`تمت إضافة ${item.name}`);
   };
-
   // حذف صنف من الفاتورة
   const removeItemFromPurchase = (index) => {
     setPurchaseForm(prev => {
@@ -192,7 +185,6 @@ export default function PurchasesPage() {
       };
     });
   };
-
   // إنشاء فاتورة شراء
   const handleCreatePurchase = async () => {
     if (!purchaseForm.supplier_id || purchaseForm.items.length === 0) {
@@ -221,7 +213,6 @@ export default function PurchasesPage() {
       setSubmitting(false);
     }
   };
-
   // رفع صورة الفاتورة
   const handleUploadInvoice = async (purchaseId) => {
     if (!uploadFile) {
@@ -251,7 +242,6 @@ export default function PurchasesPage() {
       setSubmitting(false);
     }
   };
-
   // إرسال للمخزن
   const handleSendToWarehouse = async (purchaseId) => {
     try {
@@ -262,7 +252,6 @@ export default function PurchasesPage() {
       toast.error(error.response?.data?.detail || 'فشل في الإرسال للمخزن');
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
@@ -271,7 +260,6 @@ export default function PurchasesPage() {
       default: return 'bg-gray-500/20 text-gray-500 border-gray-500/30';
     }
   };
-
   const getStatusLabel = (status) => {
     switch (status) {
       case 'pending': return 'في انتظار الإرسال';
@@ -280,7 +268,6 @@ export default function PurchasesPage() {
       default: return status;
     }
   };
-
   const getPaymentStatusColor = (status) => {
     switch (status) {
       case 'paid': return 'bg-green-500/20 text-green-500';
@@ -289,7 +276,6 @@ export default function PurchasesPage() {
       default: return 'bg-gray-500/20 text-gray-500';
     }
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -297,7 +283,6 @@ export default function PurchasesPage() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background" dir="rtl" data-testid="purchases-page">
       {/* Header */}
@@ -336,7 +321,6 @@ export default function PurchasesPage() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto p-4 space-y-4">
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -354,7 +338,6 @@ export default function PurchasesPage() {
               طلبات المخزن
             </TabsTrigger>
           </TabsList>
-
           {/* الفواتير */}
           <TabsContent value="purchases" className="space-y-4">
             {/* Filter */}
@@ -373,7 +356,6 @@ export default function PurchasesPage() {
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
-
             {/* Purchases List */}
             <div className="space-y-3">
               {purchases.length === 0 ? (
@@ -479,7 +461,6 @@ export default function PurchasesPage() {
               )}
             </div>
           </TabsContent>
-
           {/* الموردين */}
           <TabsContent value="suppliers" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -530,7 +511,6 @@ export default function PurchasesPage() {
               )}
             </div>
           </TabsContent>
-
           {/* طلبات المخزن */}
           <TabsContent value="requests" className="space-y-4">
             <Card>
@@ -582,7 +562,6 @@ export default function PurchasesPage() {
           </TabsContent>
         </Tabs>
       </main>
-
       {/* Dialog: إضافة مورد */}
       <Dialog open={showSupplierDialog} onOpenChange={setShowSupplierDialog}>
         <DialogContent>
@@ -660,7 +639,6 @@ export default function PurchasesPage() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: إنشاء فاتورة شراء */}
       <Dialog open={showPurchaseDialog} onOpenChange={setShowPurchaseDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -852,7 +830,6 @@ export default function PurchasesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: رفع صورة الفاتورة */}
       <Dialog open={!!showUploadDialog} onOpenChange={() => setShowUploadDialog(null)}>
         <DialogContent>
@@ -910,7 +887,6 @@ export default function PurchasesPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: تفاصيل الفاتورة */}
       <Dialog open={!!showDetailsDialog} onOpenChange={() => setShowDetailsDialog(null)}>
         <DialogContent className="max-w-lg">
@@ -996,4 +972,3 @@ export default function PurchasesPage() {
       </Dialog>
     </div>
   );
-}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
@@ -30,9 +31,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-
 const API = API_URL;
-
 export default function Invoices() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('templates');
@@ -74,11 +73,9 @@ export default function Invoices() {
     branch_id: '',
     is_default: false
   });
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -99,7 +96,6 @@ export default function Invoices() {
       setLoading(false);
     }
   };
-
   const handleSaveTemplate = async (e) => {
     e.preventDefault();
     
@@ -107,7 +103,6 @@ export default function Invoices() {
       toast.error('الاسم واسم المنشأة مطلوبان');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
@@ -127,7 +122,6 @@ export default function Invoices() {
       toast.error('فشل في حفظ القالب');
     }
   };
-
   const handleDeleteTemplate = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا القالب؟')) return;
     
@@ -142,7 +136,6 @@ export default function Invoices() {
       toast.error('فشل في الحذف');
     }
   };
-
   const handleSavePrinter = async (e) => {
     e.preventDefault();
     
@@ -150,7 +143,6 @@ export default function Invoices() {
       toast.error('الاسم والفرع مطلوبان');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${API}/invoices/printers`, printerForm, {
@@ -165,7 +157,6 @@ export default function Invoices() {
       toast.error('فشل في إضافة الطابعة');
     }
   };
-
   const handleDeletePrinter = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذه الطابعة؟')) return;
     
@@ -180,7 +171,6 @@ export default function Invoices() {
       toast.error('فشل في الحذف');
     }
   };
-
   const resetTemplateForm = () => {
     setTemplateForm({
       name: '', template_type: 'receipt', show_logo: true, logo_url: '',
@@ -191,7 +181,6 @@ export default function Invoices() {
     });
     setEditingTemplate(null);
   };
-
   const resetPrinterForm = () => {
     setPrinterForm({
       name: '', printer_type: 'thermal', paper_width: 80,
@@ -199,20 +188,16 @@ export default function Invoices() {
       branch_id: '', is_default: false
     });
   };
-
   const editTemplate = (template) => {
     setEditingTemplate(template);
     setTemplateForm(template);
     setTemplateDialogOpen(true);
   };
-
   const previewTemplate = (template) => {
     setEditingTemplate(template);
     setPreviewDialogOpen(true);
   };
-
   const getBranchName = (branchId) => branches.find(b => b.id === branchId)?.name || 'الكل';
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -220,7 +205,6 @@ export default function Invoices() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background p-6" dir="rtl">
       {/* Header */}
@@ -238,7 +222,6 @@ export default function Invoices() {
           </div>
         </div>
       </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="templates" className="gap-2">
@@ -248,7 +231,6 @@ export default function Invoices() {
             <Printer className="h-4 w-4" /> الطابعات
           </TabsTrigger>
         </TabsList>
-
         {/* Templates Tab */}
         <TabsContent value="templates">
           <div className="flex justify-end mb-4">
@@ -256,7 +238,6 @@ export default function Invoices() {
               <Plus className="h-4 w-4 ml-2" /> قالب جديد
             </Button>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {templates.map((template) => (
               <Card key={template.id} className="border-border/50">
@@ -281,14 +262,12 @@ export default function Invoices() {
                       </Button>
                     </div>
                   </div>
-
                   <div className="space-y-2 text-sm">
                     <p className="font-medium text-foreground">{template.business_name}</p>
                     {template.address && (
                       <p className="text-muted-foreground text-xs">{template.address}</p>
                     )}
                   </div>
-
                   <div className="flex flex-wrap gap-2 mt-3">
                     {template.show_logo && <Badge variant="outline" className="text-xs">شعار</Badge>}
                     {template.show_qr_code && <Badge variant="outline" className="text-xs">QR</Badge>}
@@ -298,7 +277,6 @@ export default function Invoices() {
                 </CardContent>
               </Card>
             ))}
-
             {templates.length === 0 && (
               <Card className="col-span-full border-border/50">
                 <CardContent className="py-12 text-center">
@@ -310,7 +288,6 @@ export default function Invoices() {
             )}
           </div>
         </TabsContent>
-
         {/* Printers Tab */}
         <TabsContent value="printers">
           <div className="flex justify-end mb-4">
@@ -318,7 +295,6 @@ export default function Invoices() {
               <Plus className="h-4 w-4 ml-2" /> إضافة طابعة
             </Button>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {printers.map((printer) => (
               <Card key={printer.id} className="border-border/50">
@@ -337,7 +313,6 @@ export default function Invoices() {
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
                   </div>
-
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">النوع:</span>
@@ -357,7 +332,6 @@ export default function Invoices() {
                       </div>
                     )}
                   </div>
-
                   <div className="flex items-center gap-2 mt-3">
                     {printer.is_active ? (
                       <Badge className="bg-green-500/10 text-green-500">
@@ -373,7 +347,6 @@ export default function Invoices() {
                 </CardContent>
               </Card>
             ))}
-
             {printers.length === 0 && (
               <Card className="col-span-full border-border/50">
                 <CardContent className="py-12 text-center">
@@ -386,7 +359,6 @@ export default function Invoices() {
           </div>
         </TabsContent>
       </Tabs>
-
       {/* Template Dialog */}
       <Dialog open={templateDialogOpen} onOpenChange={setTemplateDialogOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -395,7 +367,6 @@ export default function Invoices() {
               {editingTemplate ? 'تعديل قالب الفاتورة' : 'إنشاء قالب فاتورة'}
             </DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleSaveTemplate} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -421,7 +392,6 @@ export default function Invoices() {
                 </Select>
               </div>
             </div>
-
             <div>
               <Label>اسم المنشأة (عربي) *</Label>
               <Input
@@ -430,7 +400,6 @@ export default function Invoices() {
                 required
               />
             </div>
-
             <div>
               <Label>اسم المنشأة (إنجليزي)</Label>
               <Input
@@ -439,7 +408,6 @@ export default function Invoices() {
                 dir="ltr"
               />
             </div>
-
             <div>
               <Label>العنوان</Label>
               <Input
@@ -447,7 +415,6 @@ export default function Invoices() {
                 onChange={(e) => setTemplateForm({ ...templateForm, address: e.target.value })}
               />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>رقم الهاتف</Label>
@@ -466,7 +433,6 @@ export default function Invoices() {
                 />
               </div>
             </div>
-
             <div>
               <Label>رابط الشعار</Label>
               <Input
@@ -476,7 +442,6 @@ export default function Invoices() {
                 dir="ltr"
               />
             </div>
-
             <div>
               <Label>نص التذييل (عربي)</Label>
               <Textarea
@@ -485,7 +450,6 @@ export default function Invoices() {
                 rows={2}
               />
             </div>
-
             <div>
               <Label>نص التذييل (إنجليزي)</Label>
               <Textarea
@@ -495,7 +459,6 @@ export default function Invoices() {
                 dir="ltr"
               />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>عرض الورق</Label>
@@ -526,7 +489,6 @@ export default function Invoices() {
                 </Select>
               </div>
             </div>
-
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Switch
@@ -550,7 +512,6 @@ export default function Invoices() {
                 <Label>افتراضي</Label>
               </div>
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setTemplateDialogOpen(false)} className="flex-1">
                 إلغاء
@@ -563,14 +524,12 @@ export default function Invoices() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Printer Dialog */}
       <Dialog open={printerDialogOpen} onOpenChange={setPrinterDialogOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-foreground">إضافة طابعة</DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleSavePrinter} className="space-y-4">
             <div>
               <Label>اسم الطابعة *</Label>
@@ -581,7 +540,6 @@ export default function Invoices() {
                 required
               />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>نوع الطابعة</Label>
@@ -611,7 +569,6 @@ export default function Invoices() {
                 </Select>
               </div>
             </div>
-
             <div>
               <Label>طريقة الاتصال</Label>
               <Select
@@ -626,7 +583,6 @@ export default function Invoices() {
                 </SelectContent>
               </Select>
             </div>
-
             {printerForm.connection_type === 'network' && (
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -649,7 +605,6 @@ export default function Invoices() {
                 </div>
               </div>
             )}
-
             <div>
               <Label>الفرع *</Label>
               <Select
@@ -664,7 +619,6 @@ export default function Invoices() {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="flex items-center gap-2">
               <Switch
                 checked={printerForm.is_default}
@@ -672,7 +626,6 @@ export default function Invoices() {
               />
               <Label>طابعة افتراضية</Label>
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setPrinterDialogOpen(false)} className="flex-1">
                 إلغاء
@@ -684,14 +637,12 @@ export default function Invoices() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Preview Dialog */}
       <Dialog open={previewDialogOpen} onOpenChange={setPreviewDialogOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-foreground">معاينة الفاتورة</DialogTitle>
           </DialogHeader>
-
           {editingTemplate && (
             <div className="bg-white text-black p-4 rounded-lg text-center font-mono text-sm" style={{ direction: 'rtl' }}>
               {editingTemplate.show_logo && editingTemplate.logo_url && (
@@ -756,4 +707,3 @@ export default function Invoices() {
       </Dialog>
     </div>
   );
-}

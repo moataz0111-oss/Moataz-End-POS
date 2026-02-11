@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -28,9 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-
 const API = API_URL;
-
 export default function Ratings() {
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -39,14 +38,12 @@ export default function Ratings() {
   const [recentRatings, setRecentRatings] = useState([]);
   const [branches, setBranches] = useState([]);
   const [selectedBranch, setSelectedBranch] = useState('all');
-
   // إعداد axios
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
   }, [token]);
-
   // جلب البيانات
   const fetchData = async () => {
     setLoading(true);
@@ -54,11 +51,9 @@ export default function Ratings() {
       // جلب ملخص التقييمات
       const summaryRes = await axios.get(`${API}/ratings/tenant-summary`);
       setSummary(summaryRes.data);
-
       // جلب الفروع
       const branchesRes = await axios.get(`${API}/branches`);
       setBranches(branchesRes.data || []);
-
       // جلب آخر التقييمات
       if (branchesRes.data && branchesRes.data.length > 0) {
         const branch = selectedBranch === 'all' ? branchesRes.data[0] : branchesRes.data.find(b => b.id === selectedBranch);
@@ -74,11 +69,9 @@ export default function Ratings() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, [selectedBranch]);
-
   // مكون عرض النجوم
   const StarDisplay = ({ rating, size = 'sm' }) => {
     const sizeClass = size === 'lg' ? 'h-6 w-6' : 'h-4 w-4';
@@ -97,7 +90,6 @@ export default function Ratings() {
       </div>
     );
   };
-
   // شريط توزيع التقييمات
   const RatingBar = ({ stars, count, total }) => {
     const percentage = total > 0 ? (count / total) * 100 : 0;
@@ -115,7 +107,6 @@ export default function Ratings() {
       </div>
     );
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -126,7 +117,6 @@ export default function Ratings() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
       {/* Header */}
@@ -161,7 +151,6 @@ export default function Ratings() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* ملخص التقييمات */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -179,7 +168,6 @@ export default function Ratings() {
               </p>
             </CardContent>
           </Card>
-
           {/* توزيع التقييمات */}
           <Card>
             <CardContent className="p-6">
@@ -199,7 +187,6 @@ export default function Ratings() {
               </div>
             </CardContent>
           </Card>
-
           {/* التقييمات التفصيلية */}
           <Card>
             <CardContent className="p-6">
@@ -239,7 +226,6 @@ export default function Ratings() {
             </CardContent>
           </Card>
         </div>
-
         {/* فلتر الفروع */}
         {branches.length > 1 && (
           <div className="flex items-center gap-3">
@@ -259,7 +245,6 @@ export default function Ratings() {
             </Select>
           </div>
         )}
-
         {/* آخر التقييمات */}
         <Card>
           <CardHeader>
@@ -331,7 +316,6 @@ export default function Ratings() {
                         </Badge>
                       </div>
                     </div>
-
                     {/* التقييمات التفصيلية */}
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-2">
                       {rating.food_quality && (
@@ -353,7 +337,6 @@ export default function Ratings() {
                         </span>
                       )}
                     </div>
-
                     {/* التعليق */}
                     {rating.comment && (
                       <p className="text-gray-700 mt-2 bg-white/50 p-3 rounded-lg">
@@ -369,4 +352,3 @@ export default function Ratings() {
       </main>
     </div>
   );
-}

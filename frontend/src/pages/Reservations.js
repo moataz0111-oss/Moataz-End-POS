@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -38,9 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-
 const API = BACKEND_URL + '/api';
-
 export default function Reservations() {
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
@@ -60,12 +59,10 @@ export default function Reservations() {
     table_id: '',
     notes: ''
   });
-
   useEffect(() => {
     fetchReservations();
     fetchTables();
   }, [selectedDate]);
-
   const fetchReservations = async () => {
     try {
       const res = await axios.get(`${API}/reservations`, {
@@ -113,7 +110,6 @@ export default function Reservations() {
       setLoading(false);
     }
   };
-
   const fetchTables = async () => {
     try {
       const res = await axios.get(`${API}/tables`);
@@ -128,13 +124,11 @@ export default function Reservations() {
       ]);
     }
   };
-
   const handleSubmit = async () => {
     if (!form.customer_name || !form.customer_phone) {
       toast.error('الرجاء إدخال اسم ورقم هاتف العميل');
       return;
     }
-
     try {
       await axios.post(`${API}/reservations`, form);
       toast.success('تم إنشاء الحجز بنجاح');
@@ -155,7 +149,6 @@ export default function Reservations() {
       resetForm();
     }
   };
-
   const resetForm = () => {
     setForm({
       customer_name: '',
@@ -167,7 +160,6 @@ export default function Reservations() {
       notes: ''
     });
   };
-
   const updateStatus = async (id, status) => {
     try {
       await axios.put(`${API}/reservations/${id}/status`, { status });
@@ -181,7 +173,6 @@ export default function Reservations() {
       toast.success('تم تحديث حالة الحجز');
     }
   };
-
   const deleteReservation = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا الحجز؟')) return;
     
@@ -194,7 +185,6 @@ export default function Reservations() {
       toast.success('تم حذف الحجز');
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'confirmed': return 'bg-green-500/10 text-green-500 border-green-500/30';
@@ -204,7 +194,6 @@ export default function Reservations() {
       default: return 'bg-gray-500/10 text-gray-500 border-gray-500/30';
     }
   };
-
   const getStatusLabel = (status) => {
     switch (status) {
       case 'confirmed': return 'مؤكد';
@@ -214,21 +203,18 @@ export default function Reservations() {
       default: return status;
     }
   };
-
   const filteredReservations = reservations
     .filter(r => filterStatus === 'all' || r.status === filterStatus)
     .filter(r => 
       r.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       r.customer_phone.includes(searchQuery)
     );
-
   const todayStats = {
     total: reservations.length,
     confirmed: reservations.filter(r => r.status === 'confirmed').length,
     pending: reservations.filter(r => r.status === 'pending').length,
     totalGuests: reservations.reduce((sum, r) => sum + r.guests, 0)
   };
-
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
@@ -248,7 +234,6 @@ export default function Reservations() {
               <h1 className="text-xl font-bold font-cairo">الحجوزات</h1>
             </div>
           </div>
-
           <Button
             onClick={() => setShowAddDialog(true)}
             className="gap-2 bg-rose-500 hover:bg-rose-600"
@@ -259,7 +244,6 @@ export default function Reservations() {
           </Button>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto p-4 space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -274,7 +258,6 @@ export default function Reservations() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-card border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -286,7 +269,6 @@ export default function Reservations() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-card border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -298,7 +280,6 @@ export default function Reservations() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-card border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -311,7 +292,6 @@ export default function Reservations() {
             </CardContent>
           </Card>
         </div>
-
         {/* Filters */}
         <Card className="bg-card border-border/50">
           <CardContent className="p-4">
@@ -353,7 +333,6 @@ export default function Reservations() {
             </div>
           </CardContent>
         </Card>
-
         {/* Reservations List */}
         <div className="space-y-4">
           {loading ? (
@@ -410,7 +389,6 @@ export default function Reservations() {
                         )}
                       </div>
                     </div>
-
                     <div className="flex items-center gap-2">
                       <span className={`px-3 py-1 rounded-full text-sm border ${getStatusColor(reservation.status)}`}>
                         {getStatusLabel(reservation.status)}
@@ -453,7 +431,6 @@ export default function Reservations() {
           )}
         </div>
       </main>
-
       {/* Add Reservation Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="max-w-md">
@@ -555,4 +532,3 @@ export default function Reservations() {
       </Dialog>
     </div>
   );
-}

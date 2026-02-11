@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -51,9 +52,7 @@ import {
   TabsTrigger,
 } from '../components/ui/tabs';
 import { Badge } from '../components/ui/badge';
-
 const API = API_URL;
-
 export default function BranchOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -76,14 +75,11 @@ export default function BranchOrders() {
   });
   const [selectedProduct, setSelectedProduct] = useState('');
   const [quantity, setQuantity] = useState(1);
-
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
-
   useEffect(() => {
     fetchData();
   }, [selectedTab, selectedBranch]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -108,7 +104,6 @@ export default function BranchOrders() {
       setLoading(false);
     }
   };
-
   const addProductToOrder = () => {
     if (!selectedProduct || quantity <= 0) {
       toast.error('اختر منتج وحدد الكمية');
@@ -145,18 +140,15 @@ export default function BranchOrders() {
     setQuantity(1);
     toast.success(`تمت إضافة ${product.name}`);
   };
-
   const removeProductFromOrder = (index) => {
     setForm(prev => ({
       ...prev,
       items: prev.items.filter((_, i) => i !== index)
     }));
   };
-
   const calculateTotal = () => {
     return form.items.reduce((sum, item) => sum + (item.quantity * item.cost_per_unit), 0);
   };
-
   const handleSubmitOrder = async () => {
     if (!form.to_branch_id || form.items.length === 0) {
       toast.error('اختر الفرع وأضف منتجات');
@@ -195,7 +187,6 @@ export default function BranchOrders() {
       setSubmitting(false);
     }
   };
-
   const handleUpdateStatus = async (orderId, status) => {
     try {
       await axios.patch(`${API}/branch-orders-new/${orderId}/status?status=${status}`, {}, { headers });
@@ -205,7 +196,6 @@ export default function BranchOrders() {
       toast.error(error.response?.data?.detail || 'فشل في تحديث الحالة');
     }
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
@@ -216,7 +206,6 @@ export default function BranchOrders() {
       default: return 'bg-gray-500/20 text-gray-500 border-gray-500/30';
     }
   };
-
   const getStatusLabel = (status) => {
     switch (status) {
       case 'pending': return 'قيد الانتظار';
@@ -227,7 +216,6 @@ export default function BranchOrders() {
       default: return status;
     }
   };
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pending': return <Clock className="h-4 w-4" />;
@@ -238,9 +226,7 @@ export default function BranchOrders() {
       default: return null;
     }
   };
-
   const filteredOrders = orders.filter(o => filterStatus === 'all' || o.status === filterStatus);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -248,7 +234,6 @@ export default function BranchOrders() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background" dir="rtl" data-testid="branch-orders-page">
       {/* Header */}
@@ -277,7 +262,6 @@ export default function BranchOrders() {
           </Button>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto p-4 space-y-4">
         {/* Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
@@ -291,7 +275,6 @@ export default function BranchOrders() {
               مخزون الفروع
             </TabsTrigger>
           </TabsList>
-
           {/* الطلبات */}
           <TabsContent value="orders" className="space-y-4">
             {/* Filters */}
@@ -312,7 +295,6 @@ export default function BranchOrders() {
                 <RefreshCw className="h-4 w-4" />
               </Button>
             </div>
-
             {/* Orders List */}
             <div className="space-y-3">
               {filteredOrders.length === 0 ? (
@@ -429,7 +411,6 @@ export default function BranchOrders() {
               )}
             </div>
           </TabsContent>
-
           {/* مخزون الفروع */}
           <TabsContent value="inventory" className="space-y-4">
             <div className="flex gap-2 items-center">
@@ -446,7 +427,6 @@ export default function BranchOrders() {
                 </SelectContent>
               </Select>
             </div>
-
             {!selectedBranch ? (
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
@@ -497,7 +477,6 @@ export default function BranchOrders() {
           </TabsContent>
         </Tabs>
       </main>
-
       {/* Dialog: إنشاء طلب جديد */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -657,7 +636,6 @@ export default function BranchOrders() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: تفاصيل الطلب */}
       <Dialog open={!!showOrderDetails} onOpenChange={() => setShowOrderDetails(null)}>
         <DialogContent className="max-w-lg">
@@ -729,4 +707,3 @@ export default function BranchOrders() {
       </Dialog>
     </div>
   );
-}

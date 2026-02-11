@@ -1,14 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { Download, Smartphone, Share2, MoreVertical, Plus, Check, ExternalLink } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-
 export default function InstallApp() {
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-
   useEffect(() => {
     // Detect device
     const userAgent = navigator.userAgent.toLowerCase();
@@ -30,7 +29,6 @@ export default function InstallApp() {
     
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
-
   const handleInstall = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -40,7 +38,6 @@ export default function InstallApp() {
       }
     }
   };
-
   if (isStandalone) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
@@ -62,7 +59,6 @@ export default function InstallApp() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-900 p-4" dir="rtl">
       <div className="max-w-md mx-auto">
@@ -74,7 +70,6 @@ export default function InstallApp() {
           <h1 className="text-2xl font-bold text-white mb-2">تثبيت تطبيق السائق</h1>
           <p className="text-gray-400">Maestro EGP Driver App</p>
         </div>
-
         {/* Auto Install Button (if available) */}
         {deferredPrompt && (
           <Card className="bg-green-500/20 border-green-500 mb-6">
@@ -89,7 +84,6 @@ export default function InstallApp() {
             </CardContent>
           </Card>
         )}
-
         {/* iOS Instructions */}
         {isIOS && (
           <Card className="bg-gray-800 border-gray-700 mb-4">
@@ -148,7 +142,6 @@ export default function InstallApp() {
             </CardContent>
           </Card>
         )}
-
         {/* Android Instructions */}
         {isAndroid && (
           <Card className="bg-gray-800 border-gray-700 mb-4">
@@ -205,7 +198,6 @@ export default function InstallApp() {
             </CardContent>
           </Card>
         )}
-
         {/* Generic Instructions */}
         {!isIOS && !isAndroid && (
           <Card className="bg-gray-800 border-gray-700 mb-4">
@@ -222,7 +214,6 @@ export default function InstallApp() {
             </CardContent>
           </Card>
         )}
-
         {/* Open Driver Page */}
         <Button 
           variant="outline"
@@ -232,11 +223,9 @@ export default function InstallApp() {
           <ExternalLink className="h-5 w-5 ml-2" />
           فتح صفحة السائق
         </Button>
-
         <p className="text-center text-gray-500 text-xs mt-6">
           بعد التثبيت، افتح التطبيق من الشاشة الرئيسية للحصول على تجربة كاملة
         </p>
       </div>
     </div>
   );
-}

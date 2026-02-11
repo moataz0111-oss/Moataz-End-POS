@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
@@ -50,7 +51,6 @@ import {
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-
 // Fix Leaflet marker icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -58,13 +58,10 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
-
 const API = API_URL;
-
 // ==================== LOCATION PICKER COMPONENT ====================
 function LocationPicker({ position, setPosition, onClose }) {
   const [loading, setLoading] = useState(false);
-
   const MapClickHandler = () => {
     useMapEvents({
       click: (e) => {
@@ -73,7 +70,6 @@ function LocationPicker({ position, setPosition, onClose }) {
     });
     return null;
   };
-
   const getCurrentLocation = () => {
     setLoading(true);
     if (navigator.geolocation) {
@@ -93,7 +89,6 @@ function LocationPicker({ position, setPosition, onClose }) {
       setLoading(false);
     }
   };
-
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
@@ -159,7 +154,6 @@ function LocationPicker({ position, setPosition, onClose }) {
     </div>
   );
 }
-
 // ==================== MAIN COMPONENT ====================
 export default function CustomerMenu() {
   const { tenantId } = useParams();
@@ -217,7 +211,6 @@ export default function CustomerMenu() {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [savedCards, setSavedCards] = useState([]);
   const [saveCard, setSaveCard] = useState(false);
-
   // Check payment status on return from Stripe
   useEffect(() => {
     const sessionId = searchParams.get('session_id');
@@ -230,7 +223,6 @@ export default function CustomerMenu() {
       toast.error('تم إلغاء عملية الدفع');
     }
   }, [searchParams]);
-
   const pollPaymentStatus = async (sessionId, attempts = 0) => {
     const maxAttempts = 10;
     if (attempts >= maxAttempts) {
@@ -260,7 +252,6 @@ export default function CustomerMenu() {
       console.error('Payment status error:', error);
     }
   };
-
   // PWA Install handling - تحديث manifest للعملاء
   useEffect(() => {
     // تغيير manifest link لاستخدام manifest العملاء الجديد
@@ -288,7 +279,6 @@ export default function CustomerMenu() {
       // لا نعيد manifest الأصلي - سيتم تحديده من index.html
     };
   }, [restaurant, tenantId]);
-
   // PWA Install handling
   useEffect(() => {
     const handler = (e) => {
@@ -308,7 +298,6 @@ export default function CustomerMenu() {
     
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
-
   const handleInstallClick = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
@@ -320,7 +309,6 @@ export default function CustomerMenu() {
       setShowInstallBanner(false);
     }
   };
-
   // تسجيل إشعارات Push
   const registerPushNotifications = async () => {
     try {
@@ -328,18 +316,15 @@ export default function CustomerMenu() {
         console.log('Push notifications not supported');
         return;
       }
-
       // تسجيل Service Worker
       const registration = await navigator.serviceWorker.register('/sw-push.js');
       console.log('Service Worker registered');
-
       // طلب إذن الإشعارات
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') {
         console.log('Notification permission denied');
         return;
       }
-
       // الاشتراك في Push
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -348,11 +333,9 @@ export default function CustomerMenu() {
           'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'
         )
       });
-
       // حفظ الاشتراك
       const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
       const customerData = savedCustomer ? JSON.parse(savedCustomer) : {};
-
       await axios.post(`${API}/push/subscribe`, {
         endpoint: subscription.endpoint,
         keys: {
@@ -362,13 +345,11 @@ export default function CustomerMenu() {
         phone: customerData.phone,
         user_type: 'customer'
       });
-
       console.log('Push subscription saved');
     } catch (error) {
       console.log('Push registration error:', error);
     }
   };
-
   // تحويل VAPID key
   const urlBase64ToUint8Array = (base64String) => {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -382,7 +363,6 @@ export default function CustomerMenu() {
     }
     return outputArray;
   };
-
   useEffect(() => {
     fetchMenu();
     loadSavedData();
@@ -393,7 +373,6 @@ export default function CustomerMenu() {
     // تسجيل إشعارات Push
     registerPushNotifications();
   }, [tenantId]);
-
   // تحديد الموقع تلقائياً
   const autoDetectLocation = () => {
     if (!deliveryLocation && navigator.geolocation) {
@@ -418,7 +397,6 @@ export default function CustomerMenu() {
       );
     }
   };
-
   // تحويل الإحداثيات لعنوان (Reverse Geocoding)
   const reverseGeocode = async (lat, lng) => {
     try {
@@ -438,7 +416,6 @@ export default function CustomerMenu() {
       console.log('Reverse geocoding error:', error);
     }
   };
-
   // البحث عن عنوان (Address Autocomplete)
   const searchAddress = async (query) => {
     if (!query || query.length < 3) {
@@ -464,7 +441,6 @@ export default function CustomerMenu() {
       setSearchingAddress(false);
     }
   };
-
   // اختيار عنوان من الاقتراحات
   const selectAddress = (suggestion) => {
     setDeliveryAddress(suggestion.address);
@@ -480,7 +456,6 @@ export default function CustomerMenu() {
     
     toast.success('تم اختيار العنوان');
   };
-
   // جلب سجل الطلبات السابقة
   const fetchOrderHistory = async () => {
     const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
@@ -501,7 +476,6 @@ export default function CustomerMenu() {
       console.log('Could not fetch order history:', error.message);
     }
   };
-
   // جلب الطلبات المفضلة
   const fetchFavorites = async () => {
     const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
@@ -522,7 +496,6 @@ export default function CustomerMenu() {
       console.log('Could not fetch favorites:', error.message);
     }
   };
-
   // حفظ الطلب الحالي كمفضل
   const saveToFavorites = async () => {
     if (cart.length === 0) {
@@ -541,7 +514,6 @@ export default function CustomerMenu() {
       toast.error('يرجى إدخال رقم هاتفك أولاً');
       return;
     }
-
     setSavingFavorite(true);
     try {
       const items = cart.map(item => ({
@@ -551,14 +523,12 @@ export default function CustomerMenu() {
         price: item.price,
         notes: item.notes || ''
       }));
-
       await axios.post(`${API}/customer/favorites/add`, {
         tenant_id: tenantId,
         phone: customerData.phone,
         name: favoriteName || `طلبي المفضل`,
         items: items
       });
-
       toast.success('تم حفظ الطلب في المفضلة ⭐');
       setShowSaveFavoriteDialog(false);
       setFavoriteName('');
@@ -569,7 +539,6 @@ export default function CustomerMenu() {
       setSavingFavorite(false);
     }
   };
-
   // حذف طلب من المفضلة
   const removeFromFavorites = async (favoriteId) => {
     const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
@@ -587,7 +556,6 @@ export default function CustomerMenu() {
       toast.error('فشل في الحذف');
     }
   };
-
   // إضافة طلب مفضل للسلة
   const addFavoriteToCart = (favorite) => {
     const newCartItems = favorite.items.map(item => ({
@@ -602,7 +570,6 @@ export default function CustomerMenu() {
     setShowFavoritesDialog(false);
     toast.success('تمت إضافة الطلب المفضل للسلة 🛒');
   };
-
   // فتح نافذة التقييم
   const openRatingDialog = (order) => {
     setRatingOrder(order);
@@ -613,7 +580,6 @@ export default function CustomerMenu() {
     setServiceRating(5);
     setShowRatingDialog(true);
   };
-
   // إرسال التقييم
   const submitRating = async () => {
     if (!ratingOrder) return;
@@ -645,7 +611,6 @@ export default function CustomerMenu() {
       setSubmittingRating(false);
     }
   };
-
   // مكون النجوم للتقييم
   const StarRating = ({ value, onChange, size = 'md' }) => {
     const sizeClass = size === 'lg' ? 'h-8 w-8' : 'h-5 w-5';
@@ -670,7 +635,6 @@ export default function CustomerMenu() {
       </div>
     );
   };
-
   const loadSavedData = () => {
     // Load cart
     const savedCart = localStorage.getItem(`cart_${tenantId}`);
@@ -698,12 +662,10 @@ export default function CustomerMenu() {
       setStep('menu');
     }
   };
-
   // Save cart
   useEffect(() => {
     localStorage.setItem(`cart_${tenantId}`, JSON.stringify(cart));
   }, [cart, tenantId]);
-
   const fetchMenu = async () => {
     try {
       console.log('Fetching menu for tenant:', tenantId);
@@ -767,13 +729,11 @@ export default function CustomerMenu() {
       setLoading(false);
     }
   };
-
   const selectBranch = (branchId) => {
     setSelectedBranch(branchId);
     localStorage.setItem(`branch_${tenantId}`, branchId);
     setStep('menu');
   };
-
   const filteredProducts = products.filter(p => {
     const matchesBranch = !selectedBranch || !p.branch_id || p.branch_id === selectedBranch;
     const matchesCategory = !selectedCategory || p.category_id === selectedCategory;
@@ -782,7 +742,6 @@ export default function CustomerMenu() {
       p.name_en?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesBranch && matchesCategory && matchesSearch;
   });
-
   const addToCart = (product) => {
     const existing = cart.find(item => item.product_id === product.id);
     if (existing) {
@@ -802,7 +761,6 @@ export default function CustomerMenu() {
     }
     toast.success('تمت الإضافة للسلة');
   };
-
   const updateQuantity = (productId, delta) => {
     setCart(cart.map(item => {
       if (item.product_id === productId) {
@@ -812,16 +770,13 @@ export default function CustomerMenu() {
       return item;
     }).filter(Boolean));
   };
-
   const removeFromCart = (productId) => {
     setCart(cart.filter(item => item.product_id !== productId));
   };
-
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const deliveryFee = restaurant?.delivery_fee || 0;
   const grandTotal = cartTotal + deliveryFee;
-
   // Save customer info
   const saveCustomerInfo = () => {
     localStorage.setItem(`customer_${tenantId}`, JSON.stringify({
@@ -831,26 +786,21 @@ export default function CustomerMenu() {
       location: deliveryLocation
     }));
   };
-
   const handleSubmitOrder = async () => {
     if (!customerName || !customerPhone) {
       toast.error('يرجى إدخال الاسم ورقم الهاتف');
       return;
     }
-
     if (!deliveryAddress && !deliveryLocation) {
       toast.error('يرجى إدخال عنوان التوصيل أو تحديده على الخريطة');
       return;
     }
-
     if (cart.length === 0) {
       toast.error('السلة فارغة');
       return;
     }
-
     setSubmitting(true);
     saveCustomerInfo();
-
     try {
       const orderData = {
         items: cart.map(item => ({
@@ -869,9 +819,7 @@ export default function CustomerMenu() {
         customer_phone: customerPhone,
         branch_id: selectedBranch
       };
-
       const res = await axios.post(`${API}/customer/order/${tenantId}`, orderData);
-
       if (res.data.success) {
         // If card payment, redirect to Stripe
         if (paymentMethod === 'card') {
@@ -900,7 +848,6 @@ export default function CustomerMenu() {
             return;
           }
         }
-
         // Cash payment - show tracking
         toast.success(res.data.message);
         setCurrentOrder(res.data.order);
@@ -914,16 +861,13 @@ export default function CustomerMenu() {
       setSubmitting(false);
     }
   };
-
   const formatPrice = (price) => {
     return new Intl.NumberFormat('ar-IQ').format(price) + ' د.ع';
   };
-
   const getSelectedBranchName = () => {
     const branch = branches.find(b => b.id === selectedBranch);
     return branch?.name || '';
   };
-
   // دالة لعرض الـ Dialogs العامة في كل الخطوات
   const renderGlobalDialogs = () => (
     <>
@@ -1001,7 +945,6 @@ export default function CustomerMenu() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Save Favorite Dialog */}
       <Dialog open={showSaveFavoriteDialog} onOpenChange={setShowSaveFavoriteDialog}>
         <DialogContent className="max-w-md">
@@ -1066,7 +1009,6 @@ export default function CustomerMenu() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Rating Dialog - نافذة التقييم */}
       <Dialog open={showRatingDialog} onOpenChange={setShowRatingDialog}>
         <DialogContent className="max-w-md">
@@ -1088,7 +1030,6 @@ export default function CustomerMenu() {
                 {rating === 5 ? 'ممتاز! 🌟' : rating === 4 ? 'جيد جداً 👍' : rating === 3 ? 'جيد 😊' : rating === 2 ? 'مقبول 😐' : 'سيء 😞'}
               </p>
             </div>
-
             {/* تقييمات تفصيلية */}
             <div className="space-y-4 bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between">
@@ -1104,7 +1045,6 @@ export default function CustomerMenu() {
                 <StarRating value={serviceRating} onChange={setServiceRating} />
               </div>
             </div>
-
             {/* تعليق اختياري */}
             <div>
               <label className="text-sm font-medium mb-2 block flex items-center gap-2">
@@ -1147,7 +1087,6 @@ export default function CustomerMenu() {
       </Dialog>
     </>
   );
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
@@ -1158,7 +1097,6 @@ export default function CustomerMenu() {
       </div>
     );
   }
-
   // ==================== BRANCH SELECTION VIEW ====================
   if (step === 'branches' && branches.length > 1) {
     return (
@@ -1194,7 +1132,6 @@ export default function CustomerMenu() {
             </div>
           </div>
         </header>
-
         {/* Install Banner */}
         {showInstallBanner && (
           <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-3">
@@ -1215,7 +1152,6 @@ export default function CustomerMenu() {
             </div>
           </div>
         )}
-
         {/* Branch List */}
         <main className="max-w-lg mx-auto px-4 py-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -1261,7 +1197,6 @@ export default function CustomerMenu() {
       </div>
     );
   }
-
   // ==================== MENU VIEW ====================
   if (step === 'menu') {
     return (
@@ -1332,7 +1267,6 @@ export default function CustomerMenu() {
             </div>
           </div>
         </header>
-
         {/* Install Banner */}
         {showInstallBanner && (
           <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2">
@@ -1348,7 +1282,6 @@ export default function CustomerMenu() {
             </div>
           </div>
         )}
-
         {/* Search */}
         <div className="sticky top-[72px] z-30 bg-white border-b px-4 py-2 shadow-sm">
           <div className="max-w-lg mx-auto relative">
@@ -1362,7 +1295,6 @@ export default function CustomerMenu() {
             />
           </div>
         </div>
-
         {/* Categories */}
         <div className="sticky top-[128px] z-30 bg-white border-b shadow-sm">
           <div className="max-w-lg mx-auto px-4 py-3 overflow-x-auto">
@@ -1397,7 +1329,6 @@ export default function CustomerMenu() {
             </div>
           </div>
         </div>
-
         {/* Products */}
         <main className="max-w-lg mx-auto px-4 py-4">
           {filteredProducts.length === 0 ? (
@@ -1456,7 +1387,6 @@ export default function CustomerMenu() {
             </div>
           )}
         </main>
-
         {/* Cart Button */}
         {cart.length > 0 && (
           <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg z-50">
@@ -1473,13 +1403,11 @@ export default function CustomerMenu() {
             </div>
           </div>
         )}
-
         {/* Global Dialogs - تعرض في كل الخطوات */}
         {renderGlobalDialogs()}
       </div>
     );
   }
-
   // ==================== CART VIEW ====================
   if (step === 'cart') {
     return (
@@ -1497,7 +1425,6 @@ export default function CustomerMenu() {
             <Badge className="bg-orange-500">{cartCount}</Badge>
           </div>
         </header>
-
         <main className="max-w-lg mx-auto px-4 py-4 pb-32">
           {cart.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
@@ -1549,7 +1476,6 @@ export default function CustomerMenu() {
             </div>
           )}
         </main>
-
         {/* Bottom Actions */}
         {cart.length > 0 && (
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4">
@@ -1587,13 +1513,11 @@ export default function CustomerMenu() {
             </div>
           </div>
         )}
-
         {/* Global Dialogs - تعرض في كل الخطوات */}
         {renderGlobalDialogs()}
       </div>
     );
   }
-
   // ==================== CHECKOUT VIEW ====================
   if (step === 'checkout') {
     return (
@@ -1607,7 +1531,6 @@ export default function CustomerMenu() {
             <h1 className="text-xl font-bold">إتمام الطلب</h1>
           </div>
         </header>
-
         <main className="max-w-lg mx-auto px-4 py-4 pb-32">
           <div className="space-y-4">
             {/* Customer Info */}
@@ -1627,7 +1550,6 @@ export default function CustomerMenu() {
                     data-testid="customer-name-input"
                   />
                 </div>
-
                 <div>
                   <label className="text-sm font-medium mb-1 block">رقم الهاتف *</label>
                   <Input
@@ -1640,7 +1562,6 @@ export default function CustomerMenu() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Delivery Address */}
             <Card>
               <CardContent className="p-4 space-y-4">
@@ -1685,7 +1606,6 @@ export default function CustomerMenu() {
                     </div>
                   )}
                 </div>
-
                 {/* زر تحديد الموقع الحالي */}
                 <div className="grid grid-cols-2 gap-2">
                   <Button 
@@ -1732,7 +1652,6 @@ export default function CustomerMenu() {
                     اختر من الخريطة
                   </Button>
                 </div>
-
                 {/* عرض حالة الموقع */}
                 {deliveryLocation && (
                   <div className="flex items-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200">
@@ -1742,7 +1661,6 @@ export default function CustomerMenu() {
                     <span className="text-sm text-green-700 font-medium">✓ تم تحديد موقعك على الخريطة</span>
                   </div>
                 )}
-
                 <div>
                   <label className="text-sm font-medium mb-1 block">ملاحظات للسائق (اختياري)</label>
                   <Input
@@ -1753,7 +1671,6 @@ export default function CustomerMenu() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Payment Method */}
             <Card>
               <CardContent className="p-4 space-y-4">
@@ -1791,7 +1708,6 @@ export default function CustomerMenu() {
                     <span className="text-xs font-bold">زين كاش</span>
                   </Button>
                 </div>
-
                 {/* Card Payment Form */}
                 {paymentMethod === 'card' && (
                   <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 space-y-4">
@@ -1859,7 +1775,6 @@ export default function CustomerMenu() {
                     </div>
                   </div>
                 )}
-
                 {/* Zain Cash Form */}
                 {paymentMethod === 'zain_cash' && (
                   <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 space-y-4">
@@ -1908,7 +1823,6 @@ export default function CustomerMenu() {
                 )}
               </CardContent>
             </Card>
-
             {/* Order Summary */}
             <Card>
               <CardContent className="p-4">
@@ -1939,7 +1853,6 @@ export default function CustomerMenu() {
             </Card>
           </div>
         </main>
-
         {/* Submit Button */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg p-4">
           <div className="max-w-lg mx-auto">
@@ -1963,7 +1876,6 @@ export default function CustomerMenu() {
             </Button>
           </div>
         </div>
-
         {/* Map Dialog */}
         <Dialog open={showMap} onOpenChange={setShowMap}>
           <DialogContent className="max-w-md">
@@ -1991,13 +1903,11 @@ export default function CustomerMenu() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
         {/* Global Dialogs */}
         {renderGlobalDialogs()}
       </div>
     );
   }
-
   // ==================== ORDER HISTORY VIEW ====================
   if (step === 'history') {
     return (
@@ -2020,7 +1930,6 @@ export default function CustomerMenu() {
             </div>
           </div>
         </header>
-
         <main className="max-w-lg mx-auto px-4 py-4 space-y-3">
           {orderHistory.length === 0 ? (
             <div className="text-center py-12">
@@ -2119,7 +2028,6 @@ export default function CustomerMenu() {
       </div>
     );
   }
-
   // ==================== TRACKING VIEW ====================
   if (step === 'tracking' && currentOrder) {
     const statusSteps = [
@@ -2132,12 +2040,10 @@ export default function CustomerMenu() {
     
     const statusOrder = ['pending', 'preparing', 'ready', 'out_for_delivery', 'delivered'];
     const currentIdx = statusOrder.indexOf(currentOrder.status);
-
     // مكون عرض موقع السائق
     const DriverTrackingMap = () => {
       const [driverInfo, setDriverInfo] = React.useState(null);
       const [loadingDriver, setLoadingDriver] = React.useState(true);
-
       React.useEffect(() => {
         const fetchDriverInfo = async () => {
           try {
@@ -2150,13 +2056,11 @@ export default function CustomerMenu() {
             setLoadingDriver(false);
           }
         };
-
         // جلب معلومات السائق كل 10 ثواني
         fetchDriverInfo();
         const interval = setInterval(fetchDriverInfo, 10000);
         return () => clearInterval(interval);
       }, []);
-
       if (loadingDriver) {
         return (
           <div className="flex items-center justify-center py-8">
@@ -2164,7 +2068,6 @@ export default function CustomerMenu() {
           </div>
         );
       }
-
       if (!driverInfo?.driver) {
         return (
           <div className="text-center py-6 text-gray-500">
@@ -2174,10 +2077,8 @@ export default function CustomerMenu() {
           </div>
         );
       }
-
       const driver = driverInfo.driver;
       const hasLocation = driver.current_location?.latitude && driver.current_location?.longitude;
-
       return (
         <div className="space-y-4">
           {/* معلومات السائق */}
@@ -2201,7 +2102,6 @@ export default function CustomerMenu() {
               <Phone className="h-5 w-5" />
             </a>
           </div>
-
           {/* خريطة تتبع السائق */}
           {hasLocation && (
             <div className="rounded-xl overflow-hidden shadow-lg border border-gray-700">
@@ -2324,7 +2224,6 @@ export default function CustomerMenu() {
               </div>
             </div>
           )}
-
           {!hasLocation && (
             <div className="text-center py-6 bg-yellow-50 rounded-xl border border-yellow-200">
               <Navigation className="h-10 w-10 mx-auto mb-2 text-yellow-500" />
@@ -2335,7 +2234,6 @@ export default function CustomerMenu() {
         </div>
       );
     };
-
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50" dir="rtl">
         {/* Header */}
@@ -2346,7 +2244,6 @@ export default function CustomerMenu() {
             <p className="text-green-100">رقم الطلب: #{currentOrder.order_number}</p>
           </div>
         </header>
-
         <main className="max-w-lg mx-auto px-4 py-6 space-y-4">
           {/* Driver Tracking - يظهر عندما يكون الطلب في مرحلة التوصيل */}
           {(currentOrder.status === 'out_for_delivery' || currentOrder.driver_id) && (
@@ -2360,7 +2257,6 @@ export default function CustomerMenu() {
               </CardContent>
             </Card>
           )}
-
           {/* Status Timeline */}
           <Card>
             <CardContent className="p-4">
@@ -2397,7 +2293,6 @@ export default function CustomerMenu() {
               </div>
             </CardContent>
           </Card>
-
           {/* Order Details */}
           <Card>
             <CardContent className="p-4 space-y-3">
@@ -2418,7 +2313,6 @@ export default function CustomerMenu() {
               </div>
             </CardContent>
           </Card>
-
           {/* Rate Order Button - يظهر عند التسليم */}
           {(currentOrder.status === 'delivered' || currentOrder.status === 'completed') && (
             <Button 
@@ -2429,7 +2323,6 @@ export default function CustomerMenu() {
               قيّم طلبك
             </Button>
           )}
-
           {/* New Order Button */}
           <Button 
             className="w-full h-12 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
@@ -2444,7 +2337,5 @@ export default function CustomerMenu() {
       </div>
     );
   }
-
   // Default: redirect to menu
   return null;
-}

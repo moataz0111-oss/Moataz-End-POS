@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
@@ -34,9 +35,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-
 const API = API_URL;
-
 export default function Coupons() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('coupons');
@@ -49,7 +48,6 @@ export default function Coupons() {
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [editingPromotion, setEditingPromotion] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
-
   const [couponForm, setCouponForm] = useState({
     code: '',
     name: '',
@@ -66,7 +64,6 @@ export default function Coupons() {
     loyalty_tier_required: 'all',
     first_order_only: false
   });
-
   const [promotionForm, setPromotionForm] = useState({
     name: '',
     description: '',
@@ -82,11 +79,9 @@ export default function Coupons() {
     is_active: true,
     loyalty_tier_required: 'all'
   });
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -105,7 +100,6 @@ export default function Coupons() {
       setLoading(false);
     }
   };
-
   const handleSaveCoupon = async (e) => {
     e.preventDefault();
     
@@ -113,7 +107,6 @@ export default function Coupons() {
       toast.error('الكود والاسم مطلوبان');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
@@ -140,7 +133,6 @@ export default function Coupons() {
       toast.error(error.response?.data?.detail || 'فشل في حفظ الكوبون');
     }
   };
-
   const handleDeleteCoupon = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا الكوبون؟')) return;
     
@@ -155,7 +147,6 @@ export default function Coupons() {
       toast.error('فشل في الحذف');
     }
   };
-
   const handleSavePromotion = async (e) => {
     e.preventDefault();
     
@@ -163,7 +154,6 @@ export default function Coupons() {
       toast.error('اسم العرض مطلوب');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
@@ -188,7 +178,6 @@ export default function Coupons() {
       toast.error(error.response?.data?.detail || 'فشل في حفظ العرض');
     }
   };
-
   const handleDeletePromotion = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا العرض؟')) return;
     
@@ -203,7 +192,6 @@ export default function Coupons() {
       toast.error('فشل في الحذف');
     }
   };
-
   const resetCouponForm = () => {
     setCouponForm({
       code: '', name: '', description: '', discount_type: 'percentage',
@@ -215,7 +203,6 @@ export default function Coupons() {
     });
     setEditingCoupon(null);
   };
-
   const resetPromotionForm = () => {
     setPromotionForm({
       name: '', description: '', promotion_type: 'buy_x_get_y',
@@ -227,7 +214,6 @@ export default function Coupons() {
     });
     setEditingPromotion(null);
   };
-
   const editCoupon = (coupon) => {
     setEditingCoupon(coupon);
     setCouponForm({
@@ -237,7 +223,6 @@ export default function Coupons() {
     });
     setCouponDialogOpen(true);
   };
-
   const editPromotion = (promo) => {
     setEditingPromotion(promo);
     setPromotionForm({
@@ -247,14 +232,12 @@ export default function Coupons() {
     });
     setPromotionDialogOpen(true);
   };
-
   const copyCode = (code) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     toast.success('تم نسخ الكود');
     setTimeout(() => setCopiedCode(null), 2000);
   };
-
   const generateCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
@@ -263,10 +246,8 @@ export default function Coupons() {
     }
     setCouponForm({ ...couponForm, code });
   };
-
   const isExpired = (date) => new Date(date) < new Date();
   const isActive = (coupon) => coupon.is_active && !isExpired(coupon.valid_until);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -274,7 +255,6 @@ export default function Coupons() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background p-6" dir="rtl">
       {/* Header */}
@@ -292,7 +272,6 @@ export default function Coupons() {
           </div>
         </div>
       </div>
-
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-500/20">
@@ -308,7 +287,6 @@ export default function Coupons() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -322,7 +300,6 @@ export default function Coupons() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -336,7 +313,6 @@ export default function Coupons() {
             </div>
           </CardContent>
         </Card>
-
         <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-500/20">
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -353,7 +329,6 @@ export default function Coupons() {
           </CardContent>
         </Card>
       </div>
-
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="coupons" className="gap-2">
@@ -363,7 +338,6 @@ export default function Coupons() {
             <Sparkles className="h-4 w-4" /> العروض
           </TabsTrigger>
         </TabsList>
-
         {/* Coupons Tab */}
         <TabsContent value="coupons">
           <div className="flex justify-end mb-4">
@@ -371,7 +345,6 @@ export default function Coupons() {
               <Plus className="h-4 w-4 ml-2" /> كوبون جديد
             </Button>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {coupons.map((coupon) => (
               <Card key={coupon.id} className={`border-border/50 ${!isActive(coupon) ? 'opacity-60' : ''}`}>
@@ -406,7 +379,6 @@ export default function Coupons() {
                       </Button>
                     </div>
                   </div>
-
                   <div className="space-y-2 text-sm mb-3">
                     <div className="flex items-center gap-2">
                       {coupon.discount_type === 'percentage' ? (
@@ -439,14 +411,12 @@ export default function Coupons() {
                       <span>حتى {new Date(coupon.valid_until).toLocaleDateString('ar-IQ')}</span>
                     </div>
                   </div>
-
                   <Badge className={isActive(coupon) ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}>
                     {isActive(coupon) ? 'نشط' : isExpired(coupon.valid_until) ? 'منتهي' : 'معطل'}
                   </Badge>
                 </CardContent>
               </Card>
             ))}
-
             {coupons.length === 0 && (
               <Card className="col-span-full border-border/50">
                 <CardContent className="py-12 text-center">
@@ -457,7 +427,6 @@ export default function Coupons() {
             )}
           </div>
         </TabsContent>
-
         {/* Promotions Tab */}
         <TabsContent value="promotions">
           <div className="flex justify-end mb-4">
@@ -465,7 +434,6 @@ export default function Coupons() {
               <Plus className="h-4 w-4 ml-2" /> عرض جديد
             </Button>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {promotions.map((promo) => (
               <Card key={promo.id} className={`border-border/50 ${!promo.is_active ? 'opacity-60' : ''}`}>
@@ -486,7 +454,6 @@ export default function Coupons() {
                       </Button>
                     </div>
                   </div>
-
                   <div className="bg-muted/30 rounded-lg p-3 mb-3">
                     {promo.promotion_type === 'buy_x_get_y' && (
                       <p className="text-center font-medium text-foreground">
@@ -507,7 +474,6 @@ export default function Coupons() {
                       </p>
                     )}
                   </div>
-
                   <div className="flex items-center justify-between text-sm">
                     <Badge className={promo.is_active ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}>
                       {promo.is_active ? 'نشط' : 'معطل'}
@@ -519,7 +485,6 @@ export default function Coupons() {
                 </CardContent>
               </Card>
             ))}
-
             {promotions.length === 0 && (
               <Card className="col-span-full border-border/50">
                 <CardContent className="py-12 text-center">
@@ -531,7 +496,6 @@ export default function Coupons() {
           </div>
         </TabsContent>
       </Tabs>
-
       {/* Coupon Dialog */}
       <Dialog open={couponDialogOpen} onOpenChange={setCouponDialogOpen}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -540,7 +504,6 @@ export default function Coupons() {
               {editingCoupon ? 'تعديل كوبون' : 'إنشاء كوبون جديد'}
             </DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleSaveCoupon} className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1">
@@ -557,7 +520,6 @@ export default function Coupons() {
                 توليد
               </Button>
             </div>
-
             <div>
               <Label>اسم الكوبون *</Label>
               <Input
@@ -567,7 +529,6 @@ export default function Coupons() {
                 required
               />
             </div>
-
             <div>
               <Label>الوصف</Label>
               <Textarea
@@ -576,7 +537,6 @@ export default function Coupons() {
                 rows={2}
               />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>نوع الخصم</Label>
@@ -600,7 +560,6 @@ export default function Coupons() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>الحد الأدنى للطلب</Label>
@@ -620,7 +579,6 @@ export default function Coupons() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>عدد الاستخدامات الكلي</Label>
@@ -640,7 +598,6 @@ export default function Coupons() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>يبدأ من</Label>
@@ -659,7 +616,6 @@ export default function Coupons() {
                 />
               </div>
             </div>
-
             <div>
               <Label>مستوى الولاء المطلوب</Label>
               <Select
@@ -676,7 +632,6 @@ export default function Coupons() {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Switch
@@ -693,7 +648,6 @@ export default function Coupons() {
                 <Label>للطلب الأول فقط</Label>
               </div>
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setCouponDialogOpen(false)} className="flex-1">
                 إلغاء
@@ -705,7 +659,6 @@ export default function Coupons() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Promotion Dialog */}
       <Dialog open={promotionDialogOpen} onOpenChange={setPromotionDialogOpen}>
         <DialogContent className="max-w-lg">
@@ -714,7 +667,6 @@ export default function Coupons() {
               {editingPromotion ? 'تعديل عرض' : 'إنشاء عرض جديد'}
             </DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleSavePromotion} className="space-y-4">
             <div>
               <Label>اسم العرض *</Label>
@@ -725,7 +677,6 @@ export default function Coupons() {
                 required
               />
             </div>
-
             <div>
               <Label>الوصف</Label>
               <Textarea
@@ -734,7 +685,6 @@ export default function Coupons() {
                 rows={2}
               />
             </div>
-
             <div>
               <Label>نوع العرض</Label>
               <Select
@@ -749,7 +699,6 @@ export default function Coupons() {
                 </SelectContent>
               </Select>
             </div>
-
             {promotionForm.promotion_type === 'buy_x_get_y' && (
               <div className="grid grid-cols-3 gap-4">
                 <div>
@@ -778,7 +727,6 @@ export default function Coupons() {
                 </div>
               </div>
             )}
-
             {promotionForm.promotion_type === 'happy_hour' && (
               <div className="grid grid-cols-3 gap-4">
                 <div>
@@ -807,7 +755,6 @@ export default function Coupons() {
                 </div>
               </div>
             )}
-
             {promotionForm.promotion_type === 'bundle' && (
               <div>
                 <Label>سعر الباقة</Label>
@@ -818,7 +765,6 @@ export default function Coupons() {
                 />
               </div>
             )}
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>يبدأ من</Label>
@@ -837,7 +783,6 @@ export default function Coupons() {
                 />
               </div>
             </div>
-
             <div className="flex items-center gap-2">
               <Switch
                 checked={promotionForm.is_active}
@@ -845,7 +790,6 @@ export default function Coupons() {
               />
               <Label>نشط</Label>
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setPromotionDialogOpen(false)} className="flex-1">
                 إلغاء
@@ -859,4 +803,3 @@ export default function Coupons() {
       </Dialog>
     </div>
   );
-}

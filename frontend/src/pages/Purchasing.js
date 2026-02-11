@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -49,9 +50,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '../components/ui/tabs';
-
 const API = BACKEND_URL + '/api';
-
 export default function Purchasing() {
   const navigate = useNavigate();
   const [purchaseOrders, setPurchaseOrders] = useState([]);
@@ -73,7 +72,6 @@ export default function Purchasing() {
   const [selectedMaterial, setSelectedMaterial] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [unitPrice, setUnitPrice] = useState(0);
-
   const [supplierForm, setSupplierForm] = useState({
     name: '',
     phone: '',
@@ -81,11 +79,9 @@ export default function Purchasing() {
     address: '',
     notes: ''
   });
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       const [ordersRes, suppliersRes, materialsRes, alertsRes] = await Promise.all([
@@ -148,7 +144,6 @@ export default function Purchasing() {
       setLoading(false);
     }
   };
-
   const addItemToOrder = () => {
     if (!selectedMaterial || quantity < 1 || unitPrice < 1) return;
     
@@ -169,22 +164,18 @@ export default function Purchasing() {
     setQuantity(1);
     setUnitPrice(0);
   };
-
   const removeItem = (index) => {
     const newItems = form.items.filter((_, i) => i !== index);
     setForm({ ...form, items: newItems });
   };
-
   const getTotalAmount = () => {
     return form.items.reduce((sum, item) => sum + item.total, 0);
   };
-
   const handleSubmit = async () => {
     if (!form.supplier_id || form.items.length === 0) {
       toast.error('الرجاء اختيار المورد وإضافة منتجات');
       return;
     }
-
     try {
       await axios.post(`${API}/purchase-orders`, {
         ...form,
@@ -212,13 +203,11 @@ export default function Purchasing() {
       resetForm();
     }
   };
-
   const handleAddSupplier = async () => {
     if (!supplierForm.name || !supplierForm.phone) {
       toast.error('الرجاء إدخال اسم ورقم هاتف المورد');
       return;
     }
-
     try {
       await axios.post(`${API}/suppliers`, supplierForm);
       toast.success('تم إضافة المورد بنجاح');
@@ -236,7 +225,6 @@ export default function Purchasing() {
       setSupplierForm({ name: '', phone: '', email: '', address: '', notes: '' });
     }
   };
-
   const resetForm = () => {
     setForm({
       supplier_id: '',
@@ -245,7 +233,6 @@ export default function Purchasing() {
       expected_delivery: ''
     });
   };
-
   const updateStatus = async (orderId, status) => {
     try {
       await axios.put(`${API}/purchase-orders/${orderId}/status`, { status });
@@ -258,7 +245,6 @@ export default function Purchasing() {
       toast.success('تم تحديث حالة الطلب');
     }
   };
-
   const createOrderFromAlert = (alert) => {
     const material = rawMaterials.find(m => m.name === alert.material_name);
     if (material) {
@@ -276,11 +262,9 @@ export default function Purchasing() {
       setShowAddDialog(true);
     }
   };
-
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('ar-IQ').format(value) + ' د.ع';
   };
-
   const getStatusColor = (status) => {
     switch (status) {
       case 'pending': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30';
@@ -291,7 +275,6 @@ export default function Purchasing() {
       default: return 'bg-gray-500/10 text-gray-500 border-gray-500/30';
     }
   };
-
   const getStatusLabel = (status) => {
     switch (status) {
       case 'pending': return 'قيد الانتظار';
@@ -302,18 +285,15 @@ export default function Purchasing() {
       default: return status;
     }
   };
-
   const filteredOrders = purchaseOrders.filter(o => 
     filterStatus === 'all' || o.status === filterStatus
   );
-
   const stats = {
     totalOrders: purchaseOrders.length,
     pending: purchaseOrders.filter(o => o.status === 'pending').length,
     totalValue: purchaseOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0),
     alerts: lowStockAlerts.length
   };
-
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
@@ -333,7 +313,6 @@ export default function Purchasing() {
               <h1 className="text-xl font-bold font-cairo">المشتريات</h1>
             </div>
           </div>
-
           <div className="flex gap-2">
             <Button
               variant="outline"
@@ -353,7 +332,6 @@ export default function Purchasing() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto p-4 space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -368,7 +346,6 @@ export default function Purchasing() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-card border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -380,7 +357,6 @@ export default function Purchasing() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-card border-border/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -392,7 +368,6 @@ export default function Purchasing() {
               </div>
             </CardContent>
           </Card>
-
           <Card className={`border-border/50 ${stats.alerts > 0 ? 'bg-red-500/10 border-red-500/30' : 'bg-card'}`}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -405,7 +380,6 @@ export default function Purchasing() {
             </CardContent>
           </Card>
         </div>
-
         {/* Low Stock Alerts */}
         {lowStockAlerts.length > 0 && (
           <Card className="bg-red-500/5 border-red-500/30">
@@ -441,7 +415,6 @@ export default function Purchasing() {
             </CardContent>
           </Card>
         )}
-
         {/* Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab}>
           <div className="flex items-center justify-between">
@@ -449,7 +422,6 @@ export default function Purchasing() {
               <TabsTrigger value="orders">أوامر الشراء</TabsTrigger>
               <TabsTrigger value="suppliers">الموردين</TabsTrigger>
             </TabsList>
-
             {selectedTab === 'orders' && (
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="w-40">
@@ -466,7 +438,6 @@ export default function Purchasing() {
               </Select>
             )}
           </div>
-
           <TabsContent value="orders" className="space-y-4 mt-4">
             {loading ? (
               <div className="text-center py-12">
@@ -491,12 +462,10 @@ export default function Purchasing() {
                             {getStatusLabel(order.status)}
                           </span>
                         </div>
-
                         <p className="text-sm text-muted-foreground flex items-center gap-1">
                           <Building2 className="h-4 w-4" />
                           {order.supplier?.name}
                         </p>
-
                         <div className="flex flex-wrap gap-2">
                           {order.items?.map((item, idx) => (
                             <span key={idx} className="px-2 py-1 bg-muted rounded text-xs">
@@ -504,7 +473,6 @@ export default function Purchasing() {
                             </span>
                           ))}
                         </div>
-
                         <div className="flex items-center gap-4 text-sm">
                           <span className="font-bold text-emerald-500">
                             {formatCurrency(order.total_amount)}
@@ -515,7 +483,6 @@ export default function Purchasing() {
                           </span>
                         </div>
                       </div>
-
                       <div className="flex gap-2">
                         {order.status === 'pending' && (
                           <>
@@ -564,7 +531,6 @@ export default function Purchasing() {
               ))
             )}
           </TabsContent>
-
           <TabsContent value="suppliers" className="space-y-4 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {suppliers.map((supplier) => (
@@ -587,7 +553,6 @@ export default function Purchasing() {
           </TabsContent>
         </Tabs>
       </main>
-
       {/* Add Purchase Order Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
@@ -627,7 +592,6 @@ export default function Purchasing() {
                 />
               </div>
             </div>
-
             {/* Add Item */}
             <div className="p-4 bg-muted/50 rounded-lg space-y-3">
               <Label>إضافة مادة</Label>
@@ -664,7 +628,6 @@ export default function Purchasing() {
                 إضافة
               </Button>
             </div>
-
             {/* Items List */}
             {form.items.length > 0 && (
               <div className="space-y-2">
@@ -700,7 +663,6 @@ export default function Purchasing() {
                 </div>
               </div>
             )}
-
             <div className="space-y-2">
               <Label>ملاحظات</Label>
               <Input
@@ -721,7 +683,6 @@ export default function Purchasing() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Add Supplier Dialog */}
       <Dialog open={showSupplierDialog} onOpenChange={setShowSupplierDialog}>
         <DialogContent className="max-w-md">
@@ -782,4 +743,3 @@ export default function Purchasing() {
       </Dialog>
     </div>
   );
-}

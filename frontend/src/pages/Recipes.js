@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import axios from 'axios';
@@ -32,9 +33,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-
 const API = API_URL;
-
 const CATEGORIES = [
   { id: 'meat', name: 'لحوم ودواجن', icon: '🥩' },
   { id: 'seafood', name: 'مأكولات بحرية', icon: '🦐' },
@@ -48,7 +47,6 @@ const CATEGORIES = [
   { id: 'packaging', name: 'تغليف', icon: '📦' },
   { id: 'general', name: 'عام', icon: '📋' }
 ];
-
 const UNITS = [
   { id: 'kg', name: 'كيلوغرام', symbol: 'كغ' },
   { id: 'g', name: 'غرام', symbol: 'غ' },
@@ -58,7 +56,6 @@ const UNITS = [
   { id: 'box', name: 'علبة', symbol: 'علبة' },
   { id: 'pack', name: 'باكيت', symbol: 'باكيت' }
 ];
-
 export default function Recipes() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('materials');
@@ -83,11 +80,9 @@ export default function Recipes() {
     product_id: '', ingredients: [], labor_cost: 0,
     overhead_cost: 0, portions: 1, preparation_time: 0, instructions: ''
   });
-
   useEffect(() => {
     fetchData();
   }, []);
-
   const fetchData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -110,7 +105,6 @@ export default function Recipes() {
       setLoading(false);
     }
   };
-
   const handleSaveMaterial = async (e) => {
     e.preventDefault();
     
@@ -118,7 +112,6 @@ export default function Recipes() {
       toast.error('الاسم والوحدة مطلوبان');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
@@ -138,7 +131,6 @@ export default function Recipes() {
       toast.error('فشل في حفظ المادة');
     }
   };
-
   const handleDeleteMaterial = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذه المادة؟')) return;
     
@@ -153,7 +145,6 @@ export default function Recipes() {
       toast.error('فشل في الحذف');
     }
   };
-
   const handleSaveRecipe = async (e) => {
     e.preventDefault();
     
@@ -161,7 +152,6 @@ export default function Recipes() {
       toast.error('اختر المنتج وأضف المكونات');
       return;
     }
-
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${API}/recipes`, recipeForm, {
@@ -176,7 +166,6 @@ export default function Recipes() {
       toast.error('فشل في إنشاء الوصفة');
     }
   };
-
   const handleDeleteRecipe = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذه الوصفة؟')) return;
     
@@ -191,7 +180,6 @@ export default function Recipes() {
       toast.error('فشل في الحذف');
     }
   };
-
   const resetMaterialForm = () => {
     setMaterialForm({
       name: '', name_en: '', unit: 'kg', unit_cost: 0,
@@ -199,47 +187,39 @@ export default function Recipes() {
     });
     setEditingMaterial(null);
   };
-
   const resetRecipeForm = () => {
     setRecipeForm({
       product_id: '', ingredients: [], labor_cost: 0,
       overhead_cost: 0, portions: 1, preparation_time: 0, instructions: ''
     });
   };
-
   const editMaterial = (material) => {
     setEditingMaterial(material);
     setMaterialForm(material);
     setMaterialDialogOpen(true);
   };
-
   const addIngredient = () => {
     setRecipeForm({
       ...recipeForm,
       ingredients: [...recipeForm.ingredients, { material_id: '', quantity: 0 }]
     });
   };
-
   const updateIngredient = (index, field, value) => {
     const newIngredients = [...recipeForm.ingredients];
     newIngredients[index][field] = value;
     setRecipeForm({ ...recipeForm, ingredients: newIngredients });
   };
-
   const removeIngredient = (index) => {
     const newIngredients = recipeForm.ingredients.filter((_, i) => i !== index);
     setRecipeForm({ ...recipeForm, ingredients: newIngredients });
   };
-
   const filteredMaterials = materials.filter(m => {
     const matchesSearch = m.name?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || m.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
-
   const getCategoryInfo = (catId) => CATEGORIES.find(c => c.id === catId) || CATEGORIES[10];
   const getUnitSymbol = (unitId) => UNITS.find(u => u.id === unitId)?.symbol || unitId;
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -247,7 +227,6 @@ export default function Recipes() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background p-6" dir="rtl">
       {/* Header */}
@@ -265,7 +244,6 @@ export default function Recipes() {
           </div>
         </div>
       </div>
-
       {/* Alerts */}
       {alerts.length > 0 && (
         <Card className="mb-6 border-red-500/30 bg-red-500/5">
@@ -286,7 +264,6 @@ export default function Recipes() {
           </CardContent>
         </Card>
       )}
-
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="materials" className="gap-2">
@@ -296,7 +273,6 @@ export default function Recipes() {
             <ChefHat className="h-4 w-4" /> الوصفات
           </TabsTrigger>
         </TabsList>
-
         {/* Materials Tab */}
         <TabsContent value="materials">
           <div className="flex items-center gap-4 mb-4">
@@ -326,7 +302,6 @@ export default function Recipes() {
               <Plus className="h-4 w-4 ml-2" /> إضافة مادة
             </Button>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredMaterials.map((material) => {
               const cat = getCategoryInfo(material.category);
@@ -352,7 +327,6 @@ export default function Recipes() {
                         </Button>
                       </div>
                     </div>
-
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">المخزون الحالي:</span>
@@ -369,7 +343,6 @@ export default function Recipes() {
                         <span className="text-foreground">{material.min_stock} {getUnitSymbol(material.unit)}</span>
                       </div>
                     </div>
-
                     {isLowStock && (
                       <div className="mt-3 p-2 bg-red-500/10 rounded-lg flex items-center gap-2">
                         <AlertCircle className="h-4 w-4 text-red-500" />
@@ -382,7 +355,6 @@ export default function Recipes() {
             })}
           </div>
         </TabsContent>
-
         {/* Recipes Tab */}
         <TabsContent value="recipes">
           <div className="flex justify-end mb-4">
@@ -390,7 +362,6 @@ export default function Recipes() {
               <Plus className="h-4 w-4 ml-2" /> إنشاء وصفة
             </Button>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {recipes.map((recipe) => (
               <Card key={recipe.id} className="border-border/50">
@@ -404,7 +375,6 @@ export default function Recipes() {
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
                   </div>
-
                   <div className="grid grid-cols-3 gap-3 mb-3">
                     <div className="bg-muted/30 rounded-lg p-2 text-center">
                       <DollarSign className="h-4 w-4 text-muted-foreground mx-auto mb-1" />
@@ -422,14 +392,12 @@ export default function Recipes() {
                       <p className="font-bold text-green-500">{recipe.profit_margin?.toFixed(0)}%</p>
                     </div>
                   </div>
-
                   {recipe.preparation_time > 0 && (
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-4 w-4" />
                       <span>وقت التحضير: {recipe.preparation_time} دقيقة</span>
                     </div>
                   )}
-
                   <div className="mt-3 pt-3 border-t border-border/50">
                     <p className="text-xs text-muted-foreground mb-2">المكونات:</p>
                     <div className="flex flex-wrap gap-1">
@@ -449,7 +417,6 @@ export default function Recipes() {
               </Card>
             ))}
           </div>
-
           {recipes.length === 0 && (
             <Card className="border-border/50">
               <CardContent className="py-12 text-center">
@@ -461,7 +428,6 @@ export default function Recipes() {
           )}
         </TabsContent>
       </Tabs>
-
       {/* Material Dialog */}
       <Dialog open={materialDialogOpen} onOpenChange={setMaterialDialogOpen}>
         <DialogContent className="max-w-md">
@@ -470,7 +436,6 @@ export default function Recipes() {
               {editingMaterial ? 'تعديل مادة خام' : 'إضافة مادة خام'}
             </DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleSaveMaterial} className="space-y-4">
             <div>
               <Label>اسم المادة *</Label>
@@ -480,7 +445,6 @@ export default function Recipes() {
                 required
               />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>الوحدة *</Label>
@@ -511,7 +475,6 @@ export default function Recipes() {
                 </Select>
               </div>
             </div>
-
             <div>
               <Label>سعر الوحدة (د.ع)</Label>
               <Input
@@ -520,7 +483,6 @@ export default function Recipes() {
                 onChange={(e) => setMaterialForm({ ...materialForm, unit_cost: parseFloat(e.target.value) || 0 })}
               />
             </div>
-
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label>المخزون الحالي</Label>
@@ -547,7 +509,6 @@ export default function Recipes() {
                 />
               </div>
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setMaterialDialogOpen(false)} className="flex-1">
                 إلغاء
@@ -559,14 +520,12 @@ export default function Recipes() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Recipe Dialog */}
       <Dialog open={recipeDialogOpen} onOpenChange={setRecipeDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-foreground">إنشاء وصفة جديدة</DialogTitle>
           </DialogHeader>
-
           <form onSubmit={handleSaveRecipe} className="space-y-4">
             <div>
               <Label>المنتج *</Label>
@@ -582,7 +541,6 @@ export default function Recipes() {
                 </SelectContent>
               </Select>
             </div>
-
             <div>
               <div className="flex items-center justify-between mb-2">
                 <Label>المكونات *</Label>
@@ -621,7 +579,6 @@ export default function Recipes() {
                 )}
               </ScrollArea>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>تكلفة العمالة</Label>
@@ -640,7 +597,6 @@ export default function Recipes() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>عدد الحصص</Label>
@@ -659,7 +615,6 @@ export default function Recipes() {
                 />
               </div>
             </div>
-
             <div>
               <Label>تعليمات التحضير</Label>
               <Textarea
@@ -668,7 +623,6 @@ export default function Recipes() {
                 rows={3}
               />
             </div>
-
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setRecipeDialogOpen(false)} className="flex-1">
                 إلغاء
@@ -682,4 +636,3 @@ export default function Recipes() {
       </Dialog>
     </div>
   );
-}

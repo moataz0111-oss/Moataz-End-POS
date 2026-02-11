@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -47,9 +48,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '../components/ui/tabs';
-
 const API = API_URL;
-
 export default function InventoryReports() {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
@@ -79,14 +78,11 @@ export default function InventoryReports() {
     topProducts: [],
     branchComparison: []
   });
-
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
-
   useEffect(() => {
     fetchData();
   }, [dateRange, selectedBranch]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -130,7 +126,6 @@ export default function InventoryReports() {
       setLoading(false);
     }
   };
-
   const calculateMetrics = (raw, products, orders, purchases, branches) => {
     // إجمالي قيمة المواد الخام
     const totalRawMaterialValue = raw.reduce(
@@ -194,7 +189,6 @@ export default function InventoryReports() {
       branchComparison
     });
   };
-
   // تصدير التقرير
   const exportReport = () => {
     const reportData = {
@@ -231,7 +225,6 @@ export default function InventoryReports() {
     URL.revokeObjectURL(url);
     toast.success('تم تصدير التقرير');
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -239,7 +232,6 @@ export default function InventoryReports() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background" dir="rtl" data-testid="inventory-reports-page">
       {/* Header */}
@@ -281,7 +273,6 @@ export default function InventoryReports() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto p-4 space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -337,7 +328,6 @@ export default function InventoryReports() {
             </CardContent>
           </Card>
         </div>
-
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-2xl">
@@ -358,7 +348,6 @@ export default function InventoryReports() {
               الفروع
             </TabsTrigger>
           </TabsList>
-
           {/* نظرة عامة */}
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -398,7 +387,6 @@ export default function InventoryReports() {
                   )}
                 </CardContent>
               </Card>
-
               {/* أكثر المنتجات ربحية */}
               <Card>
                 <CardHeader className="pb-3">
@@ -449,7 +437,6 @@ export default function InventoryReports() {
                 </CardContent>
               </Card>
             </div>
-
             {/* ملخص الحركات */}
             <Card>
               <CardHeader className="pb-3">
@@ -494,7 +481,6 @@ export default function InventoryReports() {
               </CardContent>
             </Card>
           </TabsContent>
-
           {/* تقرير المواد الخام */}
           <TabsContent value="materials" className="space-y-4">
             <Card>
@@ -556,7 +542,6 @@ export default function InventoryReports() {
               </CardContent>
             </Card>
           </TabsContent>
-
           {/* تقرير المنتجات المصنعة */}
           <TabsContent value="products" className="space-y-4">
             <Card>
@@ -629,7 +614,6 @@ export default function InventoryReports() {
               </CardContent>
             </Card>
           </TabsContent>
-
           {/* مقارنة الفروع */}
           <TabsContent value="branches" className="space-y-4">
             <Card>
@@ -684,7 +668,6 @@ export default function InventoryReports() {
                 )}
               </CardContent>
             </Card>
-
             {/* إحصائيات طلبات الفروع */}
             <Card>
               <CardHeader className="pb-3">
@@ -723,4 +706,3 @@ export default function InventoryReports() {
       </main>
     </div>
   );
-}

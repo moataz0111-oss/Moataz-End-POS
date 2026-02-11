@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -56,9 +57,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '../components/ui/tabs';
-
 const API = API_URL;
-
 export default function WarehouseManufacturing() {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
@@ -125,14 +124,11 @@ export default function WarehouseManufacturing() {
   const [produceQuantity, setProduceQuantity] = useState(1);
   
   const [searchQuery, setSearchQuery] = useState('');
-
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
-
   useEffect(() => {
     fetchData();
   }, [activeTab]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -167,7 +163,6 @@ export default function WarehouseManufacturing() {
       setLoading(false);
     }
   };
-
   // إضافة مادة خام
   const handleAddRawMaterial = async (e) => {
     e.preventDefault();
@@ -197,7 +192,6 @@ export default function WarehouseManufacturing() {
       setSubmitting(false);
     }
   };
-
   // إضافة صنف للتحويل
   const addItemToTransfer = (material) => {
     const existing = transferForm.items.find(i => i.raw_material_id === material.id);
@@ -217,7 +211,6 @@ export default function WarehouseManufacturing() {
       }]
     }));
   };
-
   // تحديث كمية التحويل
   const updateTransferItemQty = (index, qty) => {
     setTransferForm(prev => {
@@ -226,7 +219,6 @@ export default function WarehouseManufacturing() {
       return { ...prev, items };
     });
   };
-
   // حذف صنف من التحويل
   const removeTransferItem = (index) => {
     setTransferForm(prev => ({
@@ -234,7 +226,6 @@ export default function WarehouseManufacturing() {
       items: prev.items.filter((_, i) => i !== index)
     }));
   };
-
   // تحويل للتصنيع
   const handleTransferToManufacturing = async () => {
     if (transferForm.items.length === 0) {
@@ -275,7 +266,6 @@ export default function WarehouseManufacturing() {
       setSubmitting(false);
     }
   };
-
   // إضافة صنف لتحويل الفرع
   const addItemToBranchTransfer = (product) => {
     const existing = branchTransferForm.items.find(i => i.product_id === product.id);
@@ -294,7 +284,6 @@ export default function WarehouseManufacturing() {
       }]
     }));
   };
-
   // تحديث كمية تحويل الفرع
   const updateBranchTransferQty = (index, qty) => {
     setBranchTransferForm(prev => {
@@ -303,7 +292,6 @@ export default function WarehouseManufacturing() {
       return { ...prev, items: newItems };
     });
   };
-
   // حذف صنف من تحويل الفرع
   const removeBranchTransferItem = (index) => {
     setBranchTransferForm(prev => ({
@@ -311,7 +299,6 @@ export default function WarehouseManufacturing() {
       items: prev.items.filter((_, i) => i !== index)
     }));
   };
-
   // تحويل للفرع
   const handleTransferToBranch = async () => {
     if (!branchTransferForm.to_branch_id) {
@@ -357,7 +344,6 @@ export default function WarehouseManufacturing() {
       setSubmitting(false);
     }
   };
-
   // إضافة مكون للوصفة
   const addIngredientToRecipe = () => {
     if (!newIngredient.raw_material_id || newIngredient.quantity <= 0) {
@@ -391,7 +377,6 @@ export default function WarehouseManufacturing() {
     
     setNewIngredient({ raw_material_id: '', quantity: 0 });
   };
-
   // حذف مكون من الوصفة
   const removeIngredientFromRecipe = (index) => {
     setProductForm(prev => ({
@@ -399,12 +384,10 @@ export default function WarehouseManufacturing() {
       recipe: prev.recipe.filter((_, i) => i !== index)
     }));
   };
-
   // حساب تكلفة الوصفة
   const calculateRecipeCost = () => {
     return productForm.recipe.reduce((sum, ing) => sum + (ing.quantity * (ing.cost_per_unit || 0)), 0);
   };
-
   // إضافة منتج مصنع
   const handleAddProduct = async (e) => {
     e.preventDefault();
@@ -435,7 +418,6 @@ export default function WarehouseManufacturing() {
       setSubmitting(false);
     }
   };
-
   // تصنيع منتج
   const handleProduce = async () => {
     if (!showProduceDialog || produceQuantity <= 0) return;
@@ -458,15 +440,12 @@ export default function WarehouseManufacturing() {
       setSubmitting(false);
     }
   };
-
   // تصفية البيانات
   const filteredRawMaterials = rawMaterials.filter(m => 
     !searchQuery || m.name.includes(searchQuery) || m.name_en?.includes(searchQuery)
   );
-
   const lowStockMaterials = rawMaterials.filter(m => m.quantity <= m.min_quantity);
   const lowStockProducts = manufacturedProducts.filter(p => p.quantity <= p.min_quantity);
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -474,7 +453,6 @@ export default function WarehouseManufacturing() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background" dir="rtl" data-testid="warehouse-page">
       {/* Header */}
@@ -547,7 +525,6 @@ export default function WarehouseManufacturing() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto p-4 space-y-4">
         {/* Stats */}
         {stats && (
@@ -607,7 +584,6 @@ export default function WarehouseManufacturing() {
             </Card>
           </div>
         )}
-
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid grid-cols-4 w-full max-w-2xl">
@@ -628,7 +604,6 @@ export default function WarehouseManufacturing() {
               التحويلات
             </TabsTrigger>
           </TabsList>
-
           {/* المخزن (المواد الخام) */}
           <TabsContent value="warehouse" className="space-y-4">
             {/* Low Stock Alert */}
@@ -649,7 +624,6 @@ export default function WarehouseManufacturing() {
                 </CardContent>
               </Card>
             )}
-
             {/* Search */}
             <div className="relative w-64">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -660,7 +634,6 @@ export default function WarehouseManufacturing() {
                 className="pr-10"
               />
             </div>
-
             {/* Materials Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredRawMaterials.map(material => (
@@ -722,7 +695,6 @@ export default function WarehouseManufacturing() {
               )}
             </div>
           </TabsContent>
-
           {/* التصنيع */}
           <TabsContent value="manufacturing" className="space-y-4">
             {/* Manufacturing Inventory */}
@@ -753,7 +725,6 @@ export default function WarehouseManufacturing() {
                 )}
               </CardContent>
             </Card>
-
             {/* Manufactured Products */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
@@ -841,7 +812,6 @@ export default function WarehouseManufacturing() {
               </CardContent>
             </Card>
           </TabsContent>
-
           {/* الحركات */}
           <TabsContent value="transactions" className="space-y-4">
             <Card>
@@ -911,7 +881,6 @@ export default function WarehouseManufacturing() {
               </CardContent>
             </Card>
           </TabsContent>
-
           {/* التحويلات */}
           <TabsContent value="transfers" className="space-y-4">
             <Card>
@@ -974,7 +943,6 @@ export default function WarehouseManufacturing() {
           </TabsContent>
         </Tabs>
       </main>
-
       {/* Dialog: إضافة مادة خام */}
       <Dialog open={showAddRawMaterial} onOpenChange={setShowAddRawMaterial}>
         <DialogContent>
@@ -1060,7 +1028,6 @@ export default function WarehouseManufacturing() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: تحويل للتصنيع */}
       <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
         <DialogContent className="max-w-lg">
@@ -1141,7 +1108,6 @@ export default function WarehouseManufacturing() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: إضافة منتج مصنع */}
       <Dialog open={showAddProductDialog} onOpenChange={setShowAddProductDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -1296,7 +1262,6 @@ export default function WarehouseManufacturing() {
           </form>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: تصنيع منتج */}
       <Dialog open={!!showProduceDialog} onOpenChange={() => setShowProduceDialog(null)}>
         <DialogContent>
@@ -1363,7 +1328,6 @@ export default function WarehouseManufacturing() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       {/* Dialog: تحويل للفرع */}
       <Dialog open={showBranchTransferDialog} onOpenChange={setShowBranchTransferDialog}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -1394,7 +1358,6 @@ export default function WarehouseManufacturing() {
                 </SelectContent>
               </Select>
             </div>
-
             {/* المنتجات المصنعة المتاحة */}
             <div>
               <Label className="mb-2 block">المنتجات المصنعة المتاحة</Label>
@@ -1422,7 +1385,6 @@ export default function WarehouseManufacturing() {
                 )}
               </div>
             </div>
-
             {/* المنتجات المختارة */}
             {branchTransferForm.items.length > 0 && (
               <div>
@@ -1454,7 +1416,6 @@ export default function WarehouseManufacturing() {
                 </div>
               </div>
             )}
-
             {/* ملاحظات */}
             <div>
               <Label>ملاحظات</Label>
@@ -1466,7 +1427,6 @@ export default function WarehouseManufacturing() {
               />
             </div>
           </div>
-
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowBranchTransferDialog(false)}>
               إلغاء
@@ -1484,4 +1444,3 @@ export default function WarehouseManufacturing() {
       </Dialog>
     </div>
   );
-}

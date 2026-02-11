@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '../components/ui/card';
@@ -6,15 +7,12 @@ import { Input } from '../components/ui/input';
 import { Store, Search, MapPin, Phone, Star, Loader2, ChefHat } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
-
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
-
 export default function RestaurantSelector() {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-
   // تحديث manifest للعملاء وتسجيل Service Worker
   useEffect(() => {
     const manifestLink = document.querySelector('link[rel="manifest"]');
@@ -28,11 +26,9 @@ export default function RestaurantSelector() {
     
     document.title = 'اطلب طعامك - اختر مطعمك المفضل';
   }, []);
-
   useEffect(() => {
     fetchRestaurants();
   }, []);
-
   const fetchRestaurants = async () => {
     try {
       const res = await axios.get(`${API}/customer/restaurants`);
@@ -44,16 +40,13 @@ export default function RestaurantSelector() {
       setLoading(false);
     }
   };
-
   const filteredRestaurants = restaurants.filter(r =>
     r.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     r.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
   const handleSelectRestaurant = (slug) => {
     navigate(`/menu/${slug}`);
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white flex items-center justify-center">
@@ -64,7 +57,6 @@ export default function RestaurantSelector() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-white" dir="rtl">
       {/* Header */}
@@ -77,7 +69,6 @@ export default function RestaurantSelector() {
           <p className="text-orange-100">اختر مطعمك المفضل وابدأ الطلب</p>
         </div>
       </div>
-
       {/* Search */}
       <div className="max-w-2xl mx-auto px-4 -mt-6">
         <div className="relative">
@@ -91,7 +82,6 @@ export default function RestaurantSelector() {
           />
         </div>
       </div>
-
       {/* Restaurants List */}
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
         {filteredRestaurants.length === 0 ? (
@@ -152,7 +142,6 @@ export default function RestaurantSelector() {
           ))
         )}
       </div>
-
       {/* PWA Install Banner */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
@@ -169,4 +158,3 @@ export default function RestaurantSelector() {
       </div>
     </div>
   );
-}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -32,9 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-
 const API = API_URL;
-
 export default function CallLogs() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -50,7 +49,6 @@ export default function CallLogs() {
     missed: 0,
     avgDuration: 0
   });
-
   const fetchLogs = async () => {
     try {
       setLoading(true);
@@ -74,11 +72,9 @@ export default function CallLogs() {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchLogs();
   }, []);
-
   // فلترة السجلات
   const filteredLogs = logs.filter(log => {
     const matchesSearch = !searchQuery || 
@@ -92,7 +88,6 @@ export default function CallLogs() {
     
     return matchesSearch && matchesStatus && matchesDate;
   });
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'ended':
@@ -105,7 +100,6 @@ export default function CallLogs() {
         return <Phone className="h-4 w-4 text-gray-500" />;
     }
   };
-
   const getStatusText = (status) => {
     switch (status) {
       case 'ended':
@@ -120,7 +114,6 @@ export default function CallLogs() {
         return status;
     }
   };
-
   const formatDuration = (start, end) => {
     if (!start || !end) return '-';
     const duration = new Date(end) - new Date(start);
@@ -128,7 +121,6 @@ export default function CallLogs() {
     const seconds = Math.floor((duration % 60000) / 1000);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-
   const formatTime = (timestamp) => {
     if (!timestamp) return '-';
     const date = new Date(timestamp);
@@ -140,7 +132,6 @@ export default function CallLogs() {
       minute: '2-digit'
     });
   };
-
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
       {/* Header */}
@@ -166,7 +157,6 @@ export default function CallLogs() {
           </Button>
         </div>
       </div>
-
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card className="bg-card border-border/50">
@@ -225,7 +215,6 @@ export default function CallLogs() {
           </CardContent>
         </Card>
       </div>
-
       {/* Filters */}
       <Card className="mb-6 bg-card border-border/50">
         <CardContent className="p-4">
@@ -263,7 +252,6 @@ export default function CallLogs() {
           </div>
         </CardContent>
       </Card>
-
       {/* Call Logs Table */}
       <Card className="bg-card border-border/50">
         <CardHeader>
@@ -364,4 +352,3 @@ export default function CallLogs() {
       </Card>
     </div>
   );
-}

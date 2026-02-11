@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -33,9 +34,7 @@ import {
   Home
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
-
 const API = API_URL;
-
 export default function WarehouseTransfers() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('transfers');
@@ -45,11 +44,9 @@ export default function WarehouseTransfers() {
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBranch, setSelectedBranch] = useState('all');
-
   // Dialogs
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
-
   // Forms
   const [transferForm, setTransferForm] = useState({
     from_branch_id: '',
@@ -64,13 +61,10 @@ export default function WarehouseTransfers() {
     priority: 'normal',
     notes: ''
   });
-
   const [selectedItems, setSelectedItems] = useState([]);
-
   useEffect(() => {
     fetchData();
   }, [selectedBranch]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -95,7 +89,6 @@ export default function WarehouseTransfers() {
       setLoading(false);
     }
   };
-
   // Transfer handlers
   const handleCreateTransfer = async (e) => {
     e.preventDefault();
@@ -123,7 +116,6 @@ export default function WarehouseTransfers() {
       toast.error(error.response?.data?.detail || 'فشل في إنشاء التحويل');
     }
   };
-
   const handleTransferAction = async (transferId, action) => {
     try {
       const token = localStorage.getItem('token');
@@ -138,7 +130,6 @@ export default function WarehouseTransfers() {
       toast.error(error.response?.data?.detail || 'فشل في تنفيذ العملية');
     }
   };
-
   // Purchase Request handlers
   const handleCreateRequest = async (e) => {
     e.preventDefault();
@@ -156,7 +147,6 @@ export default function WarehouseTransfers() {
       toast.error(error.response?.data?.detail || 'فشل في إنشاء الطلب');
     }
   };
-
   const handleRequestAction = async (requestId, action) => {
     try {
       const token = localStorage.getItem('token');
@@ -171,27 +161,23 @@ export default function WarehouseTransfers() {
       toast.error(error.response?.data?.detail || 'فشل في تنفيذ العملية');
     }
   };
-
   const addRequestItem = () => {
     setRequestForm({
       ...requestForm,
       items: [...requestForm.items, { name: '', quantity: '', unit: '', notes: '' }]
     });
   };
-
   const updateRequestItem = (index, field, value) => {
     const newItems = [...requestForm.items];
     newItems[index][field] = value;
     setRequestForm({ ...requestForm, items: newItems });
   };
-
   const removeRequestItem = (index) => {
     setRequestForm({
       ...requestForm,
       items: requestForm.items.filter((_, i) => i !== index)
     });
   };
-
   const toggleItemSelection = (item) => {
     const existingIndex = selectedItems.findIndex(i => i.id === item.id);
     if (existingIndex >= 0) {
@@ -200,13 +186,11 @@ export default function WarehouseTransfers() {
       setSelectedItems([...selectedItems, { ...item, transferQuantity: 1 }]);
     }
   };
-
   const updateItemQuantity = (itemId, quantity) => {
     setSelectedItems(selectedItems.map(item => 
       item.id === itemId ? { ...item, transferQuantity: parseFloat(quantity) || 0 } : item
     ));
   };
-
   const getStatusBadge = (status) => {
     const statusConfig = {
       pending: { label: 'قيد الانتظار', color: 'bg-yellow-500', icon: Clock },
@@ -224,7 +208,6 @@ export default function WarehouseTransfers() {
       </Badge>
     );
   };
-
   const getPriorityBadge = (priority) => {
     const priorityConfig = {
       urgent: { label: 'عاجل', color: 'bg-red-500' },
@@ -235,11 +218,9 @@ export default function WarehouseTransfers() {
     const config = priorityConfig[priority] || { label: priority, color: 'bg-gray-500' };
     return <Badge className={`${config.color} text-white`}>{config.label}</Badge>;
   };
-
   const filteredInventory = inventory.filter(item => 
     transferForm.from_branch_id ? item.branch_id === transferForm.from_branch_id : true
   );
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -250,7 +231,6 @@ export default function WarehouseTransfers() {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       <Toaster position="top-center" richColors />
@@ -309,7 +289,6 @@ export default function WarehouseTransfers() {
           </div>
         </div>
       </div>
-
       <div className="container mx-auto px-4 py-6">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -350,7 +329,6 @@ export default function WarehouseTransfers() {
             </CardContent>
           </Card>
         </div>
-
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6">
@@ -361,7 +339,6 @@ export default function WarehouseTransfers() {
               <ClipboardList className="h-4 w-4" /> طلبات الشراء
             </TabsTrigger>
           </TabsList>
-
           {/* Transfers Tab */}
           <TabsContent value="transfers">
             <Card>
@@ -416,7 +393,6 @@ export default function WarehouseTransfers() {
                           </Select>
                         </div>
                       </div>
-
                       {/* Items Selection */}
                       <div>
                         <Label className="mb-2 block">الأصناف المتاحة</Label>
@@ -469,7 +445,6 @@ export default function WarehouseTransfers() {
                           )}
                         </div>
                       </div>
-
                       {/* Selected Items Summary */}
                       {selectedItems.length > 0 && (
                         <div className="bg-muted p-3 rounded-lg">
@@ -483,7 +458,6 @@ export default function WarehouseTransfers() {
                           </div>
                         </div>
                       )}
-
                       <div>
                         <Label>ملاحظات</Label>
                         <Textarea 
@@ -491,7 +465,6 @@ export default function WarehouseTransfers() {
                           onChange={(e) => setTransferForm({...transferForm, notes: e.target.value})}
                         />
                       </div>
-
                       <div className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={() => setTransferDialogOpen(false)}>إلغاء</Button>
                         <Button type="submit" disabled={selectedItems.length === 0}>إنشاء التحويل</Button>
@@ -550,7 +523,6 @@ export default function WarehouseTransfers() {
               </CardContent>
             </Card>
           </TabsContent>
-
           {/* Purchase Requests Tab */}
           <TabsContent value="requests">
             <Card>
@@ -594,7 +566,6 @@ export default function WarehouseTransfers() {
                           </Select>
                         </div>
                       </div>
-
                       {/* Items */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
@@ -641,7 +612,6 @@ export default function WarehouseTransfers() {
                           ))}
                         </div>
                       </div>
-
                       <div>
                         <Label>ملاحظات عامة</Label>
                         <Textarea 
@@ -649,7 +619,6 @@ export default function WarehouseTransfers() {
                           onChange={(e) => setRequestForm({...requestForm, notes: e.target.value})}
                         />
                       </div>
-
                       <div className="flex justify-end gap-2">
                         <Button type="button" variant="outline" onClick={() => setRequestDialogOpen(false)}>إلغاء</Button>
                         <Button type="submit">إنشاء الطلب</Button>
@@ -724,4 +693,3 @@ export default function WarehouseTransfers() {
       </div>
     </div>
   );
-}

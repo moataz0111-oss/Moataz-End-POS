@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BACKEND_URL } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
@@ -33,9 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-
 const API = BACKEND_URL + '/api';
-
 export default function SmartReports() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -47,11 +46,9 @@ export default function SmartReports() {
     orderTypes: [],
     comparisons: {}
   });
-
   useEffect(() => {
     fetchReportData();
   }, [period]);
-
   // Export functions
   const exportToExcel = async (reportType) => {
     try {
@@ -80,7 +77,6 @@ export default function SmartReports() {
       toast.error('فشل في تصدير الملف');
     }
   };
-
   const exportToPDF = async (reportType) => {
     try {
       toast.loading('جاري تحضير ملف PDF...');
@@ -108,7 +104,6 @@ export default function SmartReports() {
       toast.error('فشل في تصدير الملف');
     }
   };
-
   const fetchReportData = async () => {
     setLoading(true);
     try {
@@ -221,14 +216,12 @@ export default function SmartReports() {
       setLoading(false);
     }
   };
-
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('ar-SY', {
       style: 'decimal',
       maximumFractionDigits: 0
     }).format(value) + ' ل.س';
   };
-
   const GrowthIndicator = ({ value }) => {
     const isPositive = value >= 0;
     return (
@@ -238,9 +231,7 @@ export default function SmartReports() {
       </span>
     );
   };
-
   const maxSales = Math.max(...(data.salesByHour?.map(h => h.sales) || [1]));
-
   return (
     <div className="min-h-screen bg-background" dir="rtl">
       {/* Header */}
@@ -260,7 +251,6 @@ export default function SmartReports() {
               <h1 className="text-xl font-bold font-cairo">التقارير الذكية</h1>
             </div>
           </div>
-
           <div className="flex items-center gap-2">
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-36">
@@ -307,7 +297,6 @@ export default function SmartReports() {
           </div>
         </div>
       </header>
-
       <main className="max-w-7xl mx-auto p-4 space-y-6">
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -325,7 +314,6 @@ export default function SmartReports() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -340,7 +328,6 @@ export default function SmartReports() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -354,7 +341,6 @@ export default function SmartReports() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/30">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -369,7 +355,6 @@ export default function SmartReports() {
             </CardContent>
           </Card>
         </div>
-
         {/* Insights */}
         {data.insights && data.insights.length > 0 && (
           <Card className="bg-card border-border/50">
@@ -400,7 +385,6 @@ export default function SmartReports() {
             </CardContent>
           </Card>
         )}
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Sales by Hour Chart */}
           <Card className="bg-card border-border/50">
@@ -430,7 +414,6 @@ export default function SmartReports() {
               </div>
             </CardContent>
           </Card>
-
           {/* Top Products */}
           <Card className="bg-card border-border/50">
             <CardHeader>
@@ -464,7 +447,6 @@ export default function SmartReports() {
               </div>
             </CardContent>
           </Card>
-
           {/* Order Types Distribution */}
           <Card className="bg-card border-border/50">
             <CardHeader>
@@ -523,7 +505,6 @@ export default function SmartReports() {
               </div>
             </CardContent>
           </Card>
-
           {/* Comparisons */}
           <Card className="bg-card border-border/50">
             <CardHeader>
@@ -551,7 +532,6 @@ export default function SmartReports() {
                     <GrowthIndicator value={data.comparisons?.vs_yesterday?.orders || 0} />
                   </div>
                 </div>
-
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-2">مقارنة بالأسبوع الماضي</p>
                   <div className="flex items-center justify-between">
@@ -573,7 +553,6 @@ export default function SmartReports() {
             </CardContent>
           </Card>
         </div>
-
         {/* Export Button */}
         <div className="flex justify-center">
           <Button variant="outline" className="gap-2">
@@ -584,4 +563,3 @@ export default function SmartReports() {
       </main>
     </div>
   );
-}

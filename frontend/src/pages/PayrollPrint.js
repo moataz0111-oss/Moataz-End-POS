@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { API_URL, BACKEND_URL } from '../utils/api';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -6,20 +7,16 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Printer, ArrowRight, Download } from 'lucide-react';
-
 const API = API_URL;
-
 export default function PayrollPrint() {
   const { payrollId } = useParams();
   const navigate = useNavigate();
   const printRef = useRef();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     fetchPayrollData();
   }, [payrollId]);
-
   const fetchPayrollData = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -33,11 +30,9 @@ export default function PayrollPrint() {
       setLoading(false);
     }
   };
-
   const handlePrint = () => {
     window.print();
   };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -45,7 +40,6 @@ export default function PayrollPrint() {
       </div>
     );
   }
-
   if (!data) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -53,9 +47,7 @@ export default function PayrollPrint() {
       </div>
     );
   }
-
   const { payroll, employee, branch, deductions, bonuses, advances } = data;
-
   return (
     <div className="min-h-screen bg-gray-100 p-4" dir="rtl">
       {/* Controls - Hidden when printing */}
@@ -69,7 +61,6 @@ export default function PayrollPrint() {
           طباعة
         </Button>
       </div>
-
       {/* Printable Content */}
       <div ref={printRef} className="max-w-3xl mx-auto bg-white shadow-lg print:shadow-none">
         <div className="p-8">
@@ -81,7 +72,6 @@ export default function PayrollPrint() {
               {branch?.name || 'الفرع الرئيسي'}
             </p>
           </div>
-
           {/* Employee Info */}
           <div className="grid grid-cols-2 gap-4 mb-6 bg-gray-50 p-4 rounded-lg print:bg-white print:border print:border-gray-300">
             <div>
@@ -111,7 +101,6 @@ export default function PayrollPrint() {
               </Badge>
             </div>
           </div>
-
           {/* Salary Details */}
           <div className="mb-6">
             <h2 className="font-bold text-lg border-b border-gray-300 pb-2 mb-4">تفاصيل الراتب</h2>
@@ -125,7 +114,6 @@ export default function PayrollPrint() {
               </tbody>
             </table>
           </div>
-
           {/* Bonuses */}
           {bonuses && bonuses.length > 0 && (
             <div className="mb-6">
@@ -160,7 +148,6 @@ export default function PayrollPrint() {
               </table>
             </div>
           )}
-
           {/* Deductions */}
           {deductions && deductions.length > 0 && (
             <div className="mb-6">
@@ -196,7 +183,6 @@ export default function PayrollPrint() {
               </table>
             </div>
           )}
-
           {/* Advance Deductions */}
           {payroll.advance_deduction > 0 && (
             <div className="mb-6">
@@ -227,7 +213,6 @@ export default function PayrollPrint() {
               </table>
             </div>
           )}
-
           {/* Summary */}
           <div className="border-t-2 border-gray-800 pt-4 mt-6">
             <table className="w-full">
@@ -255,7 +240,6 @@ export default function PayrollPrint() {
               </tbody>
             </table>
           </div>
-
           {/* Footer */}
           <div className="mt-8 pt-4 border-t border-gray-300">
             <div className="grid grid-cols-2 gap-8">
@@ -274,7 +258,6 @@ export default function PayrollPrint() {
           </div>
         </div>
       </div>
-
       {/* Print Styles */}
       <style>{`
         @media print {
@@ -293,4 +276,3 @@ export default function PayrollPrint() {
       `}</style>
     </div>
   );
-}
