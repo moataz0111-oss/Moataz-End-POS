@@ -531,7 +531,7 @@ export default function Tables() {
               </Select>
               
               {availableTablesForTransfer.length === 0 && (
-                <p className="text-sm text-amber-500 mt-2">لا توجد طاولات متاحة للتحويل</p>
+                <p className="text-sm text-amber-500 mt-2">{t('لا توجد طاولات متاحة للتحويل')}</p>
               )}
             </div>
           </div>
