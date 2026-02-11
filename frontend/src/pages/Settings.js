@@ -5062,6 +5062,9 @@ export default function Settings() {
                           </option>
                         ))}
                       </select>
+                      <p className="text-xs text-amber-500 mt-2">
+                        ⚠️ ملاحظة: تغيير اللغة يؤثر على اتجاه الصفحة (RTL/LTR). الترجمة الكاملة للواجهة قيد التطوير.
+                      </p>
                     </div>
 
                     {/* زر الحفظ */}
