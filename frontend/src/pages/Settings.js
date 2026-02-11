@@ -620,23 +620,25 @@ export default function Settings() {
       
       // تحديث العملة باستخدام setCurrency من currency.js
       setCurrency(regionalSettings.currency);
-      localStorage.setItem('app_language', regionalSettings.language);
       localStorage.setItem('app_country', regionalSettings.country);
       
       // إرسال حدث تغيير العملة
       window.dispatchEvent(new CustomEvent('currencyChanged', { detail: regionalSettings.currency }));
       
-      // تحديث اتجاه الصفحة بناءً على اللغة
-      const isRTL = ['ar', 'ku', 'fa', 'he'].includes(regionalSettings.language);
-      document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-      document.documentElement.lang = regionalSettings.language;
-      
-      toast.success('تم حفظ إعدادات النظام بنجاح - جاري إعادة التحميل...');
-      
-      // إعادة تحميل الصفحة لتطبيق التغييرات الكاملة
-      setTimeout(() => window.location.reload(), 1500);
+      // تغيير اللغة باستخدام changeLanguage من useTranslation
+      // هذا سيحدث localStorage ويعيد تحميل الصفحة تلقائياً
+      if (regionalSettings.language !== lang) {
+        toast.success(t('saved_successfully') + ' - ' + t('loading'));
+        setTimeout(() => {
+          changeLanguage(regionalSettings.language);
+        }, 1000);
+      } else {
+        toast.success(t('saved_successfully'));
+        // إعادة تحميل الصفحة لتطبيق تغييرات العملة
+        setTimeout(() => window.location.reload(), 1500);
+      }
     } catch (error) {
-      toast.error('فشل في حفظ إعدادات النظام');
+      toast.error(t('error'));
     } finally {
       setSavingRegionalSettings(false);
     }
