@@ -901,7 +901,7 @@ export default function POS() {
               data-testid="pending-orders-btn"
             >
               <List className="h-4 w-4 ml-2" />
-              الطلبات المعلقة
+              {t('الطلبات المعلقة')}
               {pendingOrders.length > 0 && (
                 <span className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
                   {pendingOrders.length}
@@ -918,7 +918,7 @@ export default function POS() {
                 data-testid="refund-btn"
               >
                 <RefreshCw className="h-4 w-4 ml-2" />
-                إرجاع طلب
+                {t('إرجاع طلب')}
               </Button>
             )}
           </div>
@@ -929,7 +929,7 @@ export default function POS() {
               <div className="flex items-center gap-2 bg-amber-500/10 px-3 py-1.5 rounded-lg">
                 <Edit className="h-4 w-4 text-amber-500" />
                 <span className="text-sm text-amber-500 font-medium">
-                  تعديل طلب #{editingOrder.order_number}
+                  {t('تعديل طلب')} #{editingOrder.order_number}
                 </span>
                 <Button 
                   variant="ghost" 
@@ -945,7 +945,7 @@ export default function POS() {
             {/* البحث عن عميل */}
             <div className="flex items-center gap-2">
               <Input
-                placeholder="رقم هاتف العميل..."
+                placeholder={t('رقم هاتف العميل...')}
                 value={customerSearchPhone}
                 onChange={(e) => setCustomerSearchPhone(e.target.value)}
                 className="w-40 h-9"
@@ -965,12 +965,12 @@ export default function POS() {
             {currentShift ? (
               <div className="text-sm text-muted-foreground">
                 <span className="text-green-500">● </span>
-                وردية مفتوحة
+                {t('وردية مفتوحة')}
               </div>
             ) : (
               <div className="text-sm text-red-500">
                 <span>● </span>
-                لا يوجد وردية
+                {t('لا يوجد وردية')}
               </div>
             )}
           </div>
@@ -981,7 +981,7 @@ export default function POS() {
           <div className="relative max-w-md">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="بحث عن منتج..."
+              placeholder={t('بحث عن منتج...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-10 bg-background"
@@ -1477,7 +1477,7 @@ export default function POS() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-foreground">
               <List className="h-5 w-5 text-primary" />
-              الطلبات المعلقة ({pendingOrders.length})
+              {t('الطلبات المعلقة')} ({pendingOrders.length})
               <Button variant="ghost" size="sm" onClick={fetchPendingOrders}>
                 <RefreshCw className="h-4 w-4" />
               </Button>
@@ -1487,7 +1487,7 @@ export default function POS() {
           <Tabs defaultValue="takeaway" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="takeaway" className="relative">
-                سفري
+                {t('سفري')}
                 {pendingTakeawayOrders.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     {pendingTakeawayOrders.length}
@@ -1495,7 +1495,7 @@ export default function POS() {
                 )}
               </TabsTrigger>
               <TabsTrigger value="delivery" className="relative">
-                توصيل
+                {t('توصيل')}
                 {pendingDeliveryOrders.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     {pendingDeliveryOrders.length}
@@ -1503,7 +1503,7 @@ export default function POS() {
                 )}
               </TabsTrigger>
               <TabsTrigger value="dine_in" className="relative">
-                داخل المطعم
+                {t('داخل المطعم')}
                 {pendingDineInOrders.length > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
                     {pendingDineInOrders.length}
@@ -1517,7 +1517,7 @@ export default function POS() {
                 {pendingTakeawayOrders.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد طلبات سفري معلقة</p>
+                    <p>{t('لا توجد طلبات سفري معلقة')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1539,7 +1539,7 @@ export default function POS() {
                 {pendingDeliveryOrders.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد طلبات توصيل معلقة</p>
+                    <p>{t('لا توجد طلبات توصيل معلقة')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1561,7 +1561,7 @@ export default function POS() {
                 {pendingDineInOrders.length === 0 ? (
                   <div className="text-center py-12 text-muted-foreground">
                     <UtensilsCrossed className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد طلبات داخل المطعمة معلقة</p>
+                    <p>{t('لا توجد طلبات داخل المطعم معلقة')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
