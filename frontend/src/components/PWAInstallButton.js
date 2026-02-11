@@ -110,11 +110,11 @@ export default function PWAInstallButton({ variant = 'default', className = '' }
 
       {/* تعليمات التثبيت */}
       <Dialog open={showInstructions} onOpenChange={setShowInstructions}>
-        <DialogContent className="max-w-md" dir="rtl">
+        <DialogContent className="max-w-md" dir={isRTL ? 'rtl' : 'ltr'}>
           <DialogHeader>
             <DialogTitle className="text-foreground flex items-center gap-2">
               <Download className="h-5 w-5 text-primary" />
-              تثبيت التطبيق
+              {t('تثبيت التطبيق')}
             </DialogTitle>
           </DialogHeader>
 
@@ -256,8 +256,8 @@ export default function PWAInstallButton({ variant = 'default', className = '' }
             className="w-full mt-2"
             variant="outline"
           >
-            <X className="h-4 w-4 ml-2" />
-            إغلاق
+            <X className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {t('إغلاق')}
           </Button>
         </DialogContent>
       </Dialog>
