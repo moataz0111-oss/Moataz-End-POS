@@ -1014,6 +1014,8 @@ const translationMap = {
   'مثال: مطعم الشام': { en: 'Example: Al-Sham Restaurant', ku: 'نمونە: چێشتخانەی شام' },
   'الآجل': { en: 'Credit', ku: 'قەرز' },
   'عدد الطلبات': { en: 'Orders Count', ku: 'ژمارەی داواکارییەکان' },
+  'الإعدادات': { en: 'Settings', ku: 'ڕێکخستنەکان' },
+  'إدارة النظام والمستخدمين': { en: 'System and Users Management', ku: 'بەڕێوەبردنی سیستەم و بەکارهێنەران' },
 };
 
 // الحصول على اللغة الحالية
