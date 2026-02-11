@@ -773,6 +773,102 @@ const translationMap = {
   'داكن': { en: 'Dark', ku: 'تاریک' },
   'تلقائي': { en: 'Auto', ku: 'ئۆتۆماتیک' },
   'وضع العرض': { en: 'Display Mode', ku: 'شێوازی پیشاندان' },
+  
+  // POS Translations - Order Types
+  'داخل المطعم': { en: 'Dine In', ku: 'ناو چێشتخانە' },
+  'سفري': { en: 'Takeaway', ku: 'بۆ دەرەوە' },
+  'توصيل': { en: 'Delivery', ku: 'گەیاندن' },
+  
+  // POS - Cart & Order
+  'السلة فارغة': { en: 'Cart is empty', ku: 'سەبەتە بەتاڵە' },
+  'خصم': { en: 'Discount', ku: 'داشکان' },
+  'المجموع الفرعي': { en: 'Subtotal', ku: 'کۆی لاوەکی' },
+  'الخصم': { en: 'Discount', ku: 'داشکان' },
+  'الإجمالي': { en: 'Total', ku: 'کۆی گشتی' },
+  'الصافي بعد العمولة': { en: 'Net After Commission', ku: 'پاک لە دوای کۆمیسیۆن' },
+  'عمولة': { en: 'Commission', ku: 'کۆمیسیۆن' },
+  
+  // POS - Payment Methods
+  'نقدي': { en: 'Cash', ku: 'کاش' },
+  'بطاقة': { en: 'Card', ku: 'کارت' },
+  'آجل': { en: 'Credit', ku: 'قەرز' },
+  
+  // POS - Pending Orders
+  'الطلبات المعلقة': { en: 'Pending Orders', ku: 'داواکاری هەڵپەسێردراوەکان' },
+  'لا توجد طلبات سفري معلقة': { en: 'No pending takeaway orders', ku: 'داواکاری بۆ دەرەوە نییە' },
+  'لا توجد طلبات توصيل معلقة': { en: 'No pending delivery orders', ku: 'داواکاری گەیاندن نییە' },
+  'لا توجد طلبات داخل المطعم معلقة': { en: 'No pending dine-in orders', ku: 'داواکاری ناو چێشتخانە نییە' },
+  
+  // POS - Refund Dialog
+  'إرجاع طلب': { en: 'Refund Order', ku: 'گەڕاندنەوەی داواکاری' },
+  'رقم الفاتورة': { en: 'Invoice Number', ku: 'ژمارەی پسوڵە' },
+  'أدخل رقم الفاتورة...': { en: 'Enter invoice number...', ku: 'ژمارەی پسوڵە داخڵ بکە...' },
+  'فاتورة': { en: 'Invoice', ku: 'پسوڵە' },
+  'تم إرجاعه': { en: 'Refunded', ku: 'گەڕێنراوە' },
+  'قابل للإرجاع': { en: 'Refundable', ku: 'دەکرێت بگەڕێنرێتەوە' },
+  'طلب قديم': { en: 'Old Order', ku: 'داواکاری کۆن' },
+  'غير مدفوع': { en: 'Unpaid', ku: 'نەدراوە' },
+  'نوع الطلب': { en: 'Order Type', ku: 'جۆری داواکاری' },
+  'المبلغ': { en: 'Amount', ku: 'بڕە پارە' },
+  'تاريخ الطلب': { en: 'Order Date', ku: 'بەرواری داواکاری' },
+  'اليوم': { en: 'Today', ku: 'ئەمڕۆ' },
+  'يوم سابق': { en: 'Previous Day', ku: 'ڕۆژی پێشوو' },
+  'العميل': { en: 'Customer', ku: 'کڕیار' },
+  'تم إرجاعه بتاريخ': { en: 'Refunded on', ku: 'گەڕێنراوە لە' },
+  'السبب': { en: 'Reason', ku: 'هۆکار' },
+  'سبب الإرجاع': { en: 'Refund Reason', ku: 'هۆکاری گەڕاندنەوە' },
+  'أدخل سبب الإرجاع (مطلوب)...': { en: 'Enter refund reason (required)...', ku: 'هۆکاری گەڕاندنەوە داخڵ بکە (پێویستە)...' },
+  'يجب إدخال سبب الإرجاع (3 أحرف على الأقل)': { en: 'Refund reason required (at least 3 characters)', ku: 'هۆکاری گەڕاندنەوە پێویستە (لانی کەم ٣ پیت)' },
+  'جاري الإرجاع...': { en: 'Processing refund...', ku: 'گەڕاندنەوە جێبەجێ دەکرێت...' },
+  'تأكيد الإرجاع': { en: 'Confirm Refund', ku: 'دڵنیاکردنەوەی گەڕاندنەوە' },
+  
+  // POS - Customer
+  'طلب سابق': { en: 'previous order', ku: 'داواکاری پێشوو' },
+  'عميل محظور': { en: 'Blocked Customer', ku: 'کڕیاری بلۆککراو' },
+  'رقم هاتف العميل...': { en: 'Customer phone number...', ku: 'ژمارەی مۆبایلی کڕیار...' },
+  'سجل العميل': { en: 'Customer History', ku: 'مێژووی کڕیار' },
+  'إجمالي الطلبات': { en: 'Total Orders', ku: 'کۆی داواکارییەکان' },
+  'إجمالي المصروف': { en: 'Total Spent', ku: 'کۆی خەرجکراو' },
+  'ملاحظات': { en: 'Notes', ku: 'تێبینییەکان' },
+  'آخر الطلبات': { en: 'Recent Orders', ku: 'دوایین داواکارییەکان' },
+  
+  // POS - Delivery
+  'اسم العميل': { en: 'Customer Name', ku: 'ناوی کڕیار' },
+  'رقم الهاتف': { en: 'Phone Number', ku: 'ژمارەی مۆبایل' },
+  'عنوان التوصيل': { en: 'Delivery Address', ku: 'ناونیشانی گەیاندن' },
+  'اختر السائق': { en: 'Select Driver', ku: 'شۆفێر هەڵبژێرە' },
+  'لا يوجد سائقين متاحين': { en: 'No drivers available', ku: 'شۆفێر بەردەست نییە' },
+  'سيتم تحويل الطلب مباشرة للسائق': { en: 'Order will be sent directly to driver', ku: 'داواکاری ڕاستەوخۆ دەنێردرێت بۆ شۆفێر' },
+  'شركة التوصيل': { en: 'Delivery Company', ku: 'کۆمپانیای گەیاندن' },
+  'بدون': { en: 'None', ku: 'هیچ' },
+  
+  // POS - Search & Buttons
+  'بحث عن منتج...': { en: 'Search for product...', ku: 'گەڕان بۆ بەرهەم...' },
+  'رقم جهاز التنبيه (اختياري)': { en: 'Buzzer number (optional)', ku: 'ژمارەی دەنگدەر (بە ئارەزوو)' },
+  
+  // POS - Kitchen Dialog
+  'تحديث الطلب وإرسال للمطبخ': { en: 'Update Order & Send to Kitchen', ku: 'نوێکردنەوەی داواکاری و ناردن بۆ چێشتخانە' },
+  'حفظ وإرسال للمطبخ': { en: 'Save & Send to Kitchen', ku: 'هەڵگرتن و ناردن بۆ چێشتخانە' },
+  'عدد العناصر': { en: 'Number of Items', ku: 'ژمارەی دانەکان' },
+  'عمولة التوصيل': { en: 'Delivery Commission', ku: 'کۆمیسیۆنی گەیاندن' },
+  'ملاحظات للمطبخ': { en: 'Notes for Kitchen', ku: 'تێبینی بۆ چێشتخانە' },
+  'ملاحظات خاصة...': { en: 'Special notes...', ku: 'تێبینی تایبەت...' },
+  'سيتم حفظ الطلب وإرساله للمطبخ للتحضير': { en: 'Order will be saved and sent to kitchen for preparation', ku: 'داواکاری هەڵدەگیرێت و دەنێردرێت بۆ چێشتخانە بۆ ئامادەکردن' },
+  'الدفع سيتم لاحقاً عند التسليم': { en: 'Payment will be made upon delivery', ku: 'پارەدان دەبێت لەکاتی ڕادەست کردن' },
+  'حفظ وإرسال': { en: 'Save & Send', ku: 'هەڵگرتن و ناردن' },
+  
+  // POS - Print Dialog
+  'معاينة الفاتورة': { en: 'Invoice Preview', ku: 'پیشبینینی پسوڵە' },
+  'تم فتح نافذة الطباعة': { en: 'Print window opened', ku: 'پەنجەرەی چاپکردن کرایەوە' },
+  'فشل في تحميل الفاتورة': { en: 'Failed to load invoice', ku: 'شکستی هێنا لە بارکردنی پسوڵە' },
+  'طباعة': { en: 'Print', ku: 'چاپکردن' },
+  'إغلاق': { en: 'Close', ku: 'داخستن' },
+  'إلغاء': { en: 'Cancel', ku: 'پاشگەزبوونەوە' },
+  
+  // POS - Status
+  'تعديل طلب': { en: 'Edit Order', ku: 'دەستکاری داواکاری' },
+  'وردية مفتوحة': { en: 'Shift Open', ku: 'شیفت کراوەیە' },
+  'لا يوجد وردية': { en: 'No Shift', ku: 'شیفت نییە' },
 };
 
 // الحصول على اللغة الحالية
