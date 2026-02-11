@@ -57,6 +57,7 @@ import {
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import BiometricDevices from '../components/BiometricDevices';
+import { useTranslation } from '../hooks/useTranslation';
 
 const API = API_URL;
 
@@ -64,6 +65,7 @@ export default function HR() {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
   const { selectedBranchId, branches: contextBranches, getBranchIdForApi } = useBranch();
+  const { t, isRTL } = useTranslation();
   const [activeTab, setActiveTab] = useState('employees');
   const [employees, setEmployees] = useState([]);
   const [branches, setBranches] = useState([]);
