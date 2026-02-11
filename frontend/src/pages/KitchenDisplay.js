@@ -244,7 +244,7 @@ export default function KitchenDisplay() {
         playNewOrderSound();
         // إشعار مرئي
         const newOrdersCount = kitchenOrders.length - lastOrderCountRef.current;
-        toast.info(`🔔 طلب جديد! (${newOrdersCount})`, {
+        toast.info(`🔔 ${t('new_order_alert')} (${newOrdersCount})`, {
           duration: 5000,
           style: { fontSize: '18px', fontWeight: 'bold' }
         });
