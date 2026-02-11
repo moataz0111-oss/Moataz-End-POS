@@ -5079,12 +5079,13 @@ export default function Settings() {
                     {/* اللغة */}
                     <div className="p-4 border rounded-lg bg-purple-500/10">
                       <Label className="text-foreground font-bold mb-4 flex items-center gap-2">
-                        🌐 لغة النظام
+                        🌐 {t('لغة النظام')}
                       </Label>
                       <select
                         value={regionalSettings.language}
                         onChange={(e) => setRegionalSettings(prev => ({...prev, language: e.target.value}))}
                         className="w-full mt-2 px-3 py-2 border rounded-lg bg-background text-foreground"
+                        data-testid="language-select"
                       >
                         {Object.entries(supportedLanguages).map(([code, lang]) => (
                           <option key={code} value={code}>
@@ -5093,7 +5094,7 @@ export default function Settings() {
                         ))}
                       </select>
                       <p className="text-xs text-amber-500 mt-2">
-                        ⚠️ ملاحظة: تغيير اللغة يؤثر على اتجاه الصفحة (RTL/LTR). الترجمة الكاملة للواجهة قيد التطوير.
+                        ⚠️ {t('الترجمة الكاملة للواجهة قيد التطوير')}
                       </p>
                     </div>
 
