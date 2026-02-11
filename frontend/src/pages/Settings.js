@@ -1708,7 +1708,7 @@ export default function Settings() {
                     تحكم في الصفحات والأقسام التي تظهر في الصفحة الرئيسية للمستخدمين (19 أيقونة)
                   </p>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
