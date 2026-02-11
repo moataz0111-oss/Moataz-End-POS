@@ -4475,6 +4475,81 @@ async def update_order_status(order_id: str, status: str, current_user: dict = D
     
     return {"message": "تم التحديث"}
 
+@api_router.put("/orders/{order_id}/kitchen-status")
+async def update_order_kitchen_status(order_id: str, kitchen_status: str, current_user: dict = Depends(get_current_user)):
+    """
+    تحديث حالة الطلب في المطبخ بشكل مستقل عن حالة الطلب الرئيسية
+    kitchen_status: pending_kitchen, preparing_kitchen, ready_kitchen, completed_kitchen
+    """
+    query = build_tenant_query(current_user, {"id": order_id})
+    order = await db.orders.find_one(query)
+    if not order:
+        raise HTTPException(status_code=404, detail="الطلب غير موجود")
+    
+    valid_statuses = ["pending_kitchen", "preparing_kitchen", "ready_kitchen", "completed_kitchen"]
+    if kitchen_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail="حالة المطبخ غير صالحة")
+    
+    await db.orders.update_one(
+        query,
+        {"$set": {
+            "kitchen_status": kitchen_status, 
+            "kitchen_updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "تم تحديث حالة المطبخ"}
+
+@api_router.get("/kitchen/orders")
+async def get_kitchen_orders(current_user: dict = Depends(get_current_user)):
+    """
+    جلب الطلبات لشاشة المطبخ
+    تظهر الطلبات التي لم يتم تحديدها كـ completed_kitchen بغض النظر عن حالتها الرئيسية
+    """
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # جلب الطلبات التي ليست completed_kitchen وليست ملغاة
+    query = {
+        "tenant_id": tenant_id,
+        "kitchen_status": {"$nin": ["completed_kitchen", None]},
+        "status": {"$ne": "cancelled"}
+    }
+    
+    # أيضاً جلب الطلبات الجديدة التي ليس لها kitchen_status بعد
+    query_new = {
+        "tenant_id": tenant_id,
+        "kitchen_status": {"$exists": False},
+        "status": {"$in": ["pending", "preparing", "ready"]}
+    }
+    
+    # دمج النتائج
+    orders_with_kitchen_status = await db.orders.find(query, {"_id": 0}).sort("created_at", 1).to_list(100)
+    orders_new = await db.orders.find(query_new, {"_id": 0}).sort("created_at", 1).to_list(100)
+    
+    # إضافة kitchen_status الافتراضي للطلبات الجديدة
+    for order in orders_new:
+        if "kitchen_status" not in order:
+            order["kitchen_status"] = "pending_kitchen"
+            # تحديث في قاعدة البيانات
+            await db.orders.update_one(
+                {"id": order["id"]},
+                {"$set": {"kitchen_status": "pending_kitchen"}}
+            )
+    
+    all_orders = orders_with_kitchen_status + orders_new
+    
+    # إزالة التكرارات وترتيب حسب التاريخ
+    seen_ids = set()
+    unique_orders = []
+    for order in all_orders:
+        if order["id"] not in seen_ids:
+            seen_ids.add(order["id"])
+            unique_orders.append(order)
+    
+    unique_orders.sort(key=lambda x: x.get("created_at", ""))
+    
+    return unique_orders
+
 @api_router.put("/orders/{order_id}/payment")
 async def update_order_payment(order_id: str, payment_method: str, current_user: dict = Depends(get_current_user)):
     query = build_tenant_query(current_user, {"id": order_id})
