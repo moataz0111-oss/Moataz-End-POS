@@ -1097,9 +1097,9 @@ export default function POS() {
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
                 >
-                  الكل ({tables.length})
+                  {t('الكل')} ({tables.length})
                 </button>
-                {[...new Set(tables.map(t => t.section).filter(Boolean))].map(section => (
+                {[...new Set(tables.map(tb => tb.section).filter(Boolean))].map(section => (
                   <button
                     key={section}
                     onClick={() => { playClick(); setSelectedTableSection(section); }}
@@ -1109,12 +1109,12 @@ export default function POS() {
                         : 'bg-muted text-muted-foreground hover:bg-muted/80'
                     }`}
                   >
-                    {section} ({tables.filter(t => t.section === section).length})
+                    {section} ({tables.filter(tb => tb.section === section).length})
                   </button>
                 ))}
               </div>
               
-              <p className="text-sm text-muted-foreground mb-2">اختر طاولة:</p>
+              <p className="text-sm text-muted-foreground mb-2">{t('اختر طاولة')}:</p>
               <div className="max-h-48 overflow-y-auto border border-border/50 rounded-lg p-2 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-muted/20">
                 <div className="grid grid-cols-5 gap-2">
                   {tables
@@ -1133,7 +1133,7 @@ export default function POS() {
                           if (isOccupied && table.current_order_id) {
                             // فتح الطلب المرتبط بالطاولة المشغولة
                             await loadOrderForEditing(table.current_order_id);
-                            toast.success(`تم فتح طلب الطاولة ${table.number}`);
+                            toast.success(t('تم فتح طلب الطاولة') + ` ${table.number}`);
                           } else if (isAvailable || isSelected) {
                             setSelectedTable(table.id);
                           }
@@ -1149,7 +1149,7 @@ export default function POS() {
                           ${isOccupied ? 'hover:ring-2 hover:ring-red-400 cursor-pointer' : ''}
                           ${isReserved ? 'cursor-not-allowed opacity-90' : ''}
                         `}
-                        title={table.section || 'عام'}
+                        title={table.section || t('عام')}
                         data-testid={`table-btn-${table.number}`}
                       >
                         {table.number}
@@ -1161,23 +1161,23 @@ export default function POS() {
               <div className="flex gap-4 text-xs mt-2">
                 <span className="flex items-center gap-1">
                   <span className="w-3 h-3 rounded" style={{backgroundColor: '#22c55e'}}></span>
-                  متاحة
+                  {t('متاحة')}
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-3 h-3 rounded" style={{backgroundColor: '#ef4444'}}></span>
-                  مشغولة
+                  {t('مشغولة')}
                 </span>
                 <span className="flex items-center gap-1">
                   <span className="w-3 h-3 rounded" style={{backgroundColor: '#f59e0b'}}></span>
-                  محجوزة
+                  {t('محجوزة')}
                 </span>
                 <span className="text-muted-foreground mr-auto">
-                  ({selectedTableSection ? tables.filter(t => t.section === selectedTableSection).length : tables.length} طاولة)
+                  ({selectedTableSection ? tables.filter(tb => tb.section === selectedTableSection).length : tables.length} {t('طاولة')})
                 </span>
               </div>
               {selectedTable && (
                 <p className="text-xs text-primary mt-2">
-                  ✓ تم اختيار طاولة {tables.find(t => t.id === selectedTable)?.number} ({tables.find(t => t.id === selectedTable)?.section || 'عام'})
+                  ✓ {t('تم اختيار طاولة')} {tables.find(tb => tb.id === selectedTable)?.number} ({tables.find(tb => tb.id === selectedTable)?.section || t('عام')})
                 </p>
               )}
             </div>
@@ -1186,13 +1186,13 @@ export default function POS() {
           {orderType === 'takeaway' && (
             <div className="space-y-2">
               <Input
-                placeholder="اسم العميل"
+                placeholder={t('اسم الزبون')}
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 data-testid="customer-name"
               />
               <Input
-                placeholder="رقم الهاتف"
+                placeholder={t('رقم الهاتف')}
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 data-testid="customer-phone"
