@@ -2152,6 +2152,8 @@ export default function POS() {
 
 // مكون بطاقة الطلب المعلق
 function OrderCard({ order, onSelect }) {
+  const { t } = useTranslation();
+  
   const getOrderTypeIcon = (type) => {
     switch (type) {
       case 'takeaway': return <Package className="h-4 w-4" />;
@@ -2162,9 +2164,9 @@ function OrderCard({ order, onSelect }) {
   
   const getOrderTypeLabel = (type) => {
     switch (type) {
-      case 'takeaway': return 'سفري';
-      case 'delivery': return 'توصيل';
-      default: return 'داخل المطعم';
+      case 'takeaway': return t('سفري');
+      case 'delivery': return t('توصيل');
+      default: return t('داخل المطعم');
     }
   };
   
@@ -2174,11 +2176,11 @@ function OrderCard({ order, onSelect }) {
     const diffMs = now - date;
     const diffMins = Math.floor(diffMs / 60000);
     
-    if (diffMins < 1) return 'الآن';
-    if (diffMins < 60) return `منذ ${diffMins} دقيقة`;
+    if (diffMins < 1) return t('الآن');
+    if (diffMins < 60) return `${t('منذ')} ${diffMins} ${t('دقيقة')}`;
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `منذ ${diffHours} ساعة`;
-    return `منذ ${Math.floor(diffHours / 24)} يوم`;
+    if (diffHours < 24) return `${t('منذ')} ${diffHours} ${t('ساعة')}`;
+    return `${t('منذ')} ${Math.floor(diffHours / 24)} ${t('يوم')}`;
   };
 
   return (
@@ -2206,7 +2208,7 @@ function OrderCard({ order, onSelect }) {
               {order.buzzer_number && (
                 <p className="text-xs text-blue-500 flex items-center gap-1">
                   <Bell className="h-3 w-3" />
-                  جهاز #{order.buzzer_number}
+                  {t('جهاز')} #{order.buzzer_number}
                 </p>
               )}
             </div>
@@ -2222,12 +2224,12 @@ function OrderCard({ order, onSelect }) {
           <div className="flex flex-wrap gap-1">
             {order.items.slice(0, 3).map((item, i) => (
               <span key={i} className="text-xs bg-muted px-2 py-1 rounded">
-                {item.product_name || item.name || 'منتج'} x{item.quantity}
+                {item.product_name || item.name || t('منتج')} x{item.quantity}
               </span>
             ))}
             {order.items.length > 3 && (
               <span className="text-xs bg-muted px-2 py-1 rounded">
-                +{order.items.length - 3} أخرى
+                +{order.items.length - 3} {t('أخرى')}
               </span>
             )}
           </div>
@@ -2236,7 +2238,7 @@ function OrderCard({ order, onSelect }) {
         <div className="mt-2 flex justify-end">
           <Button size="sm" variant="outline" className="h-8">
             <Eye className="h-3 w-3 ml-1" />
-            فتح للتعديل
+            {t('فتح للتعديل')}
           </Button>
         </div>
       </CardContent>
