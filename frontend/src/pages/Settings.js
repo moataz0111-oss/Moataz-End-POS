@@ -2496,6 +2496,21 @@ export default function Settings() {
                         </div>
                       </div>
                       
+                      {/* تغيير كلمة المرور */}
+                      <div className="p-4 border rounded-lg bg-amber-500/10 border-amber-500/30">
+                        <Label className="text-foreground font-bold mb-2 flex items-center gap-2">
+                          🔐 تغيير كلمة المرور
+                        </Label>
+                        <p className="text-xs text-muted-foreground mb-3">اتركه فارغاً إذا لم تريد تغيير كلمة المرور</p>
+                        <Input
+                          type="password"
+                          placeholder="كلمة المرور الجديدة"
+                          value={editUserForm.new_password || ''}
+                          onChange={(e) => setEditUserForm({ ...editUserForm, new_password: e.target.value })}
+                          className="bg-background"
+                        />
+                      </div>
+                      
                       {/* Permissions */}
                       <div>
                         <Label className="text-foreground mb-3 block">الصلاحيات المخصصة</Label>
