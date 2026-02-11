@@ -112,7 +112,7 @@ export default function Tables() {
           number: parseInt(formData.number),
           branch_id: selectedBranch
         });
-        toast.success('تم إضافة الطاولة');
+        toast.success(t('تم إضافة الطاولة'));
       }
       setDialogOpen(false);
       setEditingTable(null);
