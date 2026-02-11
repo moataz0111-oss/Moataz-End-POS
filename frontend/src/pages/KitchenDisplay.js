@@ -481,6 +481,7 @@ export default function KitchenDisplay() {
                 order={order}
                 onStatusChange={handleStatusChange}
                 onItemComplete={handleItemComplete}
+                t={t}
               />
             ))}
           </div>
