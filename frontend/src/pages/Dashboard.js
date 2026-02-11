@@ -930,7 +930,7 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">جاري التحميل...</p>
+          <p className="text-muted-foreground">{t('جاري التحميل...')}</p>
         </div>
       </div>
     );
@@ -958,7 +958,7 @@ export default function Dashboard() {
               <h1 className="text-xl font-bold font-cairo text-foreground">
                 {tenantInfo?.name || tenantInfo?.name_en || 'Maestro'}
               </h1>
-              <p className="text-sm text-muted-foreground">مرحباً، {user?.full_name}</p>
+              <p className="text-sm text-muted-foreground">{t('مرحباً')}، {user?.full_name}</p>
             </div>
           </div>
 
@@ -986,7 +986,7 @@ export default function Dashboard() {
               data-testid="backgrounds-btn"
             >
               <Image className="h-4 w-4" />
-              الخلفيات
+              {t('الخلفيات')}
             </Button>
 
             {/* Super Admin Button - للمالك فقط */}
