@@ -985,6 +985,33 @@ const translationMap = {
   'لا توجد طلبات آجلة في هذه الفترة': { en: 'No credit orders in this period', ku: 'هیچ داواکارییەکی قەرز نییە لەم ماوەیە' },
   'تم تحميل الطلب': { en: 'Order loaded', ku: 'داواکاری بار کرا' },
   'للتعديل': { en: 'for editing', ku: 'بۆ دەستکاری' },
+  
+  // Settings Page
+  'المظهر': { en: 'Appearance', ku: 'شێواز' },
+  'المطعم': { en: 'Restaurant', ku: 'چێشتخانە' },
+  'الرئيسية': { en: 'Home', ku: 'سەرەتا' },
+  'المستخدمين والموظفين': { en: 'Users & Staff', ku: 'بەکارهێنەران و کارمەندان' },
+  'العملاء': { en: 'Customers', ku: 'کڕیاران' },
+  'الفروع': { en: 'Branches', ku: 'لقەکان' },
+  'الفئات': { en: 'Categories', ku: 'پۆلەکان' },
+  'المنتجات': { en: 'Products', ku: 'بەرهەمەکان' },
+  'الطابعات': { en: 'Printers', ku: 'چاپەرەکان' },
+  'شركات التوصيل': { en: 'Delivery Companies', ku: 'کۆمپانیاکانی گەیاندن' },
+  'الإشعارات': { en: 'Notifications', ku: 'ئاگاداریکردنەوەکان' },
+  'الدفع الإلكتروني': { en: 'Electronic Payment', ku: 'پارەدانی ئەلیکترۆنی' },
+  'إعدادات المخزون': { en: 'Inventory Settings', ku: 'ڕێکخستنەکانی کۆگا' },
+  'إعدادات النظام': { en: 'System Settings', ku: 'ڕێکخستنەکانی سیستەم' },
+  'إعدادات الفاتورة': { en: 'Invoice Settings', ku: 'ڕێکخستنەکانی پسوڵە' },
+  'المظهر والسمة': { en: 'Appearance & Theme', ku: 'شێواز و تەم' },
+  'وضع العرض': { en: 'Display Mode', ku: 'شێوازی پیشاندان' },
+  'فاتح': { en: 'Light', ku: 'ڕوون' },
+  'داكن': { en: 'Dark', ku: 'تاریک' },
+  'تلقائي': { en: 'Auto', ku: 'ئۆتۆماتیک' },
+  'الوضع التلقائي يتبدل بين الفاتح والداكن': { en: 'Auto mode switches between light and dark', ku: 'شێوازی ئۆتۆماتیک لە نێوان ڕوون و تاریک دەگۆڕێت' },
+  'إعدادات المطعم': { en: 'Restaurant Settings', ku: 'ڕێکخستنەکانی چێشتخانە' },
+  'تظهر هذه البيانات في تطبيق العملاء': { en: 'This data appears in the customer app', ku: 'ئەم داتایانە لە ئەپلیکەیشنی کڕیاران دەردەکەون' },
+  'اسم المطعم (عربي)': { en: 'Restaurant Name (Arabic)', ku: 'ناوی چێشتخانە (عەرەبی)' },
+  'مثال: مطعم الشام': { en: 'Example: Al-Sham Restaurant', ku: 'نمونە: چێشتخانەی شام' },
 };
 
 // الحصول على اللغة الحالية
