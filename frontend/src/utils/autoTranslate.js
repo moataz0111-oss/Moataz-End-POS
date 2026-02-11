@@ -483,6 +483,9 @@ const translationMap = {
   'من تاريخ': { en: 'From Date', ku: 'لە ڕێکەوت' },
   'إلى تاريخ': { en: 'To Date', ku: 'بۆ ڕێکەوت' },
   'تصدير': { en: 'Export', ku: 'دەرهێنان' },
+  'لوحة تحكم المالك': { en: 'Owner Dashboard', ku: 'داشبۆردی خاوەن' },
+  'إغلاق الصندوق': { en: 'Close Register', ku: 'داخستنی سندوق' },
+  'قائمة العملاء': { en: 'Customer Menu', ku: 'مینیوی کڕیار' },
   'طباعة': { en: 'Print', ku: 'چاپکردن' },
 };
 
