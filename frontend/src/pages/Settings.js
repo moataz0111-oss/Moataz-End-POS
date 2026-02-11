@@ -1709,15 +1709,16 @@ export default function Settings() {
                   </p>
                   
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                          <ShoppingCart className="h-5 w-5 text-blue-500" />
+                    {/* نقاط البيع */}
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                          <ShoppingCart className="h-4 w-4 text-orange-500" />
                         </div>
-                        <span className="font-medium text-foreground">نقاط البيع</span>
+                        <span className="text-sm font-medium text-foreground">نقاط البيع</span>
                       </div>
                       <Switch
-                        checked={dashboardSettings.showPOS}
+                        checked={dashboardSettings.showPOS !== false}
                         onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showPOS: checked})}
                       />
                     </div>
