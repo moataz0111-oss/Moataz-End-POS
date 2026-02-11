@@ -114,6 +114,7 @@ const SUPER_ADMIN_SECRET = "271018";
 
 export default function SuperAdmin() {
   const navigate = useNavigate();
+  const { t, lang, isRTL } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [token, setToken] = useState(localStorage.getItem('super_admin_token'));
   const [user, setUser] = useState(null);
