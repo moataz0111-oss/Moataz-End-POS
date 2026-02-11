@@ -92,7 +92,7 @@ export default function Tables() {
       }
     } catch (error) {
       console.error('Failed to fetch tables:', error);
-      toast.error('فشل في تحميل الطاولات');
+      toast.error(t('فشل في تحميل الطاولات'));
       setTables([]);
       setBranches([]);
     } finally {
