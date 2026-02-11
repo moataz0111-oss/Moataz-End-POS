@@ -4,7 +4,11 @@ import { getCurrentLanguage, setLanguage as setLang, t as translate } from '../u
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguageState] = useState(getCurrentLanguage());
+  const [language, setLanguageState] = useState(() => {
+    // تحميل اللغة من localStorage عند البدء
+    const savedLang = localStorage.getItem('app_language');
+    return savedLang || 'ar';
+  });
   
   // تحديث اللغة
   const setLanguage = (lang) => {
@@ -14,11 +18,24 @@ export const LanguageProvider = ({ children }) => {
     window.location.reload();
   };
   
-  // تطبيق الاتجاه عند التحميل
+  // تطبيق الاتجاه عند التحميل والتغيير
   useEffect(() => {
     const isRTL = ['ar', 'ku', 'fa', 'he'].includes(language);
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
+    // حفظ اللغة في localStorage
+    localStorage.setItem('app_language', language);
+  }, [language]);
+  
+  // الاستماع لتغييرات localStorage من الصفحات الأخرى
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'app_language' && e.newValue && e.newValue !== language) {
+        setLanguageState(e.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, [language]);
   
   return (
