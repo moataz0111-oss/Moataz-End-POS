@@ -2339,3 +2339,4 @@ export default function CustomerMenu() {
   }
   // Default: redirect to menu
   return null;
+}
