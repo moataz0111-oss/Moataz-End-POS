@@ -473,9 +473,14 @@ export default function Settings() {
         setStaffForm(prev => ({...prev, branch_id: prev.branch_id || branchesRes.data[0].id}));
       }
       
-      // جلب إعدادات الصفحة الرئيسية
-      if (settingsRes.data.dashboard_settings) {
-        setDashboardSettings(settingsRes.data.dashboard_settings);
+      // جلب إعدادات الصفحة الرئيسية من API منفصل
+      try {
+        const dashboardRes = await axios.get(`${API}/settings/dashboard`);
+        if (dashboardRes.data) {
+          setDashboardSettings(prev => ({...prev, ...dashboardRes.data}));
+        }
+      } catch (err) {
+        console.log('Using default dashboard settings');
       }
       
       // جلب الموظفين والأدوار
