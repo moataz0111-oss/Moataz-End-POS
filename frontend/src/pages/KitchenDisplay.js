@@ -199,7 +199,7 @@ const KitchenOrderCard = ({ order, onStatusChange, onItemComplete, t }) => {
             ) : (
               <>
                 <Check className="h-6 w-6" />
-                جاهز للتسليم
+                {t('ready_for_delivery')}
               </>
             )}
           </Button>
