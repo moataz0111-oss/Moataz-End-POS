@@ -175,7 +175,7 @@ export default function Tables() {
       setTargetTableId('');
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تحويل الطلب');
+      toast.error(error.response?.data?.detail || t('فشل في تحويل الطلب'));
     }
   };
 
