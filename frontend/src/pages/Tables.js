@@ -139,7 +139,7 @@ export default function Tables() {
     
     try {
       await axios.delete(`${API}/tables/${tableToDelete.id}`);
-      toast.success('تم حذف الطاولة');
+      toast.success(t('تم حذف الطاولة'));
       setDeleteConfirmOpen(false);
       setTableToDelete(null);
       fetchData();
