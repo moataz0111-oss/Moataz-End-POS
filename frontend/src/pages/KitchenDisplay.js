@@ -30,16 +30,17 @@ import { useNavigate } from 'react-router-dom';
 
 const API = API_URL;
 
-// Order type icons and colors
-const orderTypeConfig = {
-  dine_in: { icon: Utensils, color: 'bg-blue-500', label: 'داخل المطعم', bgColor: 'bg-blue-500/20' },
-  takeaway: { icon: Coffee, color: 'bg-purple-500', label: 'سفري', bgColor: 'bg-purple-500/20' },
-  delivery: { icon: Truck, color: 'bg-orange-500', label: 'توصيل', bgColor: 'bg-orange-500/20' }
-};
+// Order type icons and colors - تُستخدم كدالة لدعم الترجمة
+const getOrderTypeConfig = (t) => ({
+  dine_in: { icon: Utensils, color: 'bg-blue-500', label: t('dine_in'), bgColor: 'bg-blue-500/20' },
+  takeaway: { icon: Coffee, color: 'bg-purple-500', label: t('takeaway'), bgColor: 'bg-purple-500/20' },
+  delivery: { icon: Truck, color: 'bg-orange-500', label: t('delivery_type'), bgColor: 'bg-orange-500/20' }
+});
 
 // Time formatting
 const formatTime = (date) => {
-  return new Date(date).toLocaleTimeString('ar-IQ', { 
+  const lang = localStorage.getItem('app_language') || 'ar';
+  return new Date(date).toLocaleTimeString(lang === 'ar' ? 'ar-IQ' : 'en-US', { 
     hour: '2-digit', 
     minute: '2-digit' 
   });
