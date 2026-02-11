@@ -2355,27 +2355,23 @@ export default function Settings() {
                       {/* Permissions */}
                       <div>
                         <Label className="text-foreground mb-3 block">الصلاحيات المخصصة</Label>
-                        <div className="max-h-[300px] overflow-y-auto space-y-4 pr-2">
+                        <div className="max-h-[300px] overflow-y-auto space-y-4 pr-2 border rounded-lg p-3 bg-muted/30">
                           {PERMISSION_GROUPS.map(group => (
                             <div key={group}>
-                              <p className="text-sm font-medium text-muted-foreground mb-2">{group}</p>
+                              <p className="text-sm font-medium text-muted-foreground mb-2 border-b pb-1">{group}</p>
                               <div className="grid grid-cols-2 gap-2">
                                 {AVAILABLE_PERMISSIONS.filter(p => p.group === group).map(perm => (
-                                  <div
-                                    key={perm.id}
-                                    className={`p-2 rounded-lg border cursor-pointer transition-all ${
-                                      editUserForm.permissions?.includes(perm.id)
-                                        ? 'border-primary bg-primary/10'
-                                        : 'border-border hover:border-primary/50'
-                                    }`}
-                                    onClick={() => toggleUserPermission(perm.id)}
-                                  >
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-medium text-xs text-foreground">{perm.name}</span>
-                                      {editUserForm.permissions?.includes(perm.id) && (
-                                        <Check className="h-3 w-3 text-primary" />
-                                      )}
-                                    </div>
+                                  <div key={perm.id} className="flex items-center gap-2">
+                                    <Switch
+                                      checked={editUserForm.permissions?.includes(perm.id)}
+                                      onCheckedChange={(checked) => {
+                                        const newPerms = checked 
+                                          ? [...(editUserForm.permissions || []), perm.id]
+                                          : (editUserForm.permissions || []).filter(p => p !== perm.id);
+                                        setEditUserForm({ ...editUserForm, permissions: newPerms });
+                                      }}
+                                    />
+                                    <span className="text-sm text-foreground">{perm.name}</span>
                                   </div>
                                 ))}
                               </div>
