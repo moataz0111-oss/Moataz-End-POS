@@ -117,7 +117,7 @@ export default function DriverApp() {
     
     if (brandNewOrders.length > 0 && previousOrdersRef.current.length > 0) {
       playNotificationSound();
-      toast.success(`لديك ${brandNewOrders.length} طلب جديد!`, { duration: 5000 });
+      toast.success(`${t('لديك')} ${brandNewOrders.length} ${t('طلب جديد!')}`, { duration: 5000 });
     }
     
     previousOrdersRef.current = newOrders;
@@ -155,7 +155,7 @@ export default function DriverApp() {
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') {
-      toast.success('تم تثبيت التطبيق');
+      toast.success(t('تم تثبيت التطبيق'));
     }
     setDeferredPrompt(null);
     setIsPWAInstallable(false);
@@ -164,12 +164,12 @@ export default function DriverApp() {
   // تسجيل دخول السائق برقم الهاتف والرمز السري
   const loginDriver = async () => {
     if (!driverPhone || driverPhone.length < 10) {
-      toast.error('يرجى إدخال رقم هاتف صحيح');
+      toast.error(t('يرجى إدخال رقم هاتف صحيح'));
       return;
     }
     
     if (!driverPin || driverPin.length < 4) {
-      toast.error('يرجى إدخال الرمز السري (4 أرقام على الأقل)');
+      toast.error(t('يرجى إدخال الرمز السري'));
       return;
     }
 
@@ -183,11 +183,11 @@ export default function DriverApp() {
         setIsLoggedIn(true);
         localStorage.setItem('driver_app_session', JSON.stringify(driverData));
         localStorage.setItem('driver_phone', driverPhone);
-        toast.success(`مرحباً ${driverData.name}!`);
+        toast.success(`${t('مرحباً')} ${driverData.name}!`);
         fetchOrders(driverData.id);
       }
     } catch (error) {
-      const message = error.response?.data?.detail || 'فشل في تسجيل الدخول';
+      const message = error.response?.data?.detail || t('فشل في تسجيل الدخول');
       toast.error(message);
     } finally {
       setLoading(false);
@@ -240,7 +240,7 @@ export default function DriverApp() {
   // بدء تتبع الموقع
   const startTracking = () => {
     if (!navigator.geolocation) {
-      toast.error('المتصفح لا يدعم تحديد الموقع');
+      toast.error(t('المتصفح لا يدعم تحديد الموقع'));
       return;
     }
 
@@ -248,7 +248,7 @@ export default function DriverApp() {
       updateLocation,
       (error) => {
         console.log('Location error:', error);
-        toast.error('فشل في تحديد الموقع');
+        toast.error(t('فشل في تحديد الموقع'));
       },
       {
         enableHighAccuracy: true,
@@ -259,7 +259,7 @@ export default function DriverApp() {
 
     setWatchId(id);
     setIsTracking(true);
-    toast.success('تم بدء تتبع الموقع');
+    toast.success(t('تم بدء تتبع الموقع'));
   };
 
   // إيقاف تتبع الموقع
@@ -269,7 +269,7 @@ export default function DriverApp() {
       setWatchId(null);
     }
     setIsTracking(false);
-    toast.info('تم إيقاف تتبع الموقع');
+    toast.info(t('تم إيقاف تتبع الموقع'));
   };
 
   // تسليم الطلب
@@ -279,11 +279,11 @@ export default function DriverApp() {
         params: { status: 'delivered', driver_id: driver.id }
       });
       playNotificationSound();
-      toast.success('تم تسليم الطلب بنجاح!');
+      toast.success(t('تم تسليم الطلب بنجاح!'));
       fetchOrders();
       setSelectedOrder(null);
     } catch (error) {
-      const message = error.response?.data?.detail || 'فشل في تحديث حالة الطلب';
+      const message = error.response?.data?.detail || t('فشل في تحديث حالة الطلب');
       toast.error(message);
     }
   };
@@ -294,10 +294,10 @@ export default function DriverApp() {
       await axios.put(`${API}/driver/orders/${orderId}/status`, null, {
         params: { status: 'out_for_delivery', driver_id: driver.id }
       });
-      toast.success('تم تحديث الحالة - أنت الآن في الطريق');
+      toast.success(t('تم تحديث الحالة - أنت الآن في الطريق'));
       fetchOrders();
     } catch (error) {
-      const message = error.response?.data?.detail || 'فشل في تحديث حالة الطلب';
+      const message = error.response?.data?.detail || t('فشل في تحديث حالة الطلب');
       toast.error(message);
     }
   };
@@ -310,7 +310,7 @@ export default function DriverApp() {
     } else if (address) {
       url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
     } else {
-      toast.error('لا يوجد عنوان متاح');
+      toast.error(t('لا يوجد عنوان متاح'));
       return;
     }
     window.open(url, '_blank');
@@ -331,7 +331,7 @@ export default function DriverApp() {
     setOrders([]);
     localStorage.removeItem('driver_app_session');
     localStorage.removeItem('driver_phone');
-    toast.info('تم تسجيل الخروج');
+    toast.info(t('تم تسجيل الخروج'));
   };
 
   // التحقق من تسجيل الدخول السابق
