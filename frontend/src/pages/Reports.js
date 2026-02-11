@@ -760,15 +760,15 @@ export default function Reports() {
                               <p className="text-lg font-bold text-foreground tabular-nums">{formatPrice(data.total)}</p>
                             </div>
                             <div className="text-center p-3 bg-red-500/10 rounded-lg">
-                              <p className="text-xs text-red-500">العمولة المستقطعة</p>
+                              <p className="text-xs text-red-500">{t('العمولة المستقطعة')}</p>
                               <p className="text-lg font-bold text-red-500 tabular-nums">-{formatPrice(data.commission)}</p>
                             </div>
                             <div className="text-center p-3 bg-green-500/10 rounded-lg">
-                              <p className="text-xs text-green-500">الصافي</p>
+                              <p className="text-xs text-green-500">{t('الصافي')}</p>
                               <p className="text-lg font-bold text-green-500 tabular-nums">{formatPrice(data.net_amount)}</p>
                             </div>
                             <div className="text-center p-3 bg-background rounded-lg">
-                              <p className="text-xs text-muted-foreground">مدفوع / آجل</p>
+                              <p className="text-xs text-muted-foreground">{t('مدفوع / آجل')}</p>
                               <p className="text-sm font-bold">
                                 <span className="text-green-500">{data.paid_count || 0}</span>
                                 {' / '}
@@ -782,12 +782,18 @@ export default function Reports() {
                       {Object.keys(deliveryCreditsReport.by_delivery_app || {}).length === 0 && (
                         <div className="text-center py-8 text-muted-foreground">
                           <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p>لا توجد طلبات توصيل في هذه الفترة</p>
+                          <p>{t('لا توجد طلبات توصيل في هذه الفترة')}</p>
                         </div>
                       )}
                     </div>
                   </CardContent>
                 </Card>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => window.print()}>
+                    <FileText className="h-4 w-4 ml-2" />
+                    {t('طباعة')}
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
@@ -798,25 +804,25 @@ export default function Reports() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <StatCard
-                    title="إجمالي الإلغاءات"
+                    title={t('إجمالي الإلغاءات')}
                     value={cancellationsReport.total_cancelled}
                     icon={XCircle}
                     color="red-500"
                   />
                   <StatCard
-                    title="قيمة الإلغاءات"
+                    title={t('قيمة الإلغاءات')}
                     value={formatPrice(cancellationsReport.total_value)}
                     icon={DollarSign}
                     color="red-500"
                   />
                   <StatCard
-                    title="نسبة الإلغاء"
+                    title={t('نسبة الإلغاء')}
                     value={`${cancellationsReport.cancellation_rate?.toFixed(1) || 0}%`}
                     icon={Percent}
                     color="orange-500"
                   />
                   <StatCard
-                    title="إلغاءات اليوم"
+                    title={t('إلغاءات اليوم')}
                     value={cancellationsReport.today_cancelled || 0}
                     icon={Clock}
                     color="blue-500"
@@ -827,7 +833,7 @@ export default function Reports() {
                   <CardHeader>
                     <CardTitle className="text-lg text-foreground flex items-center gap-2">
                       <XCircle className="h-5 w-5 text-red-500" />
-                      الطلبات الملغاة
+                      {t('الطلبات الملغاة')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -836,11 +842,11 @@ export default function Reports() {
                         <thead>
                           <tr className="border-b border-border">
                             <th className="text-right p-3 text-muted-foreground">#</th>
-                            <th className="text-right p-3 text-muted-foreground">التاريخ</th>
-                            <th className="text-right p-3 text-muted-foreground">النوع</th>
-                            <th className="text-right p-3 text-muted-foreground">العميل</th>
-                            <th className="text-right p-3 text-muted-foreground">القيمة</th>
-                            <th className="text-right p-3 text-muted-foreground">سبب الإلغاء</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('التاريخ')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('النوع')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('العميل')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('القيمة')}</th>
+                            <th className="text-right p-3 text-muted-foreground">{t('سبب الإلغاء')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -856,12 +862,12 @@ export default function Reports() {
                                   order.order_type === 'takeaway' ? 'bg-green-500/10 text-green-500' :
                                   'bg-orange-500/10 text-orange-500'
                                 }`}>
-                                  {order.order_type === 'dine_in' ? 'محلي' : order.order_type === 'takeaway' ? 'سفري' : 'توصيل'}
+                                  {order.order_type === 'dine_in' ? t('محلي') : order.order_type === 'takeaway' ? t('سفري') : t('توصيل')}
                                 </span>
                               </td>
                               <td className="p-3 text-foreground">{order.customer_name || '-'}</td>
                               <td className="p-3 tabular-nums text-red-500">{formatPrice(order.total)}</td>
-                              <td className="p-3 text-muted-foreground">{order.cancellation_reason || 'غير محدد'}</td>
+                              <td className="p-3 text-muted-foreground">{order.cancellation_reason || t('غير محدد')}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -869,12 +875,18 @@ export default function Reports() {
                       {(!cancellationsReport.orders || cancellationsReport.orders.length === 0) && (
                         <div className="text-center py-8 text-muted-foreground">
                           <XCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                          <p>لا توجد طلبات ملغاة في هذه الفترة</p>
+                          <p>{t('لا توجد طلبات ملغاة في هذه الفترة')}</p>
                         </div>
                       )}
                     </div>
                   </CardContent>
                 </Card>
+                <div className="flex justify-end gap-2 mt-4">
+                  <Button variant="outline" onClick={() => window.print()}>
+                    <FileText className="h-4 w-4 ml-2" />
+                    {t('طباعة')}
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>
@@ -885,19 +897,19 @@ export default function Reports() {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <StatCard
-                    title="إجمالي الخصومات"
+                    title={t('إجمالي الخصومات')}
                     value={formatPrice(discountsReport.total_discounts)}
                     icon={Percent}
                     color="orange-500"
                   />
                   <StatCard
-                    title="عدد الطلبات"
+                    title={t('عدد الطلبات')}
                     value={discountsReport.orders_with_discount}
                     icon={ShoppingCart}
                     color="blue-500"
                   />
                   <StatCard
-                    title="متوسط الخصم"
+                    title={t('متوسط الخصم')}
                     value={formatPrice(discountsReport.average_discount)}
                     icon={TrendingDown}
                     color="purple-500"
