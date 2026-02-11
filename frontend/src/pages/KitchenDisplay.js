@@ -165,7 +165,7 @@ const KitchenOrderCard = ({ order, onStatusChange, onItemComplete }) => {
               <div className="flex-1">
                 <p className={`font-medium ${item.completed ? 'line-through text-gray-500' : 'text-white'}`}>
                   {!item.completed && <span className="text-yellow-400 font-bold">{item.quantity}x </span>}
-                  {item.name}
+                  {item.product_name || item.name}
                 </p>
                 {item.notes && (
                   <p className="text-sm text-orange-400 mt-1 bg-orange-500/10 px-2 py-1 rounded">
