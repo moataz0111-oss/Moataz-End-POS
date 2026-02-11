@@ -1843,7 +1843,7 @@ export default function POS() {
           
           <div className="flex gap-2 no-print">
             <Button variant="outline" onClick={() => setPrintDialogOpen(false)} className="flex-1">
-              إغلاق
+              {t('إغلاق')}
             </Button>
             <Button 
               className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
