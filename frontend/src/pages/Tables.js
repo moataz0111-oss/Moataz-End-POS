@@ -485,7 +485,7 @@ export default function Tables() {
           <Card className="border-border/50 bg-card">
             <CardContent className="py-12 text-center">
               <LayoutGrid className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">لا توجد طاولات</p>
+              <p className="text-muted-foreground">{t('لا توجد طاولات')}</p>
               {(hasRole(['admin', 'manager']) || hasPermission('tables')) && (
                 <Button className="mt-4 bg-primary text-primary-foreground" onClick={() => setDialogOpen(true)}>
                   <Plus className="h-4 w-4 ml-2" />
