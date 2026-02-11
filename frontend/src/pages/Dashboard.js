@@ -1214,7 +1214,7 @@ export default function Dashboard() {
                   data-testid="day-management-btn"
                 >
                   <CalendarDays className="h-4 w-4" />
-                  إدارة اليوم
+                  {t('إدارة اليوم')}
                   {dayStatus.pending_orders_count > 0 && (
                     <span className="bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 mr-1">
                       {dayStatus.pending_orders_count}
