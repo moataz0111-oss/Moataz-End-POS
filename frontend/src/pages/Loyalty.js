@@ -637,3 +637,4 @@ export default function Loyalty() {
       </Dialog>
     </div>
   );
+}

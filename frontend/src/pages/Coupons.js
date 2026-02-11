@@ -803,3 +803,4 @@ export default function Coupons() {
       </Dialog>
     </div>
   );
+}

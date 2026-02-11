@@ -972,3 +972,4 @@ export default function PurchasesPage() {
       </Dialog>
     </div>
   );
+}

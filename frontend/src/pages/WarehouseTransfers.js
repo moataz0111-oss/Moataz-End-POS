@@ -693,3 +693,4 @@ export default function WarehouseTransfers() {
       </div>
     </div>
   );
+}

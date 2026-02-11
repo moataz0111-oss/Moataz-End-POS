@@ -563,3 +563,4 @@ export default function SmartReports() {
       </main>
     </div>
   );
+}

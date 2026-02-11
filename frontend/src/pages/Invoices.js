@@ -707,3 +707,4 @@ export default function Invoices() {
       </Dialog>
     </div>
   );
+}
