@@ -29,7 +29,7 @@ const Delivery = lazy(() => import("./pages/Delivery"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Reports = lazy(() => import("./pages/Reports"));
 const Expenses = lazy(() => import("./pages/Expenses"));
-const DriverPortal = lazy(() => import("./pages/DriverPortal"));
+// DriverPortal تم إزالته ودمجه في DriverApp
 const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
 const CallLogs = lazy(() => import("./pages/CallLogs"));
 const InstallApp = lazy(() => import("./pages/InstallApp"));
