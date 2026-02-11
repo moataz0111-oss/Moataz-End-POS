@@ -126,7 +126,7 @@ export default function Tables() {
   const updateTableStatus = async (tableId, status) => {
     try {
       await axios.put(`${API}/tables/${tableId}/status?status=${status}`);
-      toast.success('تم تحديث حالة الطاولة');
+      toast.success(t('تم تحديث حالة الطاولة'));
       fetchData();
     } catch (error) {
       toast.error('فشل في تحديث الحالة');
