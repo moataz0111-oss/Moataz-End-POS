@@ -460,9 +460,9 @@ export default function SuperAdmin() {
       setToken(res.data.token);
       setUser(res.data.user);
       setIsAuthenticated(true);
-      toast.success('تم تسجيل الدخول بنجاح');
+      toast.success(t('تم تسجيل الدخول بنجاح'));
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل تسجيل الدخول');
+      toast.error(error.response?.data?.detail || t('فشل تسجيل الدخول'));
     } finally {
       setLoading(false);
     }
@@ -485,9 +485,9 @@ export default function SuperAdmin() {
       setToken(res.data.token);
       setUser(res.data.user);
       setIsAuthenticated(true);
-      toast.success('تم إنشاء الحساب بنجاح');
+      toast.success(t('تم إنشاء الحساب بنجاح'));
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل إنشاء الحساب');
+      toast.error(error.response?.data?.detail || t('فشل إنشاء الحساب'));
     } finally {
       setLoading(false);
     }
@@ -525,10 +525,10 @@ export default function SuperAdmin() {
   const saveNotificationSettings = async () => {
     try {
       await axios.put(`${API}/super-admin/notification-settings`, notificationSettings);
-      toast.success('تم حفظ إعدادات الإشعارات');
+      toast.success(t('تم حفظ إعدادات الإشعارات'));
       setShowNotificationSettings(false);
     } catch (error) {
-      toast.error('فشل في حفظ الإعدادات');
+      toast.error(t('فشل في حفظ الإعدادات'));
     }
   };
 
