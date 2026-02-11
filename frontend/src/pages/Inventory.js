@@ -108,7 +108,7 @@ export default function Inventory() {
       }
     } catch (error) {
       console.error('Failed to fetch inventory:', error);
-      toast.error('فشل في تحميل المخزون');
+      toast.error(t('فشل في تحميل المخزون'));
     } finally {
       setLoading(false);
     }
