@@ -792,7 +792,8 @@ export default function POS() {
       await fetchPendingOrders();
       
       // تحديث الطاولات
-      const tablesRes = await axios.get(`${API}/tables`);
+      const tablesParams = activeBranchId ? { branch_id: activeBranchId } : {};
+      const tablesRes = await axios.get(`${API}/tables`, { params: tablesParams });
       setTables(tablesRes.data);
     } catch (error) {
       console.error('Failed to cancel order:', error);
