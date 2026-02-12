@@ -42,6 +42,7 @@ import {
 const API = BACKEND_URL + '/api';
 export default function Reservations() {
   const navigate = useNavigate();
+  const { t, isRTL } = useTranslation();
   const [reservations, setReservations] = useState([]);
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
