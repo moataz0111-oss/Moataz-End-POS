@@ -1993,7 +1993,7 @@ export default function CustomerMenu() {
                           }));
                           setCart(newCart);
                           setStep('cart');
-                          toast.success('تمت إضافة المنتجات للسلة');
+                          toast.success(t('تمت إضافة المنتجات للسلة'));
                         }
                       }}
                       variant="outline"
@@ -2001,7 +2001,7 @@ export default function CustomerMenu() {
                       size="sm"
                     >
                       <ShoppingCart className="h-4 w-4 ml-2" />
-                      إعادة الطلب
+                      {t('إعادة الطلب')}
                     </Button>
                     
                     {/* زر التقييم - يظهر فقط للطلبات المكتملة */}
