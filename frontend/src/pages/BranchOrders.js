@@ -55,6 +55,7 @@ import { Badge } from '../components/ui/badge';
 const API = API_URL;
 export default function BranchOrders() {
   const navigate = useNavigate();
+  const { t, isRTL } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [branches, setBranches] = useState([]);
   const [manufacturedProducts, setManufacturedProducts] = useState([]);

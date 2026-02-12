@@ -37,6 +37,7 @@ import { toast, Toaster } from 'sonner';
 const API = API_URL;
 export default function WarehouseTransfers() {
   const navigate = useNavigate();
+  const { t, isRTL } = useTranslation();
   const [activeTab, setActiveTab] = useState('transfers');
   const [transfers, setTransfers] = useState([]);
   const [purchaseRequests, setPurchaseRequests] = useState([]);

@@ -53,6 +53,7 @@ import {
 const API = BACKEND_URL + '/api';
 export default function Purchasing() {
   const navigate = useNavigate();
+  const { t, isRTL } = useTranslation();
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [rawMaterials, setRawMaterials] = useState([]);

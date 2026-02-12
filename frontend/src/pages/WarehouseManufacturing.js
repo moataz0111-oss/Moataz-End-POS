@@ -61,6 +61,7 @@ const API = API_URL;
 export default function WarehouseManufacturing() {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
+  const { t, isRTL } = useTranslation();
   
   const [activeTab, setActiveTab] = useState('warehouse');
   const [loading, setLoading] = useState(true);

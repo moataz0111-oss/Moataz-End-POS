@@ -34,6 +34,7 @@ import { useNavigate } from 'react-router-dom';
 const API = API_URL;
 export default function Invoices() {
   const navigate = useNavigate();
+  const { t, isRTL } = useTranslation();
   const [activeTab, setActiveTab] = useState('templates');
   const [templates, setTemplates] = useState([]);
   const [printers, setPrinters] = useState([]);

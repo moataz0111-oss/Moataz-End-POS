@@ -58,6 +58,7 @@ const UNITS = [
 ];
 export default function Recipes() {
   const navigate = useNavigate();
+  const { t, isRTL } = useTranslation();
   const [activeTab, setActiveTab] = useState('materials');
   const [materials, setMaterials] = useState([]);
   const [recipes, setRecipes] = useState([]);

@@ -60,6 +60,7 @@ const API = API_URL;
 export default function PurchasesPage() {
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
+  const { t, isRTL } = useTranslation();
   
   const [activeTab, setActiveTab] = useState('purchases');
   const [loading, setLoading] = useState(true);
