@@ -1359,9 +1359,9 @@ export default function Dashboard() {
                           <span className="text-sm font-bold text-primary">#{order.order_number}</span>
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">{order.customer_name || 'زبون'}</p>
+                          <p className="font-medium text-foreground">{order.customer_name || t('زبون')}</p>
                           <p className="text-xs text-muted-foreground">
-                            {order.items.length} عناصر
+                            {order.items.length} {t('عناصر')}
                           </p>
                         </div>
                       </div>
@@ -1548,41 +1548,41 @@ export default function Dashboard() {
 
                   {/* المصاريف */}
                   <div className="section mb-4 p-4 bg-yellow-500/10 rounded-lg">
-                    <div className="section-title font-bold mb-2 text-yellow-600">المصاريف</div>
+                    <div className="section-title font-bold mb-2 text-yellow-600">{t('المصاريف')}</div>
                     <div className="flex justify-between">
-                      <span>إجمالي المصاريف:</span>
+                      <span>{t('إجمالي المصاريف')}:</span>
                       <strong className="text-yellow-600">{formatPrice(closingResult.total_expenses)}</strong>
                     </div>
                   </div>
 
                   {/* جرد الصندوق */}
                   <div className="section mb-4 p-4 bg-purple-500/10 rounded-lg">
-                    <div className="section-title font-bold mb-2 text-purple-600">جرد الصندوق</div>
+                    <div className="section-title font-bold mb-2 text-purple-600">{t('جرد الصندوق')}</div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span>الرصيد الافتتاحي:</span>
+                        <span>{t('الرصيد الافتتاحي')}:</span>
                         <span>{formatPrice(closingResult.opening_cash)}</span>
                       </div>
                       <div className="flex justify-between text-green-600">
-                        <span>+ المبيعات النقدية:</span>
+                        <span>+ {t('المبيعات النقدية')}:</span>
                         <span>{formatPrice(closingResult.cash_sales)}</span>
                       </div>
                       <div className="flex justify-between text-red-600">
-                        <span>- المصاريف:</span>
+                        <span>- {t('المصاريف')}:</span>
                         <span>{formatPrice(closingResult.total_expenses)}</span>
                       </div>
                       <Separator className="my-2" />
                       <div className="flex justify-between font-bold">
-                        <span>المتوقع في الصندوق (نقداً):</span>
+                        <span>{t('المتوقع في الصندوق')} ({t('نقداً')}):</span>
                         <span>{formatPrice(closingResult.expected_cash)}</span>
                       </div>
                       <div className="flex justify-between font-bold">
-                        <span>الجرد الفعلي:</span>
+                        <span>{t('الجرد الفعلي')}:</span>
                         <span>{formatPrice(closingResult.closing_cash)}</span>
                       </div>
                       <Separator className="my-2" />
                       <div className={`flex justify-between font-bold text-lg ${closingResult.cash_difference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        <span>الفرق:</span>
+                        <span>{t('الفرق')}:</span>
                         <span className="flex items-center gap-1">
                           {closingResult.cash_difference >= 0 ? (
                             <CheckCircle className="h-5 w-5" />
@@ -1590,7 +1590,7 @@ export default function Dashboard() {
                             <XCircle className="h-5 w-5" />
                           )}
                           {formatPrice(Math.abs(closingResult.cash_difference))}
-                          {closingResult.cash_difference >= 0 ? ' زيادة' : ' نقص'}
+                          {closingResult.cash_difference >= 0 ? ` ${t('زيادة')}` : ` ${t('نقص')}`}
                         </span>
                       </div>
                     </div>
