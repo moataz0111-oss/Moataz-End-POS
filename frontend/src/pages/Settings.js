@@ -960,23 +960,23 @@ export default function Settings() {
         print_individual_items: editPrinterForm.print_individual_items,
         auto_print_on_order: editPrinterForm.auto_print_on_order
       });
-      toast.success('تم تحديث الطابعة');
+      toast.success(t('تم تحديث الطابعة'));
       setEditPrinterDialogOpen(false);
       setEditPrinterForm(null);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تحديث الطابعة');
+      toast.error(error.response?.data?.detail || t('فشل في تحديث الطابعة'));
     }
   };
 
   const handleDeletePrinter = async (printerId) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذه الطابعة؟')) return;
+    if (!window.confirm(t('هل أنت متأكد؟'))) return;
     try {
       await axios.delete(`${API}/printers/${printerId}`);
-      toast.success('تم حذف الطابعة');
+      toast.success(t('تم حذف الطابعة'));
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في حذف الطابعة');
+      toast.error(error.response?.data?.detail || t('فشل في حذف الطابعة'));
     }
   };
 
@@ -986,9 +986,9 @@ export default function Settings() {
       const res = await axios.post(`${API}/printers/${printerId}/test`);
       setPrinterTestStatus(prev => ({ ...prev, [printerId]: res.data.status }));
       if (res.data.status === 'online') {
-        toast.success('الطابعة متصلة ✓');
+        toast.success(t('الطابعة متصلة'));
       } else {
-        toast.error('الطابعة غير متصلة');
+        toast.error(t('الطابعة غير متصلة'));
       }
       // تحديث البيانات بعد 3 ثواني
       setTimeout(() => {
@@ -996,13 +996,13 @@ export default function Settings() {
       }, 5000);
     } catch (error) {
       setPrinterTestStatus(prev => ({ ...prev, [printerId]: 'error' }));
-      toast.error('فشل اختبار الاتصال');
+      toast.error(t('فشل اختبار الاتصال'));
     }
   };
 
   const handleAddEmail = async () => {
     if (!newEmail || !newEmail.includes('@')) {
-      toast.error('يرجى إدخال بريد إلكتروني صحيح');
+      toast.error(t('يرجى إدخال بريد إلكتروني صحيح'));
       return;
     }
     try {
@@ -1010,9 +1010,9 @@ export default function Settings() {
       await axios.post(`${API}/settings/email-recipients`, updated);
       setEmailRecipients(updated);
       setNewEmail('');
-      toast.success('تم إضافة البريد');
+      toast.success(t('تم إضافة البريد'));
     } catch (error) {
-      toast.error('فشل في إضافة البريد');
+      toast.error(t('فشل في إضافة البريد'));
     }
   };
 
@@ -1021,9 +1021,9 @@ export default function Settings() {
       const updated = emailRecipients.filter(e => e !== email);
       await axios.post(`${API}/settings/email-recipients`, updated);
       setEmailRecipients(updated);
-      toast.success('تم حذف البريد');
+      toast.success(t('تم حذف البريد'));
     } catch (error) {
-      toast.error('فشل في حذف البريد');
+      toast.error(t('فشل في حذف البريد'));
     }
   };
 
