@@ -1058,8 +1058,8 @@ export default function Dashboard() {
               </span>
             </div>
             <div>
-              <p className="font-bold text-lg">طلب جديد من تطبيق العملاء!</p>
-              <p className="text-sm text-green-100">اضغط لعرض التفاصيل</p>
+              <p className="font-bold text-lg">{t('طلب جديد من تطبيق العملاء!')}</p>
+              <p className="text-sm text-green-100">{t('اضغط لعرض التفاصيل')}</p>
             </div>
             <div className="flex gap-2">
               <Button 
@@ -1070,7 +1070,7 @@ export default function Dashboard() {
                   navigate('/orders');
                 }}
               >
-                عرض الطلبات
+                {t('عرض الطلبات')}
               </Button>
               <Button 
                 variant="ghost" 
