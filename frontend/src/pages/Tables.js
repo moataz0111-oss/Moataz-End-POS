@@ -521,7 +521,7 @@ export default function Tables() {
                 </SelectTrigger>
                 <SelectContent>
                   {availableTablesForTransfer.map(table => (
-                    <SelectItem key={table.id} value={table.id}>{t('طاولة {table.number} - {table.section || 'عام'} ({table.capacity} أشخاص)')}</SelectItem>
+                    <SelectItem key={table.id} value={table.id}>{t('طاولة')} {table.number} - {table.section || t('عام')} ({table.capacity} {t('أشخاص')})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
