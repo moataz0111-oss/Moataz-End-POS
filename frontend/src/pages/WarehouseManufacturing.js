@@ -1413,7 +1413,7 @@ export default function WarehouseManufacturing() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() =>{t('setShowBranchTransferDialog(false)}>
+            <Button variant="outline" onClick={() => setShowBranchTransferDialog(false)}>
               {t('إلغاء')}</Button>
             <Button 
               onClick={handleTransferToBranch}
