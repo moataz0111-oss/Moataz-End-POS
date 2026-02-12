@@ -60,7 +60,7 @@ L.Icon.Default.mergeOptions({
 });
 const API = API_URL;
 // ==================== LOCATION PICKER COMPONENT ====================
-function LocationPicker({ position, setPosition, onClose }) {
+function LocationPicker({ position, setPosition, onClose, t }) {
   const [loading, setLoading] = useState(false);
   const MapClickHandler = () => {
     useMapEvents({
