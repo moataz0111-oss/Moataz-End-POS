@@ -143,7 +143,7 @@ export default function HR() {
       setPayrollSummary(summaryRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('فشل في تحميل البيانات');
+      toast.error(t('فشل في تحميل البيانات'));
     } finally {
       setLoading(false);
     }
@@ -162,7 +162,7 @@ export default function HR() {
       setEmployeeRatings(res.data);
     } catch (error) {
       console.error('Error fetching ratings:', error);
-      toast.error('فشل في تحميل التقييمات');
+      toast.error(t('فشل في تحميل التقييمات'));
     } finally {
       setRatingsLoading(false);
     }
@@ -185,12 +185,12 @@ export default function HR() {
         salary: parseFloat(employeeForm.salary),
         work_hours_per_day: parseFloat(employeeForm.work_hours_per_day)
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('تم إضافة الموظف');
+      toast.success(t('تم إضافة الموظف'));
       setEmployeeDialogOpen(false);
       resetEmployeeForm();
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في إضافة الموظف');
+      toast.error(error.response?.data?.detail || t('فشل في إضافة الموظف'));
     }
   };
 
@@ -203,25 +203,25 @@ export default function HR() {
         salary: parseFloat(employeeForm.salary),
         work_hours_per_day: parseFloat(employeeForm.work_hours_per_day)
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('تم تحديث الموظف');
+      toast.success(t('تم تحديث الموظف'));
       setEditingEmployee(null);
       setEmployeeDialogOpen(false);
       resetEmployeeForm();
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تحديث الموظف');
+      toast.error(error.response?.data?.detail || t('فشل في تحديث الموظف'));
     }
   };
 
   const handleDeleteEmployee = async (id) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا الموظف؟')) return;
+    if (!window.confirm(t('هل أنت متأكد من حذف هذا الموظف؟'))) return;
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`${API}/employees/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('تم تعطيل الموظف');
+      toast.success(t('تم تعطيل الموظف'));
       fetchData();
     } catch (error) {
-      toast.error('فشل في حذف الموظف');
+      toast.error(t('فشل في حذف الموظف'));
     }
   };
 
@@ -238,12 +238,12 @@ export default function HR() {
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${API}/attendance`, attendanceForm, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('تم تسجيل الحضور');
+      toast.success(t('تم تسجيل الحضور'));
       setAttendanceDialogOpen(false);
       setAttendanceForm({ employee_id: '', date: new Date().toISOString().slice(0, 10), check_in: '', check_out: '', status: 'present', notes: '' });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تسجيل الحضور');
+      toast.error(error.response?.data?.detail || t('فشل في تسجيل الحضور'));
     }
   };
 
