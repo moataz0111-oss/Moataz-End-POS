@@ -2450,8 +2450,8 @@ export default function SuperAdmin() {
                               ${subscriptionsDashboard.subscription_prices[type]?.monthly || 0}/{t('شهر')}
                             </p>
                             <div className="flex justify-center gap-2 mt-2 text-xs">
-                              <span className="text-green-400">{data.active} نشط</span>
-                              <span className="text-red-400">{data.expired} منتهي</span>
+                              <span className="text-green-400">{data.active} {t('نشط')}</span>
+                              <span className="text-red-400">{data.expired} {t('منتهي')}</span>
                             </div>
                           </div>
                         ))}
@@ -2459,7 +2459,7 @@ export default function SuperAdmin() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-center text-gray-400 py-8">لا توجد بيانات</p>
+                  <p className="text-center text-gray-400 py-8">{t('لا توجد بيانات')}</p>
                 )}
               </TabsContent>
               
@@ -2467,7 +2467,7 @@ export default function SuperAdmin() {
               <TabsContent value="all">
                 <div className="space-y-3">
                   {filteredTenants.length === 0 ? (
-                    <p className="text-center text-gray-400 py-8">لا يوجد عملاء</p>
+                    <p className="text-center text-gray-400 py-8">{t('لا يوجد عملاء')}</p>
                   ) : (
                     filteredTenants.map((tenant) => (
                       <TenantCard key={tenant.id} tenant={tenant} isDemo={tenant.is_demo || tenant.subscription_type === 'demo'} />
@@ -2484,12 +2484,12 @@ export default function SuperAdmin() {
       <Dialog open={showNewTenant} onOpenChange={setShowNewTenant}>
         <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl">إنشاء عميل جديد</DialogTitle>
+            <DialogTitle className="text-xl">{t('إنشاء عميل جديد')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {/* اختيار نوع الحساب */}
             <div className="space-y-2">
-              <Label className="text-base font-medium">نوع الحساب *</Label>
+              <Label className="text-base font-medium">{t('نوع الحساب')} *</Label>
               <div className="grid grid-cols-2 gap-4">
                 <Button
                   type="button"
@@ -2500,7 +2500,7 @@ export default function SuperAdmin() {
                   onClick={() => setNewTenantForm({...newTenantForm, is_demo: false, subscription_type: 'trial'})}
                 >
                   <Building2 className="h-6 w-6" />
-                  <span>عميل فعلي</span>
+                  <span>{t('عميل فعلي')}</span>
                 </Button>
                 <Button
                   type="button"
@@ -2511,25 +2511,25 @@ export default function SuperAdmin() {
                   onClick={() => setNewTenantForm({...newTenantForm, is_demo: true, subscription_type: 'demo'})}
                 >
                   <Play className="h-6 w-6" />
-                  <span>حساب تجريبي</span>
+                  <span>{t('حساب تجريبي')}</span>
                 </Button>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>اسم المطعم *</Label>
+                <Label>{t('اسم المطعم')} *</Label>
                 <Input
-                  placeholder="مثال: مطعم السعادة"
+                  placeholder={t('مثال: مطعم السعادة')}
                   value={newTenantForm.name}
                   onChange={(e) => setNewTenantForm({...newTenantForm, name: e.target.value})}
                   className="bg-gray-700/50 border-gray-600"
                 />
               </div>
               <div className="space-y-2">
-                <Label>المعرف (Slug) *</Label>
+                <Label>{t('المعرف (Slug)')} *</Label>
                 <Input
-                  placeholder="مثال: saada-restaurant"
+                  placeholder="saada-restaurant"
                   value={newTenantForm.slug}
                   onChange={(e) => setNewTenantForm({...newTenantForm, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})}
                   className="bg-gray-700/50 border-gray-600"
@@ -2540,16 +2540,16 @@ export default function SuperAdmin() {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>اسم المالك *</Label>
+                <Label>{t('اسم المالك')} *</Label>
                 <Input
-                  placeholder="مثال: أحمد محمد"
+                  placeholder={t('مثال: أحمد محمد')}
                   value={newTenantForm.owner_name}
                   onChange={(e) => setNewTenantForm({...newTenantForm, owner_name: e.target.value})}
                   className="bg-gray-700/50 border-gray-600"
                 />
               </div>
               <div className="space-y-2">
-                <Label>البريد الإلكتروني *</Label>
+                <Label>{t('البريد الإلكتروني')} *</Label>
                 <Input
                   type="email"
                   placeholder="example@email.com"
@@ -2563,7 +2563,7 @@ export default function SuperAdmin() {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>رقم الهاتف</Label>
+                <Label>{t('رقم الهاتف')}</Label>
                 <Input
                   placeholder="009647xxxxxxxxx"
                   value={newTenantForm.owner_phone}
@@ -2573,7 +2573,7 @@ export default function SuperAdmin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>نوع الاشتراك</Label>
+                <Label>{t('نوع الاشتراك')}</Label>
                 <Select 
                   value={newTenantForm.subscription_type} 
                   onValueChange={(v) => setNewTenantForm({...newTenantForm, subscription_type: v})}
@@ -2582,13 +2582,13 @@ export default function SuperAdmin() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="demo">تجريبي</SelectItem>
-                    <SelectItem value="trial">فترة تجريبية</SelectItem>
-                    <SelectItem value="bronze">🥉 برونزية</SelectItem>
-                    <SelectItem value="silver">🥈 فضية</SelectItem>
-                    <SelectItem value="gold">🥇 ذهبية</SelectItem>
-                    <SelectItem value="basic">أساسي</SelectItem>
-                    <SelectItem value="premium">مميز</SelectItem>
+                    <SelectItem value="demo">{t('تجريبي')}</SelectItem>
+                    <SelectItem value="trial">{t('فترة تجريبية')}</SelectItem>
+                    <SelectItem value="bronze">{t('برونزية')}</SelectItem>
+                    <SelectItem value="silver">{t('فضية')}</SelectItem>
+                    <SelectItem value="gold">{t('ذهبية')}</SelectItem>
+                    <SelectItem value="basic">{t('أساسي')}</SelectItem>
+                    <SelectItem value="premium">{t('مميز')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -2597,7 +2597,7 @@ export default function SuperAdmin() {
             {/* حقل مدة الاشتراك - يظهر فقط للاشتراكات غير التجريبية */}
             {newTenantForm.subscription_type !== 'trial' && newTenantForm.subscription_type !== 'demo' && (
               <div className="space-y-2">
-                <Label>مدة الاشتراك</Label>
+                <Label>{t('مدة الاشتراك')}</Label>
                 <Select 
                   value={String(newTenantForm.subscription_duration)} 
                   onValueChange={(v) => setNewTenantForm({...newTenantForm, subscription_duration: parseInt(v)})}
