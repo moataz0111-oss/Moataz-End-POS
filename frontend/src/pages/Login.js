@@ -88,7 +88,7 @@ const animationStyles = {
 };
 
 export default function Login() {
-  const { t, isRTL } = useTranslation();
+  const { t, isRTL, lang, setLanguage } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
