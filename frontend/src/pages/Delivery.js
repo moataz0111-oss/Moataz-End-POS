@@ -408,13 +408,13 @@ export default function Delivery() {
   const markOrderAsPaid = async (orderId) => {
     try {
       await axios.put(`${API}/orders/${orderId}/driver-payment`, { is_paid: true });
-      toast.success('تم تحديد الطلب كمدفوع');
+      toast.success(t('تم تحديد الطلب كمدفوع'));
       fetchData();
       if (selectedDriver) {
         fetchDriverOrders(selectedDriver.id);
       }
     } catch (error) {
-      toast.error('فشل في تحديث حالة الدفع');
+      toast.error(t('فشل في تحديث حالة الدفع'));
     }
   };
 
