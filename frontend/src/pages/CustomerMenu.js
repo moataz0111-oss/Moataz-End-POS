@@ -99,7 +99,7 @@ function LocationPicker({ position, setPosition, onClose, t }) {
           className="flex-1"
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : <Navigation className="h-4 w-4 ml-2" />}
-          موقعي الحالي
+          {t('موقعي الحالي')}
         </Button>
       </div>
       <div className="h-[350px] rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg">
@@ -149,7 +149,7 @@ function LocationPicker({ position, setPosition, onClose, t }) {
       </div>
       <p className="text-sm text-center text-gray-600 mt-2 flex items-center justify-center gap-2">
         <span className="text-lg">👆</span>
-        انقر على الخريطة لتحديد موقع التوصيل
+        {t('انقر على الخريطة لتحديد موقع التوصيل')}
       </p>
     </div>
   );
