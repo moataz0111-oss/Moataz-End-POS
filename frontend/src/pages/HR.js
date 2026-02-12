@@ -1140,7 +1140,7 @@ export default function HR() {
                         <Textarea value={attendanceForm.notes} onChange={(e) => setAttendanceForm({...attendanceForm, notes: e.target.value})} />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setAttendanceDialogOpen(false)}>{t('{t('إلغاء')}</Button>
+                        <Button type="button" variant="outline" onClick={() => setAttendanceDialogOpen(false)}>{t('إلغاء')}</Button>
                         <Button type="submit">{t('تسجيل')}</Button>
                       </div>
                     </form>
