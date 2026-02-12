@@ -488,14 +488,14 @@ export default function Purchasing() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() =>{t('updateStatus(order.id, 'approved')}
+                              onClick={() => updateStatus(order.id, 'approved')}
                               className="text-blue-500 hover:bg-blue-500/10"
                             >
-                              موافقة')}</Button>
+                              {t('موافقة')}</Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() =>{t('updateStatus(order.id, 'cancelled')}
+                              onClick={() => updateStatus(order.id, 'cancelled')}
                               className="text-red-500 hover:bg-red-500/10"
                             >
                               {t('إلغاء')}</Button>
@@ -505,19 +505,19 @@ export default function Purchasing() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() =>{t('updateStatus(order.id, 'ordered')}
+                            onClick={() => updateStatus(order.id, 'ordered')}
                             className="text-purple-500 hover:bg-purple-500/10"
                           >
-                            تم الطلب')}</Button>
+                            {t('تم الطلب')}</Button>
                         )}
                         {order.status === 'ordered' && (
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() =>{t('updateStatus(order.id, 'delivered')}
+                            onClick={() => updateStatus(order.id, 'delivered')}
                             className="text-green-500 hover:bg-green-500/10"
                           >
-                            تم الاستلام')}</Button>
+                            {t('تم الاستلام')}</Button>
                         )}
                       </div>
                     </div>
