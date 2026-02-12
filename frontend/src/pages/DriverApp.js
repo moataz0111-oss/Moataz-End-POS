@@ -70,7 +70,7 @@ const MapUpdater = ({ center }) => {
 };
 
 export default function DriverApp() {
-  const { t, isRTL } = useTranslation();
+  const { t, isRTL, lang, setLanguage } = useTranslation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [driverPhone, setDriverPhone] = useState('');
   const [driverPin, setDriverPin] = useState('');
