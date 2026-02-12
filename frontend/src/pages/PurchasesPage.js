@@ -624,7 +624,7 @@ export default function PurchasesPage() {
             </div>
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() =>{t('setShowSupplierDialog(false)}>
+              <Button type="button" variant="outline" onClick={() => setShowSupplierDialog(false)}>
                 {t('إلغاء')}</Button>
               <Button type="submit" disabled={submitting}>
                 {submitting ? <RefreshCw className="h-4 w-4 animate-spin ml-2" /> : <Plus className="h-4 w-4 ml-2" />}
@@ -811,7 +811,7 @@ export default function PurchasesPage() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() =>{t('setShowPurchaseDialog(false)}>
+            <Button variant="outline" onClick={() => setShowPurchaseDialog(false)}>
               {t('إلغاء')}</Button>
             <Button 
               onClick={handleCreatePurchase}
