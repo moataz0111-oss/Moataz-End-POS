@@ -2964,6 +2964,12 @@ const translationMap = {
   'طريقة الدفع': { en: 'Payment Method', ku: '' },
   'نقداً': { en: 'Cash', ku: '' },
   'بطاقة': { en: 'Card', ku: '' },
+  'انقر على الخريطة لتحديد موقع التوصيل': { en: 'Click on the map to select delivery location', ku: '' },
+  'تحديد موقع التوصيل': { en: 'Select Delivery Location', ku: '' },
+  'قائمة الطعام': { en: 'Menu', ku: '' },
+  'اطلب الآن': { en: 'Order Now', ku: '' },
+  'فشل في تحديد الموقع': { en: 'Failed to determine location', ku: '' },
+  'المتصفح لا يدعم تحديد الموقع': { en: 'Browser does not support location', ku: '' },
 };
 
 // الحصول على اللغة الحالية
