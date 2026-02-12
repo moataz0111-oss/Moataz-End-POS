@@ -1363,7 +1363,7 @@ export default function CustomerMenu() {
                     </div>
                     {!product.is_available && (
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                        <span className="text-white font-bold">غير متوفر</span>
+                        <span className="text-white font-bold">{t('غير متوفر')}</span>
                       </div>
                     )}
                   </div>
@@ -1397,7 +1397,7 @@ export default function CustomerMenu() {
                 data-testid="view-cart-btn"
               >
                 <ShoppingCart className="h-5 w-5" />
-                عرض السلة ({cartCount})
+                {t('عرض السلة')} ({cartCount})
                 <span className="mr-auto font-bold">{formatPrice(cartTotal)}</span>
               </Button>
             </div>
@@ -1420,7 +1420,7 @@ export default function CustomerMenu() {
             </Button>
             <h1 className="text-xl font-bold flex items-center gap-2">
               <ShoppingCart className="h-5 w-5 text-orange-500" />
-              سلة المشتريات
+              {t('سلة المشتريات')}
             </h1>
             <Badge className="bg-orange-500">{cartCount}</Badge>
           </div>
@@ -1429,8 +1429,8 @@ export default function CustomerMenu() {
           {cart.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <ShoppingCart className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-lg">السلة فارغة</p>
-              <Button className="mt-4" onClick={() => setStep('menu')}>تصفح القائمة</Button>
+              <p className="text-lg">{t('السلة فارغة')}</p>
+              <Button className="mt-4" onClick={() => setStep('menu')}>{t('تصفح القائمة')}</Button>
             </div>
           ) : (
             <div className="space-y-3">
