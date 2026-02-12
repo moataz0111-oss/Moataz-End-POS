@@ -384,10 +384,10 @@ export default function Dashboard() {
       await axios.post(`${API}/upload-image`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('تم رفع الخلفية بنجاح');
+      toast.success(t('تم رفع الخلفية بنجاح'));
       fetchDashboardBackgrounds();
     } catch (error) {
-      toast.error('فشل رفع الخلفية');
+      toast.error(t('فشل رفع الخلفية'));
     } finally {
       setUploadingBg(false);
     }
@@ -398,9 +398,9 @@ export default function Dashboard() {
     try {
       await axios.put(`${API}/dashboard-backgrounds/select`, { background_url: backgroundUrl });
       setSelectedBackground(backgroundUrl);
-      toast.success('تم تحديث الخلفية');
+      toast.success(t('تم تحديث الخلفية'));
     } catch (error) {
-      toast.error('فشل تحديث الخلفية');
+      toast.error(t('فشل تحديث الخلفية'));
     }
   };
 
@@ -409,9 +409,9 @@ export default function Dashboard() {
     try {
       await axios.put(`${API}/dashboard-backgrounds/select`, { background_url: null });
       setSelectedBackground(null);
-      toast.success('تم إزالة الخلفية');
+      toast.success(t('تم إزالة الخلفية'));
     } catch (error) {
-      toast.error('فشل إزالة الخلفية');
+      toast.error(t('فشل إزالة الخلفية'));
     }
   };
 
@@ -434,7 +434,7 @@ export default function Dashboard() {
       // Try modern clipboard API first
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(menuLink);
-        toast.success('تم نسخ الرابط!');
+        toast.success(t('تم نسخ الرابط!'));
       } else {
         // Fallback for older browsers or non-secure contexts
         const textArea = document.createElement('textarea');
@@ -447,15 +447,15 @@ export default function Dashboard() {
         textArea.select();
         try {
           document.execCommand('copy');
-          toast.success('تم نسخ الرابط!');
+          toast.success(t('تم نسخ الرابط!'));
         } catch (err) {
-          toast.error('فشل في نسخ الرابط');
+          toast.error(t('فشل في نسخ الرابط'));
         }
         document.body.removeChild(textArea);
       }
     } catch (err) {
       // Final fallback - show the link for manual copy
-      toast.info(`الرابط: ${menuLink}`);
+      toast.info(t('الرابط:') + ` ${menuLink}`);
     }
   };
 
