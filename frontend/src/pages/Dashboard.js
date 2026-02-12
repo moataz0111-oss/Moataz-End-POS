@@ -2102,14 +2102,14 @@ export default function Dashboard() {
                     link.download = 'menu-qr-code.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
-                    toast.success('تم تنزيل QR Code!');
+                    toast.success(t('تم تنزيل QR Code!'));
                   };
                   img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
                 }
               }}
             >
               <Download className="h-4 w-4" />
-              تنزيل QR Code
+              {t('تنزيل QR Code')}
             </Button>
           </div>
         </DialogContent>
