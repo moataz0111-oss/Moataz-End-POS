@@ -1929,6 +1929,7 @@ const translationMap = {
   'اختر مادة خام...': { en: 'Select raw material...', ku: '' },
   'إجمالي الأصناف': { en: 'Total Items', ku: '' },
   'قيمة المخزون': { en: 'Stock Value', ku: '' },
+  'نقص المخزون': { en: 'Low Stock', ku: '' },
   'تنبيه نقص المخزون': { en: 'Low Stock Alert', ku: '' },
   'نقص': { en: 'Low', ku: '' },
   'متوفر': { en: 'Available', ku: '' },
