@@ -1022,26 +1022,26 @@ export default function CustomerMenu() {
           <div className="space-y-6 py-4">
             {/* التقييم العام */}
             <div className="text-center">
-              <p className="text-sm text-gray-600 mb-3">كيف كانت تجربتك العامة؟</p>
+              <p className="text-sm text-gray-600 mb-3">{t('كيف كانت تجربتك العامة')}؟</p>
               <div className="flex justify-center">
                 <StarRating value={rating} onChange={setRating} size="lg" />
               </div>
               <p className="text-lg font-bold text-yellow-600 mt-2">
-                {rating === 5 ? 'ممتاز! 🌟' : rating === 4 ? 'جيد جداً 👍' : rating === 3 ? 'جيد 😊' : rating === 2 ? 'مقبول 😐' : 'سيء 😞'}
+                {rating === 5 ? t('ممتاز') + '! 🌟' : rating === 4 ? t('جيد جداً') + ' 👍' : rating === 3 ? t('جيد') + ' 😊' : rating === 2 ? t('مقبول') + ' 😐' : t('سيء') + ' 😞'}
               </p>
             </div>
             {/* تقييمات تفصيلية */}
             <div className="space-y-4 bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">🍽️ جودة الطعام</span>
+                <span className="text-sm text-gray-600">🍽️ {t('جودة الطعام')}</span>
                 <StarRating value={foodRating} onChange={setFoodRating} />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">🚚 سرعة التوصيل</span>
+                <span className="text-sm text-gray-600">🚚 {t('سرعة التوصيل')}</span>
                 <StarRating value={deliveryRating} onChange={setDeliveryRating} />
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">👨‍🍳 جودة الخدمة</span>
+                <span className="text-sm text-gray-600">👨‍🍳 {t('جودة الخدمة')}</span>
                 <StarRating value={serviceRating} onChange={setServiceRating} />
               </div>
             </div>
@@ -1049,10 +1049,10 @@ export default function CustomerMenu() {
             <div>
               <label className="text-sm font-medium mb-2 block flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
-                تعليقك (اختياري)
+                {t('تعليقك')} ({t('اختياري')})
               </label>
               <Textarea
-                placeholder="شاركنا رأيك لنحسّن خدماتنا..."
+                placeholder={t('شاركنا رأيك لنحسّن خدماتنا')}
                 value={ratingComment}
                 onChange={(e) => setRatingComment(e.target.value)}
                 className="w-full resize-none"
@@ -1063,7 +1063,7 @@ export default function CustomerMenu() {
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowRatingDialog(false)}>
-              إلغاء
+              {t('إلغاء')}
             </Button>
             <Button 
               onClick={submitRating}
@@ -1073,12 +1073,12 @@ export default function CustomerMenu() {
               {submittingRating ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                  جاري الإرسال...
+                  {t('جاري الإرسال')}...
                 </>
               ) : (
                 <>
                   <Star className="h-4 w-4 ml-2" />
-                  إرسال التقييم
+                  {t('إرسال التقييم')}
                 </>
               )}
             </Button>
@@ -1092,7 +1092,7 @@ export default function CustomerMenu() {
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">جاري تحميل القائمة...</p>
+          <p className="text-gray-600 font-medium">{t('جاري تحميل القائمة')}...</p>
         </div>
       </div>
     );
@@ -1126,8 +1126,8 @@ export default function CustomerMenu() {
                 )}
               </div>
               <div>
-                <h1 className="text-2xl font-bold">{restaurant?.name || 'المطعم'}</h1>
-                <p className="text-orange-100 text-sm">اختر الفرع الأقرب إليك</p>
+                <h1 className="text-2xl font-bold">{restaurant?.name || t('المطعم')}</h1>
+                <p className="text-orange-100 text-sm">{t('اختر الفرع الأقرب إليك')}</p>
               </div>
             </div>
           </div>
@@ -1138,12 +1138,12 @@ export default function CustomerMenu() {
             <div className="max-w-lg mx-auto flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Smartphone className="h-5 w-5" />
-                <span className="text-sm">ثبّت التطبيق للوصول السريع</span>
+                <span className="text-sm">{t('ثبّت التطبيق للوصول السريع')}</span>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="secondary" onClick={handleInstallClick}>
                   <Download className="h-4 w-4 ml-1" />
-                  تثبيت
+                  {t('تثبيت')}
                 </Button>
                 <Button size="sm" variant="ghost" onClick={() => setShowInstallBanner(false)}>
                   <X className="h-4 w-4" />
