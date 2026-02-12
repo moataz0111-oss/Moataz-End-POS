@@ -168,14 +168,14 @@ export default function WarehouseManufacturing() {
   const handleAddRawMaterial = async (e) => {
     e.preventDefault();
     if (!rawMaterialForm.name) {
-      toast.error('الرجاء إدخال اسم المادة');
+      toast.error(t('الرجاء إدخال اسم المادة'));
       return;
     }
     
     setSubmitting(true);
     try {
       await axios.post(`${API}/raw-materials-new`, rawMaterialForm, { headers });
-      toast.success('تم إضافة المادة الخام');
+      toast.success(t('تم إضافة المادة الخام'));
       setShowAddRawMaterial(false);
       setRawMaterialForm({
         name: '',
@@ -188,7 +188,7 @@ export default function WarehouseManufacturing() {
       });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في إضافة المادة');
+      toast.error(error.response?.data?.detail || t('فشل في إضافة المادة'));
     } finally {
       setSubmitting(false);
     }
@@ -197,7 +197,7 @@ export default function WarehouseManufacturing() {
   const addItemToTransfer = (material) => {
     const existing = transferForm.items.find(i => i.raw_material_id === material.id);
     if (existing) {
-      toast.error('هذه المادة موجودة بالفعل');
+      toast.error(t('هذه المادة موجودة بالفعل'));
       return;
     }
     
@@ -230,14 +230,14 @@ export default function WarehouseManufacturing() {
   // تحويل للتصنيع
   const handleTransferToManufacturing = async () => {
     if (transferForm.items.length === 0) {
-      toast.error('الرجاء إضافة مواد للتحويل');
+      toast.error(t('الرجاء إضافة مواد للتحويل'));
       return;
     }
     
     // التحقق من الكميات
     for (const item of transferForm.items) {
       if (item.quantity > item.available) {
-        toast.error(`الكمية المطلوبة من ${item.raw_material_name} أكبر من المتوفر`);
+        toast.error(t('الكمية المطلوبة أكبر من المتوفر'));
         return;
       }
     }
@@ -252,16 +252,16 @@ export default function WarehouseManufacturing() {
         notes: transferForm.notes
       }, { headers });
       
-      toast.success('تم التحويل لقسم التصنيع بنجاح');
+      toast.success(t('تم التحويل لقسم التصنيع بنجاح'));
       setShowTransferDialog(false);
       setTransferForm({ items: [], notes: '' });
       fetchData();
     } catch (error) {
       const detail = error.response?.data?.detail;
       if (typeof detail === 'object' && detail.insufficient_materials) {
-        toast.error(`مواد غير كافية: ${detail.insufficient_materials.map(m => m.name).join(', ')}`);
+        toast.error(t('مواد غير كافية'));
       } else {
-        toast.error(detail || 'فشل في التحويل');
+        toast.error(detail || t('فشل في التحويل'));
       }
     } finally {
       setSubmitting(false);
@@ -271,7 +271,7 @@ export default function WarehouseManufacturing() {
   const addItemToBranchTransfer = (product) => {
     const existing = branchTransferForm.items.find(i => i.product_id === product.id);
     if (existing) {
-      toast.info('هذا المنتج موجود بالفعل');
+      toast.info(t('هذا المنتج موجود بالفعل'));
       return;
     }
     setBranchTransferForm(prev => ({
