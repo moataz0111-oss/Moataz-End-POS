@@ -79,13 +79,13 @@ function LocationPicker({ position, setPosition, onClose }) {
           setLoading(false);
         },
         (error) => {
-          toast.error('فشل في تحديد الموقع');
+          toast.error(t('فشل في تحديد الموقع'));
           setLoading(false);
         },
         { enableHighAccuracy: true }
       );
     } else {
-      toast.error('المتصفح لا يدعم تحديد الموقع');
+      toast.error(t('المتصفح لا يدعم تحديد الموقع'));
       setLoading(false);
     }
   };
