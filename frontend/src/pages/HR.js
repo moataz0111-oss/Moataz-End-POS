@@ -1103,56 +1103,56 @@ export default function HR() {
                 <CardTitle>سجل الحضور - {selectedMonth}</CardTitle>
                 <Dialog open={attendanceDialogOpen} onOpenChange={setAttendanceDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button><Plus className="h-4 w-4 ml-2" /> تسجيل حضور</Button>
+                    <Button><Plus className="h-4 w-4 ml-2" /> {t('تسجيل حضور')}</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>تسجيل حضور/انصراف</DialogTitle>
+                      <DialogTitle>{t('تسجيل حضور/انصراف')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateAttendance} className="space-y-4">
                       <div>
-                        <Label>الموظف *</Label>
+                        <Label>{t('الموظف')} *</Label>
                         <Select value={attendanceForm.employee_id} onValueChange={(v) => setAttendanceForm({...attendanceForm, employee_id: v})}>
-                          <SelectTrigger><SelectValue placeholder="اختر الموظف" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder={t('اختر الموظف')} /></SelectTrigger>
                           <SelectContent>
                             {employees.filter(e => e.is_active).map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label>التاريخ *</Label>
+                        <Label>{t('التاريخ')} *</Label>
                         <Input type="date" value={attendanceForm.date} onChange={(e) => setAttendanceForm({...attendanceForm, date: e.target.value})} required />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>وقت الحضور</Label>
+                          <Label>{t('وقت الحضور')}</Label>
                           <Input type="time" value={attendanceForm.check_in} onChange={(e) => setAttendanceForm({...attendanceForm, check_in: e.target.value})} />
                         </div>
                         <div>
-                          <Label>وقت الانصراف</Label>
+                          <Label>{t('وقت الانصراف')}</Label>
                           <Input type="time" value={attendanceForm.check_out} onChange={(e) => setAttendanceForm({...attendanceForm, check_out: e.target.value})} />
                         </div>
                       </div>
                       <div>
-                        <Label>الحالة</Label>
+                        <Label>{t('الحالة')}</Label>
                         <Select value={attendanceForm.status} onValueChange={(v) => setAttendanceForm({...attendanceForm, status: v})}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="present">حاضر</SelectItem>
-                            <SelectItem value="absent">غائب</SelectItem>
-                            <SelectItem value="late">متأخر</SelectItem>
-                            <SelectItem value="early_leave">انصراف مبكر</SelectItem>
-                            <SelectItem value="holiday">إجازة</SelectItem>
+                            <SelectItem value="present">{t('حاضر')}</SelectItem>
+                            <SelectItem value="absent">{t('غائب')}</SelectItem>
+                            <SelectItem value="late">{t('متأخر')}</SelectItem>
+                            <SelectItem value="early_leave">{t('انصراف مبكر')}</SelectItem>
+                            <SelectItem value="holiday">{t('إجازة')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label>ملاحظات</Label>
+                        <Label>{t('ملاحظات')}</Label>
                         <Textarea value={attendanceForm.notes} onChange={(e) => setAttendanceForm({...attendanceForm, notes: e.target.value})} />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setAttendanceDialogOpen(false)}>إلغاء</Button>
-                        <Button type="submit">تسجيل</Button>
+                        <Button type="button" variant="outline" onClick={() => setAttendanceDialogOpen(false)}>{t('إلغاء')}</Button>
+                        <Button type="submit">{t('تسجيل')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -1163,12 +1163,12 @@ export default function HR() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-right p-3">الموظف</th>
-                        <th className="text-right p-3">التاريخ</th>
-                        <th className="text-right p-3">الحضور</th>
-                        <th className="text-right p-3">الانصراف</th>
-                        <th className="text-right p-3">الساعات</th>
-                        <th className="text-right p-3">الحالة</th>
+                        <th className="text-right p-3">{t('الموظف')}</th>
+                        <th className="text-right p-3">{t('التاريخ')}</th>
+                        <th className="text-right p-3">{t('الحضور')}</th>
+                        <th className="text-right p-3">{t('الانصراف')}</th>
+                        <th className="text-right p-3">{t('الساعات')}</th>
+                        <th className="text-right p-3">{t('الحالة')}</th>
                       </tr>
                     </thead>
                     <tbody>
