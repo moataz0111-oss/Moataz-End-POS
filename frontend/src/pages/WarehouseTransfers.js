@@ -85,7 +85,7 @@ export default function WarehouseTransfers() {
       setInventory(inventoryRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error('فشل في تحميل البيانات');
+      toast.error(t('فشل في تحميل البيانات'));
     } finally {
       setLoading(false);
     }
@@ -94,7 +94,7 @@ export default function WarehouseTransfers() {
   const handleCreateTransfer = async (e) => {
     e.preventDefault();
     if (selectedItems.length === 0) {
-      toast.error('يرجى اختيار أصناف للتحويل');
+      toast.error(t('يرجى اختيار أصناف للتحويل'));
       return;
     }
     try {
@@ -108,13 +108,13 @@ export default function WarehouseTransfers() {
           unit: item.unit
         }))
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('تم إنشاء طلب التحويل');
+      toast.success(t('تم إنشاء طلب التحويل'));
       setTransferDialogOpen(false);
       setTransferForm({ from_branch_id: '', to_branch_id: '', transfer_type: 'warehouse_to_branch', items: [], notes: '' });
       setSelectedItems([]);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في إنشاء التحويل');
+      toast.error(error.response?.data?.detail || t('فشل في إنشاء التحويل'));
     }
   };
   const handleTransferAction = async (transferId, action) => {
@@ -122,13 +122,13 @@ export default function WarehouseTransfers() {
       const token = localStorage.getItem('token');
       await axios.put(`${API}/inventory-transfers/${transferId}/${action}`, {}, { headers: { Authorization: `Bearer ${token}` } });
       toast.success(
-        action === 'approve' ? 'تمت الموافقة على التحويل' :
-        action === 'ship' ? 'تم شحن التحويل' :
-        action === 'receive' ? 'تم استلام التحويل' : 'تم التحديث'
+        action === 'approve' ? t('تمت الموافقة على التحويل') :
+        action === 'ship' ? t('تم شحن التحويل') :
+        action === 'receive' ? t('تم استلام التحويل') : t('تم التحديث')
       );
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تنفيذ العملية');
+      toast.error(error.response?.data?.detail || t('فشل في تنفيذ العملية'));
     }
   };
   // Purchase Request handlers
@@ -140,12 +140,12 @@ export default function WarehouseTransfers() {
         ...requestForm,
         items: requestForm.items.filter(item => item.name && item.quantity)
       }, { headers: { Authorization: `Bearer ${token}` } });
-      toast.success('تم إنشاء طلب الشراء');
+      toast.success(t('تم إنشاء طلب الشراء'));
       setRequestDialogOpen(false);
       setRequestForm({ branch_id: '', items: [{ name: '', quantity: '', unit: '', notes: '' }], priority: 'normal', notes: '' });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في إنشاء الطلب');
+      toast.error(error.response?.data?.detail || t('فشل في إنشاء الطلب'));
     }
   };
   const handleRequestAction = async (requestId, action) => {
@@ -156,10 +156,10 @@ export default function WarehouseTransfers() {
       } else {
         await axios.put(`${API}/purchase-requests/${requestId}/status?status=${action}`, {}, { headers: { Authorization: `Bearer ${token}` } });
       }
-      toast.success('تم تحديث الطلب');
+      toast.success(t('تم تحديث الطلب'));
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تنفيذ العملية');
+      toast.error(error.response?.data?.detail || t('فشل في تنفيذ العملية'));
     }
   };
   const addRequestItem = () => {
