@@ -2898,18 +2898,18 @@ export default function SuperAdmin() {
                   <div className="space-y-3">
                     <h3 className="font-bold text-green-400 flex items-center gap-2 border-b border-gray-700 pb-2">
                       <Layers className="h-4 w-4" />
-                      الميزات الأساسية
+                      {t('الميزات الأساسية')}
                     </h3>
                     <div className="space-y-2">
                       {[
-                        { key: 'showPOS', label: 'نقاط البيع', icon: Monitor },
-                        { key: 'showTables', label: 'الطاولات', icon: LayoutGrid },
-                        { key: 'showOrders', label: 'الطلبات', icon: FileText },
-                        { key: 'showReports', label: 'التقارير', icon: BarChart3 },
-                        { key: 'showExpenses', label: 'المصاريف', icon: Wallet },
-                        { key: 'showInventory', label: 'المخزون', icon: Package },
-                        { key: 'showDelivery', label: 'التوصيل', icon: Truck },
-                        { key: 'showKitchen', label: 'شاشة المطبخ', icon: ChefHat },
+                        { key: 'showPOS', label: t('نقاط البيع'), icon: Monitor },
+                        { key: 'showTables', label: t('الطاولات'), icon: LayoutGrid },
+                        { key: 'showOrders', label: t('الطلبات'), icon: FileText },
+                        { key: 'showReports', label: t('التقارير'), icon: BarChart3 },
+                        { key: 'showExpenses', label: t('المصاريف'), icon: Wallet },
+                        { key: 'showInventory', label: t('المخزون'), icon: Package },
+                        { key: 'showDelivery', label: t('التوصيل'), icon: Truck },
+                        { key: 'showKitchen', label: t('شاشة المطبخ'), icon: ChefHat },
                       ].map(item => (
                         <label key={item.key} className="flex items-center justify-between p-2.5 bg-gray-700/30 rounded-lg hover:bg-gray-700/50 cursor-pointer">
                           <div className="flex items-center gap-2">
@@ -2929,18 +2929,18 @@ export default function SuperAdmin() {
                   <div className="space-y-3">
                     <h3 className="font-bold text-purple-400 flex items-center gap-2 border-b border-gray-700 pb-2">
                       <Star className="h-4 w-4" />
-                      الميزات المتقدمة
+                      {t('الميزات المتقدمة')}
                     </h3>
                     <div className="space-y-2">
                       {[
-                        { key: 'showHR', label: 'الموارد البشرية', icon: Users },
-                        { key: 'showWarehouse', label: 'التحويلات (المخازن)', icon: ArrowLeftRight },
-                        { key: 'showCallCenter', label: 'كول سنتر', icon: Headphones },
-                        { key: 'showCallLogs', label: 'سجل المكالمات', icon: Phone },
-                        { key: 'showLoyalty', label: 'برامج الولاء', icon: Gift },
-                        { key: 'showCoupons', label: 'الكوبونات والعروض', icon: Tag },
-                        { key: 'showRecipes', label: 'الوصفات', icon: UtensilsCrossed },
-                        { key: 'showReservations', label: 'حجوزات الطاولات', icon: CalendarDays },
+                        { key: 'showHR', label: t('الموارد البشرية'), icon: Users },
+                        { key: 'showWarehouse', label: t('التحويلات (المخازن)'), icon: ArrowLeftRight },
+                        { key: 'showCallCenter', label: t('كول سنتر'), icon: Headphones },
+                        { key: 'showCallLogs', label: t('سجل المكالمات'), icon: Phone },
+                        { key: 'showLoyalty', label: t('برامج الولاء'), icon: Gift },
+                        { key: 'showCoupons', label: t('الكوبونات والعروض'), icon: Tag },
+                        { key: 'showRecipes', label: t('الوصفات'), icon: UtensilsCrossed },
+                        { key: 'showReservations', label: t('حجوزات الطاولات'), icon: CalendarDays },
                       ].map(item => (
                         <label key={item.key} className="flex items-center justify-between p-2.5 bg-gray-700/30 rounded-lg hover:bg-gray-700/50 cursor-pointer">
                           <div className="flex items-center gap-2">
@@ -2961,15 +2961,15 @@ export default function SuperAdmin() {
                 <div className="space-y-3">
                   <h3 className="font-bold text-yellow-400 flex items-center gap-2 border-b border-gray-700 pb-2">
                     <Sparkles className="h-4 w-4" />
-                    ميزات إضافية
+                    {t('ميزات إضافية')}
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {[
-                      { key: 'showSmartReports', label: 'التقارير الذكية', icon: BrainCircuit },
-                      { key: 'showBranchOrders', label: 'طلبات الفروع', icon: GitBranch },
-                      { key: 'showPurchasing', label: 'المشتريات', icon: ShoppingCart },
-                      { key: 'showReviews', label: 'التقييمات', icon: Star },
-                      { key: 'showCustomerMenu', label: 'قائمة الطعام للعملاء', icon: QrCode },
+                      { key: 'showSmartReports', label: t('التقارير الذكية'), icon: BrainCircuit },
+                      { key: 'showBranchOrders', label: t('طلبات الفروع'), icon: GitBranch },
+                      { key: 'showPurchasing', label: t('المشتريات'), icon: ShoppingCart },
+                      { key: 'showReviews', label: t('التقييمات'), icon: Star },
+                      { key: 'showCustomerMenu', label: t('قائمة الطعام للعملاء'), icon: QrCode },
                     ].map(item => (
                       <label key={item.key} className="flex items-center justify-between p-2.5 bg-gray-700/30 rounded-lg hover:bg-gray-700/50 cursor-pointer">
                         <div className="flex items-center gap-2">
@@ -2989,19 +2989,19 @@ export default function SuperAdmin() {
                 <div className="space-y-3">
                   <h3 className="font-bold text-blue-400 flex items-center gap-2 border-b border-gray-700 pb-2">
                     <Settings className="h-4 w-4" />
-                    خيارات الإعدادات (تحكم في ما يظهر داخل الإعدادات)
+                    {t('خيارات الإعدادات (تحكم في ما يظهر داخل الإعدادات)')}
                   </h3>
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      { key: 'settingsUsers', label: 'المستخدمين', icon: User },
-                      { key: 'settingsCustomers', label: 'العملاء', icon: Users },
-                      { key: 'settingsCategories', label: 'الفئات', icon: FolderTree },
-                      { key: 'settingsProducts', label: 'المنتجات', icon: Package },
-                      { key: 'settingsDeliveryCompanies', label: 'شركات التوصيل', icon: Truck },
-                      { key: 'settingsBranches', label: 'الفروع', icon: Building2 },
-                      { key: 'settingsPrinters', label: 'المطبوعات', icon: Printer },
-                      { key: 'settingsNotifications', label: 'الإشعارات', icon: Bell },
-                      { key: 'settingsCallCenter', label: 'كول سنتر', icon: Headphones },
+                      { key: 'settingsUsers', label: t('المستخدمين'), icon: User },
+                      { key: 'settingsCustomers', label: t('العملاء'), icon: Users },
+                      { key: 'settingsCategories', label: t('الفئات'), icon: FolderTree },
+                      { key: 'settingsProducts', label: t('المنتجات'), icon: Package },
+                      { key: 'settingsDeliveryCompanies', label: t('شركات التوصيل'), icon: Truck },
+                      { key: 'settingsBranches', label: t('الفروع'), icon: Building2 },
+                      { key: 'settingsPrinters', label: t('المطبوعات'), icon: Printer },
+                      { key: 'settingsNotifications', label: t('الإشعارات'), icon: Bell },
+                      { key: 'settingsCallCenter', label: t('كول سنتر'), icon: Headphones },
                     ].map(item => (
                       <label key={item.key} className="flex items-center justify-between p-2.5 bg-gray-700/30 rounded-lg hover:bg-gray-700/50 cursor-pointer">
                         <div className="flex items-center gap-2">
@@ -3021,11 +3021,11 @@ export default function SuperAdmin() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowFeaturesModal(false)} className="border-gray-600">
-              إلغاء
+              {t('إلغاء')}
             </Button>
             <Button onClick={saveTenantFeatures} className="bg-purple-600 hover:bg-purple-700">
               <Check className="h-4 w-4 ml-2" />
-              حفظ الميزات
+              {t('حفظ الميزات')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -3035,19 +3035,19 @@ export default function SuperAdmin() {
       <Dialog open={showResetSalesConfirm} onOpenChange={setShowResetSalesConfirm}>
         <DialogContent className="bg-gray-800 border-gray-700 text-white">
           <DialogHeader>
-            <DialogTitle className="text-xl text-orange-400">تأكيد تصفير المبيعات</DialogTitle>
+            <DialogTitle className="text-xl text-orange-400">{t('تأكيد تصفير المبيعات')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <p className="text-gray-300">
-              هل أنت متأكد من تصفير مبيعات <span className="font-bold text-white">{selectedTenant?.name}</span>؟
+              {t('هل أنت متأكد من تصفير مبيعات')} <span className="font-bold text-white">{selectedTenant?.name}</span>؟
             </p>
             <p className="text-orange-400 text-sm mt-2">
-              ⚠️ سيتم حذف جميع الطلبات والمبيعات. هذا الإجراء لا يمكن التراجع عنه.
+              {t('سيتم حذف جميع الطلبات والمبيعات. هذا الإجراء لا يمكن التراجع عنه.')}
             </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowResetSalesConfirm(false)} className="border-gray-600">
-              إلغاء
+              {t('إلغاء')}
             </Button>
             <Button onClick={resetTenantSales} className="bg-orange-600 hover:bg-orange-700">
               <RotateCcw className="h-4 w-4 ml-2" />
