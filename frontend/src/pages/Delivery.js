@@ -788,7 +788,7 @@ export default function Delivery() {
                             onClick={(e) => { e.stopPropagation(); openEditDialog(driver); }}
                           >
                             <Edit className="h-4 w-4 ml-1" />
-                            تعديل
+                            {t('تعديل')}
                           </Button>
                           <Button 
                             variant="outline" 
@@ -805,24 +805,24 @@ export default function Delivery() {
                           <div className="mt-2 p-2 bg-green-500/10 rounded-lg">
                             <p className="text-xs text-green-400">
                               <Building className="h-3 w-3 inline ml-1" />
-                              الفرع: {branches.find(b => b.id === driver.branch_id)?.name || 'غير محدد'}
+                              {t('الفرع')}: {branches.find(b => b.id === driver.branch_id)?.name || t('غير محدد')}
                             </p>
                           </div>
                         )}
                         
                         {/* رابط تطبيق السائق */}
                         <div className="mt-2 p-2 bg-blue-500/10 rounded-lg">
-                          <p className="text-xs text-blue-400 mb-1">رابط للسائق:</p>
+                          <p className="text-xs text-blue-400 mb-1">{t('رابط للسائق')}:</p>
                           <button
                             className="text-xs text-blue-300 hover:text-blue-200 break-all text-right"
                             onClick={(e) => {
                               e.stopPropagation();
                               const url = `${window.location.origin}/driver-app`;
                               navigator.clipboard.writeText(url);
-                              toast.success('تم نسخ الرابط!');
+                              toast.success(t('تم نسخ الرابط!'));
                             }}
                           >
-                            📋 انسخ الرابط
+                            📋 {t('انسخ الرابط')}
                           </button>
                         </div>
                       </CardContent>
@@ -840,11 +840,11 @@ export default function Delivery() {
                 <CardTitle className="flex items-center justify-between text-foreground">
                   <div className="flex items-center gap-2">
                     <Map className="h-5 w-5 text-primary" />
-                    تتبع السائقين على الخريطة
+                    {t('تتبع السائقين على الخريطة')}
                   </div>
                   <Button variant="outline" size="sm" onClick={fetchDriverLocations}>
                     <RefreshCw className="h-4 w-4 ml-1" />
-                    تحديث المواقع
+                    {t('تحديث المواقع')}
                   </Button>
                 </CardTitle>
               </CardHeader>
