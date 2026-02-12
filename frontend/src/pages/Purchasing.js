@@ -405,9 +405,9 @@ export default function Purchasing() {
                       size="sm"
                       variant="ghost"
                       className="h-6 px-2 text-emerald-500 hover:bg-emerald-500/10"
-                      onClick={() =>{t('createOrderFromAlert(alert)}
+                      onClick={() => createOrderFromAlert(alert)}
                     >
-                      طلب شراء')}</Button>
+                      {t('طلب شراء')}</Button>
                   </div>
                 ))}
               </div>

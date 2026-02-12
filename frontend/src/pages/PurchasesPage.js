@@ -366,9 +366,9 @@ export default function PurchasesPage() {
                     <Button 
                       variant="link" 
                       className="mt-2"
-                      onClick={() =>{t('setShowPurchaseDialog(true)}
+                      onClick={() => setShowPurchaseDialog(true)}
                     >
-                      إنشاء فاتورة جديدة')}</Button>
+                      {t('إنشاء فاتورة جديدة')}</Button>
                   </CardContent>
                 </Card>
               ) : (
