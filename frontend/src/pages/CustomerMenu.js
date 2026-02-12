@@ -1706,7 +1706,7 @@ export default function CustomerMenu() {
                     data-testid="payment-zaincash-btn"
                   >
                     <Smartphone className="h-6 w-6" />
-                    <span className="text-xs font-bold">زين كاش</span>
+                    <span className="text-xs font-bold">{t('زين كاش')}</span>
                   </Button>
                 </div>
                 {/* Card Payment Form */}
@@ -1714,11 +1714,11 @@ export default function CustomerMenu() {
                   <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 space-y-4">
                     <div className="flex items-center gap-2 text-blue-700 mb-2">
                       <CreditCard className="h-5 w-5" />
-                      <span className="font-bold">بيانات البطاقة</span>
+                      <span className="font-bold">{t('بيانات البطاقة')}</span>
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-700 mb-1 block">رقم البطاقة</label>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">{t('رقم البطاقة')}</label>
                       <Input
                         placeholder="0000 0000 0000 0000"
                         className="bg-white text-lg tracking-wider"
@@ -1729,7 +1729,7 @@ export default function CustomerMenu() {
                     
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-sm font-medium text-gray-700 mb-1 block">تاريخ الانتهاء</label>
+                        <label className="text-sm font-medium text-gray-700 mb-1 block">{t('تاريخ الانتهاء')}</label>
                         <Input
                           placeholder="MM/YY"
                           className="bg-white"
@@ -1750,7 +1750,7 @@ export default function CustomerMenu() {
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-700 mb-1 block">اسم حامل البطاقة</label>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">{t('اسم حامل البطاقة')}</label>
                       <Input
                         placeholder="JOHN DOE"
                         className="bg-white uppercase"
@@ -1765,14 +1765,14 @@ export default function CustomerMenu() {
                         onChange={(e) => setSaveCard(e.target.checked)}
                         className="rounded border-blue-300"
                       />
-                      <span className="text-sm text-blue-700">حفظ البطاقة للطلبات القادمة</span>
+                      <span className="text-sm text-blue-700">{t('حفظ البطاقة للطلبات القادمة')}</span>
                     </label>
                     
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
-                      <span>جميع البيانات مشفرة ومحمية بتقنية SSL</span>
+                      <span>{t('جميع البيانات مشفرة ومحمية بتقنية SSL')}</span>
                     </div>
                   </div>
                 )}
@@ -1781,11 +1781,11 @@ export default function CustomerMenu() {
                   <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 space-y-4">
                     <div className="flex items-center gap-2 text-purple-700 mb-2">
                       <Smartphone className="h-5 w-5" />
-                      <span className="font-bold">الدفع عبر زين كاش</span>
+                      <span className="font-bold">{t('الدفع عبر زين كاش')}</span>
                     </div>
                     
                     <div className="text-center p-4 bg-white rounded-lg">
-                      <p className="text-sm text-gray-600 mb-3">امسح الكود أو أرسل المبلغ لهذا الرقم:</p>
+                      <p className="text-sm text-gray-600 mb-3">{t('امسح الكود أو أرسل المبلغ لهذا الرقم')}:</p>
                       
                       {/* QR Code Placeholder */}
                       <div className="w-40 h-40 mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-3 border-2 border-dashed border-purple-300">
