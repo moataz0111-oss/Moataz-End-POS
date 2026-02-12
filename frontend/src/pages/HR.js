@@ -712,10 +712,10 @@ export default function HR() {
                 variant="outline"
                 onClick={() => exportPayrollReport('excel')}
                 className="h-10"
-                title="تصدير تقرير الرواتب"
+                title={t('تصدير تقرير الرواتب')}
               >
                 <FileSpreadsheet className="h-5 w-5 ml-2" />
-                تصدير Excel
+                {t('تصدير Excel')}
               </Button>
               
               {/* زر الصفحة الرئيسية */}
@@ -724,7 +724,7 @@ export default function HR() {
                 size="icon"
                 onClick={() => navigate('/')}
                 className="h-10 w-10"
-                title="الصفحة الرئيسية"
+                title={t('الصفحة الرئيسية')}
               >
                 <Home className="h-5 w-5" />
               </Button>
@@ -740,42 +740,42 @@ export default function HR() {
             <CardContent className="p-4 text-center">
               <Users className="h-8 w-8 text-blue-500 mx-auto mb-2" />
               <p className="text-2xl font-bold text-blue-500">{stats.totalEmployees}</p>
-              <p className="text-sm text-muted-foreground">موظف نشط</p>
+              <p className="text-sm text-muted-foreground">{t('موظف نشط')}</p>
             </CardContent>
           </Card>
           <Card className="bg-green-500/10 border-green-500/20">
             <CardContent className="p-4 text-center">
               <Banknote className="h-8 w-8 text-green-500 mx-auto mb-2" />
               <p className="text-lg font-bold text-green-500">{formatPrice(stats.totalSalaries)}</p>
-              <p className="text-sm text-muted-foreground">إجمالي الرواتب</p>
+              <p className="text-sm text-muted-foreground">{t('إجمالي الرواتب')}</p>
             </CardContent>
           </Card>
           <Card className="bg-yellow-500/10 border-yellow-500/20">
             <CardContent className="p-4 text-center">
               <CreditCard className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
               <p className="text-lg font-bold text-yellow-500">{formatPrice(stats.pendingAdvances)}</p>
-              <p className="text-sm text-muted-foreground">سلف معلقة</p>
+              <p className="text-sm text-muted-foreground">{t('سلف معلقة')}</p>
             </CardContent>
           </Card>
           <Card className="bg-red-500/10 border-red-500/20">
             <CardContent className="p-4 text-center">
               <TrendingDown className="h-8 w-8 text-red-500 mx-auto mb-2" />
               <p className="text-lg font-bold text-red-500">{formatPrice(stats.monthlyDeductions)}</p>
-              <p className="text-sm text-muted-foreground">خصومات الشهر</p>
+              <p className="text-sm text-muted-foreground">{t('خصومات الشهر')}</p>
             </CardContent>
           </Card>
           <Card className="bg-purple-500/10 border-purple-500/20">
             <CardContent className="p-4 text-center">
               <TrendingUp className="h-8 w-8 text-purple-500 mx-auto mb-2" />
               <p className="text-lg font-bold text-purple-500">{formatPrice(stats.monthlyBonuses)}</p>
-              <p className="text-sm text-muted-foreground">مكافآت الشهر</p>
+              <p className="text-sm text-muted-foreground">{t('مكافآت الشهر')}</p>
             </CardContent>
           </Card>
           <Card className="bg-cyan-500/10 border-cyan-500/20">
             <CardContent className="p-4 text-center">
               <DollarSign className="h-8 w-8 text-cyan-500 mx-auto mb-2" />
               <p className="text-lg font-bold text-cyan-500">{formatPrice(stats.netPayable)}</p>
-              <p className="text-sm text-muted-foreground">المستحقات</p>
+              <p className="text-sm text-muted-foreground">{t('المستحقات')}</p>
             </CardContent>
           </Card>
         </div>
@@ -784,31 +784,31 @@ export default function HR() {
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="mb-6 flex-wrap">
             <TabsTrigger value="employees" className="flex items-center gap-2">
-              <Users className="h-4 w-4" /> الموظفين
+              <Users className="h-4 w-4" /> {t('الموظفين')}
             </TabsTrigger>
             <TabsTrigger value="salary-report" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" /> تقرير الرواتب
+              <BarChart3 className="h-4 w-4" /> {t('تقرير الرواتب')}
             </TabsTrigger>
             <TabsTrigger value="attendance" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" /> الحضور
+              <Calendar className="h-4 w-4" /> {t('الحضور')}
             </TabsTrigger>
             <TabsTrigger value="advances" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" /> السلف
+              <CreditCard className="h-4 w-4" /> {t('السلف')}
             </TabsTrigger>
             <TabsTrigger value="deductions" className="flex items-center gap-2">
-              <Minus className="h-4 w-4" /> الخصومات
+              <Minus className="h-4 w-4" /> {t('الخصومات')}
             </TabsTrigger>
             <TabsTrigger value="bonuses" className="flex items-center gap-2">
-              <Gift className="h-4 w-4" /> المكافآت
+              <Gift className="h-4 w-4" /> {t('المكافآت')}
             </TabsTrigger>
             <TabsTrigger value="payroll" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" /> كشوفات الرواتب
+              <FileText className="h-4 w-4" /> {t('كشوفات الرواتب')}
             </TabsTrigger>
             <TabsTrigger value="ratings" className="flex items-center gap-2">
-              <Award className="h-4 w-4" /> تقييم الموظفين
+              <Award className="h-4 w-4" /> {t('تقييم الموظفين')}
             </TabsTrigger>
             <TabsTrigger value="biometric" className="flex items-center gap-2">
-              <Fingerprint className="h-4 w-4" /> أجهزة البصمة
+              <Fingerprint className="h-4 w-4" /> {t('أجهزة البصمة')}
             </TabsTrigger>
           </TabsList>
 
@@ -816,12 +816,12 @@ export default function HR() {
           <TabsContent value="employees">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>قائمة الموظفين</CardTitle>
+                <CardTitle>{t('قائمة الموظفين')}</CardTitle>
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder="بحث..."
+                      placeholder={t('بحث...')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="pr-9 w-60"
@@ -830,21 +830,21 @@ export default function HR() {
                   <Dialog open={employeeDialogOpen} onOpenChange={setEmployeeDialogOpen}>
                     <DialogTrigger asChild>
                       <Button onClick={() => { setEditingEmployee(null); resetEmployeeForm(); }}>
-                        <UserPlus className="h-4 w-4 ml-2" /> إضافة موظف
+                        <UserPlus className="h-4 w-4 ml-2" /> {t('إضافة موظف')}
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl">
                       <DialogHeader>
-                        <DialogTitle>{editingEmployee ? 'تعديل موظف' : 'إضافة موظف جديد'}</DialogTitle>
+                        <DialogTitle>{editingEmployee ? t('تعديل موظف') : t('إضافة موظف جديد')}</DialogTitle>
                       </DialogHeader>
                       <form onSubmit={editingEmployee ? handleUpdateEmployee : handleCreateEmployee} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label>الاسم الكامل *</Label>
+                            <Label>{t('الاسم الكامل')} *</Label>
                             <Input value={employeeForm.name} onChange={(e) => setEmployeeForm({...employeeForm, name: e.target.value})} required />
                           </div>
                           <div>
-                            <Label>رقم الهاتف *</Label>
+                            <Label>{t('رقم الهاتف')} *</Label>
                             <Input value={employeeForm.phone} onChange={(e) => setEmployeeForm({...employeeForm, phone: e.target.value})} required />
                           </div>
                           <div>
