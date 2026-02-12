@@ -180,8 +180,8 @@ export default function POS() {
       
       // إظهار رسالة
       if (fromCall === 'true') {
-        toast.success(`تم استلام مكالمة من: ${phone}`, {
-          description: 'تم تعيين نوع الطلب إلى توصيل'
+        toast.success(t('تم استلام مكالمة من:') + ` ${phone}`, {
+          description: t('تم تعيين نوع الطلب إلى توصيل')
         });
       }
     }
@@ -224,7 +224,7 @@ export default function POS() {
           const autoOpenRes = await axios.post(`${API}/shifts/auto-open`);
           setCurrentShift(autoOpenRes.data.shift);
           if (!autoOpenRes.data.was_existing) {
-            toast.success('تم فتح وردية جديدة تلقائياً');
+            toast.success(t('تم فتح وردية جديدة تلقائياً'));
           }
         } catch (autoOpenError) {
           console.log('Could not auto-open shift:', autoOpenError);
@@ -252,7 +252,7 @@ export default function POS() {
       await fetchPendingOrders();
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      toast.error('فشل في تحميل البيانات');
+      toast.error(t('فشل في تحميل البيانات'));
     } finally {
       setLoading(false);
     }
