@@ -158,6 +158,7 @@ function LocationPicker({ position, setPosition, onClose }) {
 export default function CustomerMenu() {
   const { tenantId } = useParams();
   const [searchParams] = useSearchParams();
+  const { t, lang, isRTL } = useTranslation();
   
   // App States
   const [step, setStep] = useState('branches'); // branches, menu, cart, checkout, tracking, history
