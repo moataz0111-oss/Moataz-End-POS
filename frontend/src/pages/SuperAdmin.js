@@ -1258,7 +1258,7 @@ export default function SuperAdmin() {
       setNewBackgroundAnimation('fade');
       toast.success('تم إضافة الخلفية');
     } catch (error) {
-      toast.error('فشل في إضافة الخلفية');
+      toast.error(t('فشل في إضافة الخلفية'));
     } finally {
       setBackgroundsLoading(false);
     }
@@ -1313,7 +1313,7 @@ export default function SuperAdmin() {
         logo_url: res.data.logo_url
       }));
       
-      toast.success('تم رفع شعار صفحة تسجيل الدخول بنجاح');
+      toast.success(t('تم رفع شعار صفحة تسجيل الدخول بنجاح'));
       setLoginLogoFile(null);
       setLoginLogoPreview('');
       return res.data.logo_url;
@@ -1335,9 +1335,9 @@ export default function SuperAdmin() {
         logo_url: ''
       }));
       setLoginLogoPreview('');
-      toast.success('تم حذف الشعار');
+      toast.success(t('تم حذف الشعار'));
     } catch (error) {
-      toast.error('فشل في حذف الشعار');
+      toast.error(t('فشل في حذف الشعار'));
     }
   };
 
@@ -1358,9 +1358,9 @@ export default function SuperAdmin() {
         ...prev,
         backgrounds: prev.backgrounds.filter(b => b.id !== bgId)
       }));
-      toast.success('تم حذف الخلفية');
+      toast.success(t('تم حذف الخلفية'));
     } catch (error) {
-      toast.error('فشل في حذف الخلفية');
+      toast.error(t('فشل في حذف الخلفية'));
     }
   };
 
