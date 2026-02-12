@@ -1300,7 +1300,7 @@ export default function WarehouseManufacturing() {
           )}
           
           <DialogFooter>
-            <Button variant="outline" onClick={() =>{t('setShowProduceDialog(null)}>
+            <Button variant="outline" onClick={() => setShowProduceDialog(null)}>
               {t('إلغاء')}</Button>
             <Button 
               onClick={handleProduce}
