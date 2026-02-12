@@ -1961,6 +1961,10 @@ const translationMap = {
   'تحصيل': { en: 'Collect', ku: '' },
   'لا يوجد سائقين': { en: 'No drivers', ku: '' },
   'أضف سائقين لبدء إدارة التوصيلات': { en: 'Add drivers to start managing deliveries', ku: '' },
+  'لا توجد أصناف': { en: 'No items', ku: '' },
+  'إضافة كمية': { en: 'Add Quantity', ku: '' },
+  'سحب كمية': { en: 'Withdraw Quantity', ku: '' },
+  'الكمية الحالية': { en: 'Current Quantity', ku: '' },
 };
 
 // الحصول على اللغة الحالية
