@@ -1965,6 +1965,20 @@ const translationMap = {
   'إضافة كمية': { en: 'Add Quantity', ku: '' },
   'سحب كمية': { en: 'Withdraw Quantity', ku: '' },
   'الكمية الحالية': { en: 'Current Quantity', ku: '' },
+  
+  // ===== Additional Delivery Page =====
+  'في مهمة': { en: 'On Mission', ku: '' },
+  'توصيلة': { en: 'delivery', ku: '' },
+  'طلب معلق': { en: 'pending order', ku: '' },
+  'في طريقه للتوصيل': { en: 'On the way', ku: '' },
+  'تم التسليم': { en: 'Delivered', ku: '' },
+  'تحويل لسائق آخر': { en: 'Transfer to another driver', ku: '' },
+  'غير محدد': { en: 'Not specified', ku: '' },
+  'رابط للسائق': { en: 'Driver Link', ku: '' },
+  'انسخ الرابط': { en: 'Copy Link', ku: '' },
+  'تم نسخ الرابط!': { en: 'Link copied!', ku: '' },
+  'تتبع السائقين على الخريطة': { en: 'Track Drivers on Map', ku: '' },
+  'تحديث المواقع': { en: 'Update Locations', ku: '' },
 };
 
 // الحصول على اللغة الحالية
