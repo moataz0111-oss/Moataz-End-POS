@@ -68,7 +68,7 @@ export default function CallLogs() {
         avgDuration: 0 // يمكن حسابها لاحقاً
       });
     } catch (error) {
-      toast.error('فشل في تحميل سجل المكالمات');
+      toast.error(t('فشل في تحميل سجل المكالمات'));
     } finally {
       setLoading(false);
     }
