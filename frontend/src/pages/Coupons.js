@@ -236,7 +236,7 @@ export default function Coupons() {
   const copyCode = (code) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
-    toast.success('تم نسخ الكود');
+    toast.success(t('تم نسخ الكود'));
     setTimeout(() => setCopiedCode(null), 2000);
   };
   const generateCode = () => {
