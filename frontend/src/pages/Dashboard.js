@@ -1435,7 +1435,7 @@ export default function Dashboard() {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2">
               <Calculator className="h-6 w-6 text-orange-500" />
-              إغلاق الصندوق
+              {t('إغلاق الصندوق')}
             </DialogTitle>
           </DialogHeader>
 
@@ -1449,7 +1449,7 @@ export default function Dashboard() {
               <div className="p-4">
                 <div ref={printRef}>
                   <div className="header text-center mb-6">
-                    <h1 className="text-2xl font-bold">تقرير إغلاق الصندوق</h1>
+                    <h1 className="text-2xl font-bold">{t('تقرير إغلاق الصندوق')}</h1>
                     <p className="text-muted-foreground">{closingResult.branch_name}</p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(closingResult.ended_at).toLocaleString('ar-IQ')}
@@ -1458,37 +1458,37 @@ export default function Dashboard() {
 
                   {/* بيانات الكاشير */}
                   <div className="section mb-4 p-4 bg-muted/30 rounded-lg">
-                    <div className="section-title font-bold mb-2">بيانات الوردية</div>
+                    <div className="section-title font-bold mb-2">{t('بيانات الوردية')}</div>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>الكاشير: <strong>{closingResult.cashier_name}</strong></div>
-                      <div>الفرع: <strong>{closingResult.branch_name}</strong></div>
-                      <div>وقت الدخول: <strong>{new Date(closingResult.started_at).toLocaleString('ar-IQ')}</strong></div>
-                      <div>وقت الإغلاق: <strong>{new Date(closingResult.ended_at).toLocaleString('ar-IQ')}</strong></div>
+                      <div>{t('الكاشير')}: <strong>{closingResult.cashier_name}</strong></div>
+                      <div>{t('الفرع')}: <strong>{closingResult.branch_name}</strong></div>
+                      <div>{t('وقت الدخول')}: <strong>{new Date(closingResult.started_at).toLocaleString('ar-IQ')}</strong></div>
+                      <div>{t('وقت الإغلاق')}: <strong>{new Date(closingResult.ended_at).toLocaleString('ar-IQ')}</strong></div>
                     </div>
                   </div>
 
                   {/* إجمالي المبيعات */}
                   <div className="section mb-4 p-4 bg-green-500/10 rounded-lg">
-                    <div className="section-title font-bold mb-2 text-green-600">المبيعات</div>
+                    <div className="section-title font-bold mb-2 text-green-600">{t('المبيعات')}</div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span>إجمالي المبيعات:</span>
+                        <span>{t('إجمالي المبيعات')}:</span>
                         <strong className="text-green-600">{formatPrice(closingResult.total_sales)}</strong>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>نقدي:</span>
+                        <span>{t('نقدي')}:</span>
                         <span>{formatPrice(closingResult.cash_sales)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>بطاقات:</span>
+                        <span>{t('بطاقات')}:</span>
                         <span>{formatPrice(closingResult.card_sales)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>آجل:</span>
+                        <span>{t('آجل')}:</span>
                         <span>{formatPrice(closingResult.credit_sales)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>عدد الطلبات:</span>
+                        <span>{t('عدد الطلبات')}:</span>
                         <span>{closingResult.total_orders}</span>
                       </div>
                     </div>
@@ -1497,7 +1497,7 @@ export default function Dashboard() {
                   {/* تطبيقات التوصيل */}
                   {closingResult.delivery_app_sales && Object.keys(closingResult.delivery_app_sales).length > 0 && (
                     <div className="section mb-4 p-4 bg-blue-500/10 rounded-lg">
-                      <div className="section-title font-bold mb-2 text-blue-600">مبيعات التطبيقات</div>
+                      <div className="section-title font-bold mb-2 text-blue-600">{t('مبيعات التطبيقات')}</div>
                       <div className="space-y-1">
                         {Object.entries(closingResult.delivery_app_sales).map(([app, amount]) => (
                           <div key={app} className="flex justify-between text-sm">
@@ -1512,9 +1512,9 @@ export default function Dashboard() {
                   {/* مبيعات السائقين */}
                   {closingResult.driver_sales > 0 && (
                     <div className="section mb-4 p-4 bg-orange-500/10 rounded-lg">
-                      <div className="section-title font-bold mb-2 text-orange-600">مبيعات السائقين</div>
+                      <div className="section-title font-bold mb-2 text-orange-600">{t('مبيعات السائقين')}</div>
                       <div className="flex justify-between">
-                        <span>إجمالي السائقين:</span>
+                        <span>{t('إجمالي السائقين')}:</span>
                         <strong>{formatPrice(closingResult.driver_sales)}</strong>
                       </div>
                     </div>
@@ -1522,22 +1522,22 @@ export default function Dashboard() {
 
                   {/* الخصومات والإلغاءات */}
                   <div className="section mb-4 p-4 bg-red-500/10 rounded-lg">
-                    <div className="section-title font-bold mb-2 text-red-600">الخصومات والإلغاءات</div>
+                    <div className="section-title font-bold mb-2 text-red-600">{t('الخصومات والإلغاءات')}</div>
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span>إجمالي الخصومات:</span>
+                        <span>{t('إجمالي الخصومات')}:</span>
                         <span className="text-red-600">{formatPrice(closingResult.discounts_total || 0)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>الطلبات الملغاة ({closingResult.cancelled_orders || 0}):</span>
+                        <span>{t('الطلبات الملغاة')} ({closingResult.cancelled_orders || 0}):</span>
                         <span className="text-red-600">{formatPrice(closingResult.cancelled_amount || 0)}</span>
                       </div>
                       {closingResult.cancelled_by && closingResult.cancelled_by.length > 0 && (
                         <div className="mt-2 pt-2 border-t border-red-200">
-                          <div className="text-xs text-red-600 mb-1">تفاصيل الإلغاء:</div>
+                          <div className="text-xs text-red-600 mb-1">{t('تفاصيل الإلغاء')}:</div>
                           {closingResult.cancelled_by.map((item, idx) => (
                             <div key={idx} className="flex justify-between text-xs">
-                              <span>{item.user_name} ({item.count} طلب):</span>
+                              <span>{item.user_name} ({item.count} {t('طلب')}):</span>
                               <span>{formatPrice(item.total)}</span>
                             </div>
                           ))}
