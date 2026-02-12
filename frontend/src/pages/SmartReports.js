@@ -53,7 +53,7 @@ export default function SmartReports() {
   // Export functions
   const exportToExcel = async (reportType) => {
     try {
-      toast.loading('جاري تحضير الملف...');
+      toast.loading(t('جاري تحضير الملف...'));
       const token = localStorage.getItem('token');
       
       const response = await axios.get(`${API}/smart-reports/export/excel`, {
@@ -72,15 +72,15 @@ export default function SmartReports() {
       window.URL.revokeObjectURL(url);
       
       toast.dismiss();
-      toast.success('تم تحميل الملف بنجاح');
+      toast.success(t('تم تحميل الملف بنجاح'));
     } catch (error) {
       toast.dismiss();
-      toast.error('فشل في تصدير الملف');
+      toast.error(t('فشل في تصدير الملف'));
     }
   };
   const exportToPDF = async (reportType) => {
     try {
-      toast.loading('جاري تحضير ملف PDF...');
+      toast.loading(t('جاري تحضير ملف PDF...'));
       const token = localStorage.getItem('token');
       
       const response = await axios.get(`${API}/smart-reports/export/pdf`, {
@@ -99,10 +99,10 @@ export default function SmartReports() {
       window.URL.revokeObjectURL(url);
       
       toast.dismiss();
-      toast.success('تم تحميل ملف PDF بنجاح');
+      toast.success(t('تم تحميل ملف PDF بنجاح'));
     } catch (error) {
       toast.dismiss();
-      toast.error('فشل في تصدير الملف');
+      toast.error(t('فشل في تصدير الملف'));
     }
   };
   const fetchReportData = async () => {
