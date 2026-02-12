@@ -692,8 +692,8 @@ export default function HR() {
                   <Users className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">إدارة الموارد البشرية</h1>
-                  <p className="text-sm text-muted-foreground">إدارة الموظفين والرواتب والحضور</p>
+                  <h1 className="text-2xl font-bold text-foreground">{t('إدارة الموارد البشرية')}</h1>
+                  <p className="text-sm text-muted-foreground">{t('إدارة الموظفين والرواتب والحضور')}</p>
                 </div>
               </div>
             </div>
