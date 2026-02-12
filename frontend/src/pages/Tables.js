@@ -535,10 +535,11 @@ export default function Tables() {
           <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={() =>{t('setTransferDialogOpen(false)}
+              onClick={() => setTransferDialogOpen(false)}
               className="flex-1"
             >
-              {t('إلغاء')}</Button>
+              {t('إلغاء')}
+            </Button>
             <Button 
               onClick={handleTransferTable}
               disabled={!targetTableId}
