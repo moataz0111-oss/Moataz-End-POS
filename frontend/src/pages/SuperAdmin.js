@@ -1954,7 +1954,7 @@ export default function SuperAdmin() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">إجمالي العملاء</p>
+                  <p className="text-sm text-gray-400">{t('إجمالي العملاء')}</p>
                   <p className="text-3xl font-bold mt-1">{stats?.total_tenants || 0}</p>
                 </div>
                 <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
@@ -1968,7 +1968,7 @@ export default function SuperAdmin() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">العملاء النشطون</p>
+                  <p className="text-sm text-gray-400">{t('العملاء النشطون')}</p>
                   <p className="text-3xl font-bold mt-1 text-green-400">{stats?.active_tenants || 0}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
@@ -1982,7 +1982,7 @@ export default function SuperAdmin() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">إجمالي المستخدمين</p>
+                  <p className="text-sm text-gray-400">{t('إجمالي المستخدمين')}</p>
                   <p className="text-3xl font-bold mt-1">{stats?.total_users || 0}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
@@ -1996,7 +1996,7 @@ export default function SuperAdmin() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">إجمالي المبيعات</p>
+                  <p className="text-sm text-gray-400">{t('إجمالي المبيعات')}</p>
                   <p className="text-2xl font-bold mt-1 text-green-400">{formatPrice(stats?.total_sales || 0)}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
@@ -2011,21 +2011,21 @@ export default function SuperAdmin() {
         {stats?.subscription_stats && Object.keys(stats.subscription_stats).length > 0 && (
           <Card className="bg-gray-800/50 border-gray-700">
             <CardHeader>
-              <CardTitle className="text-lg">الاشتراكات</CardTitle>
+              <CardTitle className="text-lg">{t('الاشتراكات')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center p-4 bg-yellow-500/10 rounded-lg">
                   <p className="text-2xl font-bold text-yellow-400">{stats.subscription_stats.trial || 0}</p>
-                  <p className="text-sm text-gray-400">تجريبي</p>
+                  <p className="text-sm text-gray-400">{t('تجريبي')}</p>
                 </div>
                 <div className="text-center p-4 bg-blue-500/10 rounded-lg">
                   <p className="text-2xl font-bold text-blue-400">{stats.subscription_stats.basic || 0}</p>
-                  <p className="text-sm text-gray-400">أساسي</p>
+                  <p className="text-sm text-gray-400">{t('أساسي')}</p>
                 </div>
                 <div className="text-center p-4 bg-purple-500/10 rounded-lg">
                   <p className="text-2xl font-bold text-purple-400">{stats.subscription_stats.premium || 0}</p>
-                  <p className="text-sm text-gray-400">مميز</p>
+                  <p className="text-sm text-gray-400">{t('مميز')}</p>
                 </div>
               </div>
             </CardContent>
