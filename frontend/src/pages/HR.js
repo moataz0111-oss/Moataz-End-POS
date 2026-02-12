@@ -1051,18 +1051,10 @@ export default function HR() {
                                   <Button 
                                     size="sm" 
                                     variant="outline"
-                                    onClick={() => exportEmployeeSalarySlip(emp.id, emp.name, 'excel')}
-                                    title="Excel"
+                                    onClick={() => window.print()}
+                                    title={t('طباعة')}
                                   >
-                                    <FileSpreadsheet className="h-4 w-4" />
-                                  </Button>
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    onClick={() => exportEmployeeSalarySlipPDF(emp.id, emp.name)}
-                                    title="PDF"
-                                  >
-                                    <FileText className="h-4 w-4" />
+                                    <Printer className="h-4 w-4" />
                                   </Button>
                                 </div>
                               </td>
