@@ -4525,7 +4525,7 @@ export default function SuperAdmin() {
                   setSelectedBackgroundFile(null);
                   setBackgroundPreviewUrl('');
                 } else {
-                  toast.error('الرجاء اختيار صورة');
+                  toast.error(t('الرجاء اختيار صورة'));
                 }
               }}
               disabled={backgroundsLoading || (backgroundUploadMode === 'url' ? !newBackgroundUrl : !selectedBackgroundFile)}
