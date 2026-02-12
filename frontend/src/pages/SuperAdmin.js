@@ -2199,12 +2199,12 @@ export default function SuperAdmin() {
         {/* Tenants List */}
         <Card className="bg-gray-800/50 border-gray-700">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">إدارة العملاء</CardTitle>
+            <CardTitle className="text-lg">{t('إدارة العملاء')}</CardTitle>
             <div className="flex items-center gap-3">
               <div className="relative">
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="بحث..."
+                  placeholder={t('بحث...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pr-10 bg-gray-700/50 border-gray-600 w-64"
@@ -2215,7 +2215,7 @@ export default function SuperAdmin() {
               </Button>
               <Button onClick={() => setShowNewTenant(true)} className="bg-purple-600 hover:bg-purple-700 gap-2">
                 <Plus className="h-4 w-4" />
-                عميل جديد
+                {t('عميل جديد')}
               </Button>
             </div>
           </CardHeader>
@@ -2225,19 +2225,19 @@ export default function SuperAdmin() {
               <TabsList className="grid w-full grid-cols-4 mb-4 bg-gray-700/50">
                 <TabsTrigger value="active" className="data-[state=active]:bg-green-600">
                   <Users className="h-4 w-4 ml-2" />
-                  العملاء ({tenants.filter(t => !t.is_demo && t.subscription_type !== 'demo').length})
+                  {t('العملاء')} ({tenants.filter(t => !t.is_demo && t.subscription_type !== 'demo').length})
                 </TabsTrigger>
                 <TabsTrigger value="demo" className="data-[state=active]:bg-yellow-600">
                   <Play className="h-4 w-4 ml-2" />
-                  التجريبية ({tenants.filter(t => t.is_demo || t.subscription_type === 'demo').length})
+                  {t('التجريبية')} ({tenants.filter(t => t.is_demo || t.subscription_type === 'demo').length})
                 </TabsTrigger>
                 <TabsTrigger value="subscriptions" className="data-[state=active]:bg-purple-600">
                   <Calendar className="h-4 w-4 ml-2" />
-                  الاشتراكات
+                  {t('الاشتراكات')}
                 </TabsTrigger>
                 <TabsTrigger value="all" className="data-[state=active]:bg-gray-600">
                   <Layers className="h-4 w-4 ml-2" />
-                  الكل ({tenants.length})
+                  {t('الكل')} ({tenants.length})
                 </TabsTrigger>
               </TabsList>
               
@@ -2245,7 +2245,7 @@ export default function SuperAdmin() {
               <TabsContent value="active">
                 <div className="space-y-3">
                   {filteredTenants.filter(t => !t.is_demo && t.subscription_type !== 'demo').length === 0 ? (
-                    <p className="text-center text-gray-400 py-8">لا يوجد عملاء فعليين</p>
+                    <p className="text-center text-gray-400 py-8">{t('لا يوجد عملاء فعليين')}</p>
                   ) : (
                     filteredTenants.filter(t => !t.is_demo && t.subscription_type !== 'demo').map((tenant) => (
                       <TenantCard key={tenant.id} tenant={tenant} />
@@ -2258,7 +2258,7 @@ export default function SuperAdmin() {
               <TabsContent value="demo">
                 <div className="space-y-3">
                   {filteredTenants.filter(t => t.is_demo || t.subscription_type === 'demo').length === 0 ? (
-                    <p className="text-center text-gray-400 py-8">لا توجد حسابات تجريبية</p>
+                    <p className="text-center text-gray-400 py-8">{t('لا توجد حسابات تجريبية')}</p>
                   ) : (
                     filteredTenants.filter(t => t.is_demo || t.subscription_type === 'demo').map((tenant) => (
                       <TenantCard key={tenant.id} tenant={tenant} isDemo />
