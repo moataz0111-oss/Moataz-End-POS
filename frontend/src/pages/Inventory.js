@@ -301,7 +301,7 @@ export default function Inventory() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-foreground">الوحدة</Label>
+                        <Label className="text-foreground">{t('الوحدة')}</Label>
                         <Select 
                           value={formData.unit} 
                           onValueChange={(v) => setFormData({ ...formData, unit: v })}
@@ -310,20 +310,20 @@ export default function Inventory() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="كغم">كغم</SelectItem>
-                            <SelectItem value="كيلو">كيلو</SelectItem>
-                            <SelectItem value="غرام">غرام</SelectItem>
-                            <SelectItem value="لتر">لتر</SelectItem>
-                            <SelectItem value="مل">مل</SelectItem>
-                            <SelectItem value="قطعة">قطعة</SelectItem>
-                            <SelectItem value="حبة">حبة</SelectItem>
-                            <SelectItem value="علبة">علبة</SelectItem>
-                            <SelectItem value="كرتون">كرتون</SelectItem>
+                            <SelectItem value="كغم">{t('كغم')}</SelectItem>
+                            <SelectItem value="كيلو">{t('كيلو')}</SelectItem>
+                            <SelectItem value="غرام">{t('غرام')}</SelectItem>
+                            <SelectItem value="لتر">{t('لتر')}</SelectItem>
+                            <SelectItem value="مل">{t('مل')}</SelectItem>
+                            <SelectItem value="قطعة">{t('قطعة')}</SelectItem>
+                            <SelectItem value="حبة">{t('حبة')}</SelectItem>
+                            <SelectItem value="علبة">{t('علبة')}</SelectItem>
+                            <SelectItem value="كرتون">{t('كرتون')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label className="text-foreground">النوع</Label>
+                        <Label className="text-foreground">{t('النوع')}</Label>
                         <Select 
                           value={formData.item_type} 
                           onValueChange={(v) => setFormData({ ...formData, item_type: v })}
@@ -332,15 +332,15 @@ export default function Inventory() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="raw">مادة خام</SelectItem>
-                            <SelectItem value="finished">منتج نهائي</SelectItem>
+                            <SelectItem value="raw">{t('مادة خام')}</SelectItem>
+                            <SelectItem value="finished">{t('منتج نهائي')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-foreground">الكمية</Label>
+                        <Label className="text-foreground">{t('الكمية')}</Label>
                         <Input
                           type="number"
                           value={formData.quantity}
@@ -349,7 +349,7 @@ export default function Inventory() {
                         />
                       </div>
                       <div>
-                        <Label className="text-foreground">الحد الأدنى</Label>
+                        <Label className="text-foreground">{t('الحد الأدنى')}</Label>
                         <Input
                           type="number"
                           value={formData.min_quantity}
@@ -358,7 +358,7 @@ export default function Inventory() {
                         />
                       </div>
                       <div>
-                        <Label className="text-foreground">التكلفة/وحدة</Label>
+                        <Label className="text-foreground">{t('التكلفة/وحدة')}</Label>
                         <Input
                           type="number"
                           value={formData.cost_per_unit}
@@ -373,7 +373,7 @@ export default function Inventory() {
                       <div className="border border-blue-500/30 rounded-lg p-4 bg-blue-500/5">
                         <div className="flex items-center gap-2 mb-3">
                           <Beaker className="h-5 w-5 text-blue-500" />
-                          <Label className="text-foreground font-bold">الوصفة (المكونات)</Label>
+                          <Label className="text-foreground font-bold">{t('الوصفة (المكونات)')}</Label>
                         </div>
                         
                         {/* إضافة مكون جديد */}
@@ -383,7 +383,7 @@ export default function Inventory() {
                             onValueChange={(v) => setRecipeIngredient(prev => ({ ...prev, raw_material_id: v }))}
                           >
                             <SelectTrigger className="flex-1">
-                              <SelectValue placeholder="اختر مادة خام..." />
+                              <SelectValue placeholder={t('اختر مادة خام...')} />
                             </SelectTrigger>
                             <SelectContent className="max-h-48 overflow-y-auto">
                               {rawMaterials.map(material => (
