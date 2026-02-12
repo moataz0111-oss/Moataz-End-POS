@@ -2606,10 +2606,10 @@ export default function SuperAdmin() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-800 border-gray-700">
-                    <SelectItem value="1">شهر واحد</SelectItem>
-                    <SelectItem value="3">3 أشهر</SelectItem>
-                    <SelectItem value="6">6 أشهر</SelectItem>
-                    <SelectItem value="12">سنة كاملة</SelectItem>
+                    <SelectItem value="1">{t('شهر واحد')}</SelectItem>
+                    <SelectItem value="3">{t('3 أشهر')}</SelectItem>
+                    <SelectItem value="6">{t('6 أشهر')}</SelectItem>
+                    <SelectItem value="12">{t('سنة كاملة')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -2617,7 +2617,7 @@ export default function SuperAdmin() {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>الحد الأقصى للفروع</Label>
+                <Label>{t('الحد الأقصى للفروع')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -2627,7 +2627,7 @@ export default function SuperAdmin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>الحد الأقصى للمستخدمين</Label>
+                <Label>{t('الحد الأقصى للمستخدمين')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -2640,11 +2640,11 @@ export default function SuperAdmin() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowNewTenant(false)} className="border-gray-600">
-              إلغاء
+              {t('إلغاء')}
             </Button>
             <Button onClick={createTenant} className="bg-purple-600 hover:bg-purple-700">
               <Plus className="h-4 w-4 ml-2" />
-              إنشاء العميل
+              {t('إنشاء العميل')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2654,23 +2654,23 @@ export default function SuperAdmin() {
       <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <DialogContent className="bg-gray-800 border-gray-700 text-white">
           <DialogHeader>
-            <DialogTitle className="text-xl text-red-400">تأكيد الحذف النهائي</DialogTitle>
+            <DialogTitle className="text-xl text-red-400">{t('تأكيد الحذف النهائي')}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             <p className="text-gray-300">
-              هل أنت متأكد من حذف العميل <span className="font-bold text-white">{selectedTenant?.name}</span>؟
+              {t('هل أنت متأكد من حذف العميل')} <span className="font-bold text-white">{selectedTenant?.name}</span>؟
             </p>
             <p className="text-red-400 text-sm mt-2">
-              ⚠️ هذا الإجراء نهائي ولا يمكن التراجع عنه. سيتم حذف جميع بيانات العميل.
+              {t('هذا الإجراء نهائي ولا يمكن التراجع عنه. سيتم حذف جميع بيانات العميل.')}
             </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} className="border-gray-600">
-              إلغاء
+              {t('إلغاء')}
             </Button>
             <Button onClick={deleteTenant} className="bg-red-600 hover:bg-red-700">
               <Trash2 className="h-4 w-4 ml-2" />
-              حذف نهائي
+              {t('حذف نهائي')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2680,17 +2680,17 @@ export default function SuperAdmin() {
       <Dialog open={showResetPassword} onOpenChange={setShowResetPassword}>
         <DialogContent className="bg-gray-800 border-gray-700 text-white">
           <DialogHeader>
-            <DialogTitle className="text-xl">إعادة تعيين كلمة المرور</DialogTitle>
+            <DialogTitle className="text-xl">{t('إعادة تعيين كلمة المرور')}</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-4">
             <p className="text-gray-300">
-              إعادة تعيين كلمة المرور للعميل: <span className="font-bold text-white">{selectedTenant?.owner_email}</span>
+              {t('إعادة تعيين كلمة المرور للعميل')}: <span className="font-bold text-white">{selectedTenant?.owner_email}</span>
             </p>
             <div className="space-y-2">
-              <Label>كلمة المرور الجديدة</Label>
+              <Label>{t('كلمة المرور الجديدة')}</Label>
               <Input
                 type="password"
-                placeholder="أدخل كلمة المرور الجديدة"
+                placeholder={t('أدخل كلمة المرور الجديدة')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="bg-gray-700/50 border-gray-600"
@@ -2699,11 +2699,11 @@ export default function SuperAdmin() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowResetPassword(false)} className="border-gray-600">
-              إلغاء
+              {t('إلغاء')}
             </Button>
             <Button onClick={resetPassword} className="bg-yellow-600 hover:bg-yellow-700">
               <Key className="h-4 w-4 ml-2" />
-              تغيير كلمة المرور
+              {t('تغيير كلمة المرور')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -2713,12 +2713,12 @@ export default function SuperAdmin() {
       <Dialog open={showEditTenant} onOpenChange={setShowEditTenant}>
         <DialogContent className="bg-gray-800 border-gray-700 text-white max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl">تعديل بيانات العميل</DialogTitle>
+            <DialogTitle className="text-xl">{t('تعديل بيانات العميل')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>اسم المطعم</Label>
+                <Label>{t('اسم المطعم')}</Label>
                 <Input
                   value={editTenantForm.name}
                   onChange={(e) => setEditTenantForm({...editTenantForm, name: e.target.value})}
@@ -2726,7 +2726,7 @@ export default function SuperAdmin() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>نوع الاشتراك</Label>
+                <Label>{t('نوع الاشتراك')}</Label>
                 <Select 
                   value={editTenantForm.subscription_type} 
                   onValueChange={(v) => setEditTenantForm({...editTenantForm, subscription_type: v})}
@@ -2735,13 +2735,13 @@ export default function SuperAdmin() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="demo">تجريبي</SelectItem>
-                    <SelectItem value="trial">فترة تجريبية</SelectItem>
-                    <SelectItem value="bronze">🥉 برونزية</SelectItem>
-                    <SelectItem value="silver">🥈 فضية</SelectItem>
-                    <SelectItem value="gold">🥇 ذهبية</SelectItem>
-                    <SelectItem value="basic">أساسي</SelectItem>
-                    <SelectItem value="premium">مميز</SelectItem>
+                    <SelectItem value="demo">{t('تجريبي')}</SelectItem>
+                    <SelectItem value="trial">{t('فترة تجريبية')}</SelectItem>
+                    <SelectItem value="bronze">{t('برونزية')}</SelectItem>
+                    <SelectItem value="silver">{t('فضية')}</SelectItem>
+                    <SelectItem value="gold">{t('ذهبية')}</SelectItem>
+                    <SelectItem value="basic">{t('أساسي')}</SelectItem>
+                    <SelectItem value="premium">{t('مميز')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
