@@ -712,38 +712,38 @@ export default function Delivery() {
                           <span className={`text-xs px-2 py-1 rounded-full ${
                             driver.is_available ? 'bg-green-500/10 text-green-500' : 'bg-orange-500/10 text-orange-500'
                           }`}>
-                            {driver.is_available ? 'متاح' : 'في مهمة'}
+                            {driver.is_available ? t('متاح') : t('في مهمة')}
                           </span>
                         </div>
 
                         {/* إحصائيات السائق */}
                         <div className="grid grid-cols-2 gap-2 mb-3">
                           <div className="bg-red-500/10 p-2 rounded-lg text-center">
-                            <p className="text-xs text-muted-foreground">غير مدفوع</p>
+                            <p className="text-xs text-muted-foreground">{t('غير مدفوع')}</p>
                             <p className="text-sm font-bold text-red-500">{formatPrice(stats.unpaid_total || 0)}</p>
                           </div>
                           <div className="bg-green-500/10 p-2 rounded-lg text-center">
-                            <p className="text-xs text-muted-foreground">مدفوع اليوم</p>
+                            <p className="text-xs text-muted-foreground">{t('مدفوع اليوم')}</p>
                             <p className="text-sm font-bold text-green-500">{formatPrice(stats.paid_today || 0)}</p>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>{driver.total_deliveries || 0} توصيلة</span>
-                          <span>{stats.pending_orders || 0} طلب معلق</span>
+                          <span>{driver.total_deliveries || 0} {t('توصيلة')}</span>
+                          <span>{stats.pending_orders || 0} {t('طلب معلق')}</span>
                         </div>
 
                         {driver.current_order_id && (
                           <div className="mt-3 pt-3 border-t border-border">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm text-orange-500">في طريقه للتوصيل</span>
+                              <span className="text-sm text-orange-500">{t('في طريقه للتوصيل')}</span>
                               <Button
                                 size="sm"
                                 className="bg-green-500 hover:bg-green-600 text-white"
                                 onClick={(e) => { e.stopPropagation(); completeDelivery(driver.id); }}
                               >
                                 <Check className="h-4 w-4 ml-1" />
-                                تم التسليم
+                                {t('تم التسليم')}
                               </Button>
                             </div>
                             {/* زر تحويل الطلب لسائق آخر */}
@@ -765,7 +765,7 @@ export default function Delivery() {
                               data-testid={`transfer-driver-order-${driver.id}`}
                             >
                               <ArrowLeftRight className="h-4 w-4 ml-1" />
-                              تحويل لسائق آخر
+                              {t('تحويل لسائق آخر')}
                             </Button>
                           </div>
                         )}
@@ -776,7 +776,7 @@ export default function Delivery() {
                           onClick={(e) => { e.stopPropagation(); openDriverDetails(driver); }}
                         >
                           <Eye className="h-4 w-4 ml-2" />
-                          عرض التفاصيل
+                          {t('عرض التفاصيل')}
                         </Button>
                         
                         {/* أزرار التعديل والحذف */}
