@@ -967,6 +967,9 @@ export default function Dashboard() {
             {/* Branch Selector - مكون اختيار الفرع العام */}
             <BranchSelector />
 
+            {/* Language Switcher - تبديل اللغة السريع */}
+            <LanguageSwitcher variant="ghost" />
+
             {/* Theme Toggle */}
             <Button
               variant="ghost"
