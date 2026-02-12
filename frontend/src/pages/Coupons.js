@@ -783,10 +783,11 @@ export default function Coupons() {
               <Label>{t('نشط')}</Label>
             </div>
             <div className="flex gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() =>{t('setPromotionDialogOpen(false)} className="flex-1">
-                {t('إلغاء')}</Button>
+              <Button type="button" variant="outline" onClick={() => setPromotionDialogOpen(false)} className="flex-1">
+                {t('إلغاء')}
+              </Button>
               <Button type="submit" className="flex-1">
-                {editingPromotion ? 'تحديث' : 'إنشاء'}
+                {editingPromotion ? t('تحديث') : t('إنشاء')}
               </Button>
             </div>
           </form>
