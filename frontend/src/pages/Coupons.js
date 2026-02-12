@@ -405,12 +405,12 @@ export default function Coupons() {
                     )}
                     
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{t('استخدم {coupon.used_count || 0} مرة')}</span>
-                      <span>{t('حتى {new Date(coupon.valid_until).toLocaleDateString('ar-IQ')}')}</span>
+                      <span>{t('استخدم')} {coupon.used_count || 0} {t('مرة')}</span>
+                      <span>{t('حتى')} {new Date(coupon.valid_until).toLocaleDateString('en-US')}</span>
                     </div>
                   </div>
                   <Badge className={isActive(coupon) ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}>
-                    {isActive(coupon) ? 'نشط' : isExpired(coupon.valid_until) ? 'منتهي' : 'معطل'}
+                    {isActive(coupon) ? t('نشط') : isExpired(coupon.valid_until) ? t('منتهي') : t('معطل')}
                   </Badge>
                 </CardContent>
               </Card>
