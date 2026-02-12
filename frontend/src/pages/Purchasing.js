@@ -669,7 +669,7 @@ export default function Purchasing() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() =>{t('setShowAddDialog(false)}>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
               {t('إلغاء')}</Button>
             <Button onClick={handleSubmit} className="bg-emerald-500 hover:bg-emerald-600">{t('إنشاء الأمر')}</Button>
           </DialogFooter>
@@ -724,7 +724,7 @@ export default function Purchasing() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() =>{t('setShowSupplierDialog(false)}>
+            <Button variant="outline" onClick={() => setShowSupplierDialog(false)}>
               {t('إلغاء')}</Button>
             <Button onClick={handleAddSupplier} className="bg-blue-500 hover:bg-blue-600">{t('إضافة')}</Button>
           </DialogFooter>
