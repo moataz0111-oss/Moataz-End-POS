@@ -1305,14 +1305,15 @@ export default function Delivery() {
             </div>
             
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() =>{t('setCollectPaymentDialogOpen(false)} className="flex-1">
-                إلغاء')}</Button>
+              <Button variant="outline" onClick={() => setCollectPaymentDialogOpen(false)} className="flex-1">
+                {t('إلغاء')}
+              </Button>
               <Button 
                 onClick={handleCollectPayment}
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white"
               >
                 <Check className="h-4 w-4 ml-1" />
-                تأكيد التحصيل
+                {t('تأكيد التحصيل')}
               </Button>
             </div>
           </div>
