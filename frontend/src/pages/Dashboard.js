@@ -2073,9 +2073,9 @@ export default function Dashboard() {
                   fgColor="#000000"
                 />
               </div>
-              <p className="text-sm font-medium mt-4 text-gray-600">امسح الكود للوصول للقائمة</p>
+              <p className="text-sm font-medium mt-4 text-gray-600">{t('امسح الكود للوصول للقائمة')}</p>
               <p className="text-xs text-orange-500 mt-2">
-                💡 يمكن للزبائن تثبيت التطبيق من هذا الرابط
+                💡 {t('يمكن للزبائن تثبيت التطبيق من هذا الرابط')}
               </p>
             </div>
             
