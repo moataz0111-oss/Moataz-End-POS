@@ -50,6 +50,7 @@ if (typeof window !== 'undefined') {
 
 /**
  * Format price with current system currency
+ * Always uses English numerals for better readability
  * @param {number} amount - Amount
  * @param {boolean} showSymbol - Whether to show currency symbol
  * @returns {string} Formatted price
@@ -61,7 +62,8 @@ export const formatPrice = (amount, showSymbol = true) => {
     return showSymbol ? `0 ${currency.symbol}` : '0';
   }
   
-  const formatted = new Intl.NumberFormat('ar-IQ', {
+  // Always use English numerals (en-US locale)
+  const formatted = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: currency.decimals || 0,
     maximumFractionDigits: currency.decimals || 0,
   }).format(amount);
