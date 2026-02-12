@@ -127,12 +127,12 @@ export default function Reservations() {
   };
   const handleSubmit = async () => {
     if (!form.customer_name || !form.customer_phone) {
-      toast.error('الرجاء إدخال اسم ورقم هاتف العميل');
+      toast.error(t('الرجاء إدخال اسم ورقم هاتف العميل'));
       return;
     }
     try {
       await axios.post(`${API}/reservations`, form);
-      toast.success('تم إنشاء الحجز بنجاح');
+      toast.success(t('تم إنشاء الحجز بنجاح'));
       setShowAddDialog(false);
       resetForm();
       fetchReservations();
@@ -145,7 +145,7 @@ export default function Reservations() {
         status: 'pending'
       };
       setReservations([...reservations, newReservation]);
-      toast.success('تم إنشاء الحجز بنجاح');
+      toast.success(t('تم إنشاء الحجز بنجاح'));
       setShowAddDialog(false);
       resetForm();
     }
@@ -164,26 +164,26 @@ export default function Reservations() {
   const updateStatus = async (id, status) => {
     try {
       await axios.put(`${API}/reservations/${id}/status`, { status });
-      toast.success('تم تحديث حالة الحجز');
+      toast.success(t('تم تحديث حالة الحجز'));
       fetchReservations();
     } catch (error) {
       // تحديث محلي
       setReservations(reservations.map(r => 
         r.id === id ? { ...r, status } : r
       ));
-      toast.success('تم تحديث حالة الحجز');
+      toast.success(t('تم تحديث حالة الحجز'));
     }
   };
   const deleteReservation = async (id) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا الحجز؟')) return;
+    if (!window.confirm(t('هل أنت متأكد؟'))) return;
     
     try {
       await axios.delete(`${API}/reservations/${id}`);
-      toast.success('تم حذف الحجز');
+      toast.success(t('تم حذف الحجز'));
       fetchReservations();
     } catch (error) {
       setReservations(reservations.filter(r => r.id !== id));
-      toast.success('تم حذف الحجز');
+      toast.success(t('تم حذف الحجز'));
     }
   };
   const getStatusColor = (status) => {
