@@ -444,15 +444,15 @@ export default function Delivery() {
               <ArrowRight className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold font-cairo text-foreground">إدارة التوصيل</h1>
-              <p className="text-sm text-muted-foreground">متابعة السائقين والطلبات</p>
+              <h1 className="text-xl font-bold font-cairo text-foreground">{t('إدارة التوصيل')}</h1>
+              <p className="text-sm text-muted-foreground">{t('متابعة السائقين والطلبات')}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4 ml-1" />
-              تحديث
+              {t('تحديث')}
             </Button>
             
             <select
@@ -474,33 +474,33 @@ export default function Delivery() {
                   className="bg-blue-500/10 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
                 >
                   <ExternalLink className="h-4 w-4 ml-2" />
-                  فتح تطبيق السائقين
+                  {t('فتح تطبيق السائقين')}
                 </Button>
                 
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <Button className="bg-primary text-primary-foreground" data-testid="add-driver-btn">
                       <Plus className="h-4 w-4 ml-2" />
-                      إضافة سائق
+                      {t('إضافة سائق')}
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle className="text-foreground">إضافة سائق جديد</DialogTitle>
+                      <DialogTitle className="text-foreground">{t('إضافة سائق جديد')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateDriver} className="space-y-4">
                       <div>
-                        <Label className="text-foreground">اسم السائق *</Label>
+                        <Label className="text-foreground">{t('اسم السائق')} *</Label>
                         <Input
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           required
                           className="mt-1"
-                          placeholder="الاسم الكامل للسائق"
+                          placeholder={t('الاسم الكامل للسائق')}
                         />
                       </div>
                       <div>
-                        <Label className="text-foreground">رقم الهاتف *</Label>
+                        <Label className="text-foreground">{t('رقم الهاتف')} *</Label>
                         <Input
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -510,13 +510,13 @@ export default function Delivery() {
                         />
                       </div>
                       <div>
-                        <Label className="text-foreground">الفرع *</Label>
+                        <Label className="text-foreground">{t('الفرع')} *</Label>
                         <Select 
                           value={formData.branch_id || selectedBranch || ''} 
                           onValueChange={(val) => setFormData({ ...formData, branch_id: val })}
                         >
                           <SelectTrigger className="mt-1 bg-background border-input">
-                            <SelectValue placeholder="اختر الفرع" />
+                            <SelectValue placeholder={t('اختر الفرع')} />
                           </SelectTrigger>
                           <SelectContent>
                             {branches.map(branch => (
@@ -524,20 +524,20 @@ export default function Delivery() {
                             ))}
                           </SelectContent>
                         </Select>
-                        <p className="text-xs text-muted-foreground mt-1">السائق سيرى طلبات هذا الفرع فقط</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('السائق سيرى طلبات هذا الفرع فقط')}</p>
                       </div>
                       <div>
-                        <Label className="text-foreground">الرمز السري (PIN) *</Label>
+                        <Label className="text-foreground">{t('الرمز السري')} (PIN) *</Label>
                         <Input
                           type="password"
                           value={formData.pin}
                           onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
                           required
                           maxLength={6}
-                          placeholder="4-6 أرقام"
+                          placeholder={t('4-6 أرقام')}
                           className="mt-1"
                         />
-                        <p className="text-xs text-muted-foreground mt-1">يستخدم السائق هذا الرمز لتسجيل الدخول</p>
+                        <p className="text-xs text-muted-foreground mt-1">{t('يستخدم السائق هذا الرمز لتسجيل الدخول')}</p>
                       </div>
                       <div className="flex gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
