@@ -499,19 +499,19 @@ export default function CustomerMenu() {
   // حفظ الطلب الحالي كمفضل
   const saveToFavorites = async () => {
     if (cart.length === 0) {
-      toast.error('السلة فارغة');
+      toast.error(t('السلة فارغة'));
       return;
     }
     
     const savedCustomer = localStorage.getItem(`customer_${tenantId}`);
     if (!savedCustomer) {
-      toast.error('يرجى إدخال رقم هاتفك أولاً');
+      toast.error(t('يرجى إدخال رقم هاتفك أولاً'));
       return;
     }
     
     const customerData = JSON.parse(savedCustomer);
     if (!customerData.phone) {
-      toast.error('يرجى إدخال رقم هاتفك أولاً');
+      toast.error(t('يرجى إدخال رقم هاتفك أولاً'));
       return;
     }
     setSavingFavorite(true);
@@ -529,12 +529,12 @@ export default function CustomerMenu() {
         name: favoriteName || `طلبي المفضل`,
         items: items
       });
-      toast.success('تم حفظ الطلب في المفضلة ⭐');
+      toast.success(t('تم حفظ الطلب في المفضلة'));
       setShowSaveFavoriteDialog(false);
       setFavoriteName('');
       fetchFavorites();
     } catch (error) {
-      toast.error('فشل في حفظ الطلب');
+      toast.error(t('فشل في حفظ الطلب'));
     } finally {
       setSavingFavorite(false);
     }
@@ -550,7 +550,7 @@ export default function CustomerMenu() {
       await axios.delete(`${API}/customer/favorites/${favoriteId}`, {
         params: { phone: customerData.phone }
       });
-      toast.success('تم الحذف من المفضلة');
+      toast.success(t('تم الحذف من المفضلة'));
       fetchFavorites();
     } catch (error) {
       toast.error(t('فشل في الحذف'));
@@ -568,7 +568,7 @@ export default function CustomerMenu() {
     
     setCart(newCartItems);
     setShowFavoritesDialog(false);
-    toast.success('تمت إضافة الطلب المفضل للسلة 🛒');
+    toast.success(t('تمت إضافة الطلب المفضل للسلة'));
   };
   // فتح نافذة التقييم
   const openRatingDialog = (order) => {
@@ -597,15 +597,15 @@ export default function CustomerMenu() {
         service_quality: serviceRating
       });
       
-      toast.success('شكراً لتقييمك! ⭐');
+      toast.success(t('شكراً لتقييمك!'));
       setShowRatingDialog(false);
       setRatingOrder(null);
       fetchOrderHistory();
     } catch (error) {
       if (error.response?.data?.detail === 'تم تقييم هذا الطلب مسبقاً') {
-        toast.info('تم تقييم هذا الطلب مسبقاً');
+        toast.info(t('تم تقييم هذا الطلب مسبقاً'));
       } else {
-        toast.error('فشل في إرسال التقييم');
+        toast.error(t('فشل في إرسال التقييم'));
       }
     } finally {
       setSubmittingRating(false);
