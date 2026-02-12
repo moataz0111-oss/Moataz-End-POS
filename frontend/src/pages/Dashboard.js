@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import BranchSelector from '../components/BranchSelector';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import { QRCodeSVG } from 'qrcode.react';
 import { 
   Store, 
