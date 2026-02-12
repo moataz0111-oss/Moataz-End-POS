@@ -2884,6 +2884,32 @@ const translationMap = {
   'أمر شراء جديد': { en: 'New Purchase Order', ku: '' },
   'إضافة مورد جديد': { en: 'Add New Supplier', ku: '' },
   'أمر شراء': { en: 'Purchase Order', ku: '' },
+  
+  // ===== Dashboard Additional =====
+  'فئات النقود': { en: 'Currency Denominations', ku: '' },
+  'إجمالي الجرد': { en: 'Total Count', ku: '' },
+  'اختياري': { en: 'Optional', ku: '' },
+  'أضف ملاحظات إن وجدت': { en: 'Add notes if any', ku: '' },
+  'جاري الرفع': { en: 'Uploading', ku: '' },
+  'اضغط لرفع صورة جديدة': { en: 'Click to upload new image', ku: '' },
+  'إزالة الخلفية الحالية': { en: 'Remove Current Background', ku: '' },
+  'لا توجد خلفيات متاحة': { en: 'No backgrounds available', ku: '' },
+  'قم برفع صورة جديدة': { en: 'Upload a new image', ku: '' },
+  'الورديات المفتوحة': { en: 'Open Shifts', ku: '' },
+  'الطلبات المعلقة': { en: 'Pending Orders', ku: '' },
+  'مدة أقدم وردية': { en: 'Oldest Shift Duration', ku: '' },
+  'ساعة': { en: 'hour', ku: '' },
+  'و': { en: 'and', ku: '' },
+  'دقيقة': { en: 'minute', ku: '' },
+  'الطلبات المعلقة التي تحتاج إغلاق': { en: 'Pending Orders That Need Closing', ku: '' },
+  'آخر إغلاق': { en: 'Last Closing', ku: '' },
+  'بواسطة': { en: 'By', ku: '' },
+  'تحذير': { en: 'Warning', ku: '' },
+  'يوجد طلبات معلقة': { en: 'There are pending orders', ku: '' },
+  'يُفضل إغلاق جميع الطلبات قبل ترحيل اليوم': { en: 'It is recommended to close all orders before closing the day', ku: '' },
+  'امسح الكود للوصول للقائمة': { en: 'Scan the code to access the menu', ku: '' },
+  'يمكن للزبائن تثبيت التطبيق من هذا الرابط': { en: 'Customers can install the app from this link', ku: '' },
+  'المتوقع': { en: 'Expected', ku: '' },
 };
 
 // الحصول على اللغة الحالية
