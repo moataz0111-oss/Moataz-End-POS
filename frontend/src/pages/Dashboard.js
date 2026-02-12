@@ -1884,7 +1884,7 @@ export default function Dashboard() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">الورديات المفتوحة</p>
+                      <p className="text-sm text-muted-foreground">{t('الورديات المفتوحة')}</p>
                       <p className="text-2xl font-bold">{dayStatus?.open_shifts_count || 0}</p>
                     </div>
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -1900,7 +1900,7 @@ export default function Dashboard() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">الطلبات المعلقة</p>
+                      <p className="text-sm text-muted-foreground">{t('الطلبات المعلقة')}</p>
                       <p className="text-2xl font-bold">{dayStatus?.pending_orders_count || 0}</p>
                     </div>
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
@@ -1919,7 +1919,7 @@ export default function Dashboard() {
                 dayStatus.oldest_shift_hours >= 24 ? 'bg-orange-500/10 border-orange-500/30' : 'bg-blue-500/10 border-blue-500/30'
               }`}>
                 <p className="text-sm">
-                  <strong>مدة أقدم وردية:</strong> {Math.floor(dayStatus.oldest_shift_hours)} ساعة و {Math.floor((dayStatus.oldest_shift_hours % 1) * 60)} دقيقة
+                  <strong>{t('مدة أقدم وردية')}:</strong> {Math.floor(dayStatus.oldest_shift_hours)} {t('ساعة')} {t('و')} {Math.floor((dayStatus.oldest_shift_hours % 1) * 60)} {t('دقيقة')}
                 </p>
               </div>
             )}
@@ -1927,7 +1927,7 @@ export default function Dashboard() {
             {/* قائمة الطلبات المعلقة */}
             {dayStatus?.pending_orders?.length > 0 && (
               <div className="space-y-2">
-                <h4 className="font-medium text-sm text-muted-foreground">الطلبات المعلقة التي تحتاج إغلاق:</h4>
+                <h4 className="font-medium text-sm text-muted-foreground">{t('الطلبات المعلقة التي تحتاج إغلاق')}:</h4>
                 <div className="max-h-40 overflow-y-auto space-y-2">
                   {dayStatus.pending_orders.map(order => (
                     <div key={order.id} className="flex items-center justify-between p-2 bg-muted/30 rounded-lg text-sm">
@@ -1938,7 +1938,7 @@ export default function Dashboard() {
                           order.status === 'preparing' ? 'bg-blue-500/20 text-blue-600' :
                           'bg-green-500/20 text-green-600'
                         }`}>
-                          {order.status === 'pending' ? 'قيد الانتظار' : order.status === 'preparing' ? 'قيد التحضير' : 'جاهز'}
+                          {order.status === 'pending' ? t('قيد الانتظار') : order.status === 'preparing' ? t('قيد التحضير') : t('جاهز')}
                         </span>
                       </div>
                       <span className="font-bold">{formatPrice(order.total)}</span>
@@ -1952,8 +1952,8 @@ export default function Dashboard() {
             {dayStatus?.last_day_close && (
               <div className="p-3 bg-muted/30 rounded-lg text-sm">
                 <p className="text-muted-foreground">
-                  آخر إغلاق: {new Date(dayStatus.last_day_close.closed_at).toLocaleDateString('ar-IQ')} - 
-                  بواسطة: {dayStatus.last_day_close.closed_by}
+                  {t('آخر إغلاق')}: {new Date(dayStatus.last_day_close.closed_at).toLocaleDateString('en-US')} - 
+                  {t('بواسطة')}: {dayStatus.last_day_close.closed_by}
                 </p>
               </div>
             )}
@@ -1963,9 +1963,9 @@ export default function Dashboard() {
               <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-red-600">تحذير: يوجد طلبات معلقة</p>
+                  <p className="text-sm font-medium text-red-600">{t('تحذير')}: {t('يوجد طلبات معلقة')}</p>
                   <p className="text-xs text-muted-foreground">
-                    يُفضل إغلاق جميع الطلبات قبل ترحيل اليوم. الإغلاق الإجباري سيلغي الطلبات المعلقة.
+                    {t('يُفضل إغلاق جميع الطلبات قبل ترحيل اليوم')}
                   </p>
                 </div>
               </div>
@@ -1975,7 +1975,7 @@ export default function Dashboard() {
 
           <DialogFooter className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setShowDayCloseDialog(false)}>
-              إلغاء
+              {t('إلغاء')}
             </Button>
             
             {/* زر إرسال التقرير بالبريد */}
