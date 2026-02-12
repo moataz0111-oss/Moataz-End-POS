@@ -1226,7 +1226,7 @@ export default function CustomerMenu() {
                 )}
               </div>
               <div className="flex-1">
-                <h1 className="text-xl font-bold">{restaurant?.name || 'المطعم'}</h1>
+                <h1 className="text-xl font-bold">{restaurant?.name || t('المطعم')}</h1>
                 {selectedBranch && branches.length > 1 && (
                   <button 
                     onClick={() => setStep('branches')}
@@ -1234,7 +1234,7 @@ export default function CustomerMenu() {
                   >
                     <Store className="h-3 w-3" />
                     {getSelectedBranchName()}
-                    <span className="underline">(تغيير)</span>
+                    <span className="underline">({t('تغيير')})</span>
                   </button>
                 )}
               </div>
@@ -1242,7 +1242,7 @@ export default function CustomerMenu() {
               <button
                 onClick={() => setShowFavoritesDialog(true)}
                 className="relative p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                title="طلباتي المفضلة"
+                title={t('طلباتي المفضلة')}
               >
                 <Heart className="h-5 w-5" />
                 {favorites.length > 0 && (
@@ -1256,7 +1256,7 @@ export default function CustomerMenu() {
                 <button
                   onClick={() => setStep('history')}
                   className="relative p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                  title="طلباتي السابقة"
+                  title={t('طلباتي السابقة')}
                 >
                   <History className="h-5 w-5" />
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 text-black text-xs rounded-full flex items-center justify-center font-bold">
@@ -1273,10 +1273,10 @@ export default function CustomerMenu() {
             <div className="max-w-lg mx-auto flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Download className="h-4 w-4" />
-                <span className="text-sm">ثبّت التطبيق</span>
+                <span className="text-sm">{t('ثبّت التطبيق')}</span>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="secondary" onClick={handleInstallClick}>تثبيت</Button>
+                <Button size="sm" variant="secondary" onClick={handleInstallClick}>{t('تثبيت')}</Button>
                 <Button size="sm" variant="ghost" onClick={() => setShowInstallBanner(false)}><X className="h-4 w-4" /></Button>
               </div>
             </div>
@@ -1287,7 +1287,7 @@ export default function CustomerMenu() {
           <div className="max-w-lg mx-auto relative">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="ابحث عن منتج..."
+              placeholder={t('ابحث عن منتج')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pr-10 border-gray-200"
@@ -1309,7 +1309,7 @@ export default function CustomerMenu() {
                     : 'bg-gray-100 text-gray-700 hover:bg-orange-100 hover:text-orange-600 border border-gray-200'
                 }`}
               >
-                الكل
+                {t('الكل')}
               </Button>
               {categories.map(cat => (
                 <Button
@@ -1333,7 +1333,7 @@ export default function CustomerMenu() {
         <main className="max-w-lg mx-auto px-4 py-4">
           {filteredProducts.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
-              <p>لا توجد منتجات</p>
+              <p>{t('لا توجد منتجات')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
