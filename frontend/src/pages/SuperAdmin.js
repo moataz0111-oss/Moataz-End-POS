@@ -152,7 +152,7 @@ export default function SuperAdmin() {
   const [showImageCropper, setShowImageCropper] = useState(false);
   const [cropperType, setCropperType] = useState('system'); // system, login, background, tenant
   const [cropperAspectRatio, setCropperAspectRatio] = useState(1);
-  const [cropperTitle, setCropperTitle] = useState('تعديل الصورة');
+  const [cropperTitle, setCropperTitle] = useState(t('تعديل الصورة'));
   
   // Invoice settings for system
   const [invoiceSettings, setInvoiceSettings] = useState({
@@ -941,7 +941,7 @@ export default function SuperAdmin() {
   };
 
   // فتح أداة قص الصور
-  const openImageCropper = (type, aspectRatio = 1, title = 'تعديل الصورة') => {
+  const openImageCropper = (type, aspectRatio = 1, title = t('تعديل الصورة')) => {
     setCropperType(type);
     setCropperAspectRatio(aspectRatio);
     setCropperTitle(title);
@@ -1256,7 +1256,7 @@ export default function SuperAdmin() {
       setNewBackgroundUrl('');
       setNewBackgroundTitle('');
       setNewBackgroundAnimation('fade');
-      toast.success('تم إضافة الخلفية');
+      toast.success(t('تم إضافة الخلفية'));
     } catch (error) {
       toast.error(t('فشل في إضافة الخلفية'));
     } finally {
