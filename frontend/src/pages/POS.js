@@ -576,7 +576,7 @@ export default function POS() {
   // حفظ الطلب وإرسال للمطبخ (بدون دفع)
   const handleSaveAndSendToKitchen = async () => {
     if (cart.length === 0) {
-      toast.error('السلة فارغة');
+      toast.error(t('السلة فارغة'));
       return;
     }
 
@@ -605,7 +605,7 @@ export default function POS() {
           await axios.put(`${API}/orders/${editingOrder.id}/add-items`, newItems);
         }
         
-        toast.success('تم تحديث الطلب وإرساله للمطبخ');
+        toast.success(t('تم تحديث الطلب وإرساله للمطبخ'));
       } else {
         // طلب جديد - معلق للسفري والطاولات، جاهز للتوصيل
         const isDeliveryOrder = orderType === 'delivery';
@@ -632,9 +632,9 @@ export default function POS() {
         // إذا كان طلب توصيل مع سائق، نعين السائق مباشرة
         if (orderType === 'delivery' && selectedDriver) {
           await axios.put(`${API}/drivers/${selectedDriver}/assign?order_id=${res.data.id}`);
-          toast.success(`تم إنشاء الطلب #${res.data.order_number} وتحويله للسائق`);
+          toast.success(`${t('تم إنشاء الطلب')} #${res.data.order_number} ${t('وتحويله للسائق')}`);
         } else {
-          toast.success(`تم إنشاء الطلب #${res.data.order_number}`);
+          toast.success(`${t('تم إنشاء الطلب')} #${res.data.order_number}`);
         }
       }
       
@@ -650,7 +650,7 @@ export default function POS() {
       }
     } catch (error) {
       console.error('Failed to save order:', error);
-      toast.error(error.response?.data?.detail || 'فشل في حفظ الطلب');
+      toast.error(error.response?.data?.detail || t('فشل في حفظ الطلب'));
     } finally {
       setSubmitting(false);
     }
@@ -659,7 +659,7 @@ export default function POS() {
   // تأكيد الطلب مع الدفع - كل شيء في خطوة واحدة
   const handleSubmitOrder = async () => {
     if (cart.length === 0) {
-      toast.error('السلة فارغة');
+      toast.error(t('السلة فارغة'));
       return;
     }
 
