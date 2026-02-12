@@ -1028,13 +1028,13 @@ export default function Settings() {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+    if (!confirm(t('هل أنت متأكد؟'))) return;
     try {
       await axios.delete(`${API}/users/${userId}`);
-      toast.success('تم حذف المستخدم');
+      toast.success(t('تم حذف المستخدم'));
       fetchData();
     } catch (error) {
-      toast.error('فشل في حذف المستخدم');
+      toast.error(t('فشل في حذف المستخدم'));
     }
   };
 
@@ -1071,16 +1071,16 @@ export default function Settings() {
         await axios.put(`${API}/users/${editUserForm.id}/reset-password`, {
           new_password: editUserForm.new_password
         });
-        toast.success('تم تحديث المستخدم وكلمة المرور');
+        toast.success(t('تم تحديث المستخدم وكلمة المرور'));
       } else {
-        toast.success('تم تحديث المستخدم');
+        toast.success(t('تم تحديث المستخدم'));
       }
       
       setEditUserDialogOpen(false);
       setEditUserForm(null);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تحديث المستخدم');
+      toast.error(error.response?.data?.detail || t('فشل في تحديث المستخدم'));
     }
   };
 
@@ -1099,12 +1099,12 @@ export default function Settings() {
     e.preventDefault();
     try {
       await axios.post(`${API}/categories`, categoryForm);
-      toast.success('تم إنشاء الفئة');
+      toast.success(t('تم إنشاء الفئة'));
       setCategoryDialogOpen(false);
       setCategoryForm({ name: '', name_en: '', icon: '', image: '', color: '#D4AF37', sort_order: 0 });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في إنشاء الفئة');
+      toast.error(error.response?.data?.detail || t('فشل في إنشاء الفئة'));
     }
   };
 
@@ -1120,23 +1120,23 @@ export default function Settings() {
         color: editCategoryForm.color,
         sort_order: editCategoryForm.sort_order
       });
-      toast.success('تم تحديث الفئة');
+      toast.success(t('تم تحديث الفئة'));
       setEditCategoryDialogOpen(false);
       setEditCategoryForm(null);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تحديث الفئة');
+      toast.error(error.response?.data?.detail || t('فشل في تحديث الفئة'));
     }
   };
 
   const handleDeleteCategory = async (categoryId) => {
-    if (!confirm('هل أنت متأكد من حذف هذه الفئة؟')) return;
+    if (!confirm(t('هل أنت متأكد؟'))) return;
     try {
       await axios.delete(`${API}/categories/${categoryId}`);
-      toast.success('تم حذف الفئة');
+      toast.success(t('تم حذف الفئة'));
       fetchData();
     } catch (error) {
-      toast.error('فشل في حذف الفئة');
+      toast.error(t('فشل في حذف الفئة'));
     }
   };
 
@@ -1144,9 +1144,9 @@ export default function Settings() {
   const handleSaveDashboardSettings = async () => {
     try {
       await axios.put(`${API}/settings/dashboard`, dashboardSettings);
-      toast.success('تم حفظ إعدادات الصفحة الرئيسية');
+      toast.success(t('تم حفظ إعدادات الصفحة الرئيسية'));
     } catch (error) {
-      toast.error('فشل في حفظ الإعدادات');
+      toast.error(t('فشل في حفظ الإعدادات'));
     }
   };
 
