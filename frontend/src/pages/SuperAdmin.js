@@ -3524,13 +3524,13 @@ export default function SuperAdmin() {
                   <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
                     <Label className="text-gray-300 flex items-center gap-2 mb-3">
                       <Globe className="h-4 w-4 text-blue-400" />
-                      عملة العرض الرئيسية
+                      {t('عملة العرض الرئيسية')}
                     </Label>
                     <select
                       value={localStorage.getItem('owner_display_currency') || 'IQD'}
                       onChange={(e) => {
                         localStorage.setItem('owner_display_currency', e.target.value);
-                        toast.success(`تم تغيير عملة العرض إلى ${e.target.value}`);
+                        toast.success(t('تم تغيير عملة العرض'));
                       }}
                       className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
                     >
@@ -3546,13 +3546,13 @@ export default function SuperAdmin() {
                   <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
                     <Label className="text-gray-300 flex items-center gap-2 mb-3">
                       <Languages className="h-4 w-4 text-purple-400" />
-                      لغة لوحة التحكم
+                      {t('لغة لوحة التحكم')}
                     </Label>
                     <select
                       value={localStorage.getItem('owner_language') || 'ar'}
                       onChange={(e) => {
                         localStorage.setItem('owner_language', e.target.value);
-                        toast.success('تم تغيير اللغة - سيتم تحديث الصفحة');
+                        toast.success(t('تم تغيير اللغة'));
                         setTimeout(() => window.location.reload(), 1000);
                       }}
                       className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white"
