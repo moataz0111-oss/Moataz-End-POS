@@ -1810,7 +1810,7 @@ export default function HR() {
                 </div>
                 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() =>{t('setPayrollDialogOpen(false)}>إلغاء')}</Button>
+                  <Button variant="outline" onClick={() => setPayrollDialogOpen(false)}>{t('إلغاء')}</Button>
                   <Button onClick={createPayroll}>{t('إنشاء كشف الراتب')}</Button>
                 </div>
               </div>
