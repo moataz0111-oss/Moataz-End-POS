@@ -303,7 +303,7 @@ export default function CustomerMenu() {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        toast.success('تم تثبيت التطبيق بنجاح!');
+        toast.success(t('تم تثبيت التطبيق بنجاح!'));
       }
       setDeferredPrompt(null);
       setShowInstallBanner(false);
