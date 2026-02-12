@@ -1800,13 +1800,13 @@ export default function CustomerMenu() {
                       </div>
                       
                       <div className="bg-purple-100 rounded-lg p-3">
-                        <p className="text-xs text-purple-600">رقم المحفظة:</p>
+                        <p className="text-xs text-purple-600">{t('رقم المحفظة')}:</p>
                         <p className="text-xl font-bold text-purple-800 tracking-wider">0770 000 0000</p>
                       </div>
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-700 mb-1 block">رقم هاتفك (زين كاش)</label>
+                      <label className="text-sm font-medium text-gray-700 mb-1 block">{t('رقم هاتفك')} ({t('زين كاش')})</label>
                       <Input
                         placeholder="07xx xxx xxxx"
                         className="bg-white"
@@ -1817,7 +1817,7 @@ export default function CustomerMenu() {
                     
                     <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                       <p className="text-xs text-yellow-700">
-                        ⚠️ بعد إرسال المبلغ، أدخل رقم هاتفك واضغط "تأكيد الطلب"
+                        ⚠️ {t('بعد إرسال المبلغ، أدخل رقم هاتفك واضغط تأكيد الطلب')}
                       </p>
                     </div>
                   </div>
@@ -1827,7 +1827,7 @@ export default function CustomerMenu() {
             {/* Order Summary */}
             <Card>
               <CardContent className="p-4">
-                <h2 className="font-bold mb-3">ملخص الطلب</h2>
+                <h2 className="font-bold mb-3">{t('ملخص الطلب')}</h2>
                 <div className="space-y-2 text-sm">
                   {cart.map(item => (
                     <div key={item.product_id} className="flex justify-between">
@@ -1837,15 +1837,15 @@ export default function CustomerMenu() {
                   ))}
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span>المجموع الفرعي</span>
+                      <span>{t('المجموع الفرعي')}</span>
                       <span>{formatPrice(cartTotal)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>التوصيل</span>
+                      <span>{t('التوصيل')}</span>
                       <span>{formatPrice(deliveryFee)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg mt-2 pt-2 border-t">
-                      <span>الإجمالي</span>
+                      <span>{t('الإجمالي')}</span>
                       <span className="text-orange-600">{formatPrice(grandTotal)}</span>
                     </div>
                   </div>
@@ -1866,12 +1866,12 @@ export default function CustomerMenu() {
               {submitting || processingPayment ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin ml-2" />
-                  {processingPayment ? 'جاري التحويل للدفع...' : 'جاري الإرسال...'}
+                  {processingPayment ? t('جاري التحويل للدفع') + '...' : t('جاري الإرسال') + '...'}
                 </>
               ) : (
                 <>
                   <CheckCircle className="h-5 w-5 ml-2" />
-                  {paymentMethod === 'card' ? 'متابعة للدفع' : 'تأكيد الطلب'}
+                  {paymentMethod === 'card' ? t('متابعة للدفع') : t('تأكيد الطلب')}
                 </>
               )}
             </Button>
