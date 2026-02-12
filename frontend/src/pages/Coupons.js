@@ -268,7 +268,7 @@ export default function Coupons() {
               <Ticket className="h-6 w-6 text-primary" />
               الكوبونات والعروض
             </h1>
-            <p className="text-sm text-muted-foreground">إدارة أكواد الخصم والعروض الترويجية</p>
+            <p className="text-sm text-muted-foreground">{t('إدارة أكواد الخصم والعروض الترويجية')}</p>
           </div>
         </div>
       </div>
@@ -281,7 +281,7 @@ export default function Coupons() {
                 <Ticket className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">الكوبونات</p>
+                <p className="text-sm text-muted-foreground">{t('الكوبونات')}</p>
                 <p className="text-2xl font-bold text-foreground">{coupons.length}</p>
               </div>
             </div>
@@ -294,7 +294,7 @@ export default function Coupons() {
                 <Check className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">نشطة</p>
+                <p className="text-sm text-muted-foreground">{t('نشطة')}</p>
                 <p className="text-2xl font-bold text-foreground">{coupons.filter(c => isActive(c)).length}</p>
               </div>
             </div>
@@ -307,7 +307,7 @@ export default function Coupons() {
                 <Zap className="h-6 w-6 text-orange-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">العروض</p>
+                <p className="text-sm text-muted-foreground">{t('العروض')}</p>
                 <p className="text-2xl font-bold text-foreground">{promotions.length}</p>
               </div>
             </div>
@@ -320,7 +320,7 @@ export default function Coupons() {
                 <DollarSign className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي الخصومات</p>
+                <p className="text-sm text-muted-foreground">{t('إجمالي الخصومات')}</p>
                 <p className="text-2xl font-bold text-foreground">
                   {coupons.reduce((sum, c) => sum + (c.total_discount_given || 0), 0).toLocaleString()}
                 </p>
@@ -401,14 +401,12 @@ export default function Coupons() {
                     </div>
                     
                     {coupon.min_order_amount > 0 && (
-                      <p className="text-muted-foreground">
-                        الحد الأدنى: {coupon.min_order_amount.toLocaleString()} د.ع
-                      </p>
+                      <p className="text-muted-foreground">{t('الحد الأدنى: {coupon.min_order_amount.toLocaleString()} د.ع')}</p>
                     )}
                     
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>استخدم {coupon.used_count || 0} مرة</span>
-                      <span>حتى {new Date(coupon.valid_until).toLocaleDateString('ar-IQ')}</span>
+                      <span>{t('استخدم {coupon.used_count || 0} مرة')}</span>
+                      <span>{t('حتى {new Date(coupon.valid_until).toLocaleDateString('ar-IQ')}')}</span>
                     </div>
                   </div>
                   <Badge className={isActive(coupon) ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}>
@@ -421,7 +419,7 @@ export default function Coupons() {
               <Card className="col-span-full border-border/50">
                 <CardContent className="py-12 text-center">
                   <Ticket className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg text-muted-foreground">لا توجد كوبونات</p>
+                  <p className="text-lg text-muted-foreground">{t('لا توجد كوبونات')}</p>
                 </CardContent>
               </Card>
             )}
@@ -456,10 +454,8 @@ export default function Coupons() {
                   </div>
                   <div className="bg-muted/30 rounded-lg p-3 mb-3">
                     {promo.promotion_type === 'buy_x_get_y' && (
-                      <p className="text-center font-medium text-foreground">
-                        اشترِ {promo.buy_quantity} واحصل على {promo.get_quantity} 
-                        {promo.discount_percent === 100 ? ' مجاناً' : ` بخصم ${promo.discount_percent}%`}
-                      </p>
+                      <p className="text-center font-medium text-foreground">{t('اشترِ {promo.buy_quantity} واحصل على {promo.get_quantity} 
+                        {promo.discount_percent === 100 ? ' مجاناً' : ` بخصم ${promo.discount_percent}%`}')}</p>
                     )}
                     {promo.promotion_type === 'happy_hour' && (
                       <p className="text-center font-medium text-foreground">
@@ -469,18 +465,14 @@ export default function Coupons() {
                       </p>
                     )}
                     {promo.promotion_type === 'bundle' && (
-                      <p className="text-center font-medium text-foreground">
-                        باقة بسعر {promo.bundle_price?.toLocaleString()} د.ع
-                      </p>
+                      <p className="text-center font-medium text-foreground">{t('باقة بسعر {promo.bundle_price?.toLocaleString()} د.ع')}</p>
                     )}
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <Badge className={promo.is_active ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}>
                       {promo.is_active ? 'نشط' : 'معطل'}
                     </Badge>
-                    <span className="text-muted-foreground">
-                      حتى {new Date(promo.valid_until).toLocaleDateString('ar-IQ')}
-                    </span>
+                    <span className="text-muted-foreground">{t('حتى {new Date(promo.valid_until).toLocaleDateString('ar-IQ')}')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -489,7 +481,7 @@ export default function Coupons() {
               <Card className="col-span-full border-border/50">
                 <CardContent className="py-12 text-center">
                   <Sparkles className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-lg text-muted-foreground">لا توجد عروض</p>
+                  <p className="text-lg text-muted-foreground">{t('لا توجد عروض')}</p>
                 </CardContent>
               </Card>
             )}
@@ -507,7 +499,7 @@ export default function Coupons() {
           <form onSubmit={handleSaveCoupon} className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1">
-                <Label>كود الكوبون *</Label>
+                <Label>{t('كود الكوبون *')}</Label>
                 <Input
                   value={couponForm.code}
                   onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
@@ -516,21 +508,19 @@ export default function Coupons() {
                   required
                 />
               </div>
-              <Button type="button" variant="outline" className="mt-6" onClick={generateCode}>
-                توليد
-              </Button>
+              <Button type="button" variant="outline" className="mt-6" onClick={generateCode}>{t('توليد')}</Button>
             </div>
             <div>
-              <Label>اسم الكوبون *</Label>
+              <Label>{t('اسم الكوبون *')}</Label>
               <Input
                 value={couponForm.name}
                 onChange={(e) => setCouponForm({ ...couponForm, name: e.target.value })}
-                placeholder="خصم 20% على الطلب"
+                placeholder={t('خصم 20% على الطلب')}
                 required
               />
             </div>
             <div>
-              <Label>الوصف</Label>
+              <Label>{t('الوصف')}</Label>
               <Textarea
                 value={couponForm.description}
                 onChange={(e) => setCouponForm({ ...couponForm, description: e.target.value })}
@@ -539,20 +529,20 @@ export default function Coupons() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>نوع الخصم</Label>
+                <Label>{t('نوع الخصم')}</Label>
                 <Select
                   value={couponForm.discount_type}
                   onValueChange={(v) => setCouponForm({ ...couponForm, discount_type: v })}
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="percentage">نسبة مئوية %</SelectItem>
-                    <SelectItem value="fixed">مبلغ ثابت</SelectItem>
+                    <SelectItem value="percentage">{t('نسبة مئوية %')}</SelectItem>
+                    <SelectItem value="fixed">{t('مبلغ ثابت')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>قيمة الخصم</Label>
+                <Label>{t('قيمة الخصم')}</Label>
                 <Input
                   type="number"
                   value={couponForm.discount_value}
@@ -562,7 +552,7 @@ export default function Coupons() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>الحد الأدنى للطلب</Label>
+                <Label>{t('الحد الأدنى للطلب')}</Label>
                 <Input
                   type="number"
                   value={couponForm.min_order_amount}
@@ -570,27 +560,27 @@ export default function Coupons() {
                 />
               </div>
               <div>
-                <Label>أقصى خصم (للنسبة)</Label>
+                <Label>{t('أقصى خصم (للنسبة)')}</Label>
                 <Input
                   type="number"
                   value={couponForm.max_discount || ''}
                   onChange={(e) => setCouponForm({ ...couponForm, max_discount: parseFloat(e.target.value) || null })}
-                  placeholder="بدون حد"
+                  placeholder={t('بدون حد')}
                 />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>عدد الاستخدامات الكلي</Label>
+                <Label>{t('عدد الاستخدامات الكلي')}</Label>
                 <Input
                   type="number"
                   value={couponForm.usage_limit || ''}
                   onChange={(e) => setCouponForm({ ...couponForm, usage_limit: parseInt(e.target.value) || null })}
-                  placeholder="غير محدود"
+                  placeholder={t('غير محدود')}
                 />
               </div>
               <div>
-                <Label>لكل عميل</Label>
+                <Label>{t('لكل عميل')}</Label>
                 <Input
                   type="number"
                   value={couponForm.usage_per_customer}
@@ -600,7 +590,7 @@ export default function Coupons() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>يبدأ من</Label>
+                <Label>{t('يبدأ من')}</Label>
                 <Input
                   type="date"
                   value={couponForm.valid_from}
@@ -608,7 +598,7 @@ export default function Coupons() {
                 />
               </div>
               <div>
-                <Label>ينتهي في</Label>
+                <Label>{t('ينتهي في')}</Label>
                 <Input
                   type="date"
                   value={couponForm.valid_until}
@@ -617,18 +607,18 @@ export default function Coupons() {
               </div>
             </div>
             <div>
-              <Label>مستوى الولاء المطلوب</Label>
+              <Label>{t('مستوى الولاء المطلوب')}</Label>
               <Select
                 value={couponForm.loyalty_tier_required}
                 onValueChange={(v) => setCouponForm({ ...couponForm, loyalty_tier_required: v })}
               >
-                <SelectTrigger><SelectValue placeholder="للجميع" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('للجميع')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">للجميع</SelectItem>
-                  <SelectItem value="bronze">برونزي فأعلى</SelectItem>
-                  <SelectItem value="silver">فضي فأعلى</SelectItem>
-                  <SelectItem value="gold">ذهبي فأعلى</SelectItem>
-                  <SelectItem value="platinum">بلاتيني فقط</SelectItem>
+                  <SelectItem value="all">{t('للجميع')}</SelectItem>
+                  <SelectItem value="bronze">{t('برونزي فأعلى')}</SelectItem>
+                  <SelectItem value="silver">{t('فضي فأعلى')}</SelectItem>
+                  <SelectItem value="gold">{t('ذهبي فأعلى')}</SelectItem>
+                  <SelectItem value="platinum">{t('بلاتيني فقط')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -638,20 +628,19 @@ export default function Coupons() {
                   checked={couponForm.is_active}
                   onCheckedChange={(v) => setCouponForm({ ...couponForm, is_active: v })}
                 />
-                <Label>نشط</Label>
+                <Label>{t('نشط')}</Label>
               </div>
               <div className="flex items-center gap-2">
                 <Switch
                   checked={couponForm.first_order_only}
                   onCheckedChange={(v) => setCouponForm({ ...couponForm, first_order_only: v })}
                 />
-                <Label>للطلب الأول فقط</Label>
+                <Label>{t('للطلب الأول فقط')}</Label>
               </div>
             </div>
             <div className="flex gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setCouponDialogOpen(false)} className="flex-1">
-                إلغاء
-              </Button>
+              <Button type="button" variant="outline" onClick={() =>{t('setCouponDialogOpen(false)} className="flex-1">
+                إلغاء')}</Button>
               <Button type="submit" className="flex-1">
                 {editingCoupon ? 'تحديث' : 'إنشاء'}
               </Button>
@@ -669,16 +658,16 @@ export default function Coupons() {
           </DialogHeader>
           <form onSubmit={handleSavePromotion} className="space-y-4">
             <div>
-              <Label>اسم العرض *</Label>
+              <Label>{t('اسم العرض *')}</Label>
               <Input
                 value={promotionForm.name}
                 onChange={(e) => setPromotionForm({ ...promotionForm, name: e.target.value })}
-                placeholder="اشترِ 2 واحصل على 1 مجاناً"
+                placeholder={t('اشترِ 2 واحصل على 1 مجاناً')}
                 required
               />
             </div>
             <div>
-              <Label>الوصف</Label>
+              <Label>{t('الوصف')}</Label>
               <Textarea
                 value={promotionForm.description}
                 onChange={(e) => setPromotionForm({ ...promotionForm, description: e.target.value })}
@@ -686,23 +675,23 @@ export default function Coupons() {
               />
             </div>
             <div>
-              <Label>نوع العرض</Label>
+              <Label>{t('نوع العرض')}</Label>
               <Select
                 value={promotionForm.promotion_type}
                 onValueChange={(v) => setPromotionForm({ ...promotionForm, promotion_type: v })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="buy_x_get_y">اشترِ X واحصل على Y</SelectItem>
-                  <SelectItem value="happy_hour">ساعة السعادة</SelectItem>
-                  <SelectItem value="bundle">باقة بسعر ثابت</SelectItem>
+                  <SelectItem value="buy_x_get_y">{t('اشترِ X واحصل على Y')}</SelectItem>
+                  <SelectItem value="happy_hour">{t('ساعة السعادة')}</SelectItem>
+                  <SelectItem value="bundle">{t('باقة بسعر ثابت')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             {promotionForm.promotion_type === 'buy_x_get_y' && (
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label>اشترِ</Label>
+                  <Label>{t('اشترِ')}</Label>
                   <Input
                     type="number"
                     value={promotionForm.buy_quantity}
@@ -710,7 +699,7 @@ export default function Coupons() {
                   />
                 </div>
                 <div>
-                  <Label>احصل على</Label>
+                  <Label>{t('احصل على')}</Label>
                   <Input
                     type="number"
                     value={promotionForm.get_quantity}
@@ -718,7 +707,7 @@ export default function Coupons() {
                   />
                 </div>
                 <div>
-                  <Label>خصم %</Label>
+                  <Label>{t('خصم %')}</Label>
                   <Input
                     type="number"
                     value={promotionForm.discount_percent}
@@ -730,7 +719,7 @@ export default function Coupons() {
             {promotionForm.promotion_type === 'happy_hour' && (
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label>من الساعة</Label>
+                  <Label>{t('من الساعة')}</Label>
                   <Input
                     type="time"
                     value={promotionForm.start_time}
@@ -738,7 +727,7 @@ export default function Coupons() {
                   />
                 </div>
                 <div>
-                  <Label>إلى الساعة</Label>
+                  <Label>{t('إلى الساعة')}</Label>
                   <Input
                     type="time"
                     value={promotionForm.end_time}
@@ -746,7 +735,7 @@ export default function Coupons() {
                   />
                 </div>
                 <div>
-                  <Label>خصم %</Label>
+                  <Label>{t('خصم %')}</Label>
                   <Input
                     type="number"
                     value={promotionForm.discount_percent}
@@ -757,7 +746,7 @@ export default function Coupons() {
             )}
             {promotionForm.promotion_type === 'bundle' && (
               <div>
-                <Label>سعر الباقة</Label>
+                <Label>{t('سعر الباقة')}</Label>
                 <Input
                   type="number"
                   value={promotionForm.bundle_price || ''}
@@ -767,7 +756,7 @@ export default function Coupons() {
             )}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>يبدأ من</Label>
+                <Label>{t('يبدأ من')}</Label>
                 <Input
                   type="date"
                   value={promotionForm.valid_from}
@@ -775,7 +764,7 @@ export default function Coupons() {
                 />
               </div>
               <div>
-                <Label>ينتهي في</Label>
+                <Label>{t('ينتهي في')}</Label>
                 <Input
                   type="date"
                   value={promotionForm.valid_until}
@@ -788,12 +777,11 @@ export default function Coupons() {
                 checked={promotionForm.is_active}
                 onCheckedChange={(v) => setPromotionForm({ ...promotionForm, is_active: v })}
               />
-              <Label>نشط</Label>
+              <Label>{t('نشط')}</Label>
             </div>
             <div className="flex gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setPromotionDialogOpen(false)} className="flex-1">
-                إلغاء
-              </Button>
+              <Button type="button" variant="outline" onClick={() =>{t('setPromotionDialogOpen(false)} className="flex-1">
+                إلغاء')}</Button>
               <Button type="submit" className="flex-1">
                 {editingPromotion ? 'تحديث' : 'إنشاء'}
               </Button>

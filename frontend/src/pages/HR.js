@@ -376,15 +376,15 @@ export default function HR() {
         
         <div class="section">
           <div class="row">
-            <span class="label">اسم الموظف:</span>
-            <span class="value">${deduction.employee_name || employee?.name || 'غير محدد'}</span>
+            <span class="label">{t('اسم الموظف:')}</span>
+            <span class="value">{t('${deduction.employee_name || employee?.name || 'غير محدد'}')}</span>
           </div>
           <div class="row">
-            <span class="label">التاريخ:</span>
+            <span class="label">{t('التاريخ:')}</span>
             <span class="value">${deduction.date || new Date().toLocaleDateString('ar-IQ')}</span>
           </div>
           <div class="row">
-            <span class="label">نوع الخصم:</span>
+            <span class="label">{t('نوع الخصم:')}</span>
             <span class="value">${deductionTypeLabels[deduction.deduction_type] || deduction.deduction_type}</span>
           </div>
         </div>
@@ -398,8 +398,8 @@ export default function HR() {
           ${deduction.reason || 'غير محدد'}
         </div>
         
-        ${deduction.hours ? `<div class="row"><span class="label">عدد الساعات:</span><span class="value">${deduction.hours} ساعة</span></div>` : ''}
-        ${deduction.days ? `<div class="row"><span class="label">عدد الأيام:</span><span class="value">${deduction.days} يوم</span></div>` : ''}
+        ${deduction.hours ? `<div class="row"><span class="label">{t('عدد الساعات:')}</span><span class="value">{t('${deduction.hours} ساعة')}</span></div>` : ''}
+        ${deduction.days ? `<div class="row"><span class="label">{t('عدد الأيام:')}</span><span class="value">{t('${deduction.days} يوم')}</span></div>` : ''}
         
         <div class="signature">
           <div>توقيع الموظف (علمت بالخصم):</div>
@@ -414,7 +414,7 @@ export default function HR() {
         </div>
         
         <div class="footer">
-          <p>تم إنشاء هذا الإيصال من نظام Maestro EGP</p>
+          <p>{t('تم إنشاء هذا الإيصال من نظام Maestro EGP')}</p>
           <p>${new Date().toLocaleString('ar-IQ')}</p>
         </div>
         
@@ -661,7 +661,7 @@ export default function HR() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">جاري التحميل...</p>
+          <p className="text-muted-foreground">{t('جاري التحميل...')}</p>
         </div>
       </div>
     );
@@ -848,7 +848,7 @@ export default function HR() {
                             <Input value={employeeForm.phone} onChange={(e) => setEmployeeForm({...employeeForm, phone: e.target.value})} required />
                           </div>
                           <div>
-                            <Label>البريد الإلكتروني</Label>
+                            <Label>{t('البريد الإلكتروني')}</Label>
                             <Input type="email" value={employeeForm.email} onChange={(e) => setEmployeeForm({...employeeForm, email: e.target.value})} />
                           </div>
                           <div>
@@ -949,10 +949,10 @@ export default function HR() {
                                   work_hours_per_day: emp.work_hours_per_day
                                 });
                                 setEmployeeDialogOpen(true);
-                              }} title="تعديل">
+                              }} title={t('تعديل')}>
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button size="sm" variant="destructive" onClick={() => handleDeleteEmployee(emp.id)} title="حذف">
+                              <Button size="sm" variant="destructive" onClick={() => handleDeleteEmployee(emp.id)} title={t('حذف')}>
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
@@ -990,31 +990,31 @@ export default function HR() {
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                       <Card className="bg-blue-500/10">
                         <CardContent className="p-4 text-center">
-                          <p className="text-sm text-muted-foreground">الرواتب الأساسية</p>
+                          <p className="text-sm text-muted-foreground">{t('الرواتب الأساسية')}</p>
                           <p className="text-xl font-bold text-blue-500">{formatPrice(payrollSummary.totals?.basic_salary || 0)}</p>
                         </CardContent>
                       </Card>
                       <Card className="bg-green-500/10">
                         <CardContent className="p-4 text-center">
-                          <p className="text-sm text-muted-foreground">المكافآت</p>
+                          <p className="text-sm text-muted-foreground">{t('المكافآت')}</p>
                           <p className="text-xl font-bold text-green-500">{formatPrice(payrollSummary.totals?.total_bonuses || 0)}</p>
                         </CardContent>
                       </Card>
                       <Card className="bg-red-500/10">
                         <CardContent className="p-4 text-center">
-                          <p className="text-sm text-muted-foreground">الخصومات</p>
+                          <p className="text-sm text-muted-foreground">{t('الخصومات')}</p>
                           <p className="text-xl font-bold text-red-500">{formatPrice(payrollSummary.totals?.total_deductions || 0)}</p>
                         </CardContent>
                       </Card>
                       <Card className="bg-yellow-500/10">
                         <CardContent className="p-4 text-center">
-                          <p className="text-sm text-muted-foreground">السلف</p>
+                          <p className="text-sm text-muted-foreground">{t('السلف')}</p>
                           <p className="text-xl font-bold text-yellow-500">{formatPrice(payrollSummary.totals?.total_advances || 0)}</p>
                         </CardContent>
                       </Card>
                       <Card className="bg-cyan-500/10">
                         <CardContent className="p-4 text-center">
-                          <p className="text-sm text-muted-foreground">صافي المستحقات</p>
+                          <p className="text-sm text-muted-foreground">{t('صافي المستحقات')}</p>
                           <p className="text-xl font-bold text-cyan-500">{formatPrice(payrollSummary.totals?.net_payable || 0)}</p>
                         </CardContent>
                       </Card>
@@ -1026,15 +1026,15 @@ export default function HR() {
                         <thead className="bg-muted/50">
                           <tr>
                             <th className="p-3 text-right">#</th>
-                            <th className="p-3 text-right">الموظف</th>
-                            <th className="p-3 text-right">الفرع</th>
-                            <th className="p-3 text-right">الوظيفة</th>
-                            <th className="p-3 text-right">الراتب الأساسي</th>
-                            <th className="p-3 text-right">المكافآت</th>
-                            <th className="p-3 text-right">الخصومات</th>
-                            <th className="p-3 text-right">السلف</th>
-                            <th className="p-3 text-right">صافي الراتب</th>
-                            <th className="p-3 text-right">الإجراءات</th>
+                            <th className="p-3 text-right">{t('الموظف')}</th>
+                            <th className="p-3 text-right">{t('الفرع')}</th>
+                            <th className="p-3 text-right">{t('الوظيفة')}</th>
+                            <th className="p-3 text-right">{t('الراتب الأساسي')}</th>
+                            <th className="p-3 text-right">{t('المكافآت')}</th>
+                            <th className="p-3 text-right">{t('الخصومات')}</th>
+                            <th className="p-3 text-right">{t('السلف')}</th>
+                            <th className="p-3 text-right">{t('صافي الراتب')}</th>
+                            <th className="p-3 text-right">{t('الإجراءات')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -1074,7 +1074,7 @@ export default function HR() {
                         </tbody>
                         <tfoot className="bg-muted/50 font-bold">
                           <tr>
-                            <td colSpan="4" className="p-3">الإجمالي</td>
+                            <td colSpan="4" className="p-3">{t('الإجمالي')}</td>
                             <td className="p-3">{formatPrice(payrollSummary.totals?.basic_salary || 0)}</td>
                             <td className="p-3 text-green-600">{formatPrice(payrollSummary.totals?.total_bonuses || 0)}</td>
                             <td className="p-3 text-red-600">{formatPrice(payrollSummary.totals?.total_deductions || 0)}</td>
@@ -1089,7 +1089,7 @@ export default function HR() {
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد بيانات رواتب لهذا الشهر</p>
+                    <p>{t('لا توجد بيانات رواتب لهذا الشهر')}</p>
                   </div>
                 )}
               </CardContent>
@@ -1100,7 +1100,7 @@ export default function HR() {
           <TabsContent value="attendance">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>سجل الحضور - {selectedMonth}</CardTitle>
+                <CardTitle>{t('سجل الحضور - {selectedMonth}')}</CardTitle>
                 <Dialog open={attendanceDialogOpen} onOpenChange={setAttendanceDialogOpen}>
                   <DialogTrigger asChild>
                     <Button><Plus className="h-4 w-4 ml-2" /> {t('تسجيل حضور')}</Button>
@@ -1193,40 +1193,40 @@ export default function HR() {
           <TabsContent value="advances">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>السلف</CardTitle>
+                <CardTitle>{t('السلف')}</CardTitle>
                 <Dialog open={advanceDialogOpen} onOpenChange={setAdvanceDialogOpen}>
                   <DialogTrigger asChild>
                     <Button><Plus className="h-4 w-4 ml-2" /> سلفة جديدة</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>تسجيل سلفة</DialogTitle>
+                      <DialogTitle>{t('تسجيل سلفة')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateAdvance} className="space-y-4">
                       <div>
-                        <Label>الموظف *</Label>
+                        <Label>{t('الموظف *')}</Label>
                         <Select value={advanceForm.employee_id} onValueChange={(v) => setAdvanceForm({...advanceForm, employee_id: v})}>
-                          <SelectTrigger><SelectValue placeholder="اختر الموظف" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder={t('اختر الموظف')} /></SelectTrigger>
                           <SelectContent>
                             {employees.filter(e => e.is_active).map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label>المبلغ *</Label>
+                        <Label>{t('المبلغ *')}</Label>
                         <Input type="number" value={advanceForm.amount} onChange={(e) => setAdvanceForm({...advanceForm, amount: e.target.value})} required />
                       </div>
                       <div>
-                        <Label>عدد أشهر الاستقطاع</Label>
+                        <Label>{t('عدد أشهر الاستقطاع')}</Label>
                         <Input type="number" min="1" value={advanceForm.deduction_months} onChange={(e) => setAdvanceForm({...advanceForm, deduction_months: e.target.value})} />
                       </div>
                       <div>
-                        <Label>السبب</Label>
+                        <Label>{t('السبب')}</Label>
                         <Textarea value={advanceForm.reason} onChange={(e) => setAdvanceForm({...advanceForm, reason: e.target.value})} />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setAdvanceDialogOpen(false)}>إلغاء</Button>
-                        <Button type="submit">تسجيل</Button>
+                        <Button type="button" variant="outline" onClick={() =>{t('setAdvanceDialogOpen(false)}>إلغاء')}</Button>
+                        <Button type="submit">{t('تسجيل')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -1237,12 +1237,12 @@ export default function HR() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-right p-3">الموظف</th>
-                        <th className="text-right p-3">المبلغ</th>
-                        <th className="text-right p-3">المتبقي</th>
-                        <th className="text-right p-3">الاستقطاع الشهري</th>
-                        <th className="text-right p-3">التاريخ</th>
-                        <th className="text-right p-3">الحالة</th>
+                        <th className="text-right p-3">{t('الموظف')}</th>
+                        <th className="text-right p-3">{t('المبلغ')}</th>
+                        <th className="text-right p-3">{t('المتبقي')}</th>
+                        <th className="text-right p-3">{t('الاستقطاع الشهري')}</th>
+                        <th className="text-right p-3">{t('التاريخ')}</th>
+                        <th className="text-right p-3">{t('الحالة')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1271,63 +1271,63 @@ export default function HR() {
           <TabsContent value="deductions">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>الخصومات - {selectedMonth}</CardTitle>
+                <CardTitle>{t('الخصومات - {selectedMonth}')}</CardTitle>
                 <Dialog open={deductionDialogOpen} onOpenChange={setDeductionDialogOpen}>
                   <DialogTrigger asChild>
                     <Button variant="destructive"><Plus className="h-4 w-4 ml-2" /> خصم جديد</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>تسجيل خصم</DialogTitle>
+                      <DialogTitle>{t('تسجيل خصم')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateDeduction} className="space-y-4">
                       <div>
-                        <Label>الموظف *</Label>
+                        <Label>{t('الموظف *')}</Label>
                         <Select value={deductionForm.employee_id} onValueChange={(v) => setDeductionForm({...deductionForm, employee_id: v})}>
-                          <SelectTrigger><SelectValue placeholder="اختر الموظف" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder={t('اختر الموظف')} /></SelectTrigger>
                           <SelectContent>
                             {employees.filter(e => e.is_active).map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label>نوع الخصم</Label>
+                        <Label>{t('نوع الخصم')}</Label>
                         <Select value={deductionForm.deduction_type} onValueChange={(v) => setDeductionForm({...deductionForm, deduction_type: v})}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="absence">غياب</SelectItem>
-                            <SelectItem value="late">تأخير</SelectItem>
-                            <SelectItem value="early_leave">انصراف مبكر</SelectItem>
-                            <SelectItem value="violation">مخالفة</SelectItem>
-                            <SelectItem value="other">أخرى</SelectItem>
+                            <SelectItem value="absence">{t('غياب')}</SelectItem>
+                            <SelectItem value="late">{t('تأخير')}</SelectItem>
+                            <SelectItem value="early_leave">{t('انصراف مبكر')}</SelectItem>
+                            <SelectItem value="violation">{t('مخالفة')}</SelectItem>
+                            <SelectItem value="other">{t('أخرى')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <Label>مبلغ ثابت</Label>
+                          <Label>{t('مبلغ ثابت')}</Label>
                           <Input type="number" value={deductionForm.amount} onChange={(e) => setDeductionForm({...deductionForm, amount: e.target.value})} />
                         </div>
                         <div>
-                          <Label>ساعات</Label>
+                          <Label>{t('ساعات')}</Label>
                           <Input type="number" step="0.5" value={deductionForm.hours} onChange={(e) => setDeductionForm({...deductionForm, hours: e.target.value})} />
                         </div>
                         <div>
-                          <Label>أيام</Label>
+                          <Label>{t('أيام')}</Label>
                           <Input type="number" step="0.5" value={deductionForm.days} onChange={(e) => setDeductionForm({...deductionForm, days: e.target.value})} />
                         </div>
                       </div>
                       <div>
-                        <Label>التاريخ</Label>
+                        <Label>{t('التاريخ')}</Label>
                         <Input type="date" value={deductionForm.date} onChange={(e) => setDeductionForm({...deductionForm, date: e.target.value})} />
                       </div>
                       <div>
-                        <Label>السبب *</Label>
+                        <Label>{t('السبب *')}</Label>
                         <Textarea value={deductionForm.reason} onChange={(e) => setDeductionForm({...deductionForm, reason: e.target.value})} required />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setDeductionDialogOpen(false)}>إلغاء</Button>
-                        <Button type="submit" variant="destructive">تسجيل الخصم</Button>
+                        <Button type="button" variant="outline" onClick={() =>{t('setDeductionDialogOpen(false)}>إلغاء')}</Button>
+                        <Button type="submit" variant="destructive">{t('تسجيل الخصم')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -1338,12 +1338,12 @@ export default function HR() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-right p-3">الموظف</th>
-                        <th className="text-right p-3">النوع</th>
-                        <th className="text-right p-3">المبلغ</th>
-                        <th className="text-right p-3">السبب</th>
-                        <th className="text-right p-3">التاريخ</th>
-                        <th className="text-right p-3">إجراءات</th>
+                        <th className="text-right p-3">{t('الموظف')}</th>
+                        <th className="text-right p-3">{t('النوع')}</th>
+                        <th className="text-right p-3">{t('المبلغ')}</th>
+                        <th className="text-right p-3">{t('السبب')}</th>
+                        <th className="text-right p-3">{t('التاريخ')}</th>
+                        <th className="text-right p-3">{t('إجراءات')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1386,58 +1386,58 @@ export default function HR() {
           <TabsContent value="bonuses">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>المكافآت - {selectedMonth}</CardTitle>
+                <CardTitle>{t('المكافآت - {selectedMonth}')}</CardTitle>
                 <Dialog open={bonusDialogOpen} onOpenChange={setBonusDialogOpen}>
                   <DialogTrigger asChild>
                     <Button className="bg-green-600 hover:bg-green-700"><Plus className="h-4 w-4 ml-2" /> مكافأة جديدة</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>تسجيل مكافأة</DialogTitle>
+                      <DialogTitle>{t('تسجيل مكافأة')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateBonus} className="space-y-4">
                       <div>
-                        <Label>الموظف *</Label>
+                        <Label>{t('الموظف *')}</Label>
                         <Select value={bonusForm.employee_id} onValueChange={(v) => setBonusForm({...bonusForm, employee_id: v})}>
-                          <SelectTrigger><SelectValue placeholder="اختر الموظف" /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder={t('اختر الموظف')} /></SelectTrigger>
                           <SelectContent>
                             {employees.filter(e => e.is_active).map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label>نوع المكافأة</Label>
+                        <Label>{t('نوع المكافأة')}</Label>
                         <Select value={bonusForm.bonus_type} onValueChange={(v) => setBonusForm({...bonusForm, bonus_type: v})}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="performance">أداء</SelectItem>
-                            <SelectItem value="overtime">وقت إضافي</SelectItem>
-                            <SelectItem value="holiday">عمل في عطلة</SelectItem>
-                            <SelectItem value="other">أخرى</SelectItem>
+                            <SelectItem value="performance">{t('أداء')}</SelectItem>
+                            <SelectItem value="overtime">{t('وقت إضافي')}</SelectItem>
+                            <SelectItem value="holiday">{t('عمل في عطلة')}</SelectItem>
+                            <SelectItem value="other">{t('أخرى')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>مبلغ ثابت</Label>
+                          <Label>{t('مبلغ ثابت')}</Label>
                           <Input type="number" value={bonusForm.amount} onChange={(e) => setBonusForm({...bonusForm, amount: e.target.value})} />
                         </div>
                         <div>
-                          <Label>ساعات إضافية</Label>
+                          <Label>{t('ساعات إضافية')}</Label>
                           <Input type="number" step="0.5" value={bonusForm.hours} onChange={(e) => setBonusForm({...bonusForm, hours: e.target.value})} />
                         </div>
                       </div>
                       <div>
-                        <Label>التاريخ</Label>
+                        <Label>{t('التاريخ')}</Label>
                         <Input type="date" value={bonusForm.date} onChange={(e) => setBonusForm({...bonusForm, date: e.target.value})} />
                       </div>
                       <div>
-                        <Label>السبب *</Label>
+                        <Label>{t('السبب *')}</Label>
                         <Textarea value={bonusForm.reason} onChange={(e) => setBonusForm({...bonusForm, reason: e.target.value})} required />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setBonusDialogOpen(false)}>إلغاء</Button>
-                        <Button type="submit" className="bg-green-600 hover:bg-green-700">تسجيل المكافأة</Button>
+                        <Button type="button" variant="outline" onClick={() =>{t('setBonusDialogOpen(false)}>إلغاء')}</Button>
+                        <Button type="submit" className="bg-green-600 hover:bg-green-700">{t('تسجيل المكافأة')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -1448,11 +1448,11 @@ export default function HR() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-right p-3">الموظف</th>
-                        <th className="text-right p-3">النوع</th>
-                        <th className="text-right p-3">المبلغ</th>
-                        <th className="text-right p-3">السبب</th>
-                        <th className="text-right p-3">التاريخ</th>
+                        <th className="text-right p-3">{t('الموظف')}</th>
+                        <th className="text-right p-3">{t('النوع')}</th>
+                        <th className="text-right p-3">{t('المبلغ')}</th>
+                        <th className="text-right p-3">{t('السبب')}</th>
+                        <th className="text-right p-3">{t('التاريخ')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1482,21 +1482,21 @@ export default function HR() {
           <TabsContent value="payroll">
             <Card>
               <CardHeader>
-                <CardTitle>كشوفات الرواتب - {selectedMonth}</CardTitle>
+                <CardTitle>{t('كشوفات الرواتب - {selectedMonth}')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-right p-3">الموظف</th>
-                        <th className="text-right p-3">الراتب الأساسي</th>
-                        <th className="text-right p-3">الخصومات</th>
-                        <th className="text-right p-3">المكافآت</th>
-                        <th className="text-right p-3">استقطاع السلف</th>
-                        <th className="text-right p-3">صافي الراتب</th>
-                        <th className="text-right p-3">الحالة</th>
-                        <th className="text-right p-3">الإجراءات</th>
+                        <th className="text-right p-3">{t('الموظف')}</th>
+                        <th className="text-right p-3">{t('الراتب الأساسي')}</th>
+                        <th className="text-right p-3">{t('الخصومات')}</th>
+                        <th className="text-right p-3">{t('المكافآت')}</th>
+                        <th className="text-right p-3">{t('استقطاع السلف')}</th>
+                        <th className="text-right p-3">{t('صافي الراتب')}</th>
+                        <th className="text-right p-3">{t('الحالة')}</th>
+                        <th className="text-right p-3">{t('الإجراءات')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1580,35 +1580,35 @@ export default function HR() {
                           <CardContent className="p-4 text-center">
                             <Users className="h-6 w-6 mx-auto mb-2 text-blue-600" />
                             <p className="text-2xl font-bold text-blue-700">{employeeRatings.summary.total_employees || 0}</p>
-                            <p className="text-xs text-blue-600">إجمالي الموظفين</p>
+                            <p className="text-xs text-blue-600">{t('إجمالي الموظفين')}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                           <CardContent className="p-4 text-center">
                             <CheckCircle className="h-6 w-6 mx-auto mb-2 text-green-600" />
                             <p className="text-2xl font-bold text-green-700">{employeeRatings.summary.excellent_count || 0}</p>
-                            <p className="text-xs text-green-600">ممتاز (90+)</p>
+                            <p className="text-xs text-green-600">{t('ممتاز (90+)')}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-gradient-to-br from-sky-50 to-sky-100 border-sky-200">
                           <CardContent className="p-4 text-center">
                             <TrendingUp className="h-6 w-6 mx-auto mb-2 text-sky-600" />
                             <p className="text-2xl font-bold text-sky-700">{employeeRatings.summary.good_count || 0}</p>
-                            <p className="text-xs text-sky-600">جيد جداً (75-89)</p>
+                            <p className="text-xs text-sky-600">{t('جيد جداً (75-89)')}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
                           <CardContent className="p-4 text-center">
                             <Timer className="h-6 w-6 mx-auto mb-2 text-amber-600" />
                             <p className="text-2xl font-bold text-amber-700">{employeeRatings.summary.average_count || 0}</p>
-                            <p className="text-xs text-amber-600">جيد/مقبول (50-74)</p>
+                            <p className="text-xs text-amber-600">{t('جيد/مقبول (50-74)')}</p>
                           </CardContent>
                         </Card>
                         <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
                           <CardContent className="p-4 text-center">
                             <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-red-600" />
                             <p className="text-2xl font-bold text-red-700">{employeeRatings.summary.poor_count || 0}</p>
-                            <p className="text-xs text-red-600">ضعيف (&lt;50)</p>
+                            <p className="text-xs text-red-600">{t('ضعيف (&lt;50)')}</p>
                           </CardContent>
                         </Card>
                       </div>
@@ -1620,12 +1620,12 @@ export default function HR() {
                         <div className="flex items-center gap-3">
                           <Award className="h-8 w-8" />
                           <div>
-                            <p className="text-sm opacity-90">متوسط التقييم العام</p>
+                            <p className="text-sm opacity-90">{t('متوسط التقييم العام')}</p>
                             <p className="text-2xl font-bold">{employeeRatings.summary.average_score}/100</p>
                           </div>
                         </div>
                         <div className="text-left">
-                          <p className="text-sm opacity-90">شهر</p>
+                          <p className="text-sm opacity-90">{t('شهر')}</p>
                           <p className="font-bold">{selectedMonth}</p>
                         </div>
                       </div>
@@ -1638,14 +1638,14 @@ export default function HR() {
                           <thead>
                             <tr className="bg-muted/50">
                               <th className="p-3 text-right border">#</th>
-                              <th className="p-3 text-right border">الموظف</th>
-                              <th className="p-3 text-right border">الوظيفة</th>
-                              <th className="p-3 text-center border">الحضور</th>
-                              <th className="p-3 text-center border">التأخير</th>
-                              <th className="p-3 text-center border">الخصومات</th>
-                              <th className="p-3 text-center border">المكافآت</th>
-                              <th className="p-3 text-center border">التقييم</th>
-                              <th className="p-3 text-center border">المستوى</th>
+                              <th className="p-3 text-right border">{t('الموظف')}</th>
+                              <th className="p-3 text-right border">{t('الوظيفة')}</th>
+                              <th className="p-3 text-center border">{t('الحضور')}</th>
+                              <th className="p-3 text-center border">{t('التأخير')}</th>
+                              <th className="p-3 text-center border">{t('الخصومات')}</th>
+                              <th className="p-3 text-center border">{t('المكافآت')}</th>
+                              <th className="p-3 text-center border">{t('التقييم')}</th>
+                              <th className="p-3 text-center border">{t('المستوى')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1739,8 +1739,8 @@ export default function HR() {
                     ) : (
                       <div className="text-center py-12 text-muted-foreground">
                         <Award className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                        <p>لا توجد بيانات تقييم لهذا الشهر</p>
-                        <p className="text-sm mt-2">تأكد من وجود سجلات حضور للموظفين</p>
+                        <p>{t('لا توجد بيانات تقييم لهذا الشهر')}</p>
+                        <p className="text-sm mt-2">{t('تأكد من وجود سجلات حضور للموظفين')}</p>
                       </div>
                     )}
 
@@ -1753,19 +1753,19 @@ export default function HR() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                          <span>الحضور: 40 نقطة</span>
+                          <span>{t('الحضور: 40 نقطة')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                          <span>الالتزام بالمواعيد: 30 نقطة</span>
+                          <span>{t('الالتزام بالمواعيد: 30 نقطة')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                          <span>عدم وجود خصومات: 20 نقطة</span>
+                          <span>{t('عدم وجود خصومات: 20 نقطة')}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                          <span>المكافآت: 10 نقاط إضافية</span>
+                          <span>{t('المكافآت: 10 نقاط إضافية')}</span>
                         </div>
                       </div>
                     </div>
@@ -1780,49 +1780,49 @@ export default function HR() {
         <Dialog open={payrollDialogOpen} onOpenChange={setPayrollDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>معاينة كشف الراتب</DialogTitle>
+              <DialogTitle>{t('معاينة كشف الراتب')}</DialogTitle>
             </DialogHeader>
             {payrollPreview && (
               <div className="space-y-4">
                 <div className="bg-muted p-4 rounded-lg">
                   <h3 className="font-bold text-lg mb-2">{payrollPreview.employee_name}</h3>
-                  <p className="text-muted-foreground">شهر: {payrollPreview.month}</p>
+                  <p className="text-muted-foreground">{t('شهر: {payrollPreview.month}')}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-card border rounded-lg p-4">
-                    <p className="text-muted-foreground">الراتب الأساسي</p>
+                    <p className="text-muted-foreground">{t('الراتب الأساسي')}</p>
                     <p className="text-2xl font-bold">{formatPrice(payrollPreview.basic_salary)}</p>
                   </div>
                   <div className="bg-card border rounded-lg p-4">
-                    <p className="text-muted-foreground">أيام العمل</p>
+                    <p className="text-muted-foreground">{t('أيام العمل')}</p>
                     <p className="text-2xl font-bold">{payrollPreview.worked_days}</p>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>الخصومات</span>
+                    <span>{t('الخصومات')}</span>
                     <span className="text-red-500">-{formatPrice(payrollPreview.total_deductions)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>المكافآت</span>
+                    <span>{t('المكافآت')}</span>
                     <span className="text-green-500">+{formatPrice(payrollPreview.total_bonuses)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>استقطاع السلف</span>
+                    <span>{t('استقطاع السلف')}</span>
                     <span className="text-yellow-500">-{formatPrice(payrollPreview.advance_deduction)}</span>
                   </div>
                   <hr />
                   <div className="flex justify-between text-lg font-bold">
-                    <span>صافي الراتب</span>
+                    <span>{t('صافي الراتب')}</span>
                     <span className="text-primary">{formatPrice(payrollPreview.net_salary)}</span>
                   </div>
                 </div>
                 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setPayrollDialogOpen(false)}>إلغاء</Button>
-                  <Button onClick={createPayroll}>إنشاء كشف الراتب</Button>
+                  <Button variant="outline" onClick={() =>{t('setPayrollDialogOpen(false)}>إلغاء')}</Button>
+                  <Button onClick={createPayroll}>{t('إنشاء كشف الراتب')}</Button>
                 </div>
               </div>
             )}

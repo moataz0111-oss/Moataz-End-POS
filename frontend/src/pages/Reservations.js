@@ -231,7 +231,7 @@ export default function Reservations() {
             </Button>
             <div className="flex items-center gap-2">
               <CalendarDays className="h-6 w-6 text-rose-500" />
-              <h1 className="text-xl font-bold font-cairo">الحجوزات</h1>
+              <h1 className="text-xl font-bold font-cairo">{t('الحجوزات')}</h1>
             </div>
           </div>
           <Button
@@ -251,7 +251,7 @@ export default function Reservations() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">إجمالي الحجوزات</p>
+                  <p className="text-sm text-muted-foreground">{t('إجمالي الحجوزات')}</p>
                   <p className="text-2xl font-bold">{todayStats.total}</p>
                 </div>
                 <Calendar className="h-8 w-8 text-rose-500 opacity-50" />
@@ -262,7 +262,7 @@ export default function Reservations() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">مؤكد</p>
+                  <p className="text-sm text-muted-foreground">{t('مؤكد')}</p>
                   <p className="text-2xl font-bold text-green-500">{todayStats.confirmed}</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-500 opacity-50" />
@@ -273,7 +273,7 @@ export default function Reservations() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">قيد الانتظار</p>
+                  <p className="text-sm text-muted-foreground">{t('قيد الانتظار')}</p>
                   <p className="text-2xl font-bold text-yellow-500">{todayStats.pending}</p>
                 </div>
                 <AlertCircle className="h-8 w-8 text-yellow-500 opacity-50" />
@@ -284,7 +284,7 @@ export default function Reservations() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">إجمالي الضيوف</p>
+                  <p className="text-sm text-muted-foreground">{t('إجمالي الضيوف')}</p>
                   <p className="text-2xl font-bold text-blue-500">{todayStats.totalGuests}</p>
                 </div>
                 <Users className="h-8 w-8 text-blue-500 opacity-50" />
@@ -300,7 +300,7 @@ export default function Reservations() {
                 <div className="relative">
                   <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="بحث بالاسم أو رقم الهاتف..."
+                    placeholder={t('بحث بالاسم أو رقم الهاتف...')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pr-10"
@@ -319,14 +319,14 @@ export default function Reservations() {
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="w-36">
                     <Filter className="h-4 w-4 ml-2" />
-                    <SelectValue placeholder="الحالة" />
+                    <SelectValue placeholder={t('الحالة')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">الكل</SelectItem>
-                    <SelectItem value="pending">قيد الانتظار</SelectItem>
-                    <SelectItem value="confirmed">مؤكد</SelectItem>
-                    <SelectItem value="cancelled">ملغي</SelectItem>
-                    <SelectItem value="completed">مكتمل</SelectItem>
+                    <SelectItem value="all">{t('الكل')}</SelectItem>
+                    <SelectItem value="pending">{t('قيد الانتظار')}</SelectItem>
+                    <SelectItem value="confirmed">{t('مؤكد')}</SelectItem>
+                    <SelectItem value="cancelled">{t('ملغي')}</SelectItem>
+                    <SelectItem value="completed">{t('مكتمل')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -338,13 +338,13 @@ export default function Reservations() {
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-4 text-muted-foreground">جاري التحميل...</p>
+              <p className="mt-4 text-muted-foreground">{t('جاري التحميل...')}</p>
             </div>
           ) : filteredReservations.length === 0 ? (
             <Card className="bg-card border-border/50">
               <CardContent className="p-12 text-center">
                 <CalendarDays className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-                <p className="text-lg text-muted-foreground">لا توجد حجوزات لهذا اليوم</p>
+                <p className="text-lg text-muted-foreground">{t('لا توجد حجوزات لهذا اليوم')}</p>
                 <Button
                   className="mt-4 gap-2"
                   onClick={() => setShowAddDialog(true)}
@@ -378,9 +378,7 @@ export default function Reservations() {
                             <Users className="h-3 w-3" />
                             {reservation.guests} أشخاص
                           </span>
-                          <span className="flex items-center gap-1">
-                            طاولة #{reservation.table_number}
-                          </span>
+                          <span className="flex items-center gap-1">{t('طاولة #{reservation.table_number}')}</span>
                         </div>
                         {reservation.notes && (
                           <p className="mt-2 text-sm text-muted-foreground bg-muted/50 p-2 rounded">
@@ -444,15 +442,15 @@ export default function Reservations() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>اسم العميل *</Label>
+                <Label>{t('اسم العميل *')}</Label>
                 <Input
-                  placeholder="أدخل اسم العميل"
+                  placeholder={t('أدخل اسم العميل')}
                   value={form.customer_name}
                   onChange={(e) => setForm({...form, customer_name: e.target.value})}
                 />
               </div>
               <div className="space-y-2">
-                <Label>رقم الهاتف *</Label>
+                <Label>{t('رقم الهاتف *')}</Label>
                 <Input
                   placeholder="05xxxxxxxx"
                   value={form.customer_phone}
@@ -463,7 +461,7 @@ export default function Reservations() {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>التاريخ</Label>
+                <Label>{t('التاريخ')}</Label>
                 <Input
                   type="date"
                   value={form.date}
@@ -471,7 +469,7 @@ export default function Reservations() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>الوقت</Label>
+                <Label>{t('الوقت')}</Label>
                 <Input
                   type="time"
                   value={form.time}
@@ -482,7 +480,7 @@ export default function Reservations() {
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>عدد الأشخاص</Label>
+                <Label>{t('عدد الأشخاص')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -491,19 +489,17 @@ export default function Reservations() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>الطاولة</Label>
+                <Label>{t('الطاولة')}</Label>
                 <Select 
                   value={form.table_id} 
                   onValueChange={(v) => setForm({...form, table_id: v})}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="اختر طاولة" />
+                    <SelectValue placeholder={t('اختر طاولة')} />
                   </SelectTrigger>
                   <SelectContent>
                     {tables.map(table => (
-                      <SelectItem key={table.id} value={table.id}>
-                        طاولة #{table.number} ({table.capacity} أشخاص)
-                      </SelectItem>
+                      <SelectItem key={table.id} value={table.id}>{t('طاولة #{table.number} ({table.capacity} أشخاص)')}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -511,9 +507,9 @@ export default function Reservations() {
             </div>
             
             <div className="space-y-2">
-              <Label>ملاحظات</Label>
+              <Label>{t('ملاحظات')}</Label>
               <Input
-                placeholder="ملاحظات إضافية (اختياري)"
+                placeholder={t('ملاحظات إضافية (اختياري)')}
                 value={form.notes}
                 onChange={(e) => setForm({...form, notes: e.target.value})}
               />
@@ -521,12 +517,9 @@ export default function Reservations() {
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              إلغاء
-            </Button>
-            <Button onClick={handleSubmit} className="bg-rose-500 hover:bg-rose-600">
-              إنشاء الحجز
-            </Button>
+            <Button variant="outline" onClick={() =>{t('setShowAddDialog(false)}>
+              إلغاء')}</Button>
+            <Button onClick={handleSubmit} className="bg-rose-500 hover:bg-rose-600">{t('إنشاء الحجز')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

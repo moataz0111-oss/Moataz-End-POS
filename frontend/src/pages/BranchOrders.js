@@ -248,7 +248,7 @@ export default function BranchOrders() {
                 <Truck className="h-5 w-5 text-primary" />
                 طلبات الفروع
               </h1>
-              <p className="text-xs text-muted-foreground">طلب المنتجات من قسم التصنيع</p>
+              <p className="text-xs text-muted-foreground">{t('طلب المنتجات من قسم التصنيع')}</p>
             </div>
           </div>
           
@@ -281,14 +281,14 @@ export default function BranchOrders() {
             <div className="flex gap-2 items-center flex-wrap">
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="الحالة" />
+                  <SelectValue placeholder={t('الحالة')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">جميع الطلبات</SelectItem>
-                  <SelectItem value="pending">قيد الانتظار</SelectItem>
-                  <SelectItem value="approved">تمت الموافقة</SelectItem>
-                  <SelectItem value="shipped">تم الشحن</SelectItem>
-                  <SelectItem value="delivered">تم التسليم</SelectItem>
+                  <SelectItem value="all">{t('جميع الطلبات')}</SelectItem>
+                  <SelectItem value="pending">{t('قيد الانتظار')}</SelectItem>
+                  <SelectItem value="approved">{t('تمت الموافقة')}</SelectItem>
+                  <SelectItem value="shipped">{t('تم الشحن')}</SelectItem>
+                  <SelectItem value="delivered">{t('تم التسليم')}</SelectItem>
                 </SelectContent>
               </Select>
               <Button variant="outline" size="icon" onClick={fetchData}>
@@ -301,10 +301,9 @@ export default function BranchOrders() {
                 <Card>
                   <CardContent className="py-12 text-center text-muted-foreground">
                     <Truck className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد طلبات</p>
-                    <Button variant="link" onClick={() => setShowAddDialog(true)}>
-                      إنشاء طلب جديد
-                    </Button>
+                    <p>{t('لا توجد طلبات')}</p>
+                    <Button variant="link" onClick={() =>{t('setShowAddDialog(true)}>
+                      إنشاء طلب جديد')}</Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -314,7 +313,7 @@ export default function BranchOrders() {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2 flex-wrap">
-                            <span className="font-bold text-lg">طلب #{order.order_number}</span>
+                            <span className="font-bold text-lg">{t('طلب #{order.order_number}')}</span>
                             <Badge className={getStatusColor(order.status)}>
                               {getStatusIcon(order.status)}
                               <span className="mr-1">{getStatusLabel(order.status)}</span>
@@ -348,9 +347,7 @@ export default function BranchOrders() {
                             )}
                           </div>
                           
-                          <p className="font-bold text-primary">
-                            الإجمالي: {formatPrice(order.total_cost)}
-                          </p>
+                          <p className="font-bold text-primary">{t('الإجمالي: {formatPrice(order.total_cost)}')}</p>
                         </div>
                         
                         <div className="flex flex-col gap-2">
@@ -416,7 +413,7 @@ export default function BranchOrders() {
             <div className="flex gap-2 items-center">
               <Select value={selectedBranch} onValueChange={setSelectedBranch}>
                 <SelectTrigger className="w-64">
-                  <SelectValue placeholder="اختر الفرع" />
+                  <SelectValue placeholder={t('اختر الفرع')} />
                 </SelectTrigger>
                 <SelectContent>
                   {branches.map(branch => (
@@ -431,14 +428,14 @@ export default function BranchOrders() {
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
                   <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>اختر فرع لعرض مخزونه</p>
+                  <p>{t('اختر فرع لعرض مخزونه')}</p>
                 </CardContent>
               </Card>
             ) : branchInventory.length === 0 ? (
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
                   <Box className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>لا يوجد مخزون في هذا الفرع</p>
+                  <p>{t('لا يوجد مخزون في هذا الفرع')}</p>
                 </CardContent>
               </Card>
             ) : (
@@ -457,15 +454,15 @@ export default function BranchOrders() {
                       
                       <div className="grid grid-cols-2 gap-2 text-sm">
                         <div>
-                          <p className="text-muted-foreground">الكمية</p>
+                          <p className="text-muted-foreground">{t('الكمية')}</p>
                           <p className="text-lg font-bold">{item.quantity}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">التكلفة/وحدة</p>
+                          <p className="text-muted-foreground">{t('التكلفة/وحدة')}</p>
                           <p className="font-medium">{formatPrice(item.cost_per_unit)}</p>
                         </div>
                         <div className="col-span-2">
-                          <p className="text-muted-foreground">القيمة الإجمالية</p>
+                          <p className="text-muted-foreground">{t('القيمة الإجمالية')}</p>
                           <p className="font-bold text-primary">{formatPrice(item.total_value)}</p>
                         </div>
                       </div>
@@ -491,13 +488,13 @@ export default function BranchOrders() {
             {/* اختيار الفرع */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>الفرع المستلم *</Label>
+                <Label>{t('الفرع المستلم *')}</Label>
                 <Select 
                   value={form.to_branch_id} 
                   onValueChange={(v) => setForm(prev => ({ ...prev, to_branch_id: v }))}
                 >
                   <SelectTrigger data-testid="select-branch">
-                    <SelectValue placeholder="اختر الفرع" />
+                    <SelectValue placeholder={t('اختر الفرع')} />
                   </SelectTrigger>
                   <SelectContent>
                     {branches.map(branch => (
@@ -509,7 +506,7 @@ export default function BranchOrders() {
                 </Select>
               </div>
               <div>
-                <Label>الأولوية</Label>
+                <Label>{t('الأولوية')}</Label>
                 <Select 
                   value={form.priority} 
                   onValueChange={(v) => setForm(prev => ({ ...prev, priority: v }))}
@@ -518,10 +515,10 @@ export default function BranchOrders() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">منخفضة</SelectItem>
-                    <SelectItem value="normal">عادية</SelectItem>
-                    <SelectItem value="high">عالية</SelectItem>
-                    <SelectItem value="urgent">عاجل</SelectItem>
+                    <SelectItem value="low">{t('منخفضة')}</SelectItem>
+                    <SelectItem value="normal">{t('عادية')}</SelectItem>
+                    <SelectItem value="high">{t('عالية')}</SelectItem>
+                    <SelectItem value="urgent">{t('عاجل')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -531,19 +528,19 @@ export default function BranchOrders() {
             <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg space-y-3">
               <div className="flex items-center gap-2">
                 <Factory className="h-5 w-5 text-green-500" />
-                <Label className="font-bold">إضافة منتج من التصنيع</Label>
+                <Label className="font-bold">{t('إضافة منتج من التصنيع')}</Label>
               </div>
               
               {manufacturedProducts.length === 0 ? (
                 <div className="text-center py-4 text-muted-foreground">
                   <AlertCircle className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
-                  <p className="text-sm">لا توجد منتجات مصنعة متوفرة</p>
+                  <p className="text-sm">{t('لا توجد منتجات مصنعة متوفرة')}</p>
                 </div>
               ) : (
                 <div className="flex gap-2">
                   <Select value={selectedProduct} onValueChange={setSelectedProduct}>
                     <SelectTrigger className="flex-1 bg-background">
-                      <SelectValue placeholder="اختر منتج..." />
+                      <SelectValue placeholder={t('اختر منتج...')} />
                     </SelectTrigger>
                     <SelectContent>
                       {manufacturedProducts.filter(p => p.quantity > 0).map(product => (
@@ -559,7 +556,7 @@ export default function BranchOrders() {
                     value={quantity}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
                     className="w-24 bg-background"
-                    placeholder="الكمية"
+                    placeholder={t('الكمية')}
                   />
                   <Button
                     type="button"
@@ -603,7 +600,7 @@ export default function BranchOrders() {
                   ))}
                 </div>
                 <div className="bg-primary/10 px-3 py-2 flex justify-between items-center">
-                  <span className="font-medium">الإجمالي:</span>
+                  <span className="font-medium">{t('الإجمالي:')}</span>
                   <span className="font-bold text-lg text-primary">{formatPrice(calculateTotal())}</span>
                 </div>
               </div>
@@ -611,20 +608,19 @@ export default function BranchOrders() {
             
             {/* ملاحظات */}
             <div>
-              <Label>ملاحظات</Label>
+              <Label>{t('ملاحظات')}</Label>
               <Textarea
                 value={form.notes}
                 onChange={(e) => setForm(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="ملاحظات إضافية..."
+                placeholder={t('ملاحظات إضافية...')}
                 rows={2}
               />
             </div>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-              إلغاء
-            </Button>
+            <Button variant="outline" onClick={() =>{t('setShowAddDialog(false)}>
+              إلغاء')}</Button>
             <Button 
               onClick={handleSubmitOrder}
               disabled={!form.to_branch_id || form.items.length === 0 || submitting}
@@ -650,21 +646,21 @@ export default function BranchOrders() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-muted-foreground">الفرع:</span>
+                  <span className="text-muted-foreground">{t('الفرع:')}</span>
                   <span className="font-medium mr-2">{showOrderDetails.to_branch_name}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">الحالة:</span>
+                  <span className="text-muted-foreground">{t('الحالة:')}</span>
                   <Badge className={`mr-2 ${getStatusColor(showOrderDetails.status)}`}>
                     {getStatusLabel(showOrderDetails.status)}
                   </Badge>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">الأولوية:</span>
+                  <span className="text-muted-foreground">{t('الأولوية:')}</span>
                   <span className="font-medium mr-2">{showOrderDetails.priority}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">التاريخ:</span>
+                  <span className="text-muted-foreground">{t('التاريخ:')}</span>
                   <span className="font-medium mr-2">
                     {new Date(showOrderDetails.created_at).toLocaleDateString('ar-IQ')}
                   </span>
@@ -691,13 +687,13 @@ export default function BranchOrders() {
               </div>
               
               <div className="bg-primary/10 p-3 rounded-lg flex justify-between items-center">
-                <span className="font-medium">الإجمالي:</span>
+                <span className="font-medium">{t('الإجمالي:')}</span>
                 <span className="font-bold text-lg text-primary">{formatPrice(showOrderDetails.total_cost)}</span>
               </div>
               
               {showOrderDetails.notes && (
                 <div className="bg-muted/50 p-3 rounded-lg">
-                  <span className="text-sm text-muted-foreground">ملاحظات:</span>
+                  <span className="text-sm text-muted-foreground">{t('ملاحظات:')}</span>
                   <p className="mt-1">{showOrderDetails.notes}</p>
                 </div>
               )}

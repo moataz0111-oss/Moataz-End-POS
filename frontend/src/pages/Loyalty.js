@@ -189,7 +189,7 @@ export default function Loyalty() {
               <Gift className="h-6 w-6 text-primary" />
               برنامج الولاء
             </h1>
-            <p className="text-sm text-muted-foreground">إدارة العملاء والمكافآت</p>
+            <p className="text-sm text-muted-foreground">{t('إدارة العملاء والمكافآت')}</p>
           </div>
         </div>
         
@@ -213,7 +213,7 @@ export default function Loyalty() {
                 <Users className="h-6 w-6 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي الأعضاء</p>
+                <p className="text-sm text-muted-foreground">{t('إجمالي الأعضاء')}</p>
                 <p className="text-2xl font-bold text-foreground">{stats.totalMembers}</p>
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function Loyalty() {
                 <Coins className="h-6 w-6 text-yellow-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي النقاط</p>
+                <p className="text-sm text-muted-foreground">{t('إجمالي النقاط')}</p>
                 <p className="text-2xl font-bold text-foreground">{stats.totalPoints.toLocaleString()}</p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export default function Loyalty() {
                 <TrendingUp className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">متوسط النقاط</p>
+                <p className="text-sm text-muted-foreground">{t('متوسط النقاط')}</p>
                 <p className="text-2xl font-bold text-foreground">{stats.avgPoints}</p>
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function Loyalty() {
                 <Crown className="h-6 w-6 text-purple-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">أعضاء مميزين</p>
+                <p className="text-sm text-muted-foreground">{t('أعضاء مميزين')}</p>
                 <p className="text-2xl font-bold text-foreground">{stats.goldMembers}</p>
               </div>
             </div>
@@ -290,7 +290,7 @@ export default function Loyalty() {
           <div className="relative mb-4">
             <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="بحث عن عضو..."
+              placeholder={t('بحث عن عضو...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pr-10"
@@ -322,17 +322,17 @@ export default function Loyalty() {
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-muted/30 rounded-lg p-2 text-center">
-                      <p className="text-muted-foreground text-xs">النقاط المتاحة</p>
+                      <p className="text-muted-foreground text-xs">{t('النقاط المتاحة')}</p>
                       <p className="font-bold text-primary text-lg">{member.available_points || 0}</p>
                     </div>
                     <div className="bg-muted/30 rounded-lg p-2 text-center">
-                      <p className="text-muted-foreground text-xs">الطلبات</p>
+                      <p className="text-muted-foreground text-xs">{t('الطلبات')}</p>
                       <p className="font-bold text-foreground text-lg">{member.total_orders || 0}</p>
                     </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
-                    <span>إجمالي الإنفاق: {(member.lifetime_spending || 0).toLocaleString()} د.ع</span>
-                    <span>كود الإحالة: {member.referral_code}</span>
+                    <span>{t('إجمالي الإنفاق: {(member.lifetime_spending || 0).toLocaleString()} د.ع')}</span>
+                    <span>{t('كود الإحالة: {member.referral_code}')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -344,13 +344,13 @@ export default function Loyalty() {
           {reviewsLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-muted-foreground">جارٍ تحميل التقييمات...</p>
+              <p className="text-muted-foreground">{t('جارٍ تحميل التقييمات...')}</p>
             </div>
           ) : customerReviews.length === 0 ? (
             <div className="text-center py-12">
               <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-foreground mb-2">لا توجد تقييمات بعد</h3>
-              <p className="text-muted-foreground">سيظهر هنا تقييمات العملاء للطلبات</p>
+              <h3 className="text-lg font-bold text-foreground mb-2">{t('لا توجد تقييمات بعد')}</h3>
+              <p className="text-muted-foreground">{t('سيظهر هنا تقييمات العملاء للطلبات')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -364,9 +364,7 @@ export default function Loyalty() {
                         </div>
                         <div>
                           <h4 className="font-bold text-foreground">{review.customer_name || 'عميل'}</h4>
-                          <p className="text-xs text-muted-foreground">
-                            طلب #{review.order_number} • {new Date(review.created_at).toLocaleDateString('ar-IQ')}
-                          </p>
+                          <p className="text-xs text-muted-foreground">{t('طلب #{review.order_number} • {new Date(review.created_at).toLocaleDateString('ar-IQ')}')}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
@@ -386,15 +384,15 @@ export default function Loyalty() {
                     {review.food_rating && (
                       <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
                         <div className="bg-muted/30 p-2 rounded text-center">
-                          <p className="text-muted-foreground">الطعام</p>
+                          <p className="text-muted-foreground">{t('الطعام')}</p>
                           <p className="font-bold">{review.food_rating}/5</p>
                         </div>
                         <div className="bg-muted/30 p-2 rounded text-center">
-                          <p className="text-muted-foreground">الخدمة</p>
+                          <p className="text-muted-foreground">{t('الخدمة')}</p>
                           <p className="font-bold">{review.service_rating}/5</p>
                         </div>
                         <div className="bg-muted/30 p-2 rounded text-center">
-                          <p className="text-muted-foreground">السرعة</p>
+                          <p className="text-muted-foreground">{t('السرعة')}</p>
                           <p className="font-bold">{review.speed_rating}/5</p>
                         </div>
                       </div>
@@ -417,16 +415,16 @@ export default function Loyalty() {
           </DialogHeader>
           <form onSubmit={handleAddMember} className="space-y-4">
             <div>
-              <Label>اسم العميل *</Label>
+              <Label>{t('اسم العميل *')}</Label>
               <Input
                 value={memberForm.customer_name}
                 onChange={(e) => setMemberForm({ ...memberForm, customer_name: e.target.value })}
-                placeholder="اسم العميل"
+                placeholder={t('اسم العميل')}
                 required
               />
             </div>
             <div>
-              <Label>رقم الهاتف *</Label>
+              <Label>{t('رقم الهاتف *')}</Label>
               <Input
                 value={memberForm.phone}
                 onChange={(e) => setMemberForm({ ...memberForm, phone: e.target.value })}
@@ -436,7 +434,7 @@ export default function Loyalty() {
               />
             </div>
             <div>
-              <Label>البريد الإلكتروني</Label>
+              <Label>{t('البريد الإلكتروني')}</Label>
               <Input
                 type="email"
                 value={memberForm.email}
@@ -446,7 +444,7 @@ export default function Loyalty() {
               />
             </div>
             <div>
-              <Label>تاريخ الميلاد</Label>
+              <Label>{t('تاريخ الميلاد')}</Label>
               <Input
                 type="date"
                 value={memberForm.birthday}
@@ -454,7 +452,7 @@ export default function Loyalty() {
               />
             </div>
             <div>
-              <Label>كود الإحالة (اختياري)</Label>
+              <Label>{t('كود الإحالة (اختياري)')}</Label>
               <Input
                 value={memberForm.referred_by}
                 onChange={(e) => setMemberForm({ ...memberForm, referred_by: e.target.value.toUpperCase() })}
@@ -464,12 +462,9 @@ export default function Loyalty() {
               />
             </div>
             <div className="flex gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setAddMemberOpen(false)} className="flex-1">
-                إلغاء
-              </Button>
-              <Button type="submit" className="flex-1">
-                إضافة العضو
-              </Button>
+              <Button type="button" variant="outline" onClick={() =>{t('setAddMemberOpen(false)} className="flex-1">
+                إلغاء')}</Button>
+              <Button type="submit" className="flex-1">{t('إضافة العضو')}</Button>
             </div>
           </form>
         </DialogContent>
@@ -501,17 +496,17 @@ export default function Loyalty() {
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-primary/10 rounded-lg p-3 text-center">
                   <Coins className="h-5 w-5 text-primary mx-auto mb-1" />
-                  <p className="text-xs text-muted-foreground">متاح</p>
+                  <p className="text-xs text-muted-foreground">{t('متاح')}</p>
                   <p className="text-xl font-bold text-primary">{selectedMember.available_points}</p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
                   <Star className="h-5 w-5 text-yellow-500 mx-auto mb-1" />
-                  <p className="text-xs text-muted-foreground">إجمالي</p>
+                  <p className="text-xs text-muted-foreground">{t('إجمالي')}</p>
                   <p className="text-xl font-bold text-foreground">{selectedMember.total_points}</p>
                 </div>
                 <div className="bg-muted/50 rounded-lg p-3 text-center">
                   <Gift className="h-5 w-5 text-green-500 mx-auto mb-1" />
-                  <p className="text-xs text-muted-foreground">مستبدل</p>
+                  <p className="text-xs text-muted-foreground">{t('مستبدل')}</p>
                   <p className="text-xl font-bold text-foreground">{selectedMember.redeemed_points}</p>
                 </div>
               </div>
@@ -545,7 +540,7 @@ export default function Loyalty() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-muted-foreground py-4">لا توجد معاملات</p>
+                    <p className="text-center text-muted-foreground py-4">{t('لا توجد معاملات')}</p>
                   )}
                 </ScrollArea>
               </div>
@@ -566,7 +561,7 @@ export default function Loyalty() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>نقاط لكل دينار</Label>
+                  <Label>{t('نقاط لكل دينار')}</Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -575,7 +570,7 @@ export default function Loyalty() {
                   />
                 </div>
                 <div>
-                  <Label>قيمة النقطة (دينار)</Label>
+                  <Label>{t('قيمة النقطة (دينار)')}</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -586,7 +581,7 @@ export default function Loyalty() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>الحد الأدنى للاستبدال</Label>
+                  <Label>{t('الحد الأدنى للاستبدال')}</Label>
                   <Input
                     type="number"
                     value={settings.min_redeem_points}
@@ -594,7 +589,7 @@ export default function Loyalty() {
                   />
                 </div>
                 <div>
-                  <Label>أقصى نسبة خصم %</Label>
+                  <Label>{t('أقصى نسبة خصم %')}</Label>
                   <Input
                     type="number"
                     value={settings.max_redeem_percent}
@@ -604,7 +599,7 @@ export default function Loyalty() {
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <Label>نقاط الترحيب</Label>
+                  <Label>{t('نقاط الترحيب')}</Label>
                   <Input
                     type="number"
                     value={settings.welcome_bonus}
@@ -612,7 +607,7 @@ export default function Loyalty() {
                   />
                 </div>
                 <div>
-                  <Label>نقاط عيد الميلاد</Label>
+                  <Label>{t('نقاط عيد الميلاد')}</Label>
                   <Input
                     type="number"
                     value={settings.birthday_bonus}
@@ -620,7 +615,7 @@ export default function Loyalty() {
                   />
                 </div>
                 <div>
-                  <Label>نقاط الإحالة</Label>
+                  <Label>{t('نقاط الإحالة')}</Label>
                   <Input
                     type="number"
                     value={settings.referral_bonus}
@@ -628,9 +623,7 @@ export default function Loyalty() {
                   />
                 </div>
               </div>
-              <Button onClick={handleSaveSettings} className="w-full">
-                حفظ الإعدادات
-              </Button>
+              <Button onClick={handleSaveSettings} className="w-full">{t('حفظ الإعدادات')}</Button>
             </div>
           )}
         </DialogContent>

@@ -141,8 +141,8 @@ export default function CallLogs() {
             <ArrowRight className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">سجل المكالمات</h1>
-            <p className="text-sm text-muted-foreground">جميع المكالمات الواردة والصادرة</p>
+            <h1 className="text-2xl font-bold text-foreground">{t('سجل المكالمات')}</h1>
+            <p className="text-sm text-muted-foreground">{t('جميع المكالمات الواردة والصادرة')}</p>
           </div>
         </div>
         
@@ -166,7 +166,7 @@ export default function CallLogs() {
                 <Headphones className="h-5 w-5 text-blue-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">إجمالي المكالمات</p>
+                <p className="text-sm text-muted-foreground">{t('إجمالي المكالمات')}</p>
                 <p className="text-2xl font-bold text-foreground">{stats.total}</p>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function CallLogs() {
                 <PhoneIncoming className="h-5 w-5 text-green-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">مكالمات مكتملة</p>
+                <p className="text-sm text-muted-foreground">{t('مكالمات مكتملة')}</p>
                 <p className="text-2xl font-bold text-foreground">{stats.answered}</p>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function CallLogs() {
                 <PhoneMissed className="h-5 w-5 text-red-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">مكالمات فائتة</p>
+                <p className="text-sm text-muted-foreground">{t('مكالمات فائتة')}</p>
                 <p className="text-2xl font-bold text-foreground">{stats.missed}</p>
               </div>
             </div>
@@ -208,7 +208,7 @@ export default function CallLogs() {
                 <Clock className="h-5 w-5 text-purple-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">متوسط المدة</p>
+                <p className="text-sm text-muted-foreground">{t('متوسط المدة')}</p>
                 <p className="text-2xl font-bold text-foreground">2:30</p>
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function CallLogs() {
               <div className="relative">
                 <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="بحث بالرقم أو الاسم..."
+                  placeholder={t('بحث بالرقم أو الاسم...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pr-10"
@@ -233,13 +233,13 @@ export default function CallLogs() {
             
             <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-[150px]">
-                <SelectValue placeholder="الحالة" />
+                <SelectValue placeholder={t('الحالة')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">الكل</SelectItem>
-                <SelectItem value="ended">مكتملة</SelectItem>
-                <SelectItem value="missed">فائتة</SelectItem>
-                <SelectItem value="answered">تم الرد</SelectItem>
+                <SelectItem value="all">{t('الكل')}</SelectItem>
+                <SelectItem value="ended">{t('مكتملة')}</SelectItem>
+                <SelectItem value="missed">{t('فائتة')}</SelectItem>
+                <SelectItem value="answered">{t('تم الرد')}</SelectItem>
               </SelectContent>
             </Select>
             
@@ -264,12 +264,12 @@ export default function CallLogs() {
           {loading ? (
             <div className="text-center py-10">
               <RefreshCw className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-              <p className="mt-2 text-muted-foreground">جاري التحميل...</p>
+              <p className="mt-2 text-muted-foreground">{t('جاري التحميل...')}</p>
             </div>
           ) : filteredLogs.length === 0 ? (
             <div className="text-center py-10">
               <Headphones className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">لا توجد مكالمات</p>
+              <p className="text-muted-foreground">{t('لا توجد مكالمات')}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -295,9 +295,7 @@ export default function CallLogs() {
                           {log.caller_name || 'غير معروف'}
                         </span>
                         {log.is_new_customer && (
-                          <span className="px-2 py-0.5 text-xs bg-yellow-500/20 text-yellow-500 rounded-full">
-                            جديد
-                          </span>
+                          <span className="px-2 py-0.5 text-xs bg-yellow-500/20 text-yellow-500 rounded-full">{t('جديد')}</span>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground font-mono" dir="ltr">

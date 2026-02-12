@@ -423,7 +423,7 @@ export default function Delivery() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">جاري التحميل...</p>
+          <p className="text-muted-foreground">{t('جاري التحميل...')}</p>
         </div>
       </div>
     );
@@ -665,8 +665,8 @@ export default function Delivery() {
                 <Card className="border-border/50 bg-card col-span-full">
                   <CardContent className="py-12 text-center">
                     <Truck className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground text-lg">لا يوجد سائقين</p>
-                    <p className="text-sm text-muted-foreground">أضف سائقين لبدء إدارة التوصيل</p>
+                    <p className="text-muted-foreground text-lg">{t('لا يوجد سائقين')}</p>
+                    <p className="text-sm text-muted-foreground">{t('أضف سائقين لبدء إدارة التوصيل')}</p>
                   </CardContent>
                 </Card>
               ) : (
@@ -880,7 +880,7 @@ export default function Delivery() {
                       </p>
                       {driver.current_order && (
                         <div className="mt-2 pt-2 border-t border-border text-xs">
-                          <span className="text-orange-500">طلب #{driver.current_order.order_number}</span>
+                          <span className="text-orange-500">{t('طلب #{driver.current_order.order_number}')}</span>
                           {driver.current_order.delivery_address && (
                             <p className="text-muted-foreground truncate">
                               {driver.current_order.delivery_address}
@@ -923,14 +923,14 @@ export default function Delivery() {
               <Card className="border-border/50 bg-gradient-to-br from-blue-500/10 to-blue-600/5">
                 <CardContent className="p-3 text-center">
                   <Package className="h-5 w-5 mx-auto mb-1 text-blue-500" />
-                  <p className="text-xs text-muted-foreground">جاهزة للتوصيل</p>
+                  <p className="text-xs text-muted-foreground">{t('جاهزة للتوصيل')}</p>
                   <p className="text-xl font-bold text-blue-500">{pendingOrders.length}</p>
                 </CardContent>
               </Card>
               <Card className="border-border/50 bg-gradient-to-br from-orange-500/10 to-orange-600/5">
                 <CardContent className="p-3 text-center">
                   <Truck className="h-5 w-5 mx-auto mb-1 text-orange-500" />
-                  <p className="text-xs text-muted-foreground">في الطريق</p>
+                  <p className="text-xs text-muted-foreground">{t('في الطريق')}</p>
                   <p className="text-xl font-bold text-orange-500">
                     {drivers.filter(d => d.current_order_id).length}
                   </p>
@@ -939,7 +939,7 @@ export default function Delivery() {
               <Card className="border-border/50 bg-gradient-to-br from-green-500/10 to-green-600/5">
                 <CardContent className="p-3 text-center">
                   <CheckCircle className="h-5 w-5 mx-auto mb-1 text-green-500" />
-                  <p className="text-xs text-muted-foreground">تم التسليم اليوم</p>
+                  <p className="text-xs text-muted-foreground">{t('تم التسليم اليوم')}</p>
                   <p className="text-xl font-bold text-green-500">
                     {Object.values(driverStats).reduce((sum, s) => sum + (s.delivered_today || 0), 0)}
                   </p>
@@ -948,14 +948,14 @@ export default function Delivery() {
               <Card className="border-border/50 bg-gradient-to-br from-purple-500/10 to-purple-600/5">
                 <CardContent className="p-3 text-center">
                   <DollarSign className="h-5 w-5 mx-auto mb-1 text-purple-500" />
-                  <p className="text-xs text-muted-foreground">تم التحصيل</p>
+                  <p className="text-xs text-muted-foreground">{t('تم التحصيل')}</p>
                   <p className="text-xl font-bold text-purple-500">{formatPrice(totalPaid)}</p>
                 </CardContent>
               </Card>
               <Card className="border-border/50 bg-gradient-to-br from-red-500/10 to-red-600/5">
                 <CardContent className="p-3 text-center">
                   <AlertCircle className="h-5 w-5 mx-auto mb-1 text-red-500" />
-                  <p className="text-xs text-muted-foreground">غير محصل</p>
+                  <p className="text-xs text-muted-foreground">{t('غير محصل')}</p>
                   <p className="text-xl font-bold text-red-500">{formatPrice(totalUnpaid)}</p>
                 </CardContent>
               </Card>
@@ -978,7 +978,7 @@ export default function Delivery() {
                   <ScrollArea className="h-[400px]">
                     <div className="space-y-3">
                       {pendingOrders.filter(o => !o.driver_id).length === 0 ? (
-                        <p className="text-center text-muted-foreground py-8 text-sm">لا توجد طلبات</p>
+                        <p className="text-center text-muted-foreground py-8 text-sm">{t('لا توجد طلبات')}</p>
                       ) : (
                         pendingOrders.filter(o => !o.driver_id).map(order => (
                           <div 
@@ -1029,7 +1029,7 @@ export default function Delivery() {
                   <ScrollArea className="h-[400px]">
                     <div className="space-y-3">
                       {drivers.filter(d => d.current_order_id).length === 0 ? (
-                        <p className="text-center text-muted-foreground py-8 text-sm">لا توجد طلبات في الطريق</p>
+                        <p className="text-center text-muted-foreground py-8 text-sm">{t('لا توجد طلبات في الطريق')}</p>
                       ) : (
                         drivers.filter(d => d.current_order_id).map(driver => (
                           <div 
@@ -1102,7 +1102,7 @@ export default function Delivery() {
                   <ScrollArea className="h-[400px]">
                     <div className="space-y-2">
                       {driverOrders.filter(o => o.status === 'delivered').length === 0 ? (
-                        <p className="text-center text-muted-foreground py-8 text-sm">لا توجد طلبات مسلمة اليوم</p>
+                        <p className="text-center text-muted-foreground py-8 text-sm">{t('لا توجد طلبات مسلمة اليوم')}</p>
                       ) : (
                         driverOrders.filter(o => o.status === 'delivered').slice(0, 20).map((order, index) => (
                           <div 
@@ -1172,19 +1172,19 @@ export default function Delivery() {
               {/* ملخص */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-red-500/10 p-3 rounded-lg text-center">
-                  <p className="text-xs text-muted-foreground">غير مدفوع</p>
+                  <p className="text-xs text-muted-foreground">{t('غير مدفوع')}</p>
                   <p className="text-lg font-bold text-red-500">
                     {formatPrice(driverStats[selectedDriver.id]?.unpaid_total || 0)}
                   </p>
                 </div>
                 <div className="bg-green-500/10 p-3 rounded-lg text-center">
-                  <p className="text-xs text-muted-foreground">مدفوع اليوم</p>
+                  <p className="text-xs text-muted-foreground">{t('مدفوع اليوم')}</p>
                   <p className="text-lg font-bold text-green-500">
                     {formatPrice(driverStats[selectedDriver.id]?.paid_today || 0)}
                   </p>
                 </div>
                 <div className="bg-blue-500/10 p-3 rounded-lg text-center">
-                  <p className="text-xs text-muted-foreground">إجمالي التوصيلات</p>
+                  <p className="text-xs text-muted-foreground">{t('إجمالي التوصيلات')}</p>
                   <p className="text-lg font-bold text-blue-500">
                     {selectedDriver.total_deliveries || 0}
                   </p>
@@ -1200,7 +1200,7 @@ export default function Delivery() {
                 <ScrollArea className="h-[350px]">
                   <div className="space-y-2">
                     {driverOrders.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-8">لا توجد طلبات</p>
+                      <p className="text-center text-muted-foreground py-8">{t('لا توجد طلبات')}</p>
                     ) : (
                       driverOrders.map(order => (
                         <div 
@@ -1288,14 +1288,14 @@ export default function Delivery() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="bg-muted/50 p-4 rounded-lg text-center">
-              <p className="text-sm text-muted-foreground">المبلغ المستحق</p>
+              <p className="text-sm text-muted-foreground">{t('المبلغ المستحق')}</p>
               <p className="text-2xl font-bold text-red-500">
                 {formatPrice(driverStats[selectedDriver?.id]?.unpaid_total || 0)}
               </p>
             </div>
             
             <div>
-              <Label className="text-foreground">المبلغ المحصل</Label>
+              <Label className="text-foreground">{t('المبلغ المحصل')}</Label>
               <Input
                 type="number"
                 value={paymentAmount}
@@ -1305,9 +1305,8 @@ export default function Delivery() {
             </div>
             
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setCollectPaymentDialogOpen(false)} className="flex-1">
-                إلغاء
-              </Button>
+              <Button variant="outline" onClick={() =>{t('setCollectPaymentDialogOpen(false)} className="flex-1">
+                إلغاء')}</Button>
               <Button 
                 onClick={handleCollectPayment}
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white"
@@ -1331,16 +1330,16 @@ export default function Delivery() {
           </DialogHeader>
           <form onSubmit={handleEditDriver} className="space-y-4">
             <div>
-              <Label className="text-foreground">اسم السائق</Label>
+              <Label className="text-foreground">{t('اسم السائق')}</Label>
               <Input
                 value={editFormData.name}
                 onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
-                placeholder="اسم السائق"
+                placeholder={t('اسم السائق')}
                 required
               />
             </div>
             <div>
-              <Label className="text-foreground">رقم الهاتف</Label>
+              <Label className="text-foreground">{t('رقم الهاتف')}</Label>
               <Input
                 value={editFormData.phone}
                 onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
@@ -1349,20 +1348,19 @@ export default function Delivery() {
               />
             </div>
             <div>
-              <Label className="text-foreground">الرمز السري الجديد (PIN)</Label>
+              <Label className="text-foreground">{t('الرمز السري الجديد (PIN)')}</Label>
               <Input
                 type="password"
                 value={editFormData.pin}
                 onChange={(e) => setEditFormData({ ...editFormData, pin: e.target.value })}
-                placeholder="اتركه فارغاً للإبقاء على الرمز الحالي"
+                placeholder={t('اتركه فارغاً للإبقاء على الرمز الحالي')}
                 maxLength={6}
               />
-              <p className="text-xs text-muted-foreground mt-1">اتركه فارغاً إذا لم ترد تغيير الرمز</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('اتركه فارغاً إذا لم ترد تغيير الرمز')}</p>
             </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)} className="flex-1">
-                إلغاء
-              </Button>
+              <Button type="button" variant="outline" onClick={() =>{t('setEditDialogOpen(false)} className="flex-1">
+                إلغاء')}</Button>
               <Button type="submit" className="flex-1 bg-blue-500 hover:bg-blue-600 text-white">
                 <Check className="h-4 w-4 ml-1" />
                 حفظ التعديلات
@@ -1387,26 +1385,26 @@ export default function Delivery() {
               <div className="bg-muted/50 p-3 rounded-lg">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-sm text-muted-foreground">رقم الطلب:</p>
+                    <p className="text-sm text-muted-foreground">{t('رقم الطلب:')}</p>
                     <p className="font-bold text-lg text-foreground">#{orderToTransfer.order_number}</p>
                   </div>
                   <div className="text-left">
-                    <p className="text-sm text-muted-foreground">المبلغ:</p>
+                    <p className="text-sm text-muted-foreground">{t('المبلغ:')}</p>
                     <p className="font-bold text-primary">{formatPrice(orderToTransfer.total)}</p>
                   </div>
                 </div>
                 <div className="mt-2 pt-2 border-t border-border">
-                  <p className="text-sm text-muted-foreground">السائق الحالي:</p>
+                  <p className="text-sm text-muted-foreground">{t('السائق الحالي:')}</p>
                   <p className="font-medium text-foreground">{orderToTransfer.driver_name || selectedDriver?.name || 'غير معين'}</p>
                 </div>
               </div>
             )}
             
             <div>
-              <Label className="text-foreground">اختر السائق الجديد:</Label>
+              <Label className="text-foreground">{t('اختر السائق الجديد:')}</Label>
               <Select value={targetDriverId} onValueChange={setTargetDriverId}>
                 <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="اختر السائق" />
+                  <SelectValue placeholder={t('اختر السائق')} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableDriversForTransfer.map(driver => (
@@ -1421,7 +1419,7 @@ export default function Delivery() {
               </Select>
               
               {availableDriversForTransfer.length === 0 && (
-                <p className="text-sm text-amber-500 mt-2">لا يوجد سائقين آخرين نشطين</p>
+                <p className="text-sm text-amber-500 mt-2">{t('لا يوجد سائقين آخرين نشطين')}</p>
               )}
             </div>
           </div>
@@ -1463,18 +1461,15 @@ export default function Delivery() {
             <p className="text-foreground">
               هل أنت متأكد من حذف <span className="font-bold text-red-500">{selectedDrivers.length}</span> سائق؟
             </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              هذا الإجراء لا يمكن التراجع عنه.
-            </p>
+            <p className="text-sm text-muted-foreground mt-2">{t('هذا الإجراء لا يمكن التراجع عنه.')}</p>
           </div>
           <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={() => setDeleteConfirmOpen(false)}
+              onClick={() =>{t('setDeleteConfirmOpen(false)}
               className="flex-1"
             >
-              إلغاء
-            </Button>
+              إلغاء')}</Button>
             <Button 
               onClick={handleDeleteSelectedDrivers}
               className="flex-1 bg-red-500 text-white hover:bg-red-600"

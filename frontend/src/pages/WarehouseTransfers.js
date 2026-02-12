@@ -226,7 +226,7 @@ export default function WarehouseTransfers() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">جاري التحميل...</p>
+          <p className="text-muted-foreground">{t('جاري التحميل...')}</p>
         </div>
       </div>
     );
@@ -256,8 +256,8 @@ export default function WarehouseTransfers() {
                   <ArrowLeftRight className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">إدارة المخزون والتحويلات</h1>
-                  <p className="text-sm text-muted-foreground">تحويلات المخزون وطلبات الشراء</p>
+                  <h1 className="text-2xl font-bold text-foreground">{t('إدارة المخزون والتحويلات')}</h1>
+                  <p className="text-sm text-muted-foreground">{t('تحويلات المخزون وطلبات الشراء')}</p>
                 </div>
               </div>
             </div>
@@ -265,10 +265,10 @@ export default function WarehouseTransfers() {
             <div className="flex items-center gap-3">
               <Select value={selectedBranch} onValueChange={setSelectedBranch}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="جميع الفروع" />
+                  <SelectValue placeholder={t('جميع الفروع')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">جميع الفروع</SelectItem>
+                  <SelectItem value="all">{t('جميع الفروع')}</SelectItem>
                   {branches.map(branch => (
                     <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
                   ))}
@@ -281,7 +281,7 @@ export default function WarehouseTransfers() {
                 size="icon"
                 onClick={() => navigate('/')}
                 className="h-10 w-10"
-                title="الصفحة الرئيسية"
+                title={t('الصفحة الرئيسية')}
               >
                 <Home className="h-5 w-5" />
               </Button>
@@ -298,7 +298,7 @@ export default function WarehouseTransfers() {
               <p className="text-2xl font-bold text-yellow-500">
                 {transfers.filter(t => t.status === 'pending').length}
               </p>
-              <p className="text-sm text-muted-foreground">تحويلات معلقة</p>
+              <p className="text-sm text-muted-foreground">{t('تحويلات معلقة')}</p>
             </CardContent>
           </Card>
           <Card className="bg-purple-500/10 border-purple-500/20">
@@ -307,7 +307,7 @@ export default function WarehouseTransfers() {
               <p className="text-2xl font-bold text-purple-500">
                 {transfers.filter(t => t.status === 'shipped').length}
               </p>
-              <p className="text-sm text-muted-foreground">قيد التوصيل</p>
+              <p className="text-sm text-muted-foreground">{t('قيد التوصيل')}</p>
             </CardContent>
           </Card>
           <Card className="bg-blue-500/10 border-blue-500/20">
@@ -316,7 +316,7 @@ export default function WarehouseTransfers() {
               <p className="text-2xl font-bold text-blue-500">
                 {purchaseRequests.filter(r => r.status === 'pending').length}
               </p>
-              <p className="text-sm text-muted-foreground">طلبات شراء معلقة</p>
+              <p className="text-sm text-muted-foreground">{t('طلبات شراء معلقة')}</p>
             </CardContent>
           </Card>
           <Card className="bg-green-500/10 border-green-500/20">
@@ -325,7 +325,7 @@ export default function WarehouseTransfers() {
               <p className="text-2xl font-bold text-green-500">
                 {transfers.filter(t => t.status === 'received').length}
               </p>
-              <p className="text-sm text-muted-foreground">تحويلات مكتملة</p>
+              <p className="text-sm text-muted-foreground">{t('تحويلات مكتملة')}</p>
             </CardContent>
           </Card>
         </div>
@@ -343,50 +343,50 @@ export default function WarehouseTransfers() {
           <TabsContent value="transfers">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>تحويلات المخزون</CardTitle>
+                <CardTitle>{t('تحويلات المخزون')}</CardTitle>
                 <Dialog open={transferDialogOpen} onOpenChange={setTransferDialogOpen}>
                   <DialogTrigger asChild>
                     <Button><Plus className="h-4 w-4 ml-2" /> تحويل جديد</Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle>إنشاء تحويل مخزون</DialogTitle>
+                      <DialogTitle>{t('إنشاء تحويل مخزون')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateTransfer} className="space-y-4">
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <Label>نوع التحويل</Label>
+                          <Label>{t('نوع التحويل')}</Label>
                           <Select 
                             value={transferForm.transfer_type} 
                             onValueChange={(v) => setTransferForm({...transferForm, transfer_type: v})}
                           >
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="warehouse_to_branch">من المخزن للفرع</SelectItem>
-                              <SelectItem value="branch_to_warehouse">من الفرع للمخزن</SelectItem>
-                              <SelectItem value="branch_to_branch">بين الفروع</SelectItem>
+                              <SelectItem value="warehouse_to_branch">{t('من المخزن للفرع')}</SelectItem>
+                              <SelectItem value="branch_to_warehouse">{t('من الفرع للمخزن')}</SelectItem>
+                              <SelectItem value="branch_to_branch">{t('بين الفروع')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <Label>من *</Label>
+                          <Label>{t('من *')}</Label>
                           <Select 
                             value={transferForm.from_branch_id} 
                             onValueChange={(v) => setTransferForm({...transferForm, from_branch_id: v})}
                           >
-                            <SelectTrigger><SelectValue placeholder="اختر المصدر" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t('اختر المصدر')} /></SelectTrigger>
                             <SelectContent>
                               {branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <Label>إلى *</Label>
+                          <Label>{t('إلى *')}</Label>
                           <Select 
                             value={transferForm.to_branch_id} 
                             onValueChange={(v) => setTransferForm({...transferForm, to_branch_id: v})}
                           >
-                            <SelectTrigger><SelectValue placeholder="اختر الوجهة" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t('اختر الوجهة')} /></SelectTrigger>
                             <SelectContent>
                               {branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                             </SelectContent>
@@ -395,18 +395,18 @@ export default function WarehouseTransfers() {
                       </div>
                       {/* Items Selection */}
                       <div>
-                        <Label className="mb-2 block">الأصناف المتاحة</Label>
+                        <Label className="mb-2 block">{t('الأصناف المتاحة')}</Label>
                         <div className="border rounded-lg max-h-60 overflow-y-auto">
                           {filteredInventory.length === 0 ? (
-                            <p className="text-center text-muted-foreground p-4">اختر المصدر أولاً</p>
+                            <p className="text-center text-muted-foreground p-4">{t('اختر المصدر أولاً')}</p>
                           ) : (
                             <table className="w-full">
                               <thead className="bg-muted sticky top-0">
                                 <tr>
-                                  <th className="p-2 text-right">اختر</th>
-                                  <th className="p-2 text-right">الصنف</th>
-                                  <th className="p-2 text-right">المتوفر</th>
-                                  <th className="p-2 text-right">الكمية المحولة</th>
+                                  <th className="p-2 text-right">{t('اختر')}</th>
+                                  <th className="p-2 text-right">{t('الصنف')}</th>
+                                  <th className="p-2 text-right">{t('المتوفر')}</th>
+                                  <th className="p-2 text-right">{t('الكمية المحولة')}</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -448,7 +448,7 @@ export default function WarehouseTransfers() {
                       {/* Selected Items Summary */}
                       {selectedItems.length > 0 && (
                         <div className="bg-muted p-3 rounded-lg">
-                          <p className="font-medium mb-2">الأصناف المختارة ({selectedItems.length})</p>
+                          <p className="font-medium mb-2">{t('الأصناف المختارة ({selectedItems.length})')}</p>
                           <div className="flex flex-wrap gap-2">
                             {selectedItems.map(item => (
                               <Badge key={item.id} variant="secondary">
@@ -459,15 +459,15 @@ export default function WarehouseTransfers() {
                         </div>
                       )}
                       <div>
-                        <Label>ملاحظات</Label>
+                        <Label>{t('ملاحظات')}</Label>
                         <Textarea 
                           value={transferForm.notes} 
                           onChange={(e) => setTransferForm({...transferForm, notes: e.target.value})}
                         />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setTransferDialogOpen(false)}>إلغاء</Button>
-                        <Button type="submit" disabled={selectedItems.length === 0}>إنشاء التحويل</Button>
+                        <Button type="button" variant="outline" onClick={() =>{t('setTransferDialogOpen(false)}>إلغاء')}</Button>
+                        <Button type="submit" disabled={selectedItems.length === 0}>{t('إنشاء التحويل')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -478,13 +478,13 @@ export default function WarehouseTransfers() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-right p-3">رقم التحويل</th>
-                        <th className="text-right p-3">من</th>
-                        <th className="text-right p-3">إلى</th>
-                        <th className="text-right p-3">الأصناف</th>
-                        <th className="text-right p-3">الحالة</th>
-                        <th className="text-right p-3">التاريخ</th>
-                        <th className="text-right p-3">الإجراءات</th>
+                        <th className="text-right p-3">{t('رقم التحويل')}</th>
+                        <th className="text-right p-3">{t('من')}</th>
+                        <th className="text-right p-3">{t('إلى')}</th>
+                        <th className="text-right p-3">{t('الأصناف')}</th>
+                        <th className="text-right p-3">{t('الحالة')}</th>
+                        <th className="text-right p-3">{t('التاريخ')}</th>
+                        <th className="text-right p-3">{t('الإجراءات')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -527,41 +527,41 @@ export default function WarehouseTransfers() {
           <TabsContent value="requests">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>طلبات الشراء</CardTitle>
+                <CardTitle>{t('طلبات الشراء')}</CardTitle>
                 <Dialog open={requestDialogOpen} onOpenChange={setRequestDialogOpen}>
                   <DialogTrigger asChild>
                     <Button><Plus className="h-4 w-4 ml-2" /> طلب شراء جديد</Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                      <DialogTitle>إنشاء طلب شراء</DialogTitle>
+                      <DialogTitle>{t('إنشاء طلب شراء')}</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateRequest} className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>الفرع الطالب *</Label>
+                          <Label>{t('الفرع الطالب *')}</Label>
                           <Select 
                             value={requestForm.branch_id} 
                             onValueChange={(v) => setRequestForm({...requestForm, branch_id: v})}
                           >
-                            <SelectTrigger><SelectValue placeholder="اختر الفرع" /></SelectTrigger>
+                            <SelectTrigger><SelectValue placeholder={t('اختر الفرع')} /></SelectTrigger>
                             <SelectContent>
                               {branches.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <Label>الأولوية</Label>
+                          <Label>{t('الأولوية')}</Label>
                           <Select 
                             value={requestForm.priority} 
                             onValueChange={(v) => setRequestForm({...requestForm, priority: v})}
                           >
                             <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="urgent">عاجل</SelectItem>
-                              <SelectItem value="high">مرتفع</SelectItem>
-                              <SelectItem value="normal">عادي</SelectItem>
-                              <SelectItem value="low">منخفض</SelectItem>
+                              <SelectItem value="urgent">{t('عاجل')}</SelectItem>
+                              <SelectItem value="high">{t('مرتفع')}</SelectItem>
+                              <SelectItem value="normal">{t('عادي')}</SelectItem>
+                              <SelectItem value="low">{t('منخفض')}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -569,7 +569,7 @@ export default function WarehouseTransfers() {
                       {/* Items */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <Label>الأصناف المطلوبة</Label>
+                          <Label>{t('الأصناف المطلوبة')}</Label>
                           <Button type="button" size="sm" variant="outline" onClick={addRequestItem}>
                             <Plus className="h-4 w-4" />
                           </Button>
@@ -578,23 +578,23 @@ export default function WarehouseTransfers() {
                           {requestForm.items.map((item, index) => (
                             <div key={index} className="grid grid-cols-5 gap-2 items-center">
                               <Input 
-                                placeholder="اسم الصنف"
+                                placeholder={t('اسم الصنف')}
                                 value={item.name}
                                 onChange={(e) => updateRequestItem(index, 'name', e.target.value)}
                               />
                               <Input 
                                 type="number"
-                                placeholder="الكمية"
+                                placeholder={t('الكمية')}
                                 value={item.quantity}
                                 onChange={(e) => updateRequestItem(index, 'quantity', e.target.value)}
                               />
                               <Input 
-                                placeholder="الوحدة"
+                                placeholder={t('الوحدة')}
                                 value={item.unit}
                                 onChange={(e) => updateRequestItem(index, 'unit', e.target.value)}
                               />
                               <Input 
-                                placeholder="ملاحظات"
+                                placeholder={t('ملاحظات')}
                                 value={item.notes}
                                 onChange={(e) => updateRequestItem(index, 'notes', e.target.value)}
                               />
@@ -613,15 +613,15 @@ export default function WarehouseTransfers() {
                         </div>
                       </div>
                       <div>
-                        <Label>ملاحظات عامة</Label>
+                        <Label>{t('ملاحظات عامة')}</Label>
                         <Textarea 
                           value={requestForm.notes} 
                           onChange={(e) => setRequestForm({...requestForm, notes: e.target.value})}
                         />
                       </div>
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setRequestDialogOpen(false)}>إلغاء</Button>
-                        <Button type="submit">إنشاء الطلب</Button>
+                        <Button type="button" variant="outline" onClick={() =>{t('setRequestDialogOpen(false)}>إلغاء')}</Button>
+                        <Button type="submit">{t('إنشاء الطلب')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -632,13 +632,13 @@ export default function WarehouseTransfers() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-right p-3">رقم الطلب</th>
-                        <th className="text-right p-3">الفرع</th>
-                        <th className="text-right p-3">الأصناف</th>
-                        <th className="text-right p-3">الأولوية</th>
-                        <th className="text-right p-3">الحالة</th>
-                        <th className="text-right p-3">التاريخ</th>
-                        <th className="text-right p-3">الإجراءات</th>
+                        <th className="text-right p-3">{t('رقم الطلب')}</th>
+                        <th className="text-right p-3">{t('الفرع')}</th>
+                        <th className="text-right p-3">{t('الأصناف')}</th>
+                        <th className="text-right p-3">{t('الأولوية')}</th>
+                        <th className="text-right p-3">{t('الحالة')}</th>
+                        <th className="text-right p-3">{t('التاريخ')}</th>
+                        <th className="text-right p-3">{t('الإجراءات')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -651,7 +651,7 @@ export default function WarehouseTransfers() {
                               {request.items?.slice(0, 2).map((item, i) => (
                                 <div key={i}>{item.name} ({item.quantity} {item.unit})</div>
                               ))}
-                              {request.items?.length > 2 && <span className="text-muted-foreground">+{request.items.length - 2} أخرى</span>}
+                              {request.items?.length > 2 && <span className="text-muted-foreground">{t('+{request.items.length - 2} أخرى')}</span>}
                             </div>
                           </td>
                           <td className="p-3">{getPriorityBadge(request.priority)}</td>

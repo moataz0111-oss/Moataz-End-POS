@@ -467,7 +467,7 @@ export default function WarehouseManufacturing() {
                 <Warehouse className="h-5 w-5 text-primary" />
                 المخزن والتصنيع
               </h1>
-              <p className="text-xs text-muted-foreground">إدارة المواد الخام والمنتجات المصنعة</p>
+              <p className="text-xs text-muted-foreground">{t('إدارة المواد الخام والمنتجات المصنعة')}</p>
             </div>
           </div>
           
@@ -534,7 +534,7 @@ export default function WarehouseManufacturing() {
                 <div className="flex items-center gap-3">
                   <Package className="h-8 w-8 text-blue-500" />
                   <div>
-                    <p className="text-sm text-muted-foreground">المواد الخام</p>
+                    <p className="text-sm text-muted-foreground">{t('المواد الخام')}</p>
                     <p className="text-2xl font-bold">{stats.raw_materials?.count || 0}</p>
                     <p className="text-xs text-blue-500">{formatPrice(stats.raw_materials?.total_value || 0)}</p>
                   </div>
@@ -547,7 +547,7 @@ export default function WarehouseManufacturing() {
                 <div className="flex items-center gap-3">
                   <Beaker className="h-8 w-8 text-purple-500" />
                   <div>
-                    <p className="text-sm text-muted-foreground">مخزون التصنيع</p>
+                    <p className="text-sm text-muted-foreground">{t('مخزون التصنيع')}</p>
                     <p className="text-2xl font-bold">{stats.manufacturing?.count || 0}</p>
                     <p className="text-xs text-purple-500">{formatPrice(stats.manufacturing?.total_value || 0)}</p>
                   </div>
@@ -560,7 +560,7 @@ export default function WarehouseManufacturing() {
                 <div className="flex items-center gap-3">
                   <Factory className="h-8 w-8 text-green-500" />
                   <div>
-                    <p className="text-sm text-muted-foreground">المنتجات المصنعة</p>
+                    <p className="text-sm text-muted-foreground">{t('المنتجات المصنعة')}</p>
                     <p className="text-2xl font-bold">{stats.manufactured_products?.count || 0}</p>
                     <p className="text-xs text-green-500">{formatPrice(stats.manufactured_products?.total_value || 0)}</p>
                   </div>
@@ -573,11 +573,11 @@ export default function WarehouseManufacturing() {
                 <div className="flex items-center gap-3">
                   <AlertTriangle className="h-8 w-8 text-red-500" />
                   <div>
-                    <p className="text-sm text-muted-foreground">نقص المخزون</p>
+                    <p className="text-sm text-muted-foreground">{t('نقص المخزون')}</p>
                     <p className="text-2xl font-bold">
                       {(stats.raw_materials?.low_stock_count || 0) + (stats.manufactured_products?.low_stock_count || 0)}
                     </p>
-                    <p className="text-xs text-red-500">أصناف تحتاج إعادة تعبئة</p>
+                    <p className="text-xs text-red-500">{t('أصناف تحتاج إعادة تعبئة')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -612,7 +612,7 @@ export default function WarehouseManufacturing() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 text-red-500 mb-2">
                     <AlertTriangle className="h-5 w-5" />
-                    <span className="font-bold">تنبيه نقص المخزون</span>
+                    <span className="font-bold">{t('تنبيه نقص المخزون')}</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {lowStockMaterials.map(m => (
@@ -628,7 +628,7 @@ export default function WarehouseManufacturing() {
             <div className="relative w-64">
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="بحث..."
+                placeholder={t('بحث...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pr-10"
@@ -655,19 +655,19 @@ export default function WarehouseManufacturing() {
                     
                     <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                       <div>
-                        <p className="text-muted-foreground">الكمية</p>
+                        <p className="text-muted-foreground">{t('الكمية')}</p>
                         <p className="text-lg font-bold">{material.quantity} {material.unit}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">الحد الأدنى</p>
+                        <p className="text-muted-foreground">{t('الحد الأدنى')}</p>
                         <p className="font-medium">{material.min_quantity} {material.unit}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">التكلفة/وحدة</p>
+                        <p className="text-muted-foreground">{t('التكلفة/وحدة')}</p>
                         <p className="font-medium">{formatPrice(material.cost_per_unit)}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">القيمة الكلية</p>
+                        <p className="text-muted-foreground">{t('القيمة الكلية')}</p>
                         <p className="font-medium text-primary">{formatPrice(material.total_value || material.quantity * material.cost_per_unit)}</p>
                       </div>
                     </div>
@@ -689,7 +689,7 @@ export default function WarehouseManufacturing() {
                 <Card className="col-span-full">
                   <CardContent className="py-12 text-center text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد مواد خام</p>
+                    <p>{t('لا توجد مواد خام')}</p>
                   </CardContent>
                 </Card>
               )}
@@ -709,8 +709,8 @@ export default function WarehouseManufacturing() {
                 {manufacturingInventory.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Beaker className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد مواد في قسم التصنيع</p>
-                    <p className="text-sm">قم بتحويل مواد من المخزن</p>
+                    <p>{t('لا توجد مواد في قسم التصنيع')}</p>
+                    <p className="text-sm">{t('قم بتحويل مواد من المخزن')}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -737,10 +737,9 @@ export default function WarehouseManufacturing() {
                 {manufacturedProducts.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Factory className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد منتجات مصنعة</p>
-                    <Button variant="link" onClick={() => setShowAddProductDialog(true)}>
-                      إضافة منتج جديد
-                    </Button>
+                    <p>{t('لا توجد منتجات مصنعة')}</p>
+                    <Button variant="link" onClick={() =>{t('setShowAddProductDialog(true)}>
+                      إضافة منتج جديد')}</Button>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -758,15 +757,15 @@ export default function WarehouseManufacturing() {
                               
                               <div className="grid grid-cols-3 gap-4 text-sm mb-3">
                                 <div>
-                                  <p className="text-muted-foreground">تكلفة المواد</p>
+                                  <p className="text-muted-foreground">{t('تكلفة المواد')}</p>
                                   <p className="font-bold text-blue-500">{formatPrice(product.raw_material_cost)}</p>
                                 </div>
                                 <div>
-                                  <p className="text-muted-foreground">سعر البيع</p>
+                                  <p className="text-muted-foreground">{t('سعر البيع')}</p>
                                   <p className="font-bold text-green-500">{formatPrice(product.selling_price)}</p>
                                 </div>
                                 <div>
-                                  <p className="text-muted-foreground">هامش الربح</p>
+                                  <p className="text-muted-foreground">{t('هامش الربح')}</p>
                                   <p className="font-bold text-primary">{formatPrice(product.profit_margin)}</p>
                                 </div>
                               </div>
@@ -777,7 +776,7 @@ export default function WarehouseManufacturing() {
                                 className="flex items-center gap-2 text-sm text-primary hover:text-primary/80"
                               >
                                 <TreeDeciduous className="h-4 w-4" />
-                                <span>الوصفة ({product.recipe?.length || 0} مكونات)</span>
+                                <span>{t('الوصفة ({product.recipe?.length || 0} مكونات)')}</span>
                                 {selectedRecipe === product.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                               </button>
                               
@@ -825,7 +824,7 @@ export default function WarehouseManufacturing() {
                 {warehouseTransactions.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <ArrowUpCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد حركات</p>
+                    <p>{t('لا توجد حركات')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -851,9 +850,7 @@ export default function WarehouseManufacturing() {
                         </div>
                         
                         {transaction.supplier_name && (
-                          <p className="text-sm text-muted-foreground mb-2">
-                            المورد: {transaction.supplier_name}
-                          </p>
+                          <p className="text-sm text-muted-foreground mb-2">{t('المورد: {transaction.supplier_name}')}</p>
                         )}
                         
                         <div className="flex flex-wrap gap-2">
@@ -863,16 +860,12 @@ export default function WarehouseManufacturing() {
                             </span>
                           ))}
                           {transaction.items?.length > 3 && (
-                            <span className="px-2 py-1 text-sm text-muted-foreground">
-                              +{transaction.items.length - 3} أصناف
-                            </span>
+                            <span className="px-2 py-1 text-sm text-muted-foreground">{t('+{transaction.items.length - 3} أصناف')}</span>
                           )}
                         </div>
                         
                         {transaction.total_amount > 0 && (
-                          <p className="mt-2 font-bold text-primary">
-                            الإجمالي: {formatPrice(transaction.total_amount)}
-                          </p>
+                          <p className="mt-2 font-bold text-primary">{t('الإجمالي: {formatPrice(transaction.total_amount)}')}</p>
                         )}
                       </div>
                     ))}
@@ -894,7 +887,7 @@ export default function WarehouseManufacturing() {
                 {warehouseTransfers.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Send className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد تحويلات</p>
+                    <p>{t('لا توجد تحويلات')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -902,7 +895,7 @@ export default function WarehouseManufacturing() {
                       <div key={transfer.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
-                            <span className="font-bold">تحويل #{transfer.transfer_number}</span>
+                            <span className="font-bold">{t('تحويل #{transfer.transfer_number}')}</span>
                             <Badge className={
                               transfer.status === 'pending' ? 'bg-yellow-500/20 text-yellow-500' :
                               transfer.status === 'received' ? 'bg-green-500/20 text-green-500' :
@@ -930,9 +923,7 @@ export default function WarehouseManufacturing() {
                         </div>
                         
                         {transfer.total_cost > 0 && (
-                          <p className="mt-2 font-bold text-primary">
-                            التكلفة: {formatPrice(transfer.total_cost)}
-                          </p>
+                          <p className="mt-2 font-bold text-primary">{t('التكلفة: {formatPrice(transfer.total_cost)}')}</p>
                         )}
                       </div>
                     ))}
@@ -956,7 +947,7 @@ export default function WarehouseManufacturing() {
           <form onSubmit={handleAddRawMaterial} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>الاسم *</Label>
+                <Label>{t('الاسم *')}</Label>
                 <Input
                   value={rawMaterialForm.name}
                   onChange={(e) => setRawMaterialForm(prev => ({ ...prev, name: e.target.value }))}
@@ -964,14 +955,14 @@ export default function WarehouseManufacturing() {
                 />
               </div>
               <div>
-                <Label>الاسم بالإنجليزية</Label>
+                <Label>{t('الاسم بالإنجليزية')}</Label>
                 <Input
                   value={rawMaterialForm.name_en}
                   onChange={(e) => setRawMaterialForm(prev => ({ ...prev, name_en: e.target.value }))}
                 />
               </div>
               <div>
-                <Label>الوحدة</Label>
+                <Label>{t('الوحدة')}</Label>
                 <Select 
                   value={rawMaterialForm.unit} 
                   onValueChange={(v) => setRawMaterialForm(prev => ({ ...prev, unit: v }))}
@@ -980,18 +971,18 @@ export default function WarehouseManufacturing() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="كغم">كغم</SelectItem>
-                    <SelectItem value="غرام">غرام</SelectItem>
-                    <SelectItem value="لتر">لتر</SelectItem>
-                    <SelectItem value="مل">مل</SelectItem>
-                    <SelectItem value="قطعة">قطعة</SelectItem>
-                    <SelectItem value="علبة">علبة</SelectItem>
-                    <SelectItem value="كرتون">كرتون</SelectItem>
+                    <SelectItem value="كغم">{t('كغم')}</SelectItem>
+                    <SelectItem value="غرام">{t('غرام')}</SelectItem>
+                    <SelectItem value="لتر">{t('لتر')}</SelectItem>
+                    <SelectItem value="مل">{t('مل')}</SelectItem>
+                    <SelectItem value="قطعة">{t('قطعة')}</SelectItem>
+                    <SelectItem value="علبة">{t('علبة')}</SelectItem>
+                    <SelectItem value="كرتون">{t('كرتون')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>الكمية</Label>
+                <Label>{t('الكمية')}</Label>
                 <Input
                   type="number"
                   value={rawMaterialForm.quantity}
@@ -999,7 +990,7 @@ export default function WarehouseManufacturing() {
                 />
               </div>
               <div>
-                <Label>الحد الأدنى</Label>
+                <Label>{t('الحد الأدنى')}</Label>
                 <Input
                   type="number"
                   value={rawMaterialForm.min_quantity}
@@ -1007,7 +998,7 @@ export default function WarehouseManufacturing() {
                 />
               </div>
               <div>
-                <Label>التكلفة/وحدة</Label>
+                <Label>{t('التكلفة/وحدة')}</Label>
                 <Input
                   type="number"
                   value={rawMaterialForm.cost_per_unit}
@@ -1017,9 +1008,8 @@ export default function WarehouseManufacturing() {
             </div>
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowAddRawMaterial(false)}>
-                إلغاء
-              </Button>
+              <Button type="button" variant="outline" onClick={() =>{t('setShowAddRawMaterial(false)}>
+                إلغاء')}</Button>
               <Button type="submit" disabled={submitting}>
                 {submitting ? <RefreshCw className="h-4 w-4 animate-spin ml-2" /> : <Plus className="h-4 w-4 ml-2" />}
                 إضافة
@@ -1042,8 +1032,8 @@ export default function WarehouseManufacturing() {
             {transferForm.items.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
                 <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>لم تتم إضافة مواد</p>
-                <p className="text-sm">اضغط على "إضافة للتحويل" من قائمة المواد الخام</p>
+                <p>{t('لم تتم إضافة مواد')}</p>
+                <p className="text-sm">{t('اضغط على "إضافة للتحويل" من قائمة المواد الخام')}</p>
               </div>
             ) : (
               <div className="border rounded-lg overflow-hidden">
@@ -1055,7 +1045,7 @@ export default function WarehouseManufacturing() {
                     <div key={index} className="px-3 py-2 flex items-center justify-between gap-2">
                       <div className="flex-1">
                         <span className="font-medium">{item.raw_material_name}</span>
-                        <span className="text-xs text-muted-foreground mr-2">(متوفر: {item.available})</span>
+                        <span className="text-xs text-muted-foreground mr-2">{t('(متوفر: {item.available})')}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Input
@@ -1083,20 +1073,19 @@ export default function WarehouseManufacturing() {
             )}
             
             <div>
-              <Label>ملاحظات</Label>
+              <Label>{t('ملاحظات')}</Label>
               <Textarea
                 value={transferForm.notes}
                 onChange={(e) => setTransferForm(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="ملاحظات اختيارية..."
+                placeholder={t('ملاحظات اختيارية...')}
                 rows={2}
               />
             </div>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowTransferDialog(false)}>
-              إلغاء
-            </Button>
+            <Button variant="outline" onClick={() =>{t('setShowTransferDialog(false)}>
+              إلغاء')}</Button>
             <Button 
               onClick={handleTransferToManufacturing}
               disabled={transferForm.items.length === 0 || submitting}
@@ -1121,7 +1110,7 @@ export default function WarehouseManufacturing() {
           <form onSubmit={handleAddProduct} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>اسم المنتج *</Label>
+                <Label>{t('اسم المنتج *')}</Label>
                 <Input
                   value={productForm.name}
                   onChange={(e) => setProductForm(prev => ({ ...prev, name: e.target.value }))}
@@ -1129,14 +1118,14 @@ export default function WarehouseManufacturing() {
                 />
               </div>
               <div>
-                <Label>الاسم بالإنجليزية</Label>
+                <Label>{t('الاسم بالإنجليزية')}</Label>
                 <Input
                   value={productForm.name_en}
                   onChange={(e) => setProductForm(prev => ({ ...prev, name_en: e.target.value }))}
                 />
               </div>
               <div>
-                <Label>الوحدة</Label>
+                <Label>{t('الوحدة')}</Label>
                 <Select 
                   value={productForm.unit} 
                   onValueChange={(v) => setProductForm(prev => ({ ...prev, unit: v }))}
@@ -1145,16 +1134,16 @@ export default function WarehouseManufacturing() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="قطعة">قطعة</SelectItem>
-                    <SelectItem value="حبة">حبة</SelectItem>
-                    <SelectItem value="صحن">صحن</SelectItem>
-                    <SelectItem value="كغم">كغم</SelectItem>
-                    <SelectItem value="لتر">لتر</SelectItem>
+                    <SelectItem value="قطعة">{t('قطعة')}</SelectItem>
+                    <SelectItem value="حبة">{t('حبة')}</SelectItem>
+                    <SelectItem value="صحن">{t('صحن')}</SelectItem>
+                    <SelectItem value="كغم">{t('كغم')}</SelectItem>
+                    <SelectItem value="لتر">{t('لتر')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>سعر البيع</Label>
+                <Label>{t('سعر البيع')}</Label>
                 <Input
                   type="number"
                   value={productForm.selling_price}
@@ -1167,14 +1156,14 @@ export default function WarehouseManufacturing() {
             <div className="p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg space-y-3">
               <div className="flex items-center gap-2">
                 <Beaker className="h-5 w-5 text-purple-500" />
-                <Label className="font-bold">الوصفة (المكونات) *</Label>
+                <Label className="font-bold">{t('الوصفة (المكونات) *')}</Label>
               </div>
               
               {manufacturingInventory.length === 0 ? (
                 <div className="text-center py-4 text-muted-foreground">
                   <AlertTriangle className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
-                  <p className="text-sm">لا توجد مواد في قسم التصنيع</p>
-                  <p className="text-xs">قم بتحويل مواد من المخزن أولاً</p>
+                  <p className="text-sm">{t('لا توجد مواد في قسم التصنيع')}</p>
+                  <p className="text-xs">{t('قم بتحويل مواد من المخزن أولاً')}</p>
                 </div>
               ) : (
                 <>
@@ -1184,7 +1173,7 @@ export default function WarehouseManufacturing() {
                       onValueChange={(v) => setNewIngredient(prev => ({ ...prev, raw_material_id: v }))}
                     >
                       <SelectTrigger className="flex-1 bg-background">
-                        <SelectValue placeholder="اختر مادة خام..." />
+                        <SelectValue placeholder={t('اختر مادة خام...')} />
                       </SelectTrigger>
                       <SelectContent>
                         {manufacturingInventory.map(material => (
@@ -1198,7 +1187,7 @@ export default function WarehouseManufacturing() {
                       type="number"
                       min="0.01"
                       step="0.01"
-                      placeholder="الكمية"
+                      placeholder={t('الكمية')}
                       value={newIngredient.quantity || ''}
                       onChange={(e) => setNewIngredient(prev => ({ ...prev, quantity: parseFloat(e.target.value) || 0 }))}
                       className="w-24 bg-background"
@@ -1237,23 +1226,20 @@ export default function WarehouseManufacturing() {
                         </div>
                       ))}
                       <div className="flex items-center justify-between pt-2 border-t border-purple-500/30">
-                        <span className="font-medium">تكلفة الوحدة:</span>
+                        <span className="font-medium">{t('تكلفة الوحدة:')}</span>
                         <span className="font-bold text-primary">{formatPrice(calculateRecipeCost())}</span>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground text-center py-4">
-                      لم تتم إضافة مكونات بعد
-                    </p>
+                    <p className="text-sm text-muted-foreground text-center py-4">{t('لم تتم إضافة مكونات بعد')}</p>
                   )}
                 </>
               )}
             </div>
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setShowAddProductDialog(false)}>
-                إلغاء
-              </Button>
+              <Button type="button" variant="outline" onClick={() =>{t('setShowAddProductDialog(false)}>
+                إلغاء')}</Button>
               <Button type="submit" disabled={productForm.recipe.length === 0 || submitting}>
                 {submitting ? <RefreshCw className="h-4 w-4 animate-spin ml-2" /> : <Plus className="h-4 w-4 ml-2" />}
                 إضافة المنتج
@@ -1275,7 +1261,7 @@ export default function WarehouseManufacturing() {
           {showProduceDialog && (
             <div className="space-y-4">
               <div className="p-4 bg-muted/30 rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">المكونات المطلوبة لكل وحدة:</p>
+                <p className="text-sm text-muted-foreground mb-2">{t('المكونات المطلوبة لكل وحدة:')}</p>
                 <div className="space-y-1">
                   {showProduceDialog.recipe?.map((ing, idx) => (
                     <div key={idx} className="flex items-center justify-between text-sm">
@@ -1290,7 +1276,7 @@ export default function WarehouseManufacturing() {
               </div>
               
               <div>
-                <Label>كمية التصنيع</Label>
+                <Label>{t('كمية التصنيع')}</Label>
                 <Input
                   type="number"
                   min="1"
@@ -1300,7 +1286,7 @@ export default function WarehouseManufacturing() {
               </div>
               
               <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-lg">
-                <p className="text-sm font-medium text-green-500 mb-2">المواد التي سيتم خصمها:</p>
+                <p className="text-sm font-medium text-green-500 mb-2">{t('المواد التي سيتم خصمها:')}</p>
                 <div className="space-y-1">
                   {showProduceDialog.recipe?.map((ing, idx) => (
                     <div key={idx} className="flex items-center justify-between text-sm">
@@ -1314,9 +1300,8 @@ export default function WarehouseManufacturing() {
           )}
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowProduceDialog(null)}>
-              إلغاء
-            </Button>
+            <Button variant="outline" onClick={() =>{t('setShowProduceDialog(null)}>
+              إلغاء')}</Button>
             <Button 
               onClick={handleProduce}
               disabled={submitting}
@@ -1341,13 +1326,13 @@ export default function WarehouseManufacturing() {
           <div className="space-y-4">
             {/* اختيار الفرع */}
             <div>
-              <Label>الفرع المستلم *</Label>
+              <Label>{t('الفرع المستلم *')}</Label>
               <Select 
                 value={branchTransferForm.to_branch_id} 
                 onValueChange={(v) => setBranchTransferForm(prev => ({ ...prev, to_branch_id: v }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="اختر الفرع" />
+                  <SelectValue placeholder={t('اختر الفرع')} />
                 </SelectTrigger>
                 <SelectContent>
                   {branches.map(branch => (
@@ -1360,10 +1345,10 @@ export default function WarehouseManufacturing() {
             </div>
             {/* المنتجات المصنعة المتاحة */}
             <div>
-              <Label className="mb-2 block">المنتجات المصنعة المتاحة</Label>
+              <Label className="mb-2 block">{t('المنتجات المصنعة المتاحة')}</Label>
               <div className="border rounded-lg max-h-48 overflow-y-auto p-2">
                 {manufacturingInventory.filter(m => m.quantity > 0).length === 0 ? (
-                  <p className="text-center text-muted-foreground py-4">لا توجد منتجات متاحة</p>
+                  <p className="text-center text-muted-foreground py-4">{t('لا توجد منتجات متاحة')}</p>
                 ) : (
                   <div className="grid grid-cols-2 gap-2">
                     {manufacturingInventory.filter(m => m.quantity > 0).map(product => (
@@ -1388,7 +1373,7 @@ export default function WarehouseManufacturing() {
             {/* المنتجات المختارة */}
             {branchTransferForm.items.length > 0 && (
               <div>
-                <Label className="mb-2 block">المنتجات المختارة للتحويل</Label>
+                <Label className="mb-2 block">{t('المنتجات المختارة للتحويل')}</Label>
                 <div className="space-y-2">
                   {branchTransferForm.items.map((item, idx) => (
                     <div key={idx} className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
@@ -1403,7 +1388,7 @@ export default function WarehouseManufacturing() {
                         className="w-24"
                       />
                       <span className="text-sm text-muted-foreground">{item.unit}</span>
-                      <span className="text-xs text-green-600">(متاح: {item.available})</span>
+                      <span className="text-xs text-green-600">{t('(متاح: {item.available})')}</span>
                       <Button 
                         variant="ghost" 
                         size="icon"
@@ -1418,19 +1403,18 @@ export default function WarehouseManufacturing() {
             )}
             {/* ملاحظات */}
             <div>
-              <Label>ملاحظات</Label>
+              <Label>{t('ملاحظات')}</Label>
               <Textarea
                 value={branchTransferForm.notes}
                 onChange={(e) => setBranchTransferForm(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="ملاحظات إضافية..."
+                placeholder={t('ملاحظات إضافية...')}
                 rows={2}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBranchTransferDialog(false)}>
-              إلغاء
-            </Button>
+            <Button variant="outline" onClick={() =>{t('setShowBranchTransferDialog(false)}>
+              إلغاء')}</Button>
             <Button 
               onClick={handleTransferToBranch}
               disabled={submitting || branchTransferForm.items.length === 0 || !branchTransferForm.to_branch_id}

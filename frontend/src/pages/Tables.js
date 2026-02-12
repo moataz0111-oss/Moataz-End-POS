@@ -237,8 +237,8 @@ export default function Tables() {
               <ArrowRight className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-bold font-cairo text-foreground">إدارة الطاولات</h1>
-              <p className="text-sm text-muted-foreground">عرض وإدارة طاولات المطعم</p>
+              <h1 className="text-xl font-bold font-cairo text-foreground">{t('إدارة الطاولات')}</h1>
+              <p className="text-sm text-muted-foreground">{t('عرض وإدارة طاولات المطعم')}</p>
             </div>
           </div>
 
@@ -267,7 +267,7 @@ export default function Tables() {
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <Label className="text-foreground">رقم الطاولة</Label>
+                      <Label className="text-foreground">{t('رقم الطاولة')}</Label>
                       <Input
                         type="number"
                         value={formData.number}
@@ -277,7 +277,7 @@ export default function Tables() {
                       />
                     </div>
                     <div>
-                      <Label className="text-foreground">السعة</Label>
+                      <Label className="text-foreground">{t('السعة')}</Label>
                       <Input
                         type="number"
                         value={formData.capacity}
@@ -287,13 +287,13 @@ export default function Tables() {
                       />
                     </div>
                     <div>
-                      <Label className="text-foreground">القسم</Label>
+                      <Label className="text-foreground">{t('القسم')}</Label>
                       <Select 
                         value={formData.section} 
                         onValueChange={(value) => setFormData({ ...formData, section: value })}
                       >
                         <SelectTrigger className="mt-1">
-                          <SelectValue placeholder="اختر القسم" />
+                          <SelectValue placeholder={t('اختر القسم')} />
                         </SelectTrigger>
                         <SelectContent>
                           {DEFAULT_SECTIONS.map(section => (
@@ -304,17 +304,14 @@ export default function Tables() {
                       <Input
                         value={formData.section && !DEFAULT_SECTIONS.includes(formData.section) ? formData.section : ''}
                         onChange={(e) => setFormData({ ...formData, section: e.target.value })}
-                        placeholder="أو اكتب قسم مخصص..."
+                        placeholder={t('أو اكتب قسم مخصص...')}
                         className="mt-2"
                       />
                     </div>
                     <div className="flex gap-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
-                        إلغاء
-                      </Button>
-                      <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
-                        حفظ
-                      </Button>
+                      <Button type="button" variant="outline" onClick={() =>{t('setDialogOpen(false)} className="flex-1">
+                        إلغاء')}</Button>
+                      <Button type="submit" className="flex-1 bg-primary text-primary-foreground">{t('حفظ')}</Button>
                     </div>
                   </form>
                 </DialogContent>
@@ -333,7 +330,7 @@ export default function Tables() {
                 <Check className="h-6 w-6 text-green-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">متاحة</p>
+                <p className="text-sm text-muted-foreground">{t('متاحة')}</p>
                 <p className="text-2xl font-bold text-foreground">{tables.filter(t => t.status === 'available').length}</p>
               </div>
             </CardContent>
@@ -344,7 +341,7 @@ export default function Tables() {
                 <Users className="h-6 w-6 text-red-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">مشغولة</p>
+                <p className="text-sm text-muted-foreground">{t('مشغولة')}</p>
                 <p className="text-2xl font-bold text-foreground">{tables.filter(t => t.status === 'occupied').length}</p>
               </div>
             </CardContent>
@@ -355,7 +352,7 @@ export default function Tables() {
                 <Clock className="h-6 w-6 text-yellow-500" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">محجوزة</p>
+                <p className="text-sm text-muted-foreground">{t('محجوزة')}</p>
                 <p className="text-2xl font-bold text-foreground">{tables.filter(t => t.status === 'reserved').length}</p>
               </div>
             </CardContent>
@@ -510,22 +507,20 @@ export default function Tables() {
           <div className="space-y-4 py-4">
             {selectedTableForTransfer && (
               <div className="bg-muted/50 p-3 rounded-lg">
-                <p className="text-sm text-muted-foreground">من الطاولة:</p>
-                <p className="font-bold text-lg text-foreground">طاولة رقم {selectedTableForTransfer.number}</p>
+                <p className="text-sm text-muted-foreground">{t('من الطاولة:')}</p>
+                <p className="font-bold text-lg text-foreground">{t('طاولة رقم {selectedTableForTransfer.number}')}</p>
               </div>
             )}
             
             <div>
-              <Label className="text-foreground">إلى الطاولة:</Label>
+              <Label className="text-foreground">{t('إلى الطاولة:')}</Label>
               <Select value={targetTableId} onValueChange={setTargetTableId}>
                 <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="اختر الطاولة المستهدفة" />
+                  <SelectValue placeholder={t('اختر الطاولة المستهدفة')} />
                 </SelectTrigger>
                 <SelectContent>
                   {availableTablesForTransfer.map(table => (
-                    <SelectItem key={table.id} value={table.id}>
-                      طاولة {table.number} - {table.section || 'عام'} ({table.capacity} أشخاص)
-                    </SelectItem>
+                    <SelectItem key={table.id} value={table.id}>{t('طاولة {table.number} - {table.section || 'عام'} ({table.capacity} أشخاص)')}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -539,11 +534,10 @@ export default function Tables() {
           <div className="flex gap-2">
             <Button 
               variant="outline" 
-              onClick={() => setTransferDialogOpen(false)}
+              onClick={() =>{t('setTransferDialogOpen(false)}
               className="flex-1"
             >
-              إلغاء
-            </Button>
+              إلغاء')}</Button>
             <Button 
               onClick={handleTransferTable}
               disabled={!targetTableId}
@@ -569,9 +563,9 @@ export default function Tables() {
           <div className="py-4">
             {tableToDelete && (
               <div className="bg-red-500/10 p-4 rounded-lg text-center">
-                <p className="text-lg font-bold text-foreground">طاولة رقم {tableToDelete.number}</p>
+                <p className="text-lg font-bold text-foreground">{t('طاولة رقم {tableToDelete.number}')}</p>
                 <p className="text-sm text-muted-foreground">{tableToDelete.section || 'عام'} - {tableToDelete.capacity} أشخاص</p>
-                <p className="text-sm text-red-500 mt-3">⚠️ سيتم حذف هذه الطاولة نهائياً</p>
+                <p className="text-sm text-red-500 mt-3">{t('⚠️ سيتم حذف هذه الطاولة نهائياً')}</p>
               </div>
             )}
           </div>
