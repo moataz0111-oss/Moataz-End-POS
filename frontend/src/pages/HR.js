@@ -527,7 +527,7 @@ export default function HR() {
   // تصدير مفردات مرتب موظف
   const exportEmployeeSalarySlip = async (employeeId, employeeName, format = 'excel') => {
     try {
-      toast.loading('جاري تحضير الملف...');
+      toast.loading(t('جاري تحضير الملف...'));
       const token = localStorage.getItem('token');
       
       const response = await axios.get(
@@ -548,17 +548,17 @@ export default function HR() {
       window.URL.revokeObjectURL(url);
       
       toast.dismiss();
-      toast.success('تم تحميل مفردات المرتب بنجاح');
+      toast.success(t('تم تحميل مفردات المرتب بنجاح'));
     } catch (error) {
       toast.dismiss();
-      toast.error('فشل في تصدير مفردات المرتب');
+      toast.error(t('فشل في تصدير مفردات المرتب'));
     }
   };
 
   // تصدير تقرير الرواتب PDF
   const exportPayrollPDF = async () => {
     try {
-      toast.loading('جاري تحضير ملف PDF...');
+      toast.loading(t('جاري تحضير ملف PDF...'));
       const token = localStorage.getItem('token');
       const branchId = getBranchIdForApi();
       
@@ -580,17 +580,17 @@ export default function HR() {
       window.URL.revokeObjectURL(url);
       
       toast.dismiss();
-      toast.success('تم تحميل ملف PDF بنجاح');
+      toast.success(t('تم تحميل ملف PDF بنجاح'));
     } catch (error) {
       toast.dismiss();
-      toast.error('فشل في تصدير الملف');
+      toast.error(t('فشل في تصدير الملف'));
     }
   };
 
   // تصدير مفردات مرتب PDF
   const exportEmployeeSalarySlipPDF = async (employeeId, employeeName) => {
     try {
-      toast.loading('جاري تحضير ملف PDF...');
+      toast.loading(t('جاري تحضير ملف PDF...'));
       const token = localStorage.getItem('token');
       
       const response = await axios.get(
@@ -611,10 +611,10 @@ export default function HR() {
       window.URL.revokeObjectURL(url);
       
       toast.dismiss();
-      toast.success('تم تحميل مفردات المرتب PDF بنجاح');
+      toast.success(t('تم تحميل مفردات المرتب PDF بنجاح'));
     } catch (error) {
       toast.dismiss();
-      toast.error('فشل في تصدير مفردات المرتب');
+      toast.error(t('فشل في تصدير مفردات المرتب'));
     }
   };
 
