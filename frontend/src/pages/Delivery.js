@@ -211,23 +211,23 @@ export default function Delivery() {
         updateData.pin = editFormData.pin;
       }
       await axios.put(`${API}/drivers/${editFormData.id}`, updateData);
-      toast.success('تم تعديل السائق');
+      toast.success(t('تم تعديل السائق'));
       setEditDialogOpen(false);
       setEditFormData({ id: '', name: '', phone: '', pin: '', is_active: true });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في تعديل السائق');
+      toast.error(error.response?.data?.detail || t('فشل في تعديل السائق'));
     }
   };
 
   const handleDeleteDriver = async (driverId, driverName) => {
-    if (!window.confirm(`هل أنت متأكد من حذف السائق "${driverName}"؟`)) return;
+    if (!window.confirm(`${t('هل أنت متأكد من حذف السائق')} "${driverName}"؟`)) return;
     try {
       await axios.delete(`${API}/drivers/${driverId}`);
-      toast.success('تم حذف السائق');
+      toast.success(t('تم حذف السائق'));
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في حذف السائق');
+      toast.error(error.response?.data?.detail || t('فشل في حذف السائق'));
     }
   };
 
@@ -260,11 +260,11 @@ export default function Delivery() {
       for (const driverId of selectedDrivers) {
         await axios.delete(`${API}/drivers/${driverId}`);
       }
-      toast.success(`تم حذف ${selectedDrivers.length} سائق بنجاح`);
+      toast.success(`${t('تم حذف')} ${selectedDrivers.length} ${t('سائق بنجاح')}`);
       setSelectedDrivers([]);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في حذف بعض السائقين');
+      toast.error(error.response?.data?.detail || t('فشل في حذف بعض السائقين'));
       fetchData();
     }
   };
@@ -283,10 +283,10 @@ export default function Delivery() {
   const assignDriver = async (driverId, orderId) => {
     try {
       await axios.put(`${API}/drivers/${driverId}/assign?order_id=${orderId}`);
-      toast.success('تم تعيين السائق للطلب');
+      toast.success(t('تم تعيين السائق للطلب'));
       fetchData();
     } catch (error) {
-      toast.error('فشل في تعيين السائق');
+      toast.error(t('فشل في تعيين السائق'));
     }
   };
 
@@ -297,13 +297,13 @@ export default function Delivery() {
       } else {
         await axios.put(`${API}/drivers/${driverId}/complete`);
       }
-      toast.success('تم تسليم الطلب بنجاح');
+      toast.success(t('تم تسليم الطلب بنجاح'));
       fetchData();
       if (selectedDriver) {
         fetchDriverOrders(selectedDriver.id);
       }
     } catch (error) {
-      toast.error('فشل في تحديث الحالة');
+      toast.error(t('فشل في تحديث الحالة'));
     }
   };
 
@@ -314,7 +314,7 @@ export default function Delivery() {
       setDriverOrders(res.data);
     } catch (error) {
       console.error('Failed to fetch driver orders:', error);
-      toast.error('فشل في جلب طلبات السائق');
+      toast.error(t('فشل في جلب طلبات السائق'));
     }
   };
 
@@ -333,20 +333,20 @@ export default function Delivery() {
       await axios.post(`${API}/drivers/${selectedDriver.id}/collect-payment`, {
         amount: paymentAmount
       });
-      toast.success(`تم تسجيل دفعة بقيمة ${formatPrice(paymentAmount)}`);
+      toast.success(`${t('تم تسجيل دفعة بقيمة')} ${formatPrice(paymentAmount)}`);
       setCollectPaymentDialogOpen(false);
       setPaymentAmount(0);
       fetchData();
       fetchDriverOrders(selectedDriver.id);
     } catch (error) {
-      toast.error('فشل في تسجيل الدفعة');
+      toast.error(t('فشل في تسجيل الدفعة'));
     }
   };
 
   // تحويل الطلب لسائق آخر
   const handleTransferDriver = async () => {
     if (!orderToTransfer || !targetDriverId) {
-      toast.error('الرجاء اختيار السائق');
+      toast.error(t('الرجاء اختيار السائق'));
       return;
     }
     
