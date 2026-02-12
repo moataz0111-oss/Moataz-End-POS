@@ -1284,7 +1284,7 @@ export default function SuperAdmin() {
       
       return res.data.logo_url;
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في رفع الشعار');
+      toast.error(error.response?.data?.detail || t('فشل في رفع الشعار'));
       return null;
     }
   };
@@ -1319,7 +1319,7 @@ export default function SuperAdmin() {
       return res.data.logo_url;
     } catch (error) {
       console.error('Upload login logo error:', error);
-      toast.error(error.response?.data?.detail || 'فشل في رفع الشعار');
+      toast.error(error.response?.data?.detail || t('فشل في رفع الشعار'));
       return null;
     } finally {
       setLoginLogoUploading(false);
