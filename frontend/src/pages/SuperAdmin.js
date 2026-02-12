@@ -2037,7 +2037,7 @@ export default function SuperAdmin() {
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg flex items-center gap-2">
               <Coins className="h-5 w-5 text-yellow-400" />
-              تقارير العملات والمبيعات
+              {t('تقارير العملات والمبيعات')}
             </CardTitle>
             <div className="flex items-center gap-3">
               <Select 
@@ -2048,17 +2048,17 @@ export default function SuperAdmin() {
                 }}
               >
                 <SelectTrigger className="w-40 bg-gray-700/50 border-gray-600">
-                  <SelectValue placeholder="اختر العملة" />
+                  <SelectValue placeholder={t('اختر العملة')} />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-700">
-                  <SelectItem value="USD">🇺🇸 دولار أمريكي</SelectItem>
-                  <SelectItem value="IQD">🇮🇶 دينار عراقي</SelectItem>
-                  <SelectItem value="SAR">🇸🇦 ريال سعودي</SelectItem>
-                  <SelectItem value="AED">🇦🇪 درهم إماراتي</SelectItem>
-                  <SelectItem value="EGP">🇪🇬 جنيه مصري</SelectItem>
-                  <SelectItem value="EUR">🇪🇺 يورو</SelectItem>
-                  <SelectItem value="JOD">🇯🇴 دينار أردني</SelectItem>
-                  <SelectItem value="KWD">🇰🇼 دينار كويتي</SelectItem>
+                  <SelectItem value="USD">🇺🇸 {t('دولار أمريكي')}</SelectItem>
+                  <SelectItem value="IQD">🇮🇶 {t('دينار عراقي')}</SelectItem>
+                  <SelectItem value="SAR">🇸🇦 {t('ريال سعودي')}</SelectItem>
+                  <SelectItem value="AED">🇦🇪 {t('درهم إماراتي')}</SelectItem>
+                  <SelectItem value="EGP">🇪🇬 {t('جنيه مصري')}</SelectItem>
+                  <SelectItem value="EUR">🇪🇺 {t('يورو')}</SelectItem>
+                  <SelectItem value="JOD">🇯🇴 {t('دينار أردني')}</SelectItem>
+                  <SelectItem value="KWD">🇰🇼 {t('دينار كويتي')}</SelectItem>
                 </SelectContent>
               </Select>
               <Button 
@@ -2069,7 +2069,7 @@ export default function SuperAdmin() {
                 disabled={loadingLiveRates}
               >
                 {loadingLiveRates ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUpDown className="h-4 w-4" />}
-                أسعار حية
+                {t('أسعار حية')}
               </Button>
               <Button 
                 onClick={() => setShowCurrencySettingsModal(true)} 
@@ -2085,7 +2085,7 @@ export default function SuperAdmin() {
             {loadingSalesSummary ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-                <span className="mr-3 text-gray-400">جاري تحميل البيانات...</span>
+                <span className="mr-3 text-gray-400">{t('جاري تحميل البيانات...')}</span>
               </div>
             ) : salesSummary ? (
               <div className="space-y-6">
@@ -2097,9 +2097,9 @@ export default function SuperAdmin() {
                         <DollarSign className="h-5 w-5 text-green-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">إجمالي المبيعات</p>
+                        <p className="text-sm text-gray-400">{t('إجمالي المبيعات')}</p>
                         <p className="text-2xl font-bold text-green-400">
-                          {new Intl.NumberFormat('ar-IQ', {maximumFractionDigits: 2}).format(salesSummary.total_sales_converted || 0)} {salesSummary.display_currency_symbol || '$'}
+                          {new Intl.NumberFormat('en-US', {maximumFractionDigits: 2}).format(salesSummary.total_sales_converted || 0)} {salesSummary.display_currency_symbol || '$'}
                         </p>
                       </div>
                     </div>
@@ -2111,9 +2111,9 @@ export default function SuperAdmin() {
                         <ShoppingCart className="h-5 w-5 text-blue-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">إجمالي الطلبات</p>
+                        <p className="text-sm text-gray-400">{t('إجمالي الطلبات')}</p>
                         <p className="text-2xl font-bold text-blue-400">
-                          {new Intl.NumberFormat('ar-IQ').format(salesSummary.total_orders || 0)}
+                          {new Intl.NumberFormat('en-US').format(salesSummary.total_orders || 0)}
                         </p>
                       </div>
                     </div>
@@ -2125,7 +2125,7 @@ export default function SuperAdmin() {
                         <Building2 className="h-5 w-5 text-purple-400" />
                       </div>
                       <div>
-                        <p className="text-sm text-gray-400">العملاء النشطين</p>
+                        <p className="text-sm text-gray-400">{t('العملاء النشطين')}</p>
                         <p className="text-2xl font-bold text-purple-400">
                           {salesSummary.active_tenants || 0}
                         </p>
@@ -2139,7 +2139,7 @@ export default function SuperAdmin() {
                   <div className="bg-gray-700/30 rounded-xl p-4">
                     <h3 className="font-bold mb-4 flex items-center gap-2">
                       <BarChart3 className="h-5 w-5 text-blue-400" />
-                      المبيعات حسب العميل (بـ {currencySettings.preferred_currency})
+                      {t('المبيعات حسب العميل')} ({t('بـ')} {currencySettings.preferred_currency})
                     </h3>
                     <div className="space-y-2">
                       {salesSummary.tenant_sales.map((tenant, idx) => (
@@ -2150,10 +2150,10 @@ export default function SuperAdmin() {
                           </div>
                           <div className="text-left">
                             <p className="font-bold text-green-400">
-                              {new Intl.NumberFormat('ar-IQ', {maximumFractionDigits: 2}).format(tenant.converted_sales || 0)} {salesSummary.display_currency_symbol}
+                              {new Intl.NumberFormat('en-US', {maximumFractionDigits: 2}).format(tenant.converted_sales || 0)} {salesSummary.display_currency_symbol}
                             </p>
                             <p className="text-xs text-gray-500">
-                              {tenant.original_currency}: {new Intl.NumberFormat('ar-IQ').format(tenant.original_sales || 0)}
+                              {tenant.original_currency}: {new Intl.NumberFormat('en-US').format(tenant.original_sales || 0)}
                             </p>
                           </div>
                         </div>
@@ -2167,10 +2167,10 @@ export default function SuperAdmin() {
                   <div className="bg-gray-700/30 rounded-xl p-4">
                     <h3 className="font-bold mb-4 flex items-center gap-2">
                       <ArrowUpDown className="h-5 w-5 text-yellow-400" />
-                      أسعار الصرف {liveRates.success ? '(حية)' : '(ثابتة)'}
+                      {t('أسعار الصرف')} {liveRates.success ? t('(حية)') : t('(ثابتة)')}
                       {liveRates.fetched_at && (
                         <span className="text-xs text-gray-500 mr-2">
-                          آخر تحديث: {new Date(liveRates.fetched_at).toLocaleTimeString('ar-IQ')}
+                          {t('آخر تحديث')}: {new Date(liveRates.fetched_at).toLocaleTimeString('en-US')}
                         </span>
                       )}
                     </h3>
@@ -2190,7 +2190,7 @@ export default function SuperAdmin() {
             ) : (
               <div className="text-center py-8 text-gray-400">
                 <Coins className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>اختر عملة لعرض تقارير المبيعات المحولة</p>
+                <p>{t('اختر عملة لعرض تقارير المبيعات المحولة')}</p>
               </div>
             )}
           </CardContent>
