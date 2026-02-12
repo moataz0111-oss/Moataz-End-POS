@@ -1265,6 +1265,25 @@ export default function CustomerMenu() {
                   </span>
                 </button>
               )}
+              {/* زر تغيير اللغة */}
+              <div className="flex items-center gap-1 bg-white/20 rounded-full p-1">
+                <button
+                  onClick={() => setLanguage('ar')}
+                  className={`px-2 py-1 text-xs rounded-full transition-all ${
+                    lang === 'ar' ? 'bg-white text-orange-600 font-bold' : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  عر
+                </button>
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={`px-2 py-1 text-xs rounded-full transition-all ${
+                    lang === 'en' ? 'bg-white text-orange-600 font-bold' : 'text-white/80 hover:text-white'
+                  }`}
+                >
+                  EN
+                </button>
+              </div>
             </div>
           </div>
         </header>
