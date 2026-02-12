@@ -174,7 +174,7 @@ export default function Purchasing() {
   };
   const handleSubmit = async () => {
     if (!form.supplier_id || form.items.length === 0) {
-      toast.error('الرجاء اختيار المورد وإضافة منتجات');
+      toast.error(t('الرجاء اختيار المورد وإضافة منتجات'));
       return;
     }
     try {
@@ -182,7 +182,7 @@ export default function Purchasing() {
         ...form,
         total_amount: getTotalAmount()
       });
-      toast.success('تم إنشاء أمر الشراء بنجاح');
+      toast.success(t('تم إنشاء أمر الشراء بنجاح'));
       setShowAddDialog(false);
       resetForm();
       fetchData();
@@ -199,19 +199,19 @@ export default function Purchasing() {
         expected_delivery: form.expected_delivery
       };
       setPurchaseOrders([newOrder, ...purchaseOrders]);
-      toast.success('تم إنشاء أمر الشراء بنجاح');
+      toast.success(t('تم إنشاء أمر الشراء بنجاح'));
       setShowAddDialog(false);
       resetForm();
     }
   };
   const handleAddSupplier = async () => {
     if (!supplierForm.name || !supplierForm.phone) {
-      toast.error('الرجاء إدخال اسم ورقم هاتف المورد');
+      toast.error(t('الرجاء إدخال اسم ورقم هاتف المورد'));
       return;
     }
     try {
       await axios.post(`${API}/suppliers`, supplierForm);
-      toast.success('تم إضافة المورد بنجاح');
+      toast.success(t('تم إضافة المورد بنجاح'));
       setShowSupplierDialog(false);
       setSupplierForm({ name: '', phone: '', email: '', address: '', notes: '' });
       fetchData();
@@ -221,7 +221,7 @@ export default function Purchasing() {
         ...supplierForm
       };
       setSuppliers([...suppliers, newSupplier]);
-      toast.success('تم إضافة المورد بنجاح');
+      toast.success(t('تم إضافة المورد بنجاح'));
       setShowSupplierDialog(false);
       setSupplierForm({ name: '', phone: '', email: '', address: '', notes: '' });
     }
@@ -237,13 +237,13 @@ export default function Purchasing() {
   const updateStatus = async (orderId, status) => {
     try {
       await axios.put(`${API}/purchase-orders/${orderId}/status`, { status });
-      toast.success('تم تحديث حالة الطلب');
+      toast.success(t('تم تحديث حالة الطلب'));
       fetchData();
     } catch (error) {
       setPurchaseOrders(purchaseOrders.map(o => 
         o.id === orderId ? { ...o, status, delivered_at: status === 'delivered' ? new Date().toISOString() : null } : o
       ));
-      toast.success('تم تحديث حالة الطلب');
+      toast.success(t('تم تحديث حالة الطلب'));
     }
   };
   const createOrderFromAlert = (alert) => {
