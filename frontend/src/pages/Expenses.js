@@ -126,7 +126,7 @@ export default function Expenses() {
       }
     } catch (error) {
       console.error('Failed to fetch expenses:', error);
-      toast.error('فشل في تحميل المصاريف');
+      toast.error(t('فشل في تحميل المصاريف'));
     } finally {
       setLoading(false);
     }
@@ -152,7 +152,7 @@ export default function Expenses() {
           await axios.post(`${API}/expense-categories`, newCategory);
           // تحديث قائمة التصنيفات
           fetchCategories();
-          toast.success(`تم إضافة تصنيف "${formData.custom_category_name}" للقائمة`);
+          toast.success(`${t('تم إضافة تصنيف')} "${formData.custom_category_name}" ${t('للقائمة')}`);
         } catch (err) {
           // التصنيف موجود بالفعل - استخدمه
           console.log('Category may already exist');
@@ -167,7 +167,7 @@ export default function Expenses() {
         amount: parseFloat(formData.amount),
         branch_id: selectedBranch
       });
-      toast.success('تم إضافة المصروف');
+      toast.success(t('تم إضافة المصروف'));
       setDialogOpen(false);
       setFormData({
         category: 'other',
@@ -180,7 +180,7 @@ export default function Expenses() {
       });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في إضافة المصروف');
+      toast.error(error.response?.data?.detail || t('فشل في إضافة المصروف'));
     }
   };
 
