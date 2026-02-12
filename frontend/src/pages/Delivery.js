@@ -541,10 +541,10 @@ export default function Delivery() {
                       </div>
                       <div className="flex gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="flex-1">
-                          إلغاء
+                          {t('إلغاء')}
                         </Button>
                         <Button type="submit" className="flex-1 bg-primary text-primary-foreground">
-                          إضافة
+                          {t('إضافة')}
                         </Button>
                       </div>
                     </form>
@@ -563,7 +563,7 @@ export default function Delivery() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">إجمالي غير المدفوع</p>
+                  <p className="text-sm text-muted-foreground">{t('إجمالي غير المدفوع')}</p>
                   <p className="text-2xl font-bold text-red-500">{formatPrice(totalUnpaid)}</p>
                 </div>
                 <div className="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center">
@@ -577,7 +577,7 @@ export default function Delivery() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">المدفوع اليوم</p>
+                  <p className="text-sm text-muted-foreground">{t('المدفوع اليوم')}</p>
                   <p className="text-2xl font-bold text-green-500">{formatPrice(totalPaid)}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
@@ -591,7 +591,7 @@ export default function Delivery() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">طلبات معلقة</p>
+                  <p className="text-sm text-muted-foreground">{t('طلبات معلقة')}</p>
                   <p className="text-2xl font-bold text-amber-500">{totalPendingOrders}</p>
                 </div>
                 <div className="w-12 h-12 bg-amber-500/10 rounded-xl flex items-center justify-center">
@@ -605,7 +605,7 @@ export default function Delivery() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">السائقين النشطين</p>
+                  <p className="text-sm text-muted-foreground">{t('السائقين النشطين')}</p>
                   <p className="text-2xl font-bold text-blue-500">{drivers.filter(d => !d.is_available).length}/{drivers.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
@@ -618,12 +618,12 @@ export default function Delivery() {
 
         <Tabs defaultValue="drivers" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 max-w-lg">
-            <TabsTrigger value="drivers">السائقين والحسابات</TabsTrigger>
+            <TabsTrigger value="drivers">{t('السائقين والحسابات')}</TabsTrigger>
             <TabsTrigger value="map" className="flex items-center gap-1">
               <Map className="h-4 w-4" />
-              الخريطة
+              {t('الخريطة')}
             </TabsTrigger>
-            <TabsTrigger value="pending">طلبات جاهزة للتوصيل</TabsTrigger>
+            <TabsTrigger value="pending">{t('طلبات جاهزة للتوصيل')}</TabsTrigger>
           </TabsList>
 
           {/* السائقين */}
@@ -638,11 +638,11 @@ export default function Delivery() {
                     onClick={toggleSelectAll}
                     className={selectedDrivers.length === drivers.length ? 'bg-primary text-primary-foreground' : ''}
                   >
-                    {selectedDrivers.length === drivers.length ? 'إلغاء تحديد الكل' : 'تحديد الكل'}
+                    {selectedDrivers.length === drivers.length ? t('إلغاء تحديد الكل') : t('تحديد الكل')}
                   </Button>
                   {selectedDrivers.length > 0 && (
                     <span className="text-sm text-muted-foreground">
-                      تم تحديد {selectedDrivers.length} من {drivers.length}
+                      {t('تم تحديد')} {selectedDrivers.length} {t('من')} {drivers.length}
                     </span>
                   )}
                 </div>
