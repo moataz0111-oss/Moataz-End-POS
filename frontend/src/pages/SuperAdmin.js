@@ -1823,7 +1823,7 @@ export default function SuperAdmin() {
             </div>
             <div>
               <h1 className="text-xl font-bold">Maestro EGP</h1>
-              <p className="text-sm text-gray-400">لوحة تحكم المالك</p>
+              <p className="text-sm text-gray-400">{t('لوحة تحكم المالك')}</p>
             </div>
           </div>
           
@@ -1850,7 +1850,7 @@ export default function SuperAdmin() {
                   <div className="p-4 border-b border-gray-700 flex items-center justify-between">
                     <h3 className="font-bold flex items-center gap-2">
                       <Bell className="h-4 w-4 text-purple-400" />
-                      الإشعارات
+                      {t('الإشعارات')}
                     </h3>
                     <div className="flex items-center gap-2">
                       <Button size="sm" variant="ghost" onClick={() => setShowNotificationSettings(true)} className="text-gray-400 hover:text-white">
@@ -1858,7 +1858,7 @@ export default function SuperAdmin() {
                       </Button>
                       {unreadCount > 0 && (
                         <Button size="sm" variant="ghost" onClick={markAllNotificationsAsRead} className="text-xs text-purple-400">
-                          تعليم الكل كمقروء
+                          {t('تعليم الكل كمقروء')}
                         </Button>
                       )}
                     </div>
@@ -1870,10 +1870,10 @@ export default function SuperAdmin() {
                       <p className="text-xs text-orange-400 flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
                         {expiringSubscriptions.already_expired.length > 0 && (
-                          <span>{expiringSubscriptions.already_expired.length} اشتراك منتهي</span>
+                          <span>{expiringSubscriptions.already_expired.length} {t('اشتراك منتهي')}</span>
                         )}
                         {expiringSubscriptions.expiring_soon.length > 0 && (
-                          <span>{expiringSubscriptions.expiring_soon.length} اشتراك قارب على الانتهاء</span>
+                          <span>{expiringSubscriptions.expiring_soon.length} {t('اشتراك قارب على الانتهاء')}</span>
                         )}
                       </p>
                     </div>
@@ -1883,7 +1883,7 @@ export default function SuperAdmin() {
                     {notifications.length === 0 ? (
                       <div className="p-8 text-center text-gray-500">
                         <Bell className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                        <p>لا توجد إشعارات</p>
+                        <p>{t('لا توجد إشعارات')}</p>
                       </div>
                     ) : (
                       <div className="divide-y divide-gray-700">
@@ -1900,7 +1900,7 @@ export default function SuperAdmin() {
                                 </p>
                                 <p className="text-xs text-gray-400 mt-1">{notification.message}</p>
                                 <p className="text-xs text-gray-500 mt-1">
-                                  {new Date(notification.created_at).toLocaleString('ar-IQ')}
+                                  {new Date(notification.created_at).toLocaleString('en-US')}
                                 </p>
                               </div>
                               <Button 
