@@ -4094,7 +4094,7 @@ export default function SuperAdmin() {
           </Tabs>
 
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() =>{t('setShowInvoiceSettings(false)} className="border-gray-600">
+            <Button variant="outline" onClick={() => setShowInvoiceSettings(false)} className="border-gray-600">
               {t('إلغاء')}</Button>
             <Button onClick={async () => { 
               await saveInvoiceSettings(); 
