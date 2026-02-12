@@ -1238,7 +1238,7 @@ export default function WarehouseManufacturing() {
             </div>
             
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() =>{t('setShowAddProductDialog(false)}>
+              <Button type="button" variant="outline" onClick={() => setShowAddProductDialog(false)}>
                 {t('إلغاء')}</Button>
               <Button type="submit" disabled={productForm.recipe.length === 0 || submitting}>
                 {submitting ? <RefreshCw className="h-4 w-4 animate-spin ml-2" /> : <Plus className="h-4 w-4 ml-2" />}
