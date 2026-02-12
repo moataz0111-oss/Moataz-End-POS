@@ -1360,11 +1360,12 @@ export default function Delivery() {
               <p className="text-xs text-muted-foreground mt-1">{t('اتركه فارغاً إذا لم ترد تغيير الرمز')}</p>
             </div>
             <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={() =>{t('setEditDialogOpen(false)} className="flex-1">
-                إلغاء')}</Button>
+              <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)} className="flex-1">
+                {t('إلغاء')}
+              </Button>
               <Button type="submit" className="flex-1 bg-blue-500 hover:bg-blue-600 text-white">
                 <Check className="h-4 w-4 ml-1" />
-                حفظ التعديلات
+                {t('حفظ التعديلات')}
               </Button>
             </div>
           </form>
