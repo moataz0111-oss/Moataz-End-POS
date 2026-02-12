@@ -1356,7 +1356,7 @@ export default function Settings() {
         is_active: !app.is_active,
         payment_terms: 'weekly'
       });
-      toast.success(app.is_active ? 'تم تعطيل الشركة' : 'تم تفعيل الشركة');
+      toast.success(app.is_active ? t('تم تعطيل الشركة') : t('تم تفعيل الشركة'));
       fetchData();
     } catch (error) {
       toast.error(t('فشل في التحديث'));
