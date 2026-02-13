@@ -3068,6 +3068,8 @@ const translationMap = {
   'أسعار الاشتراكات': { en: 'Subscription Prices', ku: '' },
   'بالدولار': { en: 'in USD', ku: '' },
   'حفظ الإعدادات': { en: 'Save Settings', ku: '' },
+  'يرجى استخدام بوابة مالك النظام للدخول': { en: 'Please use the system owner portal to login', ku: '' },
+  'مالك النظام': { en: 'System Owner', ku: '' },
 };
 
 // الحصول على اللغة الحالية
