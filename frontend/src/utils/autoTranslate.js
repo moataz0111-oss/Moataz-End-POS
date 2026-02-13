@@ -3036,6 +3036,38 @@ const translationMap = {
   'إشعار عند إضافة عميل جديد': { en: 'Notify when new client added', ku: '' },
   'عميل جديد': { en: 'New Client', ku: '' },
   'حفظ جميع الإعدادات': { en: 'Save All Settings', ku: '' },
+  
+  // ===== Settings Additional =====
+  'مدير عام': { en: 'General Manager', ku: '' },
+  'مدير': { en: 'Manager', ku: '' },
+  'كاشير': { en: 'Cashier', ku: '' },
+  'ويتر': { en: 'Waiter', ku: '' },
+  'مطبخ': { en: 'Kitchen', ku: '' },
+  'نشط': { en: 'Active', ku: '' },
+  'معطل': { en: 'Disabled', ku: '' },
+  'مفعل': { en: 'Enabled', ku: '' },
+  'صورة الفئة': { en: 'Category Image', ku: '' },
+  'صورة المنتج': { en: 'Product Image', ku: '' },
+  'اسم المطعم': { en: 'Restaurant Name', ku: '' },
+  'سائق التوصيل يرى فقط الطلبات المسندة إليه من تطبيق السائق': { en: 'Delivery driver can only see orders assigned to them from the driver app', ku: '' },
+  'الويتر يرى فقط الطاولات والطلبات': { en: 'Waiter can only see tables and orders', ku: '' },
+  'المطبخ يرى فقط شاشة المطبخ': { en: 'Kitchen can only see kitchen display', ku: '' },
+  'فاتورة كاملة': { en: 'Full Receipt', ku: '' },
+  'طلبات فقط': { en: 'Orders Only', ku: '' },
+  'منتجات محددة': { en: 'Selected Products', ku: '' },
+  'فاتورة': { en: 'Receipt', ku: '' },
+  
+  // ===== HR Additional =====
+  'سلفة جديدة': { en: 'New Advance', ku: '' },
+  'خصم جديد': { en: 'New Deduction', ku: '' },
+  'مكافأة جديدة': { en: 'New Bonus', ku: '' },
+  'صرف': { en: 'Pay', ku: '' },
+  'تأخير': { en: 'Late', ku: '' },
+  'منتظم': { en: 'Regular', ku: '' },
+  'خروج مبكر': { en: 'Early Leave', ku: '' },
+  'أسعار الاشتراكات': { en: 'Subscription Prices', ku: '' },
+  'بالدولار': { en: 'in USD', ku: '' },
+  'حفظ الإعدادات': { en: 'Save Settings', ku: '' },
 };
 
 // الحصول على اللغة الحالية
