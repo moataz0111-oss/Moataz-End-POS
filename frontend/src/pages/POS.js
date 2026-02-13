@@ -1304,7 +1304,7 @@ export default function POS() {
                   className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-foreground truncate">{item.product_name || item.name || 'منتج'}</p>
+                    <p className="font-medium text-sm text-foreground truncate">{item.product_name || item.name || t('منتج')}</p>
                     <p className="text-primary text-sm tabular-nums">{formatPrice(item.price * item.quantity)}</p>
                   </div>
                   <div className="flex items-center gap-1">
