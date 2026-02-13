@@ -3350,7 +3350,7 @@ export default function Settings() {
                           value={editProductForm.image}
                           onChange={(url) => setEditProductForm({ ...editProductForm, image: url })}
                           type="product"
-                          label="صورة المنتج"
+                          label={t('صورة المنتج')}
                         />
                       </div>
                       {/* ربط بمنتج مصنع */}
