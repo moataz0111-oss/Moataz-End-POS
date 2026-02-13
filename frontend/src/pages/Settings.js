@@ -2905,7 +2905,7 @@ export default function Settings() {
                             </Button>
                           </div>
                           <p className="text-xs text-muted-foreground mt-2">
-                            {products.filter(p => p.category_id === cat.id).length} منتج
+                            {products.filter(p => p.category_id === cat.id).length} {t('منتج')}
                           </p>
                         </div>
                       ))}
@@ -2946,7 +2946,7 @@ export default function Settings() {
                           value={editCategoryForm.image}
                           onChange={(url) => setEditCategoryForm({ ...editCategoryForm, image: url })}
                           type="category"
-                          label="صورة الفئة"
+                          label={t('صورة الفئة')}
                           placeholder="https://example.com/image.jpg"
                         />
                       </div>
