@@ -2811,7 +2811,7 @@ export default function Settings() {
                             value={categoryForm.image}
                             onChange={(url) => setCategoryForm({ ...categoryForm, image: url })}
                             type="category"
-                            label="صورة الفئة"
+                            label={t('صورة الفئة')}
                             placeholder="https://example.com/image.jpg"
                           />
                         </div>
