@@ -2342,9 +2342,9 @@ export default function Settings() {
                               <p className="text-sm text-blue-500 flex items-center gap-2">
                                 <AlertCircle className="h-4 w-4" />{t('هذا الدور له صلاحيات محددة مسبقاً ولا يحتاج تخصيص إضافي')}</p>
                               <p className="text-xs text-muted-foreground mt-1">
-                                {staffForm.role === 'delivery' && 'سائق التوصيل يرى فقط الطلبات المسندة إليه من تطبيق السائق'}
-                                {staffForm.role === 'waiter' && 'الويتر يرى فقط الطاولات والطلبات'}
-                                {staffForm.role === 'kitchen' && 'المطبخ يرى فقط شاشة المطبخ'}
+                                {staffForm.role === 'delivery' && t('سائق التوصيل يرى فقط الطلبات المسندة إليه من تطبيق السائق')}
+                                {staffForm.role === 'waiter' && t('الويتر يرى فقط الطاولات والطلبات')}
+                                {staffForm.role === 'kitchen' && t('المطبخ يرى فقط شاشة المطبخ')}
                               </p>
                             </div>
                           )}
