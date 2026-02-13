@@ -3126,7 +3126,7 @@ export default function Settings() {
                             value={productForm.image}
                             onChange={(url) => setProductForm({ ...productForm, image: url })}
                             type="product"
-                            label="صورة المنتج"
+                            label={t('صورة المنتج')}
                             placeholder="https://example.com/image.jpg"
                           />
                         </div>
