@@ -1185,7 +1185,7 @@ export default function HR() {
                 <CardTitle>{t('السلف')}</CardTitle>
                 <Dialog open={advanceDialogOpen} onOpenChange={setAdvanceDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button><Plus className="h-4 w-4 ml-2" /> سلفة جديدة</Button>
+                    <Button><Plus className="h-4 w-4 ml-2" /> {t('سلفة جديدة')}</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -1263,7 +1263,7 @@ export default function HR() {
                 <CardTitle>{t('الخصومات - {selectedMonth}')}</CardTitle>
                 <Dialog open={deductionDialogOpen} onOpenChange={setDeductionDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button variant="destructive"><Plus className="h-4 w-4 ml-2" /> خصم جديد</Button>
+                    <Button variant="destructive"><Plus className="h-4 w-4 ml-2" /> {t('خصم جديد')}</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -1378,7 +1378,7 @@ export default function HR() {
                 <CardTitle>{t('المكافآت - {selectedMonth}')}</CardTitle>
                 <Dialog open={bonusDialogOpen} onOpenChange={setBonusDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-green-600 hover:bg-green-700"><Plus className="h-4 w-4 ml-2" /> مكافأة جديدة</Button>
+                    <Button className="bg-green-600 hover:bg-green-700"><Plus className="h-4 w-4 ml-2" /> {t('مكافأة جديدة')}</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
@@ -1502,7 +1502,7 @@ export default function HR() {
                             <div className="flex gap-2">
                               {pay.status !== 'paid' && (
                                 <Button size="sm" onClick={() => payPayroll(pay.id)}>
-                                  <Banknote className="h-4 w-4 ml-2" /> صرف
+                                  <Banknote className="h-4 w-4 ml-2" /> {t('صرف')}
                                 </Button>
                               )}
                               <Button 
@@ -1654,12 +1654,12 @@ export default function HR() {
                                 <td className="p-3 border text-center">
                                   <div className="flex flex-col items-center">
                                     {rating.late_count > 0 ? (
-                                      <Badge variant="destructive" className="text-xs">{rating.late_count} تأخير</Badge>
+                                      <Badge variant="destructive" className="text-xs">{rating.late_count} {t('تأخير')}</Badge>
                                     ) : (
-                                      <Badge variant="outline" className="text-xs text-green-600">منتظم</Badge>
+                                      <Badge variant="outline" className="text-xs text-green-600">{t('منتظم')}</Badge>
                                     )}
                                     {rating.early_leave_count > 0 && (
-                                      <Badge variant="secondary" className="text-xs mt-1">{rating.early_leave_count} خروج مبكر</Badge>
+                                      <Badge variant="secondary" className="text-xs mt-1">{rating.early_leave_count} {t('خروج مبكر')}</Badge>
                                     )}
                                   </div>
                                 </td>
