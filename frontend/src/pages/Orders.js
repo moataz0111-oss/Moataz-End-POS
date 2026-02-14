@@ -360,7 +360,7 @@ export default function Orders() {
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {order.items.length} {t('عناصر')} • {new Date(order.created_at).toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })}
+                            {order.items.length} {t('عناصر')} • {new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           </p>
                           {order.delivery_app && (
                             <p className="text-xs text-primary mt-1">{t('عبر')}: {order.delivery_app}</p>
