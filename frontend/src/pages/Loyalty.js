@@ -476,7 +476,7 @@ export default function Loyalty() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-foreground">
               <Award className="h-5 w-5 text-primary" />
-              تفاصيل العضو
+              {t('تفاصيل العضو')}
             </DialogTitle>
           </DialogHeader>
           {selectedMember && (
