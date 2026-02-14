@@ -3228,7 +3228,7 @@ export default function Settings() {
                           <div className="flex items-center gap-4">
                             <div className="text-left">
                               <p className="font-bold text-foreground tabular-nums">{formatPrice(p.price)}</p>
-                              <p className="text-xs text-green-500">{t('ربح: {formatPrice(p.profit || (p.price - p.cost - (p.operating_cost || 0)))}')}</p>
+                              <p className="text-xs text-green-500">{t('ربح')}: {formatPrice(p.profit || (p.price - p.cost - (p.operating_cost || 0)))}</p>
                             </div>
                             <div className="flex items-center gap-1">
                               <Button
@@ -3597,7 +3597,7 @@ export default function Settings() {
                               ) : null}
                             </div>
                             <div>
-                              <p className="font-medium text-foreground">{printer.name}</p>
+                              <p className="font-medium text-foreground">{t(printer.name)}</p>
                               <p className="text-sm text-muted-foreground">{printer.ip_address}:{printer.port}</p>
                               {/* عرض صلاحيات الطباعة */}
                               <div className="flex flex-wrap gap-1 mt-1">
