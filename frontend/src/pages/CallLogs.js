@@ -152,9 +152,9 @@ export default function CallLogs() {
             <RefreshCw className="h-4 w-4" />
             {t('تحديث')}
           </Button>
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            {t('تصدير')}
+          <Button variant="outline" className="gap-2" onClick={() => window.print()}>
+            <Printer className="h-4 w-4" />
+            {t('طباعة')}
           </Button>
         </div>
       </div>
