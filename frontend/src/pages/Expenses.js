@@ -242,7 +242,7 @@ export default function Expenses() {
                 <DialogTrigger asChild>
                   <Button className="bg-primary text-primary-foreground" data-testid="add-expense-btn">
                     <Plus className="h-4 w-4 ml-2" />
-                    إضافة مصروف
+                    {t('إضافة مصروف')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
@@ -457,7 +457,7 @@ export default function Expenses() {
                     <div className="text-left">
                       <p className="text-lg font-bold text-red-500 tabular-nums">-{formatPrice(expense.amount)}</p>
                       <p className="text-xs text-muted-foreground">
-                        {expense.payment_method === 'cash' ? 'نقدي' : expense.payment_method === 'card' ? 'بطاقة' : 'تحويل'}
+                        {expense.payment_method === 'cash' ? t('نقدي') : expense.payment_method === 'card' ? t('بطاقة') : t('تحويل')}
                       </p>
                     </div>
                   </div>
