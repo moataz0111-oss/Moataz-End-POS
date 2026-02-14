@@ -264,9 +264,9 @@ export default function InventoryReports() {
                 <SelectItem value="year">{t('هذه السنة')}</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline" onClick={exportReport}>
-              <Download className="h-4 w-4 ml-2" />
-              {t('تصدير')}
+            <Button variant="outline" onClick={() => window.print()}>
+              <Printer className="h-4 w-4 ml-2" />
+              {t('طباعة')}
             </Button>
             <Button variant="outline" size="icon" onClick={fetchData}>
               <RefreshCw className="h-4 w-4" />
