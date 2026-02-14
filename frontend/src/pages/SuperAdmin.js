@@ -4010,7 +4010,7 @@ export default function SuperAdmin() {
               <div className="space-y-4">
                 <h3 className="font-bold text-yellow-400 flex items-center gap-2 border-b border-gray-700 pb-2">
                   <ImageIcon className="h-4 w-4" />
-                  الخلفيات ({backgroundSettings.backgrounds?.length || 0})
+                  {t('الخلفيات')} ({backgroundSettings.backgrounds?.length || 0})
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   {(backgroundSettings.backgrounds || []).map((bg, idx) => {
