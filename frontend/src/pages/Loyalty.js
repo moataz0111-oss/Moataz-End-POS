@@ -188,7 +188,7 @@ export default function Loyalty() {
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               <Gift className="h-6 w-6 text-primary" />
-              برنامج الولاء
+              {t('برنامج الولاء')}
             </h1>
             <p className="text-sm text-muted-foreground">{t('إدارة العملاء والمكافآت')}</p>
           </div>
