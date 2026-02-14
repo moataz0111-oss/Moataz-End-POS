@@ -2306,7 +2306,7 @@ export default function Settings() {
                                             setStaffForm({ ...staffForm, permissions: newPerms });
                                           }}
                                         />
-                                        <span className="text-sm text-foreground">{perm.name}</span>
+                                        <span className="text-sm text-foreground">{t(perm.name)}</span>
                                       </div>
                                     ))}
                                   </div>
@@ -2326,7 +2326,7 @@ export default function Settings() {
                                             setStaffForm({ ...staffForm, permissions: newPerms });
                                           }}
                                         />
-                                        <span className="text-sm text-foreground">{perm.name}</span>
+                                        <span className="text-sm text-foreground">{t(perm.name)}</span>
                                       </div>
                                     ))}
                                   </div>
