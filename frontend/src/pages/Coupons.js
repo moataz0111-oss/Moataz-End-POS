@@ -496,7 +496,7 @@ export default function Coupons() {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-foreground">
-              {editingCoupon ? 'تعديل كوبون' : 'إنشاء كوبون جديد'}
+              {editingCoupon ? t('تعديل كوبون') : t('إنشاء كوبون جديد')}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSaveCoupon} className="space-y-4">
