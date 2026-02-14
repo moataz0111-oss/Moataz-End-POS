@@ -2615,6 +2615,12 @@ const translationMap = {
   'لا توجد فواتير شراء': { en: 'No purchase invoices', ku: 'هیچ فاکتورەی کڕین نییە' },
   'لا يوجد موردين': { en: 'No suppliers found', ku: 'هیچ دابینکەرێک نەدۆزرایەوە' },
   'فاتورة شراء': { en: 'Purchase Invoice', ku: 'فاکتورەی کڕین' },
+  'إرسال': { en: 'Send', ku: 'ناردن' },
+  'طلبات الشراء من المخزن': { en: 'Purchase requests from warehouse', ku: 'داواکاریەکانی کڕین لە کۆگا' },
+  'لا توجد طلبات شراء من المخزن': { en: 'No purchase requests from warehouse', ku: 'هیچ داواکاری کڕین نییە لە کۆگا' },
+  'طلب': { en: 'Request', ku: 'داواکاری' },
+  'تمت الموافقة': { en: 'Approved', ku: 'پەسەندکرا' },
+  'تم الشراء': { en: 'Purchased', ku: 'کڕدرا' },
 };
 
 // الحصول على اللغة الحالية
