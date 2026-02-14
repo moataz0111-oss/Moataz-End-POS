@@ -197,11 +197,11 @@ export default function Loyalty() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setSettingsOpen(true)}>
             <Settings className="h-4 w-4 ml-2" />
-            الإعدادات
+            {t('الإعدادات')}
           </Button>
           <Button onClick={() => setAddMemberOpen(true)}>
             <Plus className="h-4 w-4 ml-2" />
-            عضو جديد
+            {t('عضو جديد')}
           </Button>
         </div>
       </div>
