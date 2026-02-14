@@ -3076,6 +3076,7 @@ const translationMap = {
   'المستخدم غير موجود': { en: 'User not found', ku: '' },
   'كلمة المرور غير صحيحة': { en: 'Incorrect password', ku: '' },
   'البريد الإلكتروني أو كلمة المرور غير صحيحة': { en: 'Invalid email or password', ku: '' },
+  'مالك النظام': { en: 'System Owner', ku: '' },
 };
 
 // الحصول على اللغة الحالية
