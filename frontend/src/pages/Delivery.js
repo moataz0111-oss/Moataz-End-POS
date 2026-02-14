@@ -968,7 +968,7 @@ export default function Delivery() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center gap-2 text-blue-500">
                     <Package className="h-5 w-5" />
-                    جاهزة للتعيين
+                    {t('جاهزة للتعيين')}
                     <span className="bg-blue-500/20 text-blue-500 px-2 py-0.5 rounded-full text-xs mr-auto">
                       {pendingOrders.filter(o => !o.driver_id).length}
                     </span>
@@ -989,10 +989,10 @@ export default function Delivery() {
                               <span className="font-bold text-foreground">#{order.order_number}</span>
                               <span className="text-primary font-bold">{formatPrice(order.total)}</span>
                             </div>
-                            <p className="text-sm text-muted-foreground truncate">{order.customer_name || 'زبون'}</p>
+                            <p className="text-sm text-muted-foreground truncate">{order.customer_name || t('زبون')}</p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                               <Clock className="h-3 w-3" />
-                              {new Date(order.created_at).toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })}
+                              {new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                             <div className="flex flex-wrap gap-1 mt-2">
                               {drivers.filter(d => d.is_available).slice(0, 3).map(driver => (
