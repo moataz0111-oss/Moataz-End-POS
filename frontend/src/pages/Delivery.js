@@ -1051,7 +1051,7 @@ export default function Delivery() {
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground truncate mb-2">
-                              {driver.current_order?.customer_name || 'زبون'}
+                              {driver.current_order?.customer_name || t('زبون')}
                             </p>
                             <div className="flex gap-2">
                               <Button
@@ -1060,7 +1060,7 @@ export default function Delivery() {
                                 onClick={() => completeDelivery(driver.id)}
                               >
                                 <Check className="h-3 w-3 ml-1" />
-                                تم التسليم
+                                {t('تم التسليم')}
                               </Button>
                               <Button
                                 size="sm"
