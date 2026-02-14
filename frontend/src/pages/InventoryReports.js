@@ -488,26 +488,26 @@ export default function InventoryReports() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Package className="h-5 w-5 text-blue-500" />
-                  تفاصيل المواد الخام
+                  {t('تفاصيل المواد الخام')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {rawMaterials.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد مواد خام</p>
+                    <p>{t('لا توجد مواد خام')}</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b bg-muted/50">
-                          <th className="text-right p-3 font-medium">الاسم</th>
-                          <th className="text-right p-3 font-medium">الكمية</th>
-                          <th className="text-right p-3 font-medium">الحد الأدنى</th>
-                          <th className="text-right p-3 font-medium">تكلفة/وحدة</th>
-                          <th className="text-right p-3 font-medium">القيمة الإجمالية</th>
-                          <th className="text-right p-3 font-medium">الحالة</th>
+                          <th className="text-right p-3 font-medium">{t('الاسم')}</th>
+                          <th className="text-right p-3 font-medium">{t('الكمية')}</th>
+                          <th className="text-right p-3 font-medium">{t('الحد الأدنى')}</th>
+                          <th className="text-right p-3 font-medium">{t('تكلفة/وحدة')}</th>
+                          <th className="text-right p-3 font-medium">{t('القيمة الإجمالية')}</th>
+                          <th className="text-right p-3 font-medium">{t('الحالة')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -523,7 +523,7 @@ export default function InventoryReports() {
                               <td className="p-3 font-bold text-primary">{formatPrice(totalValue)}</td>
                               <td className="p-3">
                                 <Badge className={isLow ? 'bg-red-500/20 text-red-500' : 'bg-green-500/20 text-green-500'}>
-                                  {isLow ? 'نقص' : 'متوفر'}
+                                  {isLow ? t('نقص') : t('متوفر')}
                                 </Badge>
                               </td>
                             </tr>
@@ -532,7 +532,7 @@ export default function InventoryReports() {
                       </tbody>
                       <tfoot>
                         <tr className="bg-primary/10">
-                          <td className="p-3 font-bold" colSpan={4}>الإجمالي</td>
+                          <td className="p-3 font-bold" colSpan={4}>{t('الإجمالي')}</td>
                           <td className="p-3 font-bold text-primary">{formatPrice(metrics.totalRawMaterialValue)}</td>
                           <td className="p-3"></td>
                         </tr>
