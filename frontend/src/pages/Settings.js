@@ -4619,7 +4619,7 @@ export default function Settings() {
                           disabled={paymentSaving}
                         >
                           {paymentSaving ? <RefreshCw className="h-4 w-4 ml-2 animate-spin" /> : <Save className="h-4 w-4 ml-2" />}
-                          حفظ إعدادات زين كاش
+                          {t('حفظ إعدادات زين كاش')}
                         </Button>
                       </div>
                     </div>
