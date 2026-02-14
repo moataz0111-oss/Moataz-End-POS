@@ -3167,7 +3167,7 @@ export default function Settings() {
                                     }`}
                                   >
                                     <Printer className="h-3 w-3 inline ml-1" />
-                                    {printer.name}
+                                    {t(printer.name)}
                                     {isSelected && <Check className="h-3 w-3 inline mr-1" />}
                                   </button>
                                 );
@@ -3180,7 +3180,7 @@ export default function Settings() {
                                   const printer = printers.find(p => p.id === printerId);
                                   return printer ? (
                                     <span key={printerId} className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
-                                      {printer.name}
+                                      {t(printer.name)}
                                     </span>
                                   ) : null;
                                 })}
@@ -3412,7 +3412,7 @@ export default function Settings() {
                                 }`}
                               >
                                 <Printer className="h-3 w-3 inline ml-1" />
-                                {printer.name}
+                                {t(printer.name)}
                                 {isSelected && <Check className="h-3 w-3 inline mr-1" />}
                               </button>
                             );
@@ -3425,7 +3425,7 @@ export default function Settings() {
                               const printer = printers.find(p => p.id === printerId);
                               return printer ? (
                                 <span key={printerId} className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
-                                  {printer.name}
+                                  {t(printer.name)}
                                 </span>
                               ) : null;
                             })}
