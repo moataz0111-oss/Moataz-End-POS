@@ -71,7 +71,7 @@ export default function BiometricDevices({ branches = [] }) {
     e.preventDefault();
     
     if (!deviceForm.name || !deviceForm.ip_address || !deviceForm.branch_id) {
-      toast.error('يرجى ملء جميع الحقول المطلوبة');
+      toast.error(t('يرجى ملء جميع الحقول المطلوبة'));
       return;
     }
 
@@ -81,12 +81,12 @@ export default function BiometricDevices({ branches = [] }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      toast.success('تم إضافة الجهاز بنجاح');
+      toast.success(t('تم إضافة الجهاز بنجاح'));
       setAddDialogOpen(false);
       setDeviceForm({ name: '', ip_address: '', port: 4370, branch_id: '', device_type: 'fingerprint' });
       fetchDevices();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في إضافة الجهاز');
+      toast.error(error.response?.data?.detail || t('فشل في إضافة الجهاز'));
     }
   };
 
