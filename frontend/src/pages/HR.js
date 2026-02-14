@@ -381,7 +381,7 @@ export default function HR() {
           </div>
           <div class="row">
             <span class="label">{t('التاريخ:')}</span>
-            <span class="value">${deduction.date || new Date().toLocaleDateString('ar-IQ')}</span>
+            <span class="value">${deduction.date || new Date().toLocaleDateString('en-US')}</span>
           </div>
           <div class="row">
             <span class="label">{t('نوع الخصم:')}</span>
@@ -415,7 +415,7 @@ export default function HR() {
         
         <div class="footer">
           <p>{t('تم إنشاء هذا الإيصال من نظام Maestro EGP')}</p>
-          <p>${new Date().toLocaleString('ar-IQ')}</p>
+          <p>${new Date().toLocaleString('en-US')}</p>
         </div>
         
         <script>
