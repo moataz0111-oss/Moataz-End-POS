@@ -309,8 +309,8 @@ export default function IncomingCallPopup() {
                     <div className="flex items-center gap-3 text-gray-300">
                       <ShoppingCart className="h-5 w-5 text-gray-400" />
                       <span className="text-sm">
-                        {call.customer.total_orders} طلب سابق • 
-                        إجمالي: {formatPrice(call.customer.total_spent || 0)}
+                        {call.customer.total_orders} {t('طلب سابق')} • 
+                        {t('إجمالي')}: {formatPrice(call.customer.total_spent || 0)}
                       </span>
                     </div>
                   )}
