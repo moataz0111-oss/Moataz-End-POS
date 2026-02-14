@@ -934,8 +934,8 @@ export default function HR() {
                           </td>
                           <td className="p-3">
                             <div className="flex items-center gap-2">
-                              <Button size="sm" variant="outline" onClick={() => exportEmployeeSalarySlip(emp.id, emp.name, 'excel')} title={t('تصدير مفردات المرتب')}>
-                                <FileSpreadsheet className="h-4 w-4" />
+                              <Button size="sm" variant="outline" onClick={() => window.open(`/payroll/print/${emp.id}`, '_blank')} title={t('طباعة مفردات المرتب')}>
+                                <Printer className="h-4 w-4" />
                               </Button>
                               <Button size="sm" variant="outline" onClick={() => calculatePayroll(emp.id)} title={t('إنشاء كشف راتب')}>
                                 <FileText className="h-4 w-4" />
