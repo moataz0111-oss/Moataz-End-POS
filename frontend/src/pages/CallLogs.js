@@ -104,13 +104,13 @@ export default function CallLogs() {
   const getStatusText = (status) => {
     switch (status) {
       case 'ended':
-        return 'مكتملة';
+        return t('مكتملة');
       case 'missed':
-        return 'فائتة';
+        return t('فائتة');
       case 'answered':
-        return 'تم الرد';
+        return t('تم الرد');
       case 'ringing':
-        return 'جارية';
+        return t('جارية');
       default:
         return status;
     }
