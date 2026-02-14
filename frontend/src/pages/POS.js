@@ -866,7 +866,7 @@ export default function POS() {
                     <div className="p-2 w-full">
                       <span className="text-white font-bold text-sm drop-shadow-lg flex items-center gap-1">
                         <span>{cat.icon}</span>
-                        {cat.name}
+                        {t(cat.name)}
                       </span>
                     </div>
                   </div>
@@ -1109,7 +1109,7 @@ export default function POS() {
                         : 'bg-muted text-muted-foreground hover:bg-muted/80'
                     }`}
                   >
-                    {section} ({tables.filter(tb => tb.section === section).length})
+                    {t(section)} ({tables.filter(tb => tb.section === section).length})
                   </button>
                 ))}
               </div>
