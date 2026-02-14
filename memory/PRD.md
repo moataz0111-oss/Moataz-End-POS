@@ -5,90 +5,50 @@
 
 ## متطلبات المنتج
 
-### P0 - الأولوية الحرجة
-1. **الترجمة الشاملة** ✅ تم الإنجاز
+### P0 - الأولوية الحرجة ✅ تم الإنجاز
+1. **الترجمة الشاملة** 
    - يجب ترجمة كل نص مرئي في واجهة المستخدم عند تبديل اللغة
    - تم إصلاح جميع الصفحات المذكورة
 
-### P1 - أولوية عالية
-1. **وظائف التقارير** ✅ تم الإنجاز
+### P1 - أولوية عالية ✅ تم الإنجاز
+1. **وظائف التقارير**
    - تم استبدال أزرار تصدير Excel/PDF بأزرار طباعة (`window.print`)
-   - الصفحات المحدثة: CallLogs, InventoryReports, HR
+   
+2. **الأرقام والتواريخ بالإنجليزية** ✅ تم الإنجاز
+   - تم تغيير جميع `ar-IQ` إلى `en-US` في 17 ملف
 
-2. **الاتساق في عرض البيانات** (مطلوب التحقق)
-   - يجب أن تظل الأرقام والعملات والتواريخ بالصيغة الإنجليزية دائماً
-
-### P2 - أولوية متوسطة
-1. **إعادة هيكلة الكود** (مؤجل)
+### P2 - أولوية متوسطة (مؤجل)
+1. **إعادة هيكلة الكود**
    - تقسيم الملفات الضخمة مثل `server.py`, `SuperAdmin.js`, `Settings.js`
 
-## ما تم إنجازه (14 فبراير 2026)
+## ما تم إنجازه (15 فبراير 2026)
 
-### Session 1 - الترجمات الأساسية
-- ✅ إصلاح صفحة الحجوزات (Reservations.js)
-- ✅ إصلاح صفحة سجل المكالمات (CallLogs.js)
-- ✅ إصلاح صفحة برنامج الولاء (Loyalty.js)
-- ✅ إصلاح صفحة الكوبونات والعروض (Coupons.js)
-- ✅ إصلاح مكون أجهزة البصمة (BiometricDevices.js)
-- ✅ إصلاح خريطة تتبع السائقين (DriverTrackingMap.js)
-- ✅ إصلاح صفحة الموارد البشرية (HR.js)
-- ✅ إصلاح مكون المكالمات الواردة (IncomingCallPopup.js)
+### Session 3 - إصلاحات إضافية بناءً على ملاحظات المستخدم
+- ✅ SuperAdmin: "مميز" → "Premium"
+- ✅ Dashboard Alert: "يوجد طلبات معلقة..." → ترجمة كاملة
+- ✅ Call Logs: "عميل جديد" → "New Customer" (Backend + Frontend)
+- ✅ Call Logs: التواريخ بالإنجليزية (en-US format)
+- ✅ Coupons: "واحصل على" → "and get"
+- ✅ Smart Reports: "غير معروف" → "Unknown" (Backend)
+- ✅ تغيير جميع `ar-IQ` إلى `en-US` في 17 ملف
+- ✅ أزرار المكالمات: "رد" → "Answer", "رفض" → "Reject"
 
-### Session 2 - صفحة الإعدادات
-- ✅ إصلاح قسم الطابعات (Printers) - "Cashier Printer", "Kitchen Printer", "Bar Printer"
-- ✅ إصلاح قسم المنتجات (Products) - عرض الربح "Profit"
-- ✅ إصلاح قسم الدفع الإلكتروني (Electronic Payment) - "Save Stripe Settings", "Save Zain Cash Settings"
-- ✅ إصلاح إعدادات الفاتورة (Invoice Settings) - "Save Invoice Settings"
-- ✅ إصلاح زر حفظ رسوم التوصيل - "Save Delivery Fee"
-- ✅ إصلاح أدوار المستخدمين - "System Admin", "Manager", "Supervisor", "Cashier", "Delivery Driver"
+### الملفات التي تم تعديلها لتنسيق التاريخ:
+- Reports.js, Dashboard.js, Orders.js, HR.js, SystemAdmin.js
+- Delivery.js, Ratings.js, WarehouseTransfers.js, PayrollPrint.js
+- WarehouseManufacturing.js, InventoryReports.js, Invoices.js
+- Settings.js, Loyalty.js, BranchOrders.js, Purchasing.js
+- CustomerMenu.js, CallLogs.js
 
-### استبدال التصدير بالطباعة
-- ✅ CallLogs.js - تم استبدال زر التصدير بزر الطباعة
-- ✅ InventoryReports.js - تم استبدال زر التصدير بزر الطباعة
-- ✅ HR.js - تم استبدال زر تصدير مفردات المرتب بزر الطباعة
-
-## إضافات قاموس الترجمة (autoTranslate.js)
-تم إضافة أكثر من 200 ترجمة جديدة شاملة:
-- ترجمات الحجوزات
-- ترجمات سجل المكالمات
-- ترجمات برنامج الولاء
-- ترجمات الكوبونات والعروض
-- ترجمات أجهزة البصمة
-- ترجمات خريطة التوصيل
-- ترجمات صفحة الإعدادات
-
-## البنية التقنية
-
-### الواجهة الأمامية (Frontend)
-- React 18 مع React Router
-- Shadcn/UI للمكونات
-- نظام ترجمة مزدوج:
-  - `useTranslation` hook + `autoTranslate.js` للنصوص المخصصة
-  - `translations.js` للنصوص الأساسية
-- اللغة تُحفظ في localStorage تحت مفتاح `app_language`
-
-### الخلفية (Backend)
-- FastAPI
-- MongoDB
-
-## ملفات المرجع الرئيسية
-- `/app/frontend/src/utils/autoTranslate.js` - قاموس الترجمة المخصص
-- `/app/frontend/src/utils/translations.js` - قاموس الترجمة الأساسي
-- `/app/frontend/src/hooks/useTranslation.js` - Hook الترجمة
-- `/app/frontend/src/context/LanguageContext.js` - سياق اللغة
+## تقارير الاختبار
+- `/app/test_reports/iteration_79.json` - الصفحات الأساسية (100% نجاح)
+- `/app/test_reports/iteration_80.json` - صفحة الإعدادات (100% نجاح)
+- `/app/test_reports/iteration_81.json` - المشاكل الخمس من ملاحظات المستخدم (95% نجاح)
 
 ## بيانات الاختبار
 - **Super Admin:** `owner@maestroegp.com` / `owner123` (المفتاح السري: `271018`)
 - **Demo User:** `demo@maestroegp.com` / `demo123`
 
-## تقارير الاختبار
-- `/app/test_reports/iteration_79.json` - اختبار الترجمات الأساسية (100% نجاح)
-- `/app/test_reports/iteration_80.json` - اختبار صفحة الإعدادات (100% نجاح)
-
-## المهام القادمة
-1. التحقق من عرض الأرقام والتواريخ بالإنجليزية دائماً
-2. مراجعة أي صفحات إضافية قد تحتاج ترجمة
-3. إعادة هيكلة الملفات الضخمة (P2)
-
 ## ملاحظة مهمة
-أسماء المنتجات وأسماء الفئات (مثل "عصير برتقال"، "المشروبات") هي **بيانات مُدخلة من المستخدم** وليست نصوص النظام، لذلك لا تُترجم تلقائياً. هذا سلوك متوقع ومقصود.
+- أسماء المنتجات والفئات هي **بيانات مُدخلة من المستخدم** ولا تُترجم تلقائياً
+- البيانات المخزنة مسبقاً في قاعدة البيانات (مثل سجلات المكالمات القديمة) ستظل بالعربية
