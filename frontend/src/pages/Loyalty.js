@@ -555,7 +555,7 @@ export default function Loyalty() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-foreground">
               <Settings className="h-5 w-5 text-primary" />
-              إعدادات برنامج الولاء
+              {t('إعدادات برنامج الولاء')}
             </DialogTitle>
           </DialogHeader>
           {settings && (
