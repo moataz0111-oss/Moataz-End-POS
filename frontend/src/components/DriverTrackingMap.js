@@ -507,11 +507,15 @@ export default function DriverTrackingMap({
           { icon: destIcon }
         ).addTo(mapRef.current);
         
+        const destinationTitleText = t('وجهة التوصيل');
+        const notSpecifiedText = t('غير محدد');
+        const orderText = t('طلب');
+        
         destMarker.bindPopup(`
           <div style="direction: rtl; padding: 12px; font-family: 'Cairo', sans-serif;">
-            <h4 style="margin: 0 0 8px; font-weight: 700;">وجهة التوصيل</h4>
-            <p style="margin: 0; color: #666; font-size: 13px;">${driver.current_order.delivery_address || 'غير محدد'}</p>
-            <p style="margin: 8px 0 0; color: #f97316; font-weight: 600;">طلب #${driver.current_order.order_number}</p>
+            <h4 style="margin: 0 0 8px; font-weight: 700;">${destinationTitleText}</h4>
+            <p style="margin: 0; color: #666; font-size: 13px;">${driver.current_order.delivery_address || notSpecifiedText}</p>
+            <p style="margin: 8px 0 0; color: #f97316; font-weight: 600;">${orderText} #${driver.current_order.order_number}</p>
           </div>
         `);
         
