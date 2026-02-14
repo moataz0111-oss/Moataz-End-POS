@@ -3623,7 +3623,7 @@ export default function Settings() {
                             ) : null}
                             
                             <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
-                              {printer.printer_type || 'عام'}
+                              {t(printer.printer_type) || t('عام')}
                             </span>
                             
                             {/* زر اختبار الاتصال */}
