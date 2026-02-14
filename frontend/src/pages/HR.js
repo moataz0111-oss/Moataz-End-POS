@@ -1539,7 +1539,7 @@ export default function HR() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <CardTitle className="flex items-center gap-2">
                     <Award className="h-5 w-5 text-amber-500" />
-                    تقييم الموظفين التلقائي
+                    {t('تقييم الموظفين التلقائي')}
                   </CardTitle>
                   <div className="flex items-center gap-3">
                     <Input
@@ -1550,7 +1550,7 @@ export default function HR() {
                     />
                     <Button onClick={fetchEmployeeRatings} variant="outline" size="sm">
                       <BarChart3 className="h-4 w-4 ml-1" />
-                      تحديث
+                      {t('تحديث')}
                     </Button>
                   </div>
                 </div>
