@@ -307,7 +307,7 @@ export default function SystemAdmin() {
                       <p className="font-medium text-sm">{backup.filename}</p>
                       <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {new Date(backup.created_at).toLocaleString('ar-IQ')}
+                        {new Date(backup.created_at).toLocaleString('en-US')}
                       </p>
                     </div>
                   </div>
@@ -320,7 +320,7 @@ export default function SystemAdmin() {
       </Card>
       {/* Last Updated */}
       <p className="text-center text-sm text-muted-foreground">
-        {t('آخر تحديث:')}{health?.timestamp ? new Date(health.timestamp).toLocaleString('ar-IQ') : t('غير متاح')}
+        {t('آخر تحديث:')}{health?.timestamp ? new Date(health.timestamp).toLocaleString('en-US') : t('غير متاح')}
       </p>
     </div>
   );
