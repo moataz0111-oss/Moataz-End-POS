@@ -3568,7 +3568,7 @@ export default function SuperAdmin() {
                 <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                   <p className="text-sm text-blue-400 flex items-center gap-2">
                     <AlertCircle className="h-4 w-4" />
-                    <strong>ملاحظة:</strong> عند استخدام عملاء بعملات مختلفة، سيتم تحويل جميع المبالغ تلقائياً إلى العملة المحددة أعلاه
+                    <strong>{t('ملاحظة:')}</strong> {t('عند استخدام عملاء بعملات مختلفة، سيتم تحويل جميع المبالغ تلقائياً إلى العملة المحددة أعلاه')}
                   </p>
                 </div>
               </div>
