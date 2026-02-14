@@ -6,12 +6,12 @@
 ## متطلبات المنتج
 
 ### P0 - الأولوية الحرجة
-1. **الترجمة الشاملة** ✅
+1. **الترجمة الشاملة** ✅ تم الإنجاز
    - يجب ترجمة كل نص مرئي في واجهة المستخدم عند تبديل اللغة
    - تم إصلاح جميع الصفحات المذكورة
 
 ### P1 - أولوية عالية
-1. **وظائف التقارير** ✅
+1. **وظائف التقارير** ✅ تم الإنجاز
    - تم استبدال أزرار تصدير Excel/PDF بأزرار طباعة (`window.print`)
    - الصفحات المحدثة: CallLogs, InventoryReports, HR
 
@@ -24,7 +24,7 @@
 
 ## ما تم إنجازه (14 فبراير 2026)
 
-### الترجمة
+### Session 1 - الترجمات الأساسية
 - ✅ إصلاح صفحة الحجوزات (Reservations.js)
 - ✅ إصلاح صفحة سجل المكالمات (CallLogs.js)
 - ✅ إصلاح صفحة برنامج الولاء (Loyalty.js)
@@ -33,35 +33,62 @@
 - ✅ إصلاح خريطة تتبع السائقين (DriverTrackingMap.js)
 - ✅ إصلاح صفحة الموارد البشرية (HR.js)
 - ✅ إصلاح مكون المكالمات الواردة (IncomingCallPopup.js)
-- ✅ إضافة أكثر من 150 ترجمة جديدة إلى قاموس الترجمة
+
+### Session 2 - صفحة الإعدادات
+- ✅ إصلاح قسم الطابعات (Printers) - "Cashier Printer", "Kitchen Printer", "Bar Printer"
+- ✅ إصلاح قسم المنتجات (Products) - عرض الربح "Profit"
+- ✅ إصلاح قسم الدفع الإلكتروني (Electronic Payment) - "Save Stripe Settings", "Save Zain Cash Settings"
+- ✅ إصلاح إعدادات الفاتورة (Invoice Settings) - "Save Invoice Settings"
+- ✅ إصلاح زر حفظ رسوم التوصيل - "Save Delivery Fee"
+- ✅ إصلاح أدوار المستخدمين - "System Admin", "Manager", "Supervisor", "Cashier", "Delivery Driver"
 
 ### استبدال التصدير بالطباعة
 - ✅ CallLogs.js - تم استبدال زر التصدير بزر الطباعة
 - ✅ InventoryReports.js - تم استبدال زر التصدير بزر الطباعة
 - ✅ HR.js - تم استبدال زر تصدير مفردات المرتب بزر الطباعة
 
+## إضافات قاموس الترجمة (autoTranslate.js)
+تم إضافة أكثر من 200 ترجمة جديدة شاملة:
+- ترجمات الحجوزات
+- ترجمات سجل المكالمات
+- ترجمات برنامج الولاء
+- ترجمات الكوبونات والعروض
+- ترجمات أجهزة البصمة
+- ترجمات خريطة التوصيل
+- ترجمات صفحة الإعدادات
+
 ## البنية التقنية
 
 ### الواجهة الأمامية (Frontend)
 - React 18 مع React Router
 - Shadcn/UI للمكونات
-- i18next و LanguageContext للترجمة
-- قاموس الترجمة المركزي: `/app/frontend/src/utils/autoTranslate.js`
+- نظام ترجمة مزدوج:
+  - `useTranslation` hook + `autoTranslate.js` للنصوص المخصصة
+  - `translations.js` للنصوص الأساسية
+- اللغة تُحفظ في localStorage تحت مفتاح `app_language`
 
 ### الخلفية (Backend)
 - FastAPI
 - MongoDB
 
 ## ملفات المرجع الرئيسية
-- `/app/frontend/src/utils/autoTranslate.js` - قاموس الترجمة
+- `/app/frontend/src/utils/autoTranslate.js` - قاموس الترجمة المخصص
+- `/app/frontend/src/utils/translations.js` - قاموس الترجمة الأساسي
 - `/app/frontend/src/hooks/useTranslation.js` - Hook الترجمة
 - `/app/frontend/src/context/LanguageContext.js` - سياق اللغة
 
 ## بيانات الاختبار
 - **Super Admin:** `owner@maestroegp.com` / `owner123` (المفتاح السري: `271018`)
-- **Demo User:** `demo@maestroegp.com` / `demo`
+- **Demo User:** `demo@maestroegp.com` / `demo123`
+
+## تقارير الاختبار
+- `/app/test_reports/iteration_79.json` - اختبار الترجمات الأساسية (100% نجاح)
+- `/app/test_reports/iteration_80.json` - اختبار صفحة الإعدادات (100% نجاح)
 
 ## المهام القادمة
 1. التحقق من عرض الأرقام والتواريخ بالإنجليزية دائماً
 2. مراجعة أي صفحات إضافية قد تحتاج ترجمة
 3. إعادة هيكلة الملفات الضخمة (P2)
+
+## ملاحظة مهمة
+أسماء المنتجات وأسماء الفئات (مثل "عصير برتقال"، "المشروبات") هي **بيانات مُدخلة من المستخدم** وليست نصوص النظام، لذلك لا تُترجم تلقائياً. هذا سلوك متوقع ومقصود.
