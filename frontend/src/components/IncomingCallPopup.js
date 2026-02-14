@@ -5,12 +5,14 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { formatPrice } from '../utils/currency';
 import { getSoundSettings } from '../utils/sound';
+import { useTranslation } from '../hooks/useTranslation';
 
 import { API_URL } from '../utils/api';
 const API = API_URL;
 
 export default function IncomingCallPopup() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeCalls, setActiveCalls] = useState([]);
   const [isRinging, setIsRinging] = useState(false);
   const [isLoading, setIsLoading] = useState({});
