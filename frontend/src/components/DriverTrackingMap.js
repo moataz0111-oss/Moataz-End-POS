@@ -777,16 +777,16 @@ export default function DriverTrackingMap({
         <div className="space-y-2 text-sm">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="text-white">متاح ({availableDrivers.length})</span>
+            <span className="text-white">{t('متاح')} ({availableDrivers.length})</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-orange-500" />
-            <span className="text-white">مشغول ({busyDrivers.length})</span>
+            <span className="text-white">{t('مشغول')} ({busyDrivers.length})</span>
           </div>
           {showRoutes && (
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-red-500" />
-              <span className="text-white">وجهة التوصيل</span>
+              <span className="text-white">{t('وجهة التوصيل')}</span>
             </div>
           )}
         </div>
