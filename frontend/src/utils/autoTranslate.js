@@ -3196,6 +3196,8 @@ const translationMap = {
   'اختر صورة': { en: 'Select Image', ku: '' },
   'رابط الصورة': { en: 'Image URL', ku: '' },
   'الرجاء إدخال رابط الصورة': { en: 'Please enter image URL', ku: '' },
+  'أدخل رابط صورة الشعار أو قم برفع/قص صورة جديدة': { en: 'Enter logo image URL or upload/crop a new image', ku: '' },
+  'المفتاح السري يُستخدم لتسجيل الدخول كمالك': { en: 'The secret key is used to login as owner', ku: '' },
 };
 
 // الحصول على اللغة الحالية
