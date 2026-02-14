@@ -964,7 +964,7 @@ export default function SuperAdmin() {
         try {
           const formData = new FormData();
           formData.append('file', file);
-          formData.append('title', newBackgroundTitle || 'خلفية جديدة');
+          formData.append('title', newBackgroundTitle || t('خلفية جديدة'));
           formData.append('animation_type', newBackgroundAnimation);
           
           const token = localStorage.getItem('super_admin_token');
@@ -4381,7 +4381,7 @@ export default function SuperAdmin() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <ImageIcon className="h-5 w-5 text-purple-400" />
-              إضافة خلفية جديدة
+              {t('إضافة خلفية جديدة')}
             </DialogTitle>
           </DialogHeader>
           
@@ -4396,7 +4396,7 @@ export default function SuperAdmin() {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                رابط URL
+                {t('رابط URL')}
               </button>
               <button
                 onClick={() => setBackgroundUploadMode('device')}
@@ -4406,7 +4406,7 @@ export default function SuperAdmin() {
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                رفع من الجهاز
+                {t('رفع من الجهاز')}
               </button>
             </div>
 
@@ -4465,10 +4465,10 @@ export default function SuperAdmin() {
                 <Button 
                   variant="default" 
                   className="w-full bg-blue-600 hover:bg-blue-700"
-                  onClick={() => openImageCropper('background', 16/9, 'قص خلفية صفحة الدخول')}
+                  onClick={() => openImageCropper('background', 16/9, t('قص خلفية صفحة الدخول'))}
                 >
                   <Crop className="h-4 w-4 ml-2" />
-                  قص وتعديل صورة
+                  {t('قص وتعديل صورة')}
                 </Button>
                 <p className="text-xs text-gray-500 text-center">{t('استخدم أداة القص للحصول على أبعاد مثالية للخلفية')}</p>
               </div>
@@ -4514,7 +4514,7 @@ export default function SuperAdmin() {
               }} 
               className="border-gray-600"
             >
-              إلغاء
+              {t('إلغاء')}
             </Button>
             <Button 
               onClick={async () => {
@@ -4534,12 +4534,12 @@ export default function SuperAdmin() {
               {backgroundsLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 ml-2 animate-spin" />
-                  جاري الرفع...
+                  {t('جاري الرفع...')}
                 </>
               ) : (
                 <>
                   <Plus className="h-4 w-4 ml-2" />
-                  إضافة الخلفية
+                  {t('إضافة الخلفية')}
                 </>
               )}
             </Button>
