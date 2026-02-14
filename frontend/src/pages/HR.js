@@ -1089,7 +1089,7 @@ export default function HR() {
           <TabsContent value="attendance">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{t('سجل الحضور - {selectedMonth}')}</CardTitle>
+                <CardTitle>{t('سجل الحضور')} - {selectedMonth}</CardTitle>
                 <Dialog open={attendanceDialogOpen} onOpenChange={setAttendanceDialogOpen}>
                   <DialogTrigger asChild>
                     <Button><Plus className="h-4 w-4 ml-2" /> {t('تسجيل حضور')}</Button>
