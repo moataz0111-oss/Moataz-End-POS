@@ -233,7 +233,7 @@ export default function BiometricDevices({ branches = [] }) {
                     </div>
                   </div>
                   <Badge className={device.is_active ? 'bg-green-500/10 text-green-500' : 'bg-gray-500/10 text-gray-500'}>
-                    {device.is_active ? 'نشط' : 'غير نشط'}
+                    {device.is_active ? t('نشط') : t('غير نشط')}
                   </Badge>
                 </div>
 
