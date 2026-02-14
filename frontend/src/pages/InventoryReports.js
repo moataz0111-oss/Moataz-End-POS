@@ -462,9 +462,9 @@ export default function InventoryReports() {
                             <ArrowUpCircle className="h-5 w-5 text-red-500" />
                           )}
                           <div>
-                            <p className="font-medium">{t.type === 'incoming' ? 'وارد' : 'صادر'}</p>
+                            <p className="font-medium">{t.type === 'incoming' ? t('وارد') : t('صادر')}</p>
                             <p className="text-xs text-muted-foreground">
-                              {t.supplier_name || t.source || 'غير محدد'}
+                              {t.supplier_name || t.source || t('غير محدد')}
                             </p>
                           </div>
                         </div>
