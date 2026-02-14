@@ -3761,7 +3761,7 @@ export default function SuperAdmin() {
                   <hr className="my-2" />
                   <p className="text-xs text-gray-500">{t('... المجموع الإجمالي ...')}</p>
                   <hr className="my-2" />
-                  <p className="text-sm font-medium">{invoiceSettings.thank_you_message || 'شكراً لزيارتكم'}</p>
+                  <p className="text-sm font-medium">{invoiceSettings.thank_you_message || t('شكراً لزيارتكم')}</p>
                   {invoiceSettings.footer_text && (
                     <p className="text-xs text-gray-500 mt-1">{invoiceSettings.footer_text}</p>
                   )}
