@@ -2709,6 +2709,7 @@ const translationMap = {
   'متوسط النقاط': { en: 'Average Points', ku: 'ناوەندی خاڵەکان' },
   'الأعضاء': { en: 'Members', ku: 'ئەندامان' },
   'تقييمات العملاء': { en: 'Customer Reviews', ku: 'هەڵسەنگاندنی کڕیاران' },
+  'عضو جديد': { en: 'New Member', ku: 'ئەندامی نوێ' },
   'إضافة عضو جديد': { en: 'Add New Member', ku: 'زیادکردنی ئەندامی نوێ' },
   'تفاصيل العضو': { en: 'Member Details', ku: 'وردەکاری ئەندام' },
   'سجل المعاملات': { en: 'Transaction History', ku: 'مێژووی مامەڵەکان' },
