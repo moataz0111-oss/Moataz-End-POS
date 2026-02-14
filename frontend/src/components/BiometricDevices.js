@@ -139,7 +139,7 @@ export default function BiometricDevices({ branches = [] }) {
   };
 
   const handleDeleteDevice = async (device) => {
-    if (!window.confirm(`هل أنت متأكد من حذف "${device.name}"؟`)) return;
+    if (!window.confirm(t('هل أنت متأكد من حذف') + ` "${device.name}"؟`)) return;
     
     try {
       const token = localStorage.getItem('token');
@@ -147,10 +147,10 @@ export default function BiometricDevices({ branches = [] }) {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      toast.success('تم حذف الجهاز');
+      toast.success(t('تم حذف الجهاز'));
       fetchDevices();
     } catch (error) {
-      toast.error('فشل في حذف الجهاز');
+      toast.error(t('فشل في حذف الجهاز'));
     }
   };
 
