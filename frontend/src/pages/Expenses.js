@@ -192,7 +192,7 @@ export default function Expenses() {
 
   const getCategoryName = (catId) => {
     const cat = expenseCategories.find(c => c.id === catId);
-    return cat ? cat.name : catId;
+    return cat ? t(cat.name) : catId;
   };
 
   const getCategoryIcon = (catId) => {
@@ -259,7 +259,7 @@ export default function Expenses() {
                         <SelectContent>
                           {expenseCategories.map(cat => (
                             <SelectItem key={cat.id} value={cat.id}>
-                              {cat.icon} {cat.name}
+                              {cat.icon} {t(cat.name)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -375,7 +375,7 @@ export default function Expenses() {
             <SelectContent>
               <SelectItem value="all">{t('جميع التصنيفات')}</SelectItem>
               {expenseCategories.map(cat => (
-                <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
+                <SelectItem key={cat.id} value={cat.id}>{cat.icon} {t(cat.name)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
