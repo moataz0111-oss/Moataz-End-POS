@@ -2448,7 +2448,7 @@ export default function SuperAdmin() {
                           <div key={type} className="bg-gray-800/50 rounded-lg p-3 text-center">
                             <p className="text-2xl font-bold">{data.count}</p>
                             <p className="text-xs text-gray-400">
-                              {subscriptionsDashboard.subscription_prices[type]?.name || type}
+                              {type === 'premium' ? t('مميز') : type === 'basic' ? t('أساسي') : type === 'demo' ? t('عرض') : type === 'trial' ? t('تجريبي') : type}
                             </p>
                             <p className="text-sm text-purple-400 mt-1">
                               ${subscriptionsDashboard.subscription_prices[type]?.monthly || 0}/{t('شهر')}
