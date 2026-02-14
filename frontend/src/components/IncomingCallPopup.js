@@ -345,7 +345,7 @@ export default function IncomingCallPopup() {
                     className="flex-1 h-12 bg-red-600 hover:bg-red-700 text-white gap-2 text-base font-medium disabled:opacity-50"
                   >
                     <PhoneOff className="h-5 w-5" />
-                    {isLoading[call.call_id] ? '...' : 'رفض'}
+                    {isLoading[call.call_id] ? '...' : t('رفض')}
                   </Button>
                   <Button
                     onClick={() => handleAnswer(call.call_id)}
@@ -353,7 +353,7 @@ export default function IncomingCallPopup() {
                     className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white gap-2 text-base font-medium disabled:opacity-50"
                   >
                     <Phone className="h-5 w-5" />
-                    {isLoading[call.call_id] ? '...' : 'رد'}
+                    {isLoading[call.call_id] ? '...' : t('رد')}
                   </Button>
                 </>
               ) : (
