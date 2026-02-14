@@ -224,7 +224,7 @@ export default function InventoryReports() {
     a.download = `inventory-report-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('تم تصدير التقرير');
+    toast.success(t('تم تصدير التقرير'));
   };
   if (loading) {
     return (
@@ -234,7 +234,7 @@ export default function InventoryReports() {
     );
   }
   return (
-    <div className="min-h-screen bg-background" dir="rtl" data-testid="inventory-reports-page">
+    <div className="min-h-screen bg-background" dir={isRTL ? 'rtl' : 'ltr'} data-testid="inventory-reports-page">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -245,9 +245,9 @@ export default function InventoryReports() {
             <div>
               <h1 className="text-xl font-bold flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-primary" />
-                تقارير المخزون والتصنيع
+                {t('تقارير المخزون والتصنيع')}
               </h1>
-              <p className="text-xs text-muted-foreground">تحليل الأداء والتكاليف والأرباح</p>
+              <p className="text-xs text-muted-foreground">{t('تحليل الأداء والتكاليف والأرباح')}</p>
             </div>
           </div>
           
@@ -258,15 +258,15 @@ export default function InventoryReports() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="today">اليوم</SelectItem>
-                <SelectItem value="week">هذا الأسبوع</SelectItem>
-                <SelectItem value="month">هذا الشهر</SelectItem>
-                <SelectItem value="year">هذه السنة</SelectItem>
+                <SelectItem value="today">{t('اليوم')}</SelectItem>
+                <SelectItem value="week">{t('هذا الأسبوع')}</SelectItem>
+                <SelectItem value="month">{t('هذا الشهر')}</SelectItem>
+                <SelectItem value="year">{t('هذه السنة')}</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" onClick={exportReport}>
               <Download className="h-4 w-4 ml-2" />
-              تصدير
+              {t('تصدير')}
             </Button>
             <Button variant="outline" size="icon" onClick={fetchData}>
               <RefreshCw className="h-4 w-4" />
