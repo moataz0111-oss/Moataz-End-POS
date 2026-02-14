@@ -430,7 +430,7 @@ export default function Coupons() {
         <TabsContent value="promotions">
           <div className="flex justify-end mb-4">
             <Button onClick={() => { resetPromotionForm(); setPromotionDialogOpen(true); }}>
-              <Plus className="h-4 w-4 ml-2" /> عرض جديد
+              <Plus className="h-4 w-4 ml-2" /> {t('عرض جديد')}
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
