@@ -141,20 +141,20 @@ export default function SystemAdmin() {
             <div className="flex items-center justify-between mb-2">
               {getStatusIcon(health?.database?.status)}
               <Badge className={getStatusBadge(health?.database?.status)}>
-                {health?.database?.status === 'healthy' ? 'سليم' : 'مشكلة'}
+                {health?.database?.status === 'healthy' ? t('سليم') : t('مشكلة')}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">
-              {health?.database?.collections_count} مجموعة
+              {health?.database?.collections_count} {t('مجموعة')}
             </p>
             {stats?.database && (
               <div className="mt-3 space-y-1 text-sm">
                 <div className="flex justify-between">
-                  <span>حجم البيانات:</span>
+                  <span>{t('حجم البيانات:')}</span>
                   <span className="font-medium">{stats.database.database_size}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>حجم الفهارس:</span>
+                  <span>{t('حجم الفهارس:')}</span>
                   <span className="font-medium">{stats.database.indexes_size}</span>
                 </div>
               </div>
@@ -204,13 +204,13 @@ export default function SystemAdmin() {
             <div className="flex items-center justify-between mb-2">
               {getStatusIcon(stats?.capacity?.status)}
               <Badge className={getStatusBadge(stats?.capacity?.status)}>
-                {stats?.capacity?.status === 'healthy' ? 'جيد' : 'تحذير'}
+                {stats?.capacity?.status === 'healthy' ? t('جيد') : t('تحذير')}
               </Badge>
             </div>
             <div className="space-y-2 text-sm">
               <div>
                 <div className="flex justify-between mb-1">
-                  <span>الطلبات</span>
+                  <span>{t('الطلبات')}</span>
                   <span>{stats?.business?.total_orders?.toLocaleString()} / {stats?.capacity?.orders_limit?.toLocaleString()}</span>
                 </div>
                 <Progress 
@@ -243,12 +243,12 @@ export default function SystemAdmin() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             {[
-              { label: 'الطلبات', value: stats?.business?.total_orders, icon: '📦' },
-              { label: 'المنتجات', value: stats?.business?.total_products, icon: '🍔' },
-              { label: 'العملاء', value: stats?.business?.total_customers, icon: '👥' },
-              { label: 'الموظفين', value: stats?.business?.total_employees, icon: '👨‍💼' },
-              { label: 'الفروع', value: stats?.business?.total_branches, icon: '🏪' },
-              { label: 'الورديات النشطة', value: stats?.business?.active_shifts, icon: '⏰' }
+              { label: t('الطلبات'), value: stats?.business?.total_orders, icon: '📦' },
+              { label: t('المنتجات'), value: stats?.business?.total_products, icon: '🍔' },
+              { label: t('العملاء'), value: stats?.business?.total_customers, icon: '👥' },
+              { label: t('الموظفين'), value: stats?.business?.total_employees, icon: '👨‍💼' },
+              { label: t('الفروع'), value: stats?.business?.total_branches, icon: '🏪' },
+              { label: t('الورديات النشطة'), value: stats?.business?.active_shifts, icon: '⏰' }
             ].map((item, idx) => (
               <div key={idx} className="text-center p-4 bg-muted/30 rounded-lg">
                 <div className="text-2xl mb-1">{item.icon}</div>
@@ -320,7 +320,7 @@ export default function SystemAdmin() {
       </Card>
       {/* Last Updated */}
       <p className="text-center text-sm text-muted-foreground">
-        آخر تحديث: {health?.timestamp ? new Date(health.timestamp).toLocaleString('ar-IQ') : 'غير متاح'}
+        {t('آخر تحديث:')}{health?.timestamp ? new Date(health.timestamp).toLocaleString('ar-IQ') : t('غير متاح')}
       </p>
     </div>
   );
