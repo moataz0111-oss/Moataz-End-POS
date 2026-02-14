@@ -872,7 +872,7 @@ export default function Delivery() {
                             <Locate className="h-3 w-3 inline ml-1" />
                             {driver.location_updated_at ? (
                               `آخر تحديث: ${new Date(driver.location_updated_at).toLocaleTimeString('ar-IQ', { hour: '2-digit', minute: '2-digit' })}`
-                            ) : 'موقع متاح'}
+                            ) : t('موقع متاح')}
                           </>
                         ) : (
                           'لا يوجد موقع'
@@ -1413,7 +1413,7 @@ export default function Delivery() {
                     <SelectItem key={driver.id} value={driver.id}>
                       <div className="flex items-center gap-2">
                         <span className={`w-2 h-2 rounded-full ${driver.is_available ? 'bg-green-500' : 'bg-orange-500'}`}></span>
-                        {driver.name} - {driver.is_available ? 'متاح' : 'في مهمة'}
+                        {driver.name} - {driver.is_available ? t('متاح') : t('في مهمة')}
                       </div>
                     </SelectItem>
                   ))}
