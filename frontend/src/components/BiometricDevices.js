@@ -126,13 +126,13 @@ export default function BiometricDevices({ branches = [] }) {
       
       toast.success(
         <div>
-          <p className="font-bold">تمت المزامنة بنجاح!</p>
-          <p className="text-sm">عدد السجلات: {res.data.records_count}</p>
+          <p className="font-bold">{t('تمت المزامنة بنجاح!')}</p>
+          <p className="text-sm">{t('عدد السجلات')}: {res.data.records_count}</p>
         </div>
       );
       fetchDevices();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'فشل في المزامنة');
+      toast.error(error.response?.data?.detail || t('فشل في المزامنة'));
     } finally {
       setSyncingDevice(null);
     }
