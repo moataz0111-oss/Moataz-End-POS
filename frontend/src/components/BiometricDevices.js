@@ -308,24 +308,24 @@ export default function BiometricDevices({ branches = [] }) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-foreground">
               <Fingerprint className="h-5 w-5 text-primary" />
-              إضافة جهاز بصمة
+              {t('إضافة جهاز بصمة')}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleAddDevice} className="space-y-4">
             <div>
-              <Label className="text-foreground">اسم الجهاز *</Label>
+              <Label className="text-foreground">{t('اسم الجهاز')} *</Label>
               <Input
                 value={deviceForm.name}
                 onChange={(e) => setDeviceForm({ ...deviceForm, name: e.target.value })}
-                placeholder="مثال: جهاز بصمة الفرع الرئيسي"
+                placeholder={t('مثال: جهاز بصمة الفرع الرئيسي')}
                 className="mt-1"
                 required
               />
             </div>
 
             <div>
-              <Label className="text-foreground">عنوان IP *</Label>
+              <Label className="text-foreground">{t('عنوان IP')} *</Label>
               <Input
                 value={deviceForm.ip_address}
                 onChange={(e) => setDeviceForm({ ...deviceForm, ip_address: e.target.value })}
@@ -338,7 +338,7 @@ export default function BiometricDevices({ branches = [] }) {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-foreground">المنفذ</Label>
+                <Label className="text-foreground">{t('المنفذ')}</Label>
                 <Input
                   type="number"
                   value={deviceForm.port}
@@ -348,7 +348,7 @@ export default function BiometricDevices({ branches = [] }) {
                 />
               </div>
               <div>
-                <Label className="text-foreground">نوع الجهاز</Label>
+                <Label className="text-foreground">{t('نوع الجهاز')}</Label>
                 <Select
                   value={deviceForm.device_type}
                   onValueChange={(value) => setDeviceForm({ ...deviceForm, device_type: value })}
@@ -357,22 +357,22 @@ export default function BiometricDevices({ branches = [] }) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="fingerprint">بصمة</SelectItem>
-                    <SelectItem value="face">تعرف على الوجه</SelectItem>
-                    <SelectItem value="card">بطاقة</SelectItem>
+                    <SelectItem value="fingerprint">{t('بصمة')}</SelectItem>
+                    <SelectItem value="face">{t('تعرف على الوجه')}</SelectItem>
+                    <SelectItem value="card">{t('بطاقة')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div>
-              <Label className="text-foreground">الفرع *</Label>
+              <Label className="text-foreground">{t('الفرع')} *</Label>
               <Select
                 value={deviceForm.branch_id}
                 onValueChange={(value) => setDeviceForm({ ...deviceForm, branch_id: value })}
               >
                 <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="اختر الفرع" />
+                  <SelectValue placeholder={t('اختر الفرع')} />
                 </SelectTrigger>
                 <SelectContent>
                   {branches.map((branch) => (
@@ -386,10 +386,10 @@ export default function BiometricDevices({ branches = [] }) {
 
             <div className="flex gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setAddDialogOpen(false)} className="flex-1">
-                إلغاء
+                {t('إلغاء')}
               </Button>
               <Button type="submit" className="flex-1">
-                إضافة الجهاز
+                {t('إضافة الجهاز')}
               </Button>
             </div>
           </form>
