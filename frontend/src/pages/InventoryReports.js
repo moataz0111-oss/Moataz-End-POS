@@ -682,22 +682,22 @@ export default function InventoryReports() {
                   <div className="p-4 bg-yellow-500/10 rounded-lg text-center">
                     <Clock className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
                     <p className="text-2xl font-bold">{branchOrders.filter(o => o.status === 'pending').length}</p>
-                    <p className="text-sm text-muted-foreground">قيد الانتظار</p>
+                    <p className="text-sm text-muted-foreground">{t('قيد الانتظار')}</p>
                   </div>
                   <div className="p-4 bg-blue-500/10 rounded-lg text-center">
                     <CheckCircle className="h-8 w-8 mx-auto mb-2 text-blue-500" />
                     <p className="text-2xl font-bold">{branchOrders.filter(o => o.status === 'approved').length}</p>
-                    <p className="text-sm text-muted-foreground">تمت الموافقة</p>
+                    <p className="text-sm text-muted-foreground">{t('تمت الموافقة')}</p>
                   </div>
                   <div className="p-4 bg-purple-500/10 rounded-lg text-center">
                     <Truck className="h-8 w-8 mx-auto mb-2 text-purple-500" />
                     <p className="text-2xl font-bold">{branchOrders.filter(o => o.status === 'shipped').length}</p>
-                    <p className="text-sm text-muted-foreground">قيد الشحن</p>
+                    <p className="text-sm text-muted-foreground">{t('قيد الشحن')}</p>
                   </div>
                   <div className="p-4 bg-green-500/10 rounded-lg text-center">
                     <Boxes className="h-8 w-8 mx-auto mb-2 text-green-500" />
                     <p className="text-2xl font-bold">{branchOrders.filter(o => o.status === 'delivered').length}</p>
-                    <p className="text-sm text-muted-foreground">تم التسليم</p>
+                    <p className="text-sm text-muted-foreground">{t('تم التسليم')}</p>
                   </div>
                 </div>
               </CardContent>
