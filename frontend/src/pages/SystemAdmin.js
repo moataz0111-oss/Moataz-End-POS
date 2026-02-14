@@ -237,7 +237,7 @@ export default function SystemAdmin() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
-            إحصائيات العمل
+            {t('إحصائيات العمل')}
           </CardTitle>
         </CardHeader>
         <CardContent>
