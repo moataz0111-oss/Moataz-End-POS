@@ -2601,6 +2601,20 @@ const translationMap = {
   'المنتجات المصنعة (الوصفات)': { en: 'Manufactured Products (Recipes)', ku: 'بەرهەمە دروستکراوەکان (ڕێچەتەکان)' },
   'المنتجات المصنعة المتاحة': { en: 'Available Manufactured Products', ku: 'بەرهەمە دروستکراوە بەردەستەکان' },
   'أصناف تحتاج إعادة تعبئة': { en: 'Items need restocking', ku: 'بڕگەکان پێویستیان بە پڕکردنەوە هەیە' },
+  
+  // ===== ترجمات صفحة المشتريات =====
+  'أوامر الشراء': { en: 'Purchase Orders', ku: 'فەرمانەکانی کڕین' },
+  'إجمالي القيمة': { en: 'Total Value', ku: 'کۆی بەها' },
+  'تنبيهات المخزون': { en: 'Stock Alerts', ku: 'ئاگادارکردنەوەکانی کۆگا' },
+  'طلب شراء': { en: 'Purchase Request', ku: 'داواکاری کڕین' },
+  'موافق عليه': { en: 'Approved', ku: 'پەسەندکراو' },
+  'تم الطلب': { en: 'Ordered', ku: 'داواکرا' },
+  'لا توجد أوامر شراء': { en: 'No purchase orders', ku: 'هیچ فەرمانی کڕین نییە' },
+  'الشراء من الموردين وإرسال للمخزن': { en: 'Purchase from suppliers and send to warehouse', ku: 'کڕین لە دابینکەرەکان و ناردن بۆ کۆگا' },
+  'طلبات المخزن': { en: 'Warehouse Requests', ku: 'داواکاریەکانی کۆگا' },
+  'لا توجد فواتير شراء': { en: 'No purchase invoices', ku: 'هیچ فاکتورەی کڕین نییە' },
+  'لا يوجد موردين': { en: 'No suppliers found', ku: 'هیچ دابینکەرێک نەدۆزرایەوە' },
+  'فاتورة شراء': { en: 'Purchase Invoice', ku: 'فاکتورەی کڕین' },
 };
 
 // الحصول على اللغة الحالية
