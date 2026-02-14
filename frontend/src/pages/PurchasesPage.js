@@ -386,7 +386,7 @@ export default function PurchasesPage() {
                                 {getStatusLabel(purchase.status)}
                               </Badge>
                               <Badge className={getPaymentStatusColor(purchase.payment_status)}>
-                                {purchase.payment_status === 'paid' ? 'مدفوع' : purchase.payment_status === 'pending' ? 'غير مدفوع' : 'جزئي'}
+                                {purchase.payment_status === 'paid' ? t('مدفوع') : purchase.payment_status === 'pending' ? t('غير مدفوع') : t('جزئي')}
                               </Badge>
                             </div>
                             

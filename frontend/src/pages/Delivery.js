@@ -1126,7 +1126,7 @@ export default function Delivery() {
                                 <span className={`text-xs ${
                                   order.driver_payment_status === 'paid' ? 'text-green-500' : 'text-red-500'
                                 }`}>
-                                  {order.driver_payment_status === 'paid' ? '✓ محصل' : '○ غير محصل'}
+                                  {order.driver_payment_status === 'paid' ? t('✓ محصل') : t('○ غير محصل')}
                                 </span>
                               </div>
                             </div>
@@ -1229,7 +1229,7 @@ export default function Delivery() {
                                       ? 'bg-green-500/20 text-green-500' 
                                       : 'bg-red-500/20 text-red-500'
                                   }`}>
-                                    {order.driver_payment_status === 'paid' ? 'مدفوع' : 'غير مدفوع'}
+                                    {order.driver_payment_status === 'paid' ? t('مدفوع') : t('غير مدفوع')}
                                   </span>
                                 </div>
                                 <p className="text-xs text-muted-foreground">
@@ -1397,7 +1397,7 @@ export default function Delivery() {
                 </div>
                 <div className="mt-2 pt-2 border-t border-border">
                   <p className="text-sm text-muted-foreground">{t('السائق الحالي:')}</p>
-                  <p className="font-medium text-foreground">{orderToTransfer.driver_name || selectedDriver?.name || 'غير معين'}</p>
+                  <p className="font-medium text-foreground">{orderToTransfer.driver_name || selectedDriver?.name || t('غير معين')}</p>
                 </div>
               </div>
             )}
