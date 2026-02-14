@@ -549,27 +549,27 @@ export default function InventoryReports() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2">
                   <Factory className="h-5 w-5 text-green-500" />
-                  تحليل المنتجات المصنعة والأرباح
+                  {t('تحليل المنتجات المصنعة والأرباح')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {manufacturedProducts.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Factory className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>لا توجد منتجات مصنعة</p>
+                    <p>{t('لا توجد منتجات مصنعة')}</p>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b bg-muted/50">
-                          <th className="text-right p-3 font-medium">المنتج</th>
-                          <th className="text-right p-3 font-medium">الكمية</th>
-                          <th className="text-right p-3 font-medium">تكلفة المواد</th>
-                          <th className="text-right p-3 font-medium">سعر البيع</th>
-                          <th className="text-right p-3 font-medium">هامش الربح</th>
-                          <th className="text-right p-3 font-medium">نسبة الربح</th>
-                          <th className="text-right p-3 font-medium">القيمة الإجمالية</th>
+                          <th className="text-right p-3 font-medium">{t('المنتج')}</th>
+                          <th className="text-right p-3 font-medium">{t('الكمية')}</th>
+                          <th className="text-right p-3 font-medium">{t('تكلفة المواد')}</th>
+                          <th className="text-right p-3 font-medium">{t('سعر البيع')}</th>
+                          <th className="text-right p-3 font-medium">{t('هامش الربح')}</th>
+                          <th className="text-right p-3 font-medium">{t('نسبة الربح')}</th>
+                          <th className="text-right p-3 font-medium">{t('القيمة الإجمالية')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -601,7 +601,7 @@ export default function InventoryReports() {
                       </tbody>
                       <tfoot>
                         <tr className="bg-primary/10">
-                          <td className="p-3 font-bold" colSpan={4}>الإجمالي</td>
+                          <td className="p-3 font-bold" colSpan={4}>{t('الإجمالي')}</td>
                           <td className="p-3 font-bold text-primary">
                             {formatPrice(manufacturedProducts.reduce((s, p) => s + (p.profit_margin || 0), 0))}
                           </td>
