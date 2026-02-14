@@ -602,7 +602,7 @@ export default function DriverTrackingMap({
           <div className="p-4 h-full flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-white">السائقين</h3>
+              <h3 className="text-lg font-bold text-white">{t('السائقين')}</h3>
               <Button
                 variant="ghost"
                 size="icon"
@@ -617,15 +617,15 @@ export default function DriverTrackingMap({
             <div className="grid grid-cols-3 gap-2 mb-4">
               <div className="bg-gray-800 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-white">{drivers.length}</p>
-                <p className="text-xs text-gray-400">الكل</p>
+                <p className="text-xs text-gray-400">{t('الكل')}</p>
               </div>
               <div className="bg-green-500/20 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-green-400">{availableDrivers.length}</p>
-                <p className="text-xs text-gray-400">متاح</p>
+                <p className="text-xs text-gray-400">{t('متاح')}</p>
               </div>
               <div className="bg-orange-500/20 rounded-lg p-3 text-center">
                 <p className="text-2xl font-bold text-orange-400">{busyDrivers.length}</p>
-                <p className="text-xs text-gray-400">مشغول</p>
+                <p className="text-xs text-gray-400">{t('مشغول')}</p>
               </div>
             </div>
             
@@ -657,20 +657,20 @@ export default function DriverTrackingMap({
                       </div>
                       {hasLocation ? (
                         <Badge className={isBusy ? 'bg-orange-500/20 text-orange-400' : 'bg-green-500/20 text-green-400'}>
-                          {isBusy ? 'مشغول' : 'متاح'}
+                          {isBusy ? t('مشغول') : t('متاح')}
                         </Badge>
                       ) : (
-                        <Badge className="bg-gray-500/20 text-gray-400">بدون موقع</Badge>
+                        <Badge className="bg-gray-500/20 text-gray-400">{t('بدون موقع')}</Badge>
                       )}
                     </div>
                     
                     {isBusy && driver.current_order && (
                       <div className="mt-2 p-2 bg-gray-900/50 rounded-lg">
                         <p className="text-xs text-gray-400">
-                          <span className="text-orange-400 font-medium">طلب #{driver.current_order.order_number}</span>
+                          <span className="text-orange-400 font-medium">{t('طلب')} #{driver.current_order.order_number}</span>
                         </p>
                         <p className="text-xs text-gray-500 truncate mt-1">
-                          {driver.current_order.delivery_address || 'بدون عنوان'}
+                          {driver.current_order.delivery_address || t('بدون عنوان')}
                         </p>
                       </div>
                     )}
