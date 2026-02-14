@@ -10569,7 +10569,7 @@ async def callcenter_webhook(request: Request):
     call_data = {
         "call_id": call_id,
         "phone": phone,
-        "caller_name": caller_name or (customer["name"] if customer else "عميل جديد"),
+        "caller_name": caller_name or (customer["name"] if customer else "New Customer"),
         "direction": direction,
         "customer": customer,
         "last_order": last_order,
@@ -10632,7 +10632,7 @@ async def simulate_incoming_call(data: dict, current_user: dict = Depends(get_cu
     call_data = {
         "call_id": call_id,
         "phone": phone,
-        "caller_name": customer["name"] if customer else "عميل جديد",
+        "caller_name": customer["name"] if customer else "New Customer",
         "direction": "incoming",
         "customer": customer,
         "last_order": last_order,
