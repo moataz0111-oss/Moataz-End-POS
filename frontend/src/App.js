@@ -383,6 +383,15 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* تقرير نقطة التعادل */}
+      <Route 
+        path="/break-even" 
+        element={
+          <ProtectedRoute>
+            <BreakEvenReport />
+          </ProtectedRoute>
+        } 
+      />
       {/* صفحة Super Admin - لوحة تحكم المالك */}
       <Route path="/super-admin" element={<SuperAdmin />} />
       {/* صفحة إدارة النظام */}
