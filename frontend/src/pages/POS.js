@@ -386,7 +386,7 @@ export default function POS() {
       }
     } catch (error) {
       console.error('Failed to search order:', error);
-      toast.error(error.response?.data?.detail || t('الطلب غير موجود'));
+      toast.error(getErrorMessage(error, t('الطلب غير موجود')));
       setRefundOrderInfo(null);
     } finally {
       setRefundLoading(false);
