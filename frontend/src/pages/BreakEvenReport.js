@@ -536,6 +536,106 @@ export default function BreakEvenReport() {
           )}
         </div>
         
+        {/* ملخص إجمالي التكاليف - جديد */}
+        {data?.branches?.length > 0 && (
+          <Card className="bg-gradient-to-br from-purple-500/5 to-purple-500/10 border-purple-500/20">
+            <CardHeader>
+              <CardTitle className="text-lg text-foreground flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-purple-500" />
+                {t('ملخص إجمالي التكاليف')} {viewMode === 'daily' ? t('اليومية') : t('الشهرية')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {/* الإيجار */}
+                <div className="p-4 bg-background/50 rounded-lg text-center">
+                  <Home className="h-6 w-6 text-blue-500 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">{t('الإيجار')}</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {formatPrice(
+                      data.branches.reduce((sum, b) => sum + (viewMode === 'daily' ? (b.fixed_costs?.rent?.daily || 0) : (b.fixed_costs?.rent || 0)), 0)
+                    )}
+                  </p>
+                </div>
+                
+                {/* الكهرباء */}
+                <div className="p-4 bg-background/50 rounded-lg text-center">
+                  <Zap className="h-6 w-6 text-yellow-500 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">{t('الكهرباء')}</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {formatPrice(
+                      data.branches.reduce((sum, b) => sum + (viewMode === 'daily' ? (b.fixed_costs?.electricity?.daily || 0) : (b.fixed_costs?.electricity || 0)), 0)
+                    )}
+                  </p>
+                </div>
+                
+                {/* الماء */}
+                <div className="p-4 bg-background/50 rounded-lg text-center">
+                  <Droplets className="h-6 w-6 text-cyan-500 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">{t('الماء')}</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {formatPrice(
+                      data.branches.reduce((sum, b) => sum + (viewMode === 'daily' ? (b.fixed_costs?.water?.daily || 0) : (b.fixed_costs?.water || 0)), 0)
+                    )}
+                  </p>
+                </div>
+                
+                {/* المولدة */}
+                <div className="p-4 bg-background/50 rounded-lg text-center">
+                  <Settings className="h-6 w-6 text-gray-500 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">{t('المولدة')}</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {formatPrice(
+                      data.branches.reduce((sum, b) => sum + (viewMode === 'daily' ? (b.fixed_costs?.generator?.daily || 0) : (b.fixed_costs?.generator || 0)), 0)
+                    )}
+                  </p>
+                </div>
+                
+                {/* الرواتب */}
+                <div className="p-4 bg-background/50 rounded-lg text-center">
+                  <Users className="h-6 w-6 text-indigo-500 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">{t('الرواتب')}</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {formatPrice(
+                      data.branches.reduce((sum, b) => sum + (viewMode === 'daily' ? (b.salaries?.daily || 0) : (b.salaries?.total || b.salaries?.monthly_total || 0)), 0)
+                    )}
+                  </p>
+                </div>
+                
+                {/* الإجمالي */}
+                <div className="p-4 bg-red-500/10 rounded-lg text-center border border-red-500/20">
+                  <DollarSign className="h-6 w-6 text-red-500 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">{t('الإجمالي')}</p>
+                  <p className="text-xl font-bold text-red-600">
+                    {formatPrice(viewMode === 'daily' ? data.total_daily_target : data.total_monthly_target)}
+                  </p>
+                </div>
+              </div>
+              
+              {/* صافي الربح الإجمالي */}
+              <div className={`mt-6 p-4 rounded-lg border-2 ${
+                data?.is_break_even_reached 
+                  ? 'bg-green-500/10 border-green-500/30' 
+                  : 'bg-orange-500/10 border-orange-500/30'
+              }`}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{t('صافي الربح بعد جميع التكاليف')}</p>
+                    <p className={`text-3xl font-bold ${data?.is_break_even_reached ? 'text-green-600' : 'text-orange-600'}`}>
+                      {formatPrice(viewMode === 'daily' ? data?.net_profit_after_break_even : data?.net_profit_after_costs)}
+                    </p>
+                  </div>
+                  {data?.is_break_even_reached ? (
+                    <CheckCircle className="h-12 w-12 text-green-500" />
+                  ) : (
+                    <AlertTriangle className="h-12 w-12 text-orange-500" />
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         {/* ملاحظة توضيحية */}
         <Card className="bg-blue-500/5 border-blue-500/20">
           <CardContent className="pt-6">
