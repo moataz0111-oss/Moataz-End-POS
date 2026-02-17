@@ -1106,43 +1106,52 @@ export default function POS() {
           
           {orderType === 'dine_in' && (
             <div className="space-y-2">
-              {/* اختيار القسم */}
-              <div className="flex flex-wrap gap-2 mb-2">
-                <button
-                  onClick={() => { playClick(); setSelectedTableSection(null); }}
-                  className={`px-3 py-1 text-xs rounded-full transition-all ${
-                    selectedTableSection === null 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
-                >
-                  {t('الكل')} ({tables.length})
-                </button>
-                {[...new Set(tables.map(tb => tb.section).filter(Boolean))].map(section => (
-                  <button
-                    key={section}
-                    onClick={() => { playClick(); setSelectedTableSection(section); }}
-                    className={`px-3 py-1 text-xs rounded-full transition-all ${
-                      selectedTableSection === section 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                    }`}
-                  >
-                    {t(section)} ({tables.filter(tb => tb.section === section).length})
-                  </button>
-                ))}
-              </div>
-              
-              <p className="text-sm text-muted-foreground mb-2">{t('اختر طاولة')}:</p>
-              <div className="max-h-48 overflow-y-auto border border-border/50 rounded-lg p-2 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-muted/20">
-                <div className="grid grid-cols-5 gap-2">
-                  {tables
-                    .filter(table => !selectedTableSection || table.section === selectedTableSection)
-                    .map(table => {
-                    const isOccupied = table.status === 'occupied';
-                    const isReserved = table.status === 'reserved';
-                    const isAvailable = table.status === 'available';
-                    const isSelected = selectedTable === table.id;
+              {/* تحقق من اختيار فرع */}
+              {!selectedBranchId ? (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 text-center">
+                  <AlertCircle className="h-8 w-8 mx-auto text-amber-500 mb-2" />
+                  <p className="text-amber-600 font-medium">{t('اختر فرع أولاً')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('يجب اختيار فرع لعرض الطاولات المتاحة')}</p>
+                </div>
+              ) : (
+                <>
+                  {/* اختيار القسم */}
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <button
+                      onClick={() => { playClick(); setSelectedTableSection(null); }}
+                      className={`px-3 py-1 text-xs rounded-full transition-all ${
+                        selectedTableSection === null 
+                          ? 'bg-primary text-primary-foreground' 
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                      }`}
+                    >
+                      {t('الكل')} ({tables.length})
+                    </button>
+                    {[...new Set(tables.map(tb => tb.section).filter(Boolean))].map(section => (
+                      <button
+                        key={section}
+                        onClick={() => { playClick(); setSelectedTableSection(section); }}
+                        className={`px-3 py-1 text-xs rounded-full transition-all ${
+                          selectedTableSection === section 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                        }`}
+                      >
+                        {t(section)} ({tables.filter(tb => tb.section === section).length})
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground mb-2">{t('اختر طاولة')}:</p>
+                  <div className="max-h-48 overflow-y-auto border border-border/50 rounded-lg p-2 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-muted/20">
+                    <div className="grid grid-cols-5 gap-2">
+                      {tables
+                        .filter(table => !selectedTableSection || table.section === selectedTableSection)
+                        .map(table => {
+                        const isOccupied = table.status === 'occupied';
+                        const isReserved = table.status === 'reserved';
+                        const isAvailable = table.status === 'available';
+                        const isSelected = selectedTable === table.id;
                     
                     return (
                       <button
