@@ -6217,6 +6217,8 @@ class SystemInvoiceSettings(BaseModel):
     system_website: Optional[str] = None  # موقع النظام
     footer_text: Optional[str] = None  # نص إضافي في التذييل
     show_system_branding: bool = True  # عرض شعار وبيانات النظام
+    promo_text: Optional[str] = "نظام إدارة متكامل للمطاعم والكافيهات"  # نص الدعاية
+    cta_text: Optional[str] = "للحصول على نسختك تواصل معنا"  # نص التحفيز للتواصل
 
 class TenantInvoiceSettings(BaseModel):
     """إعدادات الفاتورة للعميل (المطعم)"""
