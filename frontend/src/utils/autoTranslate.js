@@ -2925,6 +2925,26 @@ const translationMap = {
   'رمز QR للقائمة': { en: 'Menu QR Code', ku: 'کۆدی QR ی لیست' },
   'تنزيل QR Code': { en: 'Download QR Code', ku: 'داگرتنی کۆدی QR' },
   'تم تنزيل QR Code!': { en: 'QR Code downloaded!', ku: 'کۆدی QR داگیرا!' },
+
+  // ===== ترجمات صفحة التواصل =====
+  'للتواصل معنا لشراء نسخة امسح الكود': { en: 'Scan the code to contact us', ku: 'کۆدەکە بسکێنە بۆ پەیوەندی کردن' },
+  'اتصال': { en: 'Call', ku: 'پەیوەندی' },
+  'واتساب': { en: 'WhatsApp', ku: 'واتساپ' },
+  'إرسال بريد إلكتروني': { en: 'Send Email', ku: 'ناردنی ئیمەیل' },
+  'زيارة الموقع': { en: 'Visit Website', ku: 'سەردانی ماڵپەڕ' },
+  'استفسار عن نظام Maestro EGP': { en: 'Inquiry about Maestro EGP system', ku: 'پرسیار دەربارەی سیستەمی Maestro EGP' },
+  'جميع الحقوق محفوظة': { en: 'All Rights Reserved', ku: 'هەموو مافەکان پارێزراون' },
+  
+  // ===== ترجمات إعدادات الفاتورة =====
+  'شعار المطعم (يظهر أعلى الفاتورة)': { en: 'Restaurant Logo (appears at top of invoice)', ku: 'لۆگۆی چێشتخانە (لە سەرەوەی فاکتورە دەردەکەوێت)' },
+  'شعار النظام': { en: 'System Logo', ku: 'لۆگۆی سیستەم' },
+  'يظهر شعار النظام ومعلومات التواصل تلقائياً في أسفل الفاتورة مع QR Code': { en: 'System logo and contact info appear automatically at bottom of invoice with QR Code', ku: 'لۆگۆی سیستەم و زانیاری پەیوەندی بە شێوەی ئۆتۆماتیکی لە خوارەوەی فاکتورەدا دەردەکەوێت لەگەڵ کۆدی QR' },
+  'تم رفع الشعار بنجاح': { en: 'Logo uploaded successfully', ku: 'لۆگۆ بە سەرکەوتوویی بارکرا' },
+  'فشل في رفع الشعار': { en: 'Failed to upload logo', ku: 'بارکردنی لۆگۆ سەرکەوتوو نەبوو' },
+  'يفضل صورة مربعة بحجم 200×200 بكسل': { en: 'Square image 200×200 pixels preferred', ku: 'وێنەی چوارگۆشە بە قەبارەی 200×200 پیکسەڵ باشترە' },
+  'إزالة الشعار': { en: 'Remove Logo', ku: 'لابردنی لۆگۆ' },
+  'رسالة الشكر (تظهر في نهاية الفاتورة)': { en: 'Thank You Message (appears at end of invoice)', ku: 'پەیامی سوپاس (لە کۆتایی فاکتورەدا دەردەکەوێت)' },
+  'مثال: شكراً لزيارتكم ❤️': { en: 'Example: Thank you for visiting ❤️', ku: 'نموونە: سوپاس بۆ سەردانکردنتان ❤️' },
 };
 
 // الحصول على اللغة الحالية
