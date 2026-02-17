@@ -2968,6 +2968,9 @@ const translationMap = {
   'شركة التوصيل': { en: 'Delivery Company', ku: 'کۆمپانیای گەیاندن' },
   'أو اختر شركة التوصيل': { en: 'Or select delivery company', ku: 'یان کۆمپانیای گەیاندن هەڵبژێرە' },
   'شركة التوصيل ستستلم الطلب - لا حاجة للعنوان': { en: 'Delivery company will pick up - no address needed', ku: 'کۆمپانیای گەیاندن وەریدەگرێت - ناونیشان پێویست نییە' },
+  'اختر فرع أولاً': { en: 'Select a branch first', ku: 'سەرەتا لقێک هەڵبژێرە' },
+  'يجب اختيار فرع لعرض الطاولات المتاحة': { en: 'You must select a branch to view available tables', ku: 'دەبێت لقێک هەڵبژێریت بۆ بینینی مێزەکانی بەردەست' },
+  'داخل': { en: 'Dine-in', ku: 'ناوەوە' },
 };
 
 // الحصول على اللغة الحالية
