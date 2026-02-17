@@ -1261,7 +1261,16 @@ export default function POS() {
                   {drivers.filter(d => d.is_available).map(driver => (
                     <button
                       key={driver.id}
-                      onClick={() => { setSelectedDriver(driver.id); setDeliveryApp(''); playClick(); }}
+                      onClick={() => { 
+                        // إلغاء التحديد بالنقر مرة أخرى
+                        if (selectedDriver === driver.id) {
+                          setSelectedDriver('');
+                        } else {
+                          setSelectedDriver(driver.id); 
+                          setDeliveryApp('');
+                        }
+                        playClick(); 
+                      }}
                       className={`p-3 rounded-lg text-sm transition-all flex items-center gap-2 ${
                         selectedDriver === driver.id 
                           ? 'bg-green-500 text-white ring-2 ring-green-300' 
