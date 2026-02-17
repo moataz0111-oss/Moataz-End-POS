@@ -3170,7 +3170,7 @@ export default function Settings() {
                             />
                           </div>
                           <div>
-                            <Label className="text-foreground">{t('تكلفة التغليف (للسفري/التوصيل)')}</Label>
+                            <Label className="text-foreground text-xs">{t('تكلفة التغليف')}</Label>
                             <Input
                               type="number"
                               value={productForm.packaging_cost}
