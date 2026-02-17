@@ -474,6 +474,11 @@ export default function Reports() {
                 <Card className="border-border/50 bg-card">
                   <CardHeader>
                     <CardTitle className="text-lg text-foreground">{t('تقرير الأرباح والخسائر')}</CardTitle>
+                    {profitLossReport.period_days && (
+                      <p className="text-sm text-muted-foreground">
+                        {t('فترة التقرير')}: {profitLossReport.period_days} {t('يوم')}
+                      </p>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -526,13 +531,59 @@ export default function Reports() {
                         </p>
                       </div>
 
-                      {/* Operating Expenses */}
-                      <div className="p-4 bg-red-500/10 rounded-lg">
-                        <div className="flex justify-between items-center">
-                          <span className="text-red-600 font-medium">{t('المصاريف التشغيلية')}</span>
-                          <span className="text-lg font-bold text-red-600 tabular-nums">
-                            -{formatPrice(profitLossReport.operating_expenses?.total || 0)}
-                          </span>
+                      {/* التكاليف التشغيلية - القسم الجديد */}
+                      <div className="p-4 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                        <h3 className="text-purple-600 font-bold mb-3">{t('التكاليف التشغيلية')}</h3>
+                        
+                        {/* التكاليف الثابتة */}
+                        {profitLossReport.fixed_costs && (
+                          <div className="space-y-2 mb-3">
+                            <p className="text-sm font-medium text-muted-foreground">{t('التكاليف الثابتة')}:</p>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">{t('الإيجار')}</span>
+                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.rent?.period || 0)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">{t('الكهرباء')}</span>
+                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.electricity?.period || 0)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">{t('الماء')}</span>
+                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.water?.period || 0)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-muted-foreground">{t('المولدة')}</span>
+                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.generator?.period || 0)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* الرواتب */}
+                        {profitLossReport.salaries && (
+                          <div className="flex justify-between text-sm mb-2">
+                            <span className="text-muted-foreground">
+                              {t('الرواتب')} ({profitLossReport.salaries.employees_count} {t('موظف')})
+                            </span>
+                            <span className="text-red-600">-{formatPrice(profitLossReport.salaries.total_period || 0)}</span>
+                          </div>
+                        )}
+                        
+                        {/* المصاريف الأخرى */}
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-muted-foreground">{t('مصاريف أخرى')}</span>
+                          <span className="text-red-600">-{formatPrice(profitLossReport.operating_expenses?.total || 0)}</span>
+                        </div>
+                        
+                        {/* إجمالي التكاليف التشغيلية */}
+                        <div className="pt-2 border-t border-purple-500/20">
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-purple-600">{t('إجمالي التكاليف التشغيلية')}</span>
+                            <span className="text-lg font-bold text-red-600 tabular-nums">
+                              -{formatPrice(profitLossReport.total_operating_costs?.total || 0)}
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -563,11 +614,11 @@ export default function Reports() {
                 </Card>
                 <div className="flex justify-between items-center gap-2 mt-4">
                   <Button 
-                    onClick={() => navigate('/break-even')} 
+                    onClick={() => navigate('/cost-analysis')} 
                     className="bg-primary text-primary-foreground"
                   >
                     <Target className="h-4 w-4 ml-2" />
-                    {t('تقرير نقطة التعادل المفصل')}
+                    {t('تقرير تحليل التكاليف المفصل')}
                   </Button>
                   <Button variant="outline" onClick={() => window.print()}>
                     <FileText className="h-4 w-4 ml-2" />
