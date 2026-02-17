@@ -561,7 +561,14 @@ export default function Reports() {
                     </div>
                   </CardContent>
                 </Card>
-                <div className="flex justify-end gap-2 mt-4">
+                <div className="flex justify-between items-center gap-2 mt-4">
+                  <Button 
+                    onClick={() => navigate('/break-even')} 
+                    className="bg-primary text-primary-foreground"
+                  >
+                    <Target className="h-4 w-4 ml-2" />
+                    {t('تقرير نقطة التعادل المفصل')}
+                  </Button>
                   <Button variant="outline" onClick={() => window.print()}>
                     <FileText className="h-4 w-4 ml-2" />
                     {t('طباعة')}
