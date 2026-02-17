@@ -1047,17 +1047,18 @@ export default function POS() {
       {/* Cart Sidebar */}
       <div className="w-96 border-r border-border bg-card flex flex-col">
         {/* Order Type Tabs */}
-        <div className="p-4 border-b border-border">
-          <div className="grid grid-cols-3 gap-2">
+        <div className="p-3 border-b border-border">
+          <div className="flex gap-1">
             {[
-              { id: 'dine_in', label: t('داخل المطعم'), icon: UtensilsCrossed },
+              { id: 'dine_in', label: t('داخل'), icon: UtensilsCrossed },
               { id: 'takeaway', label: t('سفري'), icon: Package },
               { id: 'delivery', label: t('توصيل'), icon: Truck },
             ].map(type => (
               <Button
                 key={type.id}
-                variant={orderType === type.id ? 'default' : 'outline'}
-                className={`h-12 ${orderType === type.id ? 'bg-primary text-primary-foreground' : ''}`}
+                variant={orderType === type.id ? 'default' : 'ghost'}
+                size="sm"
+                className={`flex-1 h-9 text-xs ${orderType === type.id ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground'}`}
                 onClick={() => { 
                   setOrderType(type.id); 
                   playClick();
@@ -1066,7 +1067,7 @@ export default function POS() {
                 disabled={editingOrder && editingOrder.order_type !== type.id}
                 data-testid={`order-type-${type.id}`}
               >
-                <type.icon className="h-5 w-5 ml-2" />
+                <type.icon className="h-4 w-4 ml-1" />
                 {type.label}
               </Button>
             ))}
