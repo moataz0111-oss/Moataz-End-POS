@@ -12361,8 +12361,39 @@ async def get_dashboard_stats(
     week_ago = (now - timedelta(days=7)).strftime('%Y-%m-%d')
     month_ago = (now - timedelta(days=30)).strftime('%Y-%m-%d')
     
+    # جلب الفروع والتكاليف الثابتة
+    branches_query = {"tenant_id": tenant_id, "is_active": {"$ne": False}}
+    if branch_id:
+        branches_query["id"] = branch_id
+    elif user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        branches_query["id"] = user_branch_id
+    
+    branches = await db.branches.find(branches_query, {"_id": 0}).to_list(100)
+    
+    # حساب التكاليف الثابتة الشهرية
+    total_rent = sum(b.get("rent_cost", 0) for b in branches)
+    total_electricity = sum(b.get("electricity_cost", 0) for b in branches)
+    total_water = sum(b.get("water_cost", 0) for b in branches)
+    total_generator = sum(b.get("generator_cost", 0) for b in branches)
+    total_fixed_costs = total_rent + total_electricity + total_water + total_generator
+    daily_fixed_costs = total_fixed_costs / 30
+    
+    # حساب الرواتب
+    employees_query = {"tenant_id": tenant_id, "is_active": {"$ne": False}}
+    if branch_id:
+        employees_query["branch_id"] = branch_id
+    elif user_branch_id and user_role not in [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.MANAGER]:
+        employees_query["branch_id"] = user_branch_id
+    
+    employees = await db.employees.find(employees_query, {"_id": 0, "salary": 1}).to_list(1000)
+    total_salaries = sum(e.get("salary", 0) for e in employees)
+    daily_salaries = total_salaries / 30
+    
+    # الهدف اليومي من التكاليف التشغيلية
+    daily_operating_costs = daily_fixed_costs + daily_salaries
+    
     # استعلامات الفترات المختلفة
-    async def get_period_stats(start_date: Optional[str] = None):
+    async def get_period_stats(start_date: Optional[str] = None, days: int = 1):
         query = base_query.copy()
         if start_date:
             query["created_at"] = {"$gte": start_date}
@@ -12372,7 +12403,13 @@ async def get_dashboard_stats(
         total_sales = sum(o.get("total", 0) for o in orders)
         total_orders = len(orders)
         avg_order = total_sales / total_orders if total_orders > 0 else 0
-        total_profit = sum(o.get("profit", 0) for o in orders)
+        gross_profit = sum(o.get("profit", 0) for o in orders)  # الربح قبل التكاليف التشغيلية
+        
+        # حساب التكاليف التشغيلية للفترة
+        period_operating_costs = daily_operating_costs * days
+        
+        # صافي الربح الحقيقي = الربح الإجمالي - التكاليف التشغيلية
+        net_profit = gross_profit - period_operating_costs
         
         by_payment = {}
         for o in orders:
@@ -12383,16 +12420,18 @@ async def get_dashboard_stats(
             "total_sales": total_sales,
             "total_orders": total_orders,
             "average_order_value": avg_order,
-            "total_profit": total_profit,
+            "gross_profit": gross_profit,
+            "operating_costs": period_operating_costs,
+            "total_profit": net_profit,  # صافي الربح الحقيقي
             "by_payment_method": by_payment
         }
     
     # جلب جميع الإحصائيات بالتوازي
     today_stats, week_stats, month_stats, all_stats = await asyncio.gather(
-        get_period_stats(today),
-        get_period_stats(week_ago),
-        get_period_stats(month_ago),
-        get_period_stats(None)
+        get_period_stats(today, 1),
+        get_period_stats(week_ago, 7),
+        get_period_stats(month_ago, 30),
+        get_period_stats(None, 30)  # نفترض 30 يوم للإجمالي
     )
     
     # جلب آخر الطلبات
