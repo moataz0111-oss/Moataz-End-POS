@@ -432,7 +432,7 @@ export default function POS() {
       await fetchPendingOrders();
     } catch (error) {
       console.error('Failed to process refund:', error);
-      toast.error(error.response?.data?.detail || t('فشل في إرجاع الطلب'));
+      toast.error(getErrorMessage(error, t('فشل في إرجاع الطلب')));
     } finally {
       setRefundLoading(false);
     }
