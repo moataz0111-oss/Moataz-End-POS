@@ -1821,18 +1821,15 @@ export default function POS() {
                   {systemInvoiceSettings.system_name || 'Maestro EGP'}
                 </p>
                 
-                {/* QR Code يحتوي على جميع معلومات التواصل */}
+                {/* نص التواصل */}
+                <p className="text-[10px] text-gray-500 mt-1">
+                  {t('للتواصل معنا لشراء نسخة امسح الكود')}
+                </p>
+                
+                {/* QR Code يفتح صفحة التواصل */}
                 <div className="mt-2">
                   <QRCodeSVG 
-                    value={[
-                      systemInvoiceSettings.system_name || 'Maestro EGP',
-                      systemInvoiceSettings.promo_text || 'نظام إدارة متكامل للمطاعم والكافيهات',
-                      systemInvoiceSettings.cta_text || 'للحصول على نسختك تواصل معنا',
-                      systemInvoiceSettings.system_phone ? `📞 ${systemInvoiceSettings.system_phone}` : '',
-                      systemInvoiceSettings.system_phone2 ? `📞 ${systemInvoiceSettings.system_phone2}` : '',
-                      systemInvoiceSettings.system_email ? `✉️ ${systemInvoiceSettings.system_email}` : '',
-                      systemInvoiceSettings.system_website || ''
-                    ].filter(Boolean).join('\n')}
+                    value={`${window.location.origin}/contact`}
                     size={70}
                     level="L"
                     bgColor="#ffffff"
