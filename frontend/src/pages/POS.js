@@ -1307,20 +1307,20 @@ export default function POS() {
               <div>
                 <p className="text-sm text-muted-foreground mb-2">{t('أو اختر شركة التوصيل')}:</p>
                 <div className="grid grid-cols-3 gap-1">
-                  <button
-                    onClick={() => { setDeliveryApp(''); playClick(); }}
-                    className={`p-2 rounded-lg text-xs transition-all ${
-                      deliveryApp === '' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                    }`}
-                  >
-                    {t('بدون')}
-                  </button>
                   {deliveryApps.map(app => (
                     <button
                       key={app.id}
-                      onClick={() => { setDeliveryApp(app.id); setSelectedDriver(''); setDeliveryAddress(''); playClick(); }}
+                      onClick={() => { 
+                        // إلغاء التحديد بالنقر مرة أخرى
+                        if (deliveryApp === app.id) {
+                          setDeliveryApp('');
+                        } else {
+                          setDeliveryApp(app.id); 
+                          setSelectedDriver(''); 
+                          setDeliveryAddress('');
+                        }
+                        playClick(); 
+                      }}
                       className={`p-2 rounded-lg text-xs transition-all ${
                         deliveryApp === app.id 
                           ? 'bg-primary text-primary-foreground' 
