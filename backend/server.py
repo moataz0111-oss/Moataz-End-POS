@@ -6272,18 +6272,31 @@ async def get_tenant_invoice_settings(current_user: dict = Depends(get_current_u
     
     default_settings = {
         "show_logo": True,
+        "invoice_logo": None,
         "phone": None,
         "phone2": None,
         "address": None,
         "tax_number": None,
+        "show_tax": True,
         "custom_header": None,
-        "custom_footer": None
+        "custom_footer": None,
+        "thank_you_message": "شكراً لزيارتكم ❤️"
     }
     
     if tenant_id:
         settings = await db.tenant_invoice_settings.find_one({"tenant_id": tenant_id}, {"_id": 0})
         if settings:
+            # جلب شعار المطعم من tenant إذا لم يكن هناك شعار مخصص للفاتورة
+            if not settings.get("invoice_logo"):
+                tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0, "logo_url": 1, "logo": 1})
+                if tenant:
+                    settings["invoice_logo"] = tenant.get("logo_url") or tenant.get("logo")
             return {**default_settings, **settings}
+        else:
+            # إذا لم يكن هناك إعدادات، نحاول جلب شعار المطعم من tenant
+            tenant = await db.tenants.find_one({"id": tenant_id}, {"_id": 0, "logo_url": 1, "logo": 1})
+            if tenant and (tenant.get("logo_url") or tenant.get("logo")):
+                default_settings["invoice_logo"] = tenant.get("logo_url") or tenant.get("logo")
     
     return default_settings
 
