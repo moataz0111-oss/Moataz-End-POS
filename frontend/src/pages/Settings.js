@@ -3276,7 +3276,12 @@ export default function Settings() {
                         
                         {productForm.price && productForm.cost && (
                           <div className="p-3 bg-green-500/10 rounded-lg">
-                            <p className="text-sm text-green-600">{t('الربح المتوقع: {formatPrice((parseFloat(productForm.price) || 0) - (parseFloat(productForm.cost) || 0) - (parseFloat(productForm.operating_cost) || 0))} لكل وحدة')}</p>
+                            <p className="text-sm text-green-600">
+                              {t('ربح المواد الخام')}: {formatPrice((parseFloat(productForm.price) || 0) - (parseFloat(productForm.cost) || 0))} {t('لكل وحدة')}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {t('التكاليف التشغيلية تُحسب تلقائياً من إعدادات الفرع')}
+                            </p>
                           </div>
                         )}
                         <div className="flex gap-2 pt-4">
