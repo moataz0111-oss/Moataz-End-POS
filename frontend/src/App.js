@@ -385,6 +385,15 @@ function AppRoutes() {
       />
       {/* تقرير نقطة التعادل */}
       <Route 
+        path="/cost-analysis" 
+        element={
+          <ProtectedRoute>
+            <BreakEvenReport />
+          </ProtectedRoute>
+        } 
+      />
+      {/* للتوافق مع الروابط القديمة */}
+      <Route 
         path="/break-even" 
         element={
           <ProtectedRoute>
