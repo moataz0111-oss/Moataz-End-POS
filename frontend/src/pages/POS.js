@@ -1785,60 +1785,52 @@ export default function POS() {
               </div>
             )}
             
-            {/* ========== أسفل الفاتورة - معلومات النظام والتواصل ========== */}
+            {/* ========== أسفل الفاتورة - شعار النظام وQR Code ========== */}
             <div className="text-center mt-4 pt-3 border-t-2 border-gray-400">
               {/* رسالة الشكر من المطعم */}
-              <p className="text-xs font-bold mb-2">
-                {systemInvoiceSettings.thank_you_message || 'شكراً لزيارتكم ❤️'}
+              <p className="text-xs font-bold mb-3">
+                {invoiceSettings.thank_you_message || 'شكراً لزيارتكم ❤️'}
               </p>
               
               {/* خط فاصل */}
               <div className="border-t border-dashed border-gray-300 my-2"></div>
               
-              {/* معلومات النظام للتسويق */}
-              <div className="bg-gray-100 rounded p-2 mt-2">
+              {/* قسم النظام - شعار + اسم + QR */}
+              <div className="flex flex-col items-center mt-2">
+                {/* شعار النظام */}
+                {systemInvoiceSettings.system_logo_url && (
+                  <img 
+                    src={(() => {
+                      const logoUrl = systemInvoiceSettings.system_logo_url;
+                      if (logoUrl?.startsWith('/api')) {
+                        return `${API}${logoUrl.replace('/api', '')}`;
+                      }
+                      if (logoUrl?.startsWith('/uploads')) {
+                        return `${API}${logoUrl}`;
+                      }
+                      return logoUrl;
+                    })()}
+                    alt="شعار النظام" 
+                    className="h-10 w-10 object-contain rounded-full mb-1"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                )}
+                
                 {/* اسم النظام */}
-                <p className="text-sm font-bold text-gray-800">
+                <p className="text-xs font-bold text-gray-700">
                   {systemInvoiceSettings.system_name || 'Maestro EGP'}
                 </p>
                 
-                {/* نص الدعاية */}
-                <p className="text-xs text-gray-600 mt-1">
-                  {systemInvoiceSettings.promo_text || 'نظام إدارة متكامل للمطاعم والكافيهات'}
-                </p>
-                
-                {/* نص التواصل للشراء */}
-                <p className="text-xs text-blue-600 font-bold mt-1">
-                  📲 {systemInvoiceSettings.cta_text || 'للحصول على نسختك تواصل معنا'}
-                </p>
-                
-                {/* أرقام التواصل */}
-                {(systemInvoiceSettings.system_phone || systemInvoiceSettings.system_phone2) && (
-                  <div className="text-xs mt-1 font-bold">
-                    {systemInvoiceSettings.system_phone && <span>📞 {systemInvoiceSettings.system_phone}</span>}
-                    {systemInvoiceSettings.system_phone && systemInvoiceSettings.system_phone2 && <span> - </span>}
-                    {systemInvoiceSettings.system_phone2 && <span>{systemInvoiceSettings.system_phone2}</span>}
-                  </div>
-                )}
-                
-                {/* البريد والموقع */}
-                {systemInvoiceSettings.system_email && (
-                  <p className="text-xs">✉️ {systemInvoiceSettings.system_email}</p>
-                )}
-                {systemInvoiceSettings.system_website && (
-                  <p className="text-xs">🌐 {systemInvoiceSettings.system_website}</p>
-                )}
-                
-                {/* QR Code بمعلومات التواصل للشراء */}
-                <div className="mt-2 flex flex-col items-center">
-                  <p className="text-[10px] text-gray-500 mb-1">امسح الكود للتواصل</p>
+                {/* QR Code يحتوي على جميع معلومات التواصل */}
+                <div className="mt-2">
                   <QRCodeSVG 
                     value={[
                       systemInvoiceSettings.system_name || 'Maestro EGP',
-                      systemInvoiceSettings.promo_text || 'نظام إدارة متكامل للمطاعم',
-                      systemInvoiceSettings.system_phone ? `Tel: ${systemInvoiceSettings.system_phone}` : '',
-                      systemInvoiceSettings.system_phone2 ? `Tel2: ${systemInvoiceSettings.system_phone2}` : '',
-                      systemInvoiceSettings.system_email ? `Email: ${systemInvoiceSettings.system_email}` : '',
+                      systemInvoiceSettings.promo_text || 'نظام إدارة متكامل للمطاعم والكافيهات',
+                      systemInvoiceSettings.cta_text || 'للحصول على نسختك تواصل معنا',
+                      systemInvoiceSettings.system_phone ? `📞 ${systemInvoiceSettings.system_phone}` : '',
+                      systemInvoiceSettings.system_phone2 ? `📞 ${systemInvoiceSettings.system_phone2}` : '',
+                      systemInvoiceSettings.system_email ? `✉️ ${systemInvoiceSettings.system_email}` : '',
                       systemInvoiceSettings.system_website || ''
                     ].filter(Boolean).join('\n')}
                     size={70}
@@ -1848,11 +1840,6 @@ export default function POS() {
                   />
                 </div>
               </div>
-              
-              {/* نص إضافي من المالك */}
-              {systemInvoiceSettings.footer_text && (
-                <p className="text-[10px] text-gray-400 mt-2">{systemInvoiceSettings.footer_text}</p>
-              )}
             </div>
           </div>
           
