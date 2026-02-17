@@ -107,6 +107,7 @@ export default function POS() {
   const [buzzerNumber, setBuzzerNumber] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [discount, setDiscount] = useState(0);
+  const [discountType, setDiscountType] = useState('fixed'); // fixed or percentage
   const [deliveryApp, setDeliveryApp] = useState('');
   const [deliveryApps, setDeliveryApps] = useState([]);
   const [drivers, setDrivers] = useState([]);
