@@ -1279,7 +1279,7 @@ export default function POS() {
               
               {/* شركة التوصيل */}
               <div>
-                <p className="text-sm text-muted-foreground mb-2">{t('شركة التوصيل')}:</p>
+                <p className="text-sm text-muted-foreground mb-2">{t('أو اختر شركة التوصيل')}:</p>
                 <div className="grid grid-cols-3 gap-1">
                   <button
                     onClick={() => { setDeliveryApp(''); playClick(); }}
@@ -1294,7 +1294,7 @@ export default function POS() {
                   {deliveryApps.map(app => (
                     <button
                       key={app.id}
-                      onClick={() => { setDeliveryApp(app.id); playClick(); }}
+                      onClick={() => { setDeliveryApp(app.id); setSelectedDriver(''); setDeliveryAddress(''); playClick(); }}
                       className={`p-2 rounded-lg text-xs transition-all ${
                         deliveryApp === app.id 
                           ? 'bg-primary text-primary-foreground' 
@@ -1305,6 +1305,11 @@ export default function POS() {
                     </button>
                   ))}
                 </div>
+                {deliveryApp && (
+                  <p className="text-xs text-blue-500 mt-1">
+                    ℹ️ {t('شركة التوصيل ستستلم الطلب - لا حاجة للعنوان')}
+                  </p>
+                )}
               </div>
             </div>
           )}
