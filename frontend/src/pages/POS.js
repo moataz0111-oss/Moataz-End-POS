@@ -69,6 +69,22 @@ import {
 
 const API = API_URL;
 
+// دالة لاستخراج رسالة الخطأ من استجابة API
+const getErrorMessage = (error, defaultMsg) => {
+  const detail = error?.response?.data?.detail;
+  if (!detail) return defaultMsg;
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    // استخراج أول رسالة خطأ من مصفوفة أخطاء Pydantic
+    const firstError = detail[0];
+    if (firstError?.msg) return firstError.msg;
+    if (typeof firstError === 'string') return firstError;
+    return defaultMsg;
+  }
+  if (detail?.msg) return detail.msg;
+  return defaultMsg;
+};
+
 export default function POS() {
   const { user } = useAuth();
   const { selectedBranchId, branches, getBranchIdForApi } = useBranch();
