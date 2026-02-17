@@ -3035,6 +3035,13 @@ const translationMap = {
   'تقدم جيد': { en: 'Good progress', ku: 'پێشکەوتنی باش' },
   'تغطية منخفضة': { en: 'Low coverage', ku: 'داپۆشینی کەم' },
   'عرض التفاصيل': { en: 'View Details', ku: 'بینینی وردەکاری' },
+  
+  // ===== ترجمات المنتجات =====
+  'ربح المواد الخام': { en: 'Raw Material Profit', ku: 'قازانجی کەرەستەی خاو' },
+  'ربح المواد': { en: 'Material Profit', ku: 'قازانجی کەرەستە' },
+  'لكل وحدة': { en: 'per unit', ku: 'بۆ هەر یەکە' },
+  'التكاليف التشغيلية تُحسب تلقائياً من إعدادات الفرع': { en: 'Operating costs are calculated automatically from branch settings', ku: 'خەرجی کارپێکردن بە ئۆتۆماتیکی لە ڕێکخستنی لق دادەنرێت' },
+  'تكلفة التغليف': { en: 'Packaging Cost', ku: 'خەرجی پاکەتکردن' },
 };
 
 // الحصول على اللغة الحالية
