@@ -61,7 +61,10 @@ import {
   Link,
   QrCode,
   Smartphone,
-  ClipboardList
+  ClipboardList,
+  Target,
+  AlertTriangle,
+  Bell
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { toast } from 'sonner';
