@@ -829,7 +829,6 @@ export default function POS() {
         driver_id: orderType === 'delivery' && selectedDriver ? selectedDriver : null,
         delivery_app: orderType === 'delivery' && deliveryApp ? deliveryApp : null,
         discount: discount || 0,
-        discount_type: discountType || 'fixed',
         branch_id: currentBranchId,
         status: 'completed',
         payment_status: 'paid',
