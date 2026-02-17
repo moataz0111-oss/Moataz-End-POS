@@ -225,12 +225,17 @@ export default function Dashboard() {
       
       const res = await axios.get(`${API}/notifications/delayed-orders`, { params });
       
-      if (res.data.stats.total_delayed > 0) {
-        setDelayedOrders(res.data.delayed_orders);
-        setDelayedStats(res.data.stats);
+      // Handle both array response and object response with stats
+      const data = res.data;
+      const stats = data?.stats;
+      const delayedOrdersList = data?.delayed_orders || (Array.isArray(data) ? data : []);
+      
+      if (stats?.total_delayed > 0) {
+        setDelayedOrders(delayedOrdersList);
+        setDelayedStats(stats);
         
         // إظهار تنبيه إذا كان هناك طلبات حرجة أو عالية
-        if (res.data.stats.critical_count > 0 || res.data.stats.high_count > 0) {
+        if (stats.critical_count > 0 || stats.high_count > 0) {
           setShowDelayedAlert(true);
           playDelayedSound();
         }
