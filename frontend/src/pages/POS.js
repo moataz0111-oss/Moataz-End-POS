@@ -781,13 +781,85 @@ export default function POS() {
   const pendingDeliveryOrders = pendingOrders.filter(o => o.order_type === 'delivery');
   const pendingDineInOrders = pendingOrders.filter(o => o.order_type === 'dine_in');
 
-  // طباعة الفاتورة (معاينة)
-  const handlePrintBill = () => {
+  // طباعة الفاتورة (حفظ تلقائي + معاينة)
+  const handlePrintBill = async () => {
     if (cart.length === 0) {
       toast.error(t('السلة فارغة'));
       return;
     }
-    setPrintDialogOpen(true);
+    
+    // إذا كان هناك طلب قيد التعديل، افتح المعاينة مباشرة
+    if (editingOrder) {
+      setPrintDialogOpen(true);
+      return;
+    }
+    
+    // التحقق من الشروط حسب نوع الطلب
+    if (orderType === 'dine_in' && !selectedTable) {
+      toast.error(t('يرجى اختيار طاولة'));
+      return;
+    }
+    
+    if (orderType === 'delivery' && selectedDriver && !deliveryAddress) {
+      toast.error(t('يرجى إدخال عنوان التوصيل'));
+      return;
+    }
+    
+    // حفظ الطلب تلقائياً قبل الطباعة
+    setSubmitting(true);
+    try {
+      const currentBranchId = getBranchIdForApi() || user?.branch_id;
+      
+      const orderData = {
+        items: cart.map(item => ({
+          product_id: item.product_id || item.id,
+          quantity: item.quantity,
+          notes: item.notes || '',
+          addons: item.addons || []
+        })),
+        order_type: orderType,
+        table_id: orderType === 'dine_in' ? selectedTable : null,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        delivery_address: deliveryAddress,
+        buzzer_number: buzzerNumber,
+        driver_id: orderType === 'delivery' ? selectedDriver : null,
+        delivery_app: orderType === 'delivery' ? deliveryApp : null,
+        discount: discount,
+        discount_type: discountType,
+        branch_id: currentBranchId,
+        status: 'completed',
+        payment_status: 'paid',
+        auto_ready: true
+      };
+      
+      const res = await axios.post(`${API}/orders`, orderData);
+      const savedOrder = res.data;
+      
+      // تحديث رقم الطلب الأخير
+      setLastOrderNumber(savedOrder.order_number);
+      
+      // تحديث حالة الطاولة إذا كان طلب داخلي
+      if (orderType === 'dine_in' && selectedTable) {
+        try {
+          await axios.put(`${API}/tables/${selectedTable}/status?status=available`);
+        } catch (err) {
+          console.error('Failed to update table status:', err);
+        }
+      }
+      
+      playSuccess();
+      toast.success(`✅ ${t('تم حفظ الطلب')} #${savedOrder.order_number}`);
+      
+      // فتح نافذة الطباعة
+      setPrintDialogOpen(true);
+      
+    } catch (error) {
+      console.error('Failed to save order:', error);
+      toast.error(getErrorMessage(error, t('فشل في حفظ الطلب')));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // إلغاء تعديل الطلب
