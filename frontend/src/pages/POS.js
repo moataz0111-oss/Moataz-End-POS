@@ -2014,7 +2014,14 @@ export default function POS() {
           </div>
           
           <div className="flex gap-2 no-print">
-            <Button variant="outline" onClick={() => setPrintDialogOpen(false)} className="flex-1">
+            <Button variant="outline" onClick={() => {
+              setPrintDialogOpen(false);
+              // إذا تم حفظ الطلب، نظف السلة
+              if (lastOrderNumber && !editingOrder) {
+                clearCart();
+                setLastOrderNumber(null);
+              }
+            }} className="flex-1">
               {t('إغلاق')}
             </Button>
             <Button 
@@ -2026,10 +2033,10 @@ export default function POS() {
                   const printWindow = window.open('', '_blank', 'width=400,height=600');
                   printWindow.document.write(`
                     <!DOCTYPE html>
-                    <html dir="rtl" lang="ar">
+                    <html dir="${isRTL ? 'rtl' : 'ltr'}" lang="${isRTL ? 'ar' : 'en'}">
                     <head>
                       <meta charset="UTF-8">
-                      <title>طباعة الفاتورة</title>
+                      <title>${t('طباعة الفاتورة')}</title>
                       <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body { 
