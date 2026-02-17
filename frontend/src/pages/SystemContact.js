@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../utils/api';
 import { useTranslation } from '../hooks/useTranslation';
+import { useLanguage } from '../context/LanguageContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
-import { Phone, Mail, MessageCircle, Globe, ExternalLink } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Globe, ExternalLink, Languages } from 'lucide-react';
 import axios from 'axios';
 
 const API = API_URL;
 
 export default function SystemContact() {
   const { t, isRTL } = useTranslation();
+  const { language, setLanguage } = useLanguage();
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -25,6 +27,23 @@ export default function SystemContact() {
       console.error('Failed to fetch settings:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // تبديل اللغة
+  const toggleLanguage = () => {
+    const languages = ['ar', 'en', 'ku'];
+    const currentIndex = languages.indexOf(language);
+    const nextIndex = (currentIndex + 1) % languages.length;
+    setLanguage(languages[nextIndex]);
+  };
+
+  const getLanguageName = () => {
+    switch(language) {
+      case 'ar': return 'العربية';
+      case 'en': return 'English';
+      case 'ku': return 'کوردی';
+      default: return 'العربية';
     }
   };
 
