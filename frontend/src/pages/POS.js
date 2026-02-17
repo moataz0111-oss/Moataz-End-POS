@@ -1208,6 +1208,8 @@ export default function POS() {
                   ✓ {t('تم اختيار طاولة')} {tables.find(tb => tb.id === selectedTable)?.number} ({tables.find(tb => tb.id === selectedTable)?.section || t('عام')})
                 </p>
               )}
+                </>
+              )}
             </div>
           )}
 
