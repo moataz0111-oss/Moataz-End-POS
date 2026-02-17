@@ -1236,12 +1236,6 @@ export default function POS() {
                 onChange={(e) => setCustomerPhone(e.target.value)}
                 data-testid="delivery-phone"
               />
-              <Input
-                placeholder={t('عنوان التوصيل')}
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-                data-testid="delivery-address"
-              />
               
               {/* اختيار السائق أولاً */}
               <div>
@@ -1250,7 +1244,7 @@ export default function POS() {
                   {drivers.filter(d => d.is_available).map(driver => (
                     <button
                       key={driver.id}
-                      onClick={() => { setSelectedDriver(driver.id); playClick(); }}
+                      onClick={() => { setSelectedDriver(driver.id); setDeliveryApp(''); playClick(); }}
                       className={`p-3 rounded-lg text-sm transition-all flex items-center gap-2 ${
                         selectedDriver === driver.id 
                           ? 'bg-green-500 text-white ring-2 ring-green-300' 
@@ -1271,6 +1265,17 @@ export default function POS() {
                   </p>
                 )}
               </div>
+              
+              {/* حقل العنوان - يظهر فقط إذا تم اختيار سائق */}
+              {selectedDriver && (
+                <Input
+                  placeholder={t('عنوان التوصيل')}
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  data-testid="delivery-address"
+                  className="border-green-300 focus:border-green-500"
+                />
+              )}
               
               {/* شركة التوصيل */}
               <div>
