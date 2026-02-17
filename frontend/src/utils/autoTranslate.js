@@ -2934,6 +2934,8 @@ const translationMap = {
   'زيارة الموقع': { en: 'Visit Website', ku: 'سەردانی ماڵپەڕ' },
   'استفسار عن نظام Maestro EGP': { en: 'Inquiry about Maestro EGP system', ku: 'پرسیار دەربارەی سیستەمی Maestro EGP' },
   'جميع الحقوق محفوظة': { en: 'All Rights Reserved', ku: 'هەموو مافەکان پارێزراون' },
+  'نظام إدارة متكامل للمطاعم والكافيهات': { en: 'Integrated Restaurant & Cafe Management System', ku: 'سیستەمی بەڕێوەبردنی چێشتخانە و کافە' },
+  'للحصول على نسختك تواصل معنا': { en: 'Contact us to get your copy', ku: 'پەیوەندیمان پێوە بکە بۆ وەرگرتنی کۆپییەکەت' },
   
   // ===== ترجمات إعدادات الفاتورة =====
   'شعار المطعم (يظهر أعلى الفاتورة)': { en: 'Restaurant Logo (appears at top of invoice)', ku: 'لۆگۆی چێشتخانە (لە سەرەوەی فاکتورە دەردەکەوێت)' },
@@ -2945,6 +2947,20 @@ const translationMap = {
   'إزالة الشعار': { en: 'Remove Logo', ku: 'لابردنی لۆگۆ' },
   'رسالة الشكر (تظهر في نهاية الفاتورة)': { en: 'Thank You Message (appears at end of invoice)', ku: 'پەیامی سوپاس (لە کۆتایی فاکتورەدا دەردەکەوێت)' },
   'مثال: شكراً لزيارتكم ❤️': { en: 'Example: Thank you for visiting ❤️', ku: 'نموونە: سوپاس بۆ سەردانکردنتان ❤️' },
+  
+  // ===== ترجمات الفاتورة =====
+  'شكراً لزيارتكم': { en: 'Thank you for visiting', ku: 'سوپاس بۆ سەردانکردنتان' },
+  'اسم المطعم': { en: 'Restaurant Name', ku: 'ناوی چێشتخانە' },
+  'الرقم الضريبي': { en: 'Tax Number', ku: 'ژمارەی باج' },
+  'فاتورة رقم': { en: 'Invoice No', ku: 'ژمارەی فاکتورە' },
+  'طلب سفري': { en: 'Takeaway', ku: 'بردنەوە' },
+  'طلب توصيل': { en: 'Delivery', ku: 'گەیاندن' },
+  'الفرع الرئيسي': { en: 'Main Branch', ku: 'لقی سەرەکی' },
+  'المجموع الفرعي': { en: 'Subtotal', ku: 'کۆی فەرعی' },
+  'الإجمالي النهائي': { en: 'Grand Total', ku: 'کۆی گشتی' },
+  'مدير': { en: 'Manager', ku: 'بەڕێوەبەر' },
+  'كاشير': { en: 'Cashier', ku: 'کاشیێر' },
+  'نادل': { en: 'Waiter', ku: 'گارسۆن' },
 };
 
 // الحصول على اللغة الحالية
