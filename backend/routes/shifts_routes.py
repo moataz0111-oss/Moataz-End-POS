@@ -288,13 +288,13 @@ async def get_cash_register_summary(current_user: dict = Depends(get_current_use
             "tenant_id": tenant_id,
             "status": "closed"
         },
-        {"_id": 0, "closed_at": 1},
-        sort=[("closed_at", -1)]
+        {"_id": 0, "ended_at": 1},
+        sort=[("ended_at", -1)]
     )
     
     # تحديد نقطة البداية للحساب
-    if last_closed_shift and last_closed_shift.get("closed_at"):
-        start_from = last_closed_shift["closed_at"]
+    if last_closed_shift and last_closed_shift.get("ended_at"):
+        start_from = last_closed_shift["ended_at"]
     else:
         # إذا لم تكن هناك وردية مغلقة، نبدأ من بداية اليوم
         start_from = today_start
