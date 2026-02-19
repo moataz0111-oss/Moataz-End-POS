@@ -64,9 +64,12 @@
 ## الملفات المُعدّلة في هذه الجلسة
 - `/app/frontend/src/pages/Settings.js` - إزالة حقل التكلفة التشغيلية
 - `/app/backend/server.py` - API تنبيهات نقطة التعادل
-- `/app/frontend/src/pages/Dashboard.js` - قسم التنبيهات
+- `/app/frontend/src/pages/Dashboard.js` - قسم التنبيهات + اسم الفرع في إغلاق الصندوق
 - `/app/frontend/src/pages/POS.js` - شعار الفاتورة دائري
 - `/app/frontend/src/utils/autoTranslate.js` - ترجمات جديدة
+- `/app/frontend/src/pages/Reports.js` - زر التقرير الشامل + أزرار الطباعة
+- `/app/frontend/src/utils/printReport.js` - (جديد) نظام الطباعة الورقية
+- `/app/backend/routes/shifts_routes.py` - دعم branch_id + إصلاح منطق الحساب
 
 ## إصلاح منطق إغلاق الصندوق ✅ (19 فبراير 2026)
 ### المشكلة
