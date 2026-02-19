@@ -641,9 +641,11 @@ export default function Dashboard() {
     setIsClosing(true);
     
     try {
+      const branchId = getBranchIdForApi();
       const res = await axios.post(`${API}/cash-register/close`, {
         denominations,
-        notes: closeNotes
+        notes: closeNotes,
+        branch_id: branchId
       });
       
       setClosingResult(res.data);
