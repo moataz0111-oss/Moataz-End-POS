@@ -402,6 +402,15 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* خزينة المالك */}
+      <Route 
+        path="/owner-wallet" 
+        element={
+          <ProtectedRoute>
+            <OwnerWallet />
+          </ProtectedRoute>
+        } 
+      />
       {/* صفحة Super Admin - لوحة تحكم المالك */}
       <Route path="/super-admin" element={<SuperAdmin />} />
       {/* صفحة إدارة النظام */}
