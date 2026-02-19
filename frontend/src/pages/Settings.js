@@ -2579,6 +2579,49 @@ export default function Settings() {
                         </div>
                       </div>
                       
+                      {/* صلاحيات الميزات الخاصة */}
+                      <div className="p-4 border rounded-lg bg-purple-500/10 border-purple-500/30">
+                        <Label className="text-foreground font-bold mb-3 flex items-center gap-2">
+                          <Shield className="h-5 w-5 text-purple-500" />
+                          {t('التحكم بالميزات الخاصة')}
+                        </Label>
+                        <p className="text-xs text-muted-foreground mb-4">{t('الوصول إلى الميزات الخاصة بالمالك')}</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          {/* خزينة المالك */}
+                          <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <Wallet className="h-4 w-4 text-amber-500" />
+                              <span className="text-sm text-foreground">{t('خزينة المالك')}</span>
+                            </div>
+                            <Switch
+                              checked={editUserForm.permissions?.includes('owner_wallet')}
+                              onCheckedChange={(checked) => {
+                                const newPerms = checked 
+                                  ? [...(editUserForm.permissions || []), 'owner_wallet']
+                                  : (editUserForm.permissions || []).filter(p => p !== 'owner_wallet');
+                                setEditUserForm({ ...editUserForm, permissions: newPerms });
+                              }}
+                            />
+                          </div>
+                          {/* الفروع الخارجية */}
+                          <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                            <div className="flex items-center gap-2">
+                              <Store className="h-4 w-4 text-blue-500" />
+                              <span className="text-sm text-foreground">{t('الفروع الخارجية')}</span>
+                            </div>
+                            <Switch
+                              checked={editUserForm.permissions?.includes('external_branches')}
+                              onCheckedChange={(checked) => {
+                                const newPerms = checked 
+                                  ? [...(editUserForm.permissions || []), 'external_branches']
+                                  : (editUserForm.permissions || []).filter(p => p !== 'external_branches');
+                                setEditUserForm({ ...editUserForm, permissions: newPerms });
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      
                       <div className="flex gap-2 pt-4">
                         <Button type="button" variant="outline" onClick={() => setEditUserDialogOpen(false)} className="flex-1">{t('إلغاء')}</Button>
                         <Button type="submit" className="flex-1 bg-primary text-primary-foreground">{t('حفظ التعديلات')}</Button>
