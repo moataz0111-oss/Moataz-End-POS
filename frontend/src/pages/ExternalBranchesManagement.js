@@ -274,7 +274,7 @@ export default function ExternalBranchesManagement() {
               <CardContent className="p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm opacity-90">{t('عوائد النسبة الشهرية')}</p>
+                    <p className="text-sm opacity-90">{t('عوائد النسبة')}</p>
                     <p className="text-2xl font-bold mt-1">{formatPrice(dashboardStats.monthly_revenue)}</p>
                     <p className="text-xs mt-1 opacity-80">{dashboardStats.current_month}</p>
                   </div>

@@ -323,13 +323,15 @@ export default function Dashboard() {
   // فتح الوردية تلقائياً عند الدخول
   const autoOpenShift = async () => {
     try {
-      // التحقق من وجود وردية مفتوحة
-      const checkRes = await axios.get(`${API}/shifts/current`);
+      // التحقق من وجود وردية مفتوحة للفرع المحدد
+      const branchId = getBranchIdForApi();
+      const params = branchId ? { branch_id: branchId } : {};
+      const checkRes = await axios.get(`${API}/shifts/current`, { params });
       if (!checkRes.data || checkRes.data.message === 'لا توجد وردية مفتوحة') {
         // فتح وردية جديدة
         await axios.post(`${API}/shifts/open`, {
           opening_cash: 0,
-          branch_id: getBranchIdForApi()
+          branch_id: branchId
         });
         console.log('تم فتح الوردية تلقائياً');
       }
@@ -337,9 +339,10 @@ export default function Dashboard() {
       // إذا لم تكن هناك وردية، نفتح واحدة جديدة
       if (error.response?.status === 404) {
         try {
+          const branchId = getBranchIdForApi();
           await axios.post(`${API}/shifts/open`, {
             opening_cash: 0,
-            branch_id: getBranchIdForApi()
+            branch_id: branchId
           });
           console.log('تم فتح الوردية تلقائياً');
         } catch (openError) {
