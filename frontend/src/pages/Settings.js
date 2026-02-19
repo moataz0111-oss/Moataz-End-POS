@@ -2008,6 +2008,34 @@ export default function Settings() {
                         onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showSettings: checked})}
                       />
                     </div>
+                    
+                    {/* خزينة المالك */}
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-amber-500/10 rounded-lg flex items-center justify-center">
+                          <Wallet className="h-4 w-4 text-amber-500" />
+                        </div>
+                        <span className="text-sm font-medium text-foreground">{t('خزينة المالك')}</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showOwnerWallet !== false}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showOwnerWallet: checked})}
+                      />
+                    </div>
+                    
+                    {/* الفروع الخارجية */}
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                          <Store className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <span className="text-sm font-medium text-foreground">{t('الفروع الخارجية')}</span>
+                      </div>
+                      <Switch
+                        checked={dashboardSettings.showExternalBranches !== false}
+                        onCheckedChange={(checked) => setDashboardSettings({...dashboardSettings, showExternalBranches: checked})}
+                      />
+                    </div>
                   </div>
                   
                   <Button 
