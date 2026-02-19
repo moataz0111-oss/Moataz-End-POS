@@ -1432,14 +1432,6 @@ export default function Settings() {
                   {t('المطعم')}
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'super_admin', 'manager', 'branch_manager']) && (
-                <TabsTrigger 
-                  value="dashboard"
-                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  {t('الرئيسية')}
-                </TabsTrigger>
-              )}
               {/* super_admin يدير المستخدمين من لوحة تحكم المالك فقط */}
               {hasRole(['admin', 'super_admin']) && (
                 <TabsTrigger 
