@@ -111,6 +111,13 @@ async def create_deposit(
     db = get_database()
     tenant_id = get_user_tenant_id(current_user)
     
+    # جلب اسم الفرع إذا كان معرف الفرع موجوداً
+    branch_name = deposit.branch_name
+    if deposit.branch_id and not branch_name:
+        branch = await db.branches.find_one({"id": deposit.branch_id}, {"_id": 0, "name": 1})
+        if branch:
+            branch_name = branch.get("name")
+    
     new_deposit = {
         "id": str(uuid.uuid4()),
         "tenant_id": tenant_id,
@@ -118,6 +125,8 @@ async def create_deposit(
         "date": deposit.date,
         "description": deposit.description,
         "source": deposit.source,
+        "branch_id": deposit.branch_id,
+        "branch_name": branch_name,
         "created_by": current_user.get("username") or current_user.get("full_name"),
         "created_at": datetime.now(timezone.utc).isoformat()
     }
