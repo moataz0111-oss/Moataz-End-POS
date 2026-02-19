@@ -50,6 +50,228 @@ import { printComprehensiveReport, printSalesReport, printProfitLossReport } fro
 
 const API = API_URL;
 
+// مكون التقرير الشامل
+const ComprehensiveReportTab = ({ 
+  salesReport, 
+  purchasesReport,
+  expensesReport, 
+  profitLossReport, 
+  productsReport,
+  deliveryCreditsReport,
+  cancellationsReport,
+  discountsReport,
+  creditReport,
+  refundsReport,
+  branchName,
+  dateRange,
+  t,
+  formatPrice,
+  loading,
+  fetchAllReports
+}) => {
+  const handlePrint = () => {
+    printComprehensiveReport(
+      {
+        salesReport,
+        purchasesReport,
+        productsReport,
+        expensesReport,
+        profitLossReport,
+        deliveryCreditsReport,
+        cancellationsReport,
+        discountsReport,
+        creditReport,
+        refundsReport
+      },
+      branchName,
+      dateRange,
+      t
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* زر تحديث وطباعة */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-foreground">{t('التقرير الشامل')}</h2>
+          <p className="text-sm text-muted-foreground">
+            {branchName} | {dateRange.start} - {dateRange.end}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={fetchAllReports} disabled={loading} variant="outline" className="gap-2">
+            {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            {t('تحديث الكل')}
+          </Button>
+          <Button onClick={handlePrint} className="gap-2 bg-green-600 hover:bg-green-700">
+            <Printer className="h-4 w-4" />
+            {t('طباعة التقرير')}
+          </Button>
+        </div>
+      </div>
+
+      {/* ملخص سريع */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <Card className="bg-green-50 dark:bg-green-950 border-green-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-green-600">{t('المبيعات')}</p>
+            <p className="text-lg font-bold text-green-700">{formatPrice(salesReport?.total_sales || 0)}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-red-50 dark:bg-red-950 border-red-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-red-600">{t('المشتريات')}</p>
+            <p className="text-lg font-bold text-red-700">{formatPrice(purchasesReport?.total_purchases || 0)}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-orange-50 dark:bg-orange-950 border-orange-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-orange-600">{t('المصاريف')}</p>
+            <p className="text-lg font-bold text-orange-700">{formatPrice(expensesReport?.total_expenses || 0)}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-blue-600">{t('الآجل')}</p>
+            <p className="text-lg font-bold text-blue-700">{formatPrice(creditReport?.total_remaining || 0)}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-purple-50 dark:bg-purple-950 border-purple-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-purple-600">{t('الإرجاعات')}</p>
+            <p className="text-lg font-bold text-purple-700">{formatPrice(refundsReport?.total_amount || 0)}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-emerald-50 dark:bg-emerald-950 border-emerald-200">
+          <CardContent className="p-4 text-center">
+            <p className="text-xs text-emerald-600">{t('صافي الربح')}</p>
+            <p className="text-lg font-bold text-emerald-700">{formatPrice(profitLossReport?.net_profit?.amount || 0)}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* تفاصيل التقارير */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* المبيعات */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <DollarSign className="h-5 w-5 text-green-500" />
+              {t('المبيعات')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between"><span>{t('إجمالي المبيعات')}</span><span className="font-bold">{formatPrice(salesReport?.total_sales || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('نقدي')}</span><span>{formatPrice(salesReport?.by_payment_method?.cash || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('بطاقة')}</span><span>{formatPrice(salesReport?.by_payment_method?.card || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('آجل')}</span><span>{formatPrice(salesReport?.by_payment_method?.credit || 0)}</span></div>
+            <div className="flex justify-between border-t pt-2"><span>{t('عدد الطلبات')}</span><span>{salesReport?.total_orders || 0}</span></div>
+          </CardContent>
+        </Card>
+
+        {/* المشتريات */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5 text-red-500" />
+              {t('المشتريات')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between"><span>{t('إجمالي المشتريات')}</span><span className="font-bold text-red-600">{formatPrice(purchasesReport?.total_purchases || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('المدفوع')}</span><span>{formatPrice(purchasesReport?.total_paid || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('المتبقي')}</span><span className="text-orange-600">{formatPrice(purchasesReport?.total_remaining || 0)}</span></div>
+            <div className="flex justify-between border-t pt-2"><span>{t('عدد الفواتير')}</span><span>{purchasesReport?.total_invoices || 0}</span></div>
+          </CardContent>
+        </Card>
+
+        {/* المصاريف */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <TrendingDown className="h-5 w-5 text-orange-500" />
+              {t('المصاريف')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between"><span>{t('إجمالي المصاريف')}</span><span className="font-bold text-orange-600">{formatPrice(expensesReport?.total_expenses || 0)}</span></div>
+            {expensesReport?.by_category && Object.entries(expensesReport.by_category).slice(0, 4).map(([cat, amount]) => (
+              <div key={cat} className="flex justify-between">
+                <span>{t(cat)}</span>
+                <span>{formatPrice(amount)}</span>
+              </div>
+            ))}
+            <div className="flex justify-between border-t pt-2"><span>{t('عدد المعاملات')}</span><span>{expensesReport?.total_transactions || 0}</span></div>
+          </CardContent>
+        </Card>
+
+        {/* الآجل */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-blue-500" />
+              {t('الآجل')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between"><span>{t('إجمالي الآجل')}</span><span className="font-bold">{formatPrice(creditReport?.total_credit || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('المدفوع')}</span><span className="text-green-600">{formatPrice(creditReport?.total_paid || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('المتبقي')}</span><span className="text-red-600 font-bold">{formatPrice(creditReport?.total_remaining || 0)}</span></div>
+            <div className="flex justify-between border-t pt-2"><span>{t('عدد الحسابات')}</span><span>{creditReport?.accounts_count || 0}</span></div>
+          </CardContent>
+        </Card>
+
+        {/* التوصيل */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Truck className="h-5 w-5 text-indigo-500" />
+              {t('شركات التوصيل')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between"><span>{t('إجمالي المبيعات')}</span><span className="font-bold">{formatPrice(deliveryCreditsReport?.total_sales || deliveryCreditsReport?.total_credit || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('العمولات')}</span><span className="text-red-600">-{formatPrice(deliveryCreditsReport?.total_commission || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('الصافي')}</span><span className="text-green-600 font-bold">{formatPrice(deliveryCreditsReport?.net_receivable || 0)}</span></div>
+            <div className="flex justify-between border-t pt-2"><span>{t('عدد الطلبات')}</span><span>{deliveryCreditsReport?.total_orders || 0}</span></div>
+          </CardContent>
+        </Card>
+
+        {/* الإلغاءات والخصومات */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-red-500" />
+              {t('الإلغاءات والخصومات')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between"><span>{t('الإلغاءات')}</span><span className="text-red-600">{cancellationsReport?.total_cancelled || 0} ({formatPrice(cancellationsReport?.total_value || 0)})</span></div>
+            <div className="flex justify-between"><span>{t('الخصومات')}</span><span className="text-orange-600">{formatPrice(discountsReport?.total_discounts || 0)}</span></div>
+            <div className="flex justify-between"><span>{t('الإرجاعات')}</span><span className="text-purple-600">{refundsReport?.total_count || 0} ({formatPrice(refundsReport?.total_amount || 0)})</span></div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* صافي الربح */}
+      <Card className={`${(profitLossReport?.net_profit?.amount || 0) >= 0 ? 'bg-green-50 dark:bg-green-950 border-green-300' : 'bg-red-50 dark:bg-red-950 border-red-300'}`}>
+        <CardContent className="p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-lg font-semibold">{t('صافي الربح الحقيقي')}</p>
+              <p className="text-sm text-muted-foreground">{t('بعد خصم جميع التكاليف والمصاريف')}</p>
+            </div>
+            <p className={`text-3xl font-bold ${(profitLossReport?.net_profit?.amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {formatPrice(profitLossReport?.net_profit?.amount || 0)}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 export default function Reports() {
   const { user, hasRole } = useAuth();
   const { selectedBranchId, branches, getBranchIdForApi, canSelectAllBranches } = useBranch();
