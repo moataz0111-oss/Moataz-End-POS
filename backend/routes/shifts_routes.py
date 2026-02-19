@@ -29,6 +29,7 @@ class ShiftClose(BaseModel):
 class CashRegisterClose(BaseModel):
     denominations: Dict[str, int] = {}
     notes: Optional[str] = None
+    branch_id: Optional[str] = None
 
 class ShiftResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
