@@ -715,7 +715,6 @@ export default function Dashboard() {
     { label: t('الطلبات'), icon: ClipboardList, path: '/orders', color: 'bg-gradient-to-br from-amber-400 to-amber-600', key: 'showOrders', id: 'orders' },
     { label: t('شاشة المطبخ'), icon: ChefHat, path: '/kitchen', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600', key: 'showKitchen', id: 'kitchen' },
     { label: t('التقارير'), icon: BarChart3, path: '/reports', color: 'bg-gradient-to-br from-amber-400 to-amber-600', key: 'showReports', id: 'reports' },
-    { label: t('التقارير الذكية'), icon: PieChart, path: '/smart-reports', color: 'bg-gradient-to-br from-emerald-400 to-emerald-600', key: 'showSmartReports', id: 'smart-reports' },
     { label: t('التقييمات'), icon: Star, path: '/ratings', color: 'bg-gradient-to-br from-yellow-400 to-yellow-500', key: 'showRatings', id: 'ratings' },
     { label: t('المصاريف'), icon: Receipt, path: '/expenses', color: 'bg-gradient-to-br from-red-400 to-red-600', key: 'showExpenses', id: 'expenses' },
     { label: t('المشتريات'), icon: ShoppingBag, path: '/purchases-new', color: 'bg-gradient-to-br from-blue-500 to-blue-700', key: 'showPurchasing', id: 'purchasing' },
