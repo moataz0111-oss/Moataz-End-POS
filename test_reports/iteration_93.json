@@ -1,0 +1,104 @@
+{
+  "summary": "Testing completed for 5 requested features. 4 features working correctly, 1 issue found: Dashboard Settings tab (containing Owner Wallet and External Branches feature toggles) is missing from Settings tabs navigation.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Settings.js",
+        "issue": "Dashboard Settings tab (value='dashboard') has TabsContent but no TabsTrigger - feature toggles for Owner Wallet and External Branches are inaccessible from UI",
+        "selector": "TabsTrigger value='dashboard'",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_93.json"
+  ],
+  "action_items": [
+    "Add TabsTrigger for 'dashboard' value in Settings.js tabs list (around line 1541) to make Dashboard Settings accessible"
+  ],
+  "critical_code_review_comments": [
+    "Settings.js line 1732 has TabsContent value='dashboard' but no corresponding TabsTrigger in the TabsList (lines 1429-1549)",
+    "The dashboard settings containing showOwnerWallet and showExternalBranches toggles (lines 2012-2038) are not accessible from UI"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "80%"
+  },
+  "seed_data_creation": "Updated branch 'Alsaydaia' to be a sold branch with buyer_name='أحمد محمد', owner_percentage=15, monthly_fee=500000",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Dashboard Settings tab needs TabsTrigger added. All other features working: cash-register/summary API accepts branch_id, branch edit dialog has sold branch fields, branch card shows percentage and buyer, External Branches page has correct buttons.",
+  "features_tested": {
+    "cash_register_summary_api": {
+      "status": "PASS",
+      "description": "API GET /api/cash-register/summary?branch_id=xxx works correctly",
+      "verified": [
+        "API accepts branch_id as Query parameter",
+        "Returns shift summary with correct branch filtering",
+        "Tested with branch_id=b45125b7-b7d3-48c6-9386-a95fcf773132"
+      ]
+    },
+    "branch_card_percentage_display": {
+      "status": "PASS",
+      "description": "Branch card shows percentage and buyer name for sold branches",
+      "verified": [
+        "15% badge displayed on Alsaydaia branch card",
+        "👤 المشتري: أحمد محمد displayed",
+        "Only shows for branches with is_sold_branch=true"
+      ]
+    },
+    "branch_edit_sold_fields": {
+      "status": "PASS",
+      "description": "Branch edit dialog saves is_sold_branch, buyer_name, owner_percentage, monthly_fee",
+      "verified": [
+        "إعدادات الفرع الخارجي section with Store icon visible",
+        "فرع مباع switch toggle works",
+        "اسم المشتري/المستفيد field visible when switch enabled",
+        "هاتف المشتري field visible",
+        "نسبتك من المبيعات (%) field with % symbol visible",
+        "رسوم شهرية ثابتة (اختياري) field visible",
+        "Info box explaining dues calculation visible"
+      ]
+    },
+    "external_branches_button_removed": {
+      "status": "PASS",
+      "description": "Top button 'تسجيل فرع مباع' removed from External Branches page",
+      "verified": [
+        "تسجيل فرع مباع button NOT present in header",
+        "Info message directing to Settings visible",
+        "الذهاب للإعدادات button visible in empty state",
+        "Sold branches display correctly with percentage badge"
+      ]
+    },
+    "dashboard_settings_feature_toggles": {
+      "status": "FAIL",
+      "description": "Owner Wallet and External Branches toggles in Dashboard Settings",
+      "issue": "TabsContent exists but TabsTrigger missing - settings not accessible from UI",
+      "code_location": {
+        "TabsContent": "Settings.js line 1732",
+        "showOwnerWallet_toggle": "Settings.js lines 2012-2023",
+        "showExternalBranches_toggle": "Settings.js lines 2026-2038",
+        "missing_TabsTrigger": "Should be added around line 1541"
+      }
+    }
+  },
+  "test_credentials": {
+    "demo_user": "demo@maestroegp.com / demo123"
+  },
+  "screenshots": [
+    ".screenshots/01_dashboard.png - Dashboard with quick actions",
+    ".screenshots/03_branches_tab.png - Settings branches tab",
+    ".screenshots/07_sold_branch_enabled.png - Branch edit with sold branch switch enabled",
+    ".screenshots/09_all_fields_scrolled.png - All sold branch fields visible",
+    ".screenshots/14_external_branches.png - External Branches page without top button",
+    ".screenshots/15_branches_with_sold.png - Branch card showing 15% and buyer name",
+    ".screenshots/16_external_branches_with_sold.png - External Branches showing sold branch"
+  ]
+}
