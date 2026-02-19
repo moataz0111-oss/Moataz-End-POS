@@ -443,7 +443,7 @@ export default function OwnerWallet() {
           <Dialog open={profitDialogOpen} onOpenChange={setProfitDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-amber-600 hover:bg-amber-700 gap-2">
-                <PiggyBank className="h-4 w-4" />
+                <LockOpen className="h-4 w-4" />
                 {t('تحويل للخزينة')}
               </Button>
             </DialogTrigger>
