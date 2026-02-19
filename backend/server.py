@@ -5639,8 +5639,8 @@ async def get_cash_register_summary(
     }
     if tenant_id:
         sales_query["tenant_id"] = tenant_id
-    if branch_id:
-        sales_query["branch_id"] = branch_id
+    if effective_branch_id:
+        sales_query["branch_id"] = effective_branch_id
     
     cash_orders = await db.orders.find(sales_query, {"_id": 0, "total": 1}).to_list(1000)
     total_cash_sales = sum(o.get("total", 0) for o in cash_orders)
@@ -5661,8 +5661,8 @@ async def get_cash_register_summary(
     expenses_query = {"date": today}
     if tenant_id:
         expenses_query["tenant_id"] = tenant_id
-    if branch_id:
-        expenses_query["branch_id"] = branch_id
+    if effective_branch_id:
+        expenses_query["branch_id"] = effective_branch_id
     
     expenses = await db.expenses.find(expenses_query, {"_id": 0}).to_list(100)
     total_expenses = sum(e.get("amount", 0) for e in expenses)
@@ -5683,7 +5683,7 @@ async def get_cash_register_summary(
         "expenses": expenses,
         "total_expenses": total_expenses,
         "expected_cash": opening_balance + total_cash_sales - total_expenses,
-        "branch_id": branch_id,
+        "branch_id": effective_branch_id,
         "cashier_name": open_shift.get("cashier_name", current_user.get("full_name", ""))
     }
 
