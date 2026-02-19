@@ -719,6 +719,7 @@ export default function Reports() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sales');
   const [loadingComprehensive, setLoadingComprehensive] = useState(false);
+  const [dashboardSettings, setDashboardSettings] = useState({ showSmartReports: true });
   
   // Report Data
   const [salesReport, setSalesReport] = useState(null);
@@ -732,6 +733,19 @@ export default function Reports() {
   const [discountsReport, setDiscountsReport] = useState(null);
   const [creditReport, setCreditReport] = useState(null);
   const [refundsReport, setRefundsReport] = useState(null);
+
+  // جلب إعدادات لوحة المعلومات للتحقق من الصلاحيات
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await axios.get(`${API}/settings/dashboard`);
+        if (res.data) setDashboardSettings(res.data);
+      } catch (error) {
+        console.error('Failed to fetch dashboard settings');
+      }
+    };
+    fetchSettings();
+  }, []);
 
   // الحصول على اسم الفرع المحدد
   const getSelectedBranchName = () => {
