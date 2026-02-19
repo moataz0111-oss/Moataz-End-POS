@@ -603,9 +603,256 @@ export const printProfitLossReport = (data, branchName, dateRange) => {
   openPrintWindow('تقرير الأرباح والخسائر - ' + (branchName || 'جميع الفروع'), content);
 };
 
+/**
+ * طباعة تقرير المشتريات
+ */
+export const printPurchasesReport = (data, branchName, dateRange) => {
+  const content = `
+    <div class="print-header">
+      <h1>تقرير المشتريات</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    <div class="print-section">
+      <div class="summary-grid">
+        <div class="summary-box negative"><div class="label">إجمالي المشتريات</div><div class="value">${formatPrice(data.total_purchases || 0)}</div></div>
+        <div class="summary-box positive"><div class="label">المدفوع</div><div class="value">${formatPrice(data.total_paid || 0)}</div></div>
+        <div class="summary-box warning"><div class="label">المتبقي</div><div class="value">${formatPrice(data.total_remaining || 0)}</div></div>
+        <div class="summary-box info"><div class="label">عدد الفواتير</div><div class="value">${data.total_invoices || 0}</div></div>
+      </div>
+    </div>
+    ${data.by_supplier && Object.keys(data.by_supplier).length > 0 ? `
+    <div class="print-section">
+      <div class="section-title">حسب المورد</div>
+      <table><thead><tr><th>المورد</th><th>المبلغ</th><th>المدفوع</th><th>المتبقي</th></tr></thead>
+      <tbody>${Object.entries(data.by_supplier || {}).map(([supplier, info]) => `
+        <tr><td>${supplier}</td><td>${formatPrice(info.total || 0)}</td><td>${formatPrice(info.paid || 0)}</td><td class="text-negative">${formatPrice(info.remaining || 0)}</td></tr>
+      `).join('')}</tbody></table>
+    </div>` : ''}
+    <div class="print-footer"><p>تقرير المشتريات - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير المشتريات - ' + (branchName || 'جميع الفروع'), content);
+};
+
+/**
+ * طباعة تقرير المصاريف
+ */
+export const printExpensesReport = (data, branchName, dateRange) => {
+  const catNames = { rent: 'إيجار', utilities: 'خدمات', salaries: 'رواتب', maintenance: 'صيانة', supplies: 'مستلزمات', marketing: 'تسويق', transport: 'نقل', other: 'أخرى' };
+  const content = `
+    <div class="print-header">
+      <h1>تقرير المصاريف</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    <div class="print-section">
+      <div class="summary-grid">
+        <div class="summary-box negative"><div class="label">إجمالي المصاريف</div><div class="value">${formatPrice(data.total_expenses || 0)}</div></div>
+        <div class="summary-box info"><div class="label">عدد المعاملات</div><div class="value">${data.total_transactions || 0}</div></div>
+      </div>
+    </div>
+    ${data.by_category && Object.keys(data.by_category).length > 0 ? `
+    <div class="print-section">
+      <div class="section-title">حسب التصنيف</div>
+      <table><thead><tr><th>التصنيف</th><th>المبلغ</th><th>النسبة</th></tr></thead>
+      <tbody>${Object.entries(data.by_category || {}).map(([cat, amount]) => {
+        const pct = ((amount / (data.total_expenses || 1)) * 100).toFixed(1);
+        return `<tr><td>${catNames[cat] || cat}</td><td class="text-negative">${formatPrice(amount)}</td><td>${pct}%</td></tr>`;
+      }).join('')}</tbody></table>
+    </div>` : ''}
+    <div class="print-footer"><p>تقرير المصاريف - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير المصاريف - ' + (branchName || 'جميع الفروع'), content);
+};
+
+/**
+ * طباعة تقرير الأصناف
+ */
+export const printProductsReport = (data, branchName, dateRange) => {
+  const content = `
+    <div class="print-header">
+      <h1>تقرير الأصناف</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    ${data.products && data.products.length > 0 ? `
+    <div class="print-section">
+      <table>
+        <thead><tr><th>#</th><th>الصنف</th><th>السعر</th><th>التكلفة</th><th>الكمية</th><th>الإيرادات</th><th>الربح</th></tr></thead>
+        <tbody>${data.products.map((p, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${p.name}</td>
+            <td>${formatPrice(p.price)}</td>
+            <td>${formatPrice(p.cost)}</td>
+            <td>${p.quantity_sold}</td>
+            <td>${formatPrice(p.total_revenue)}</td>
+            <td class="text-positive">${formatPrice(p.total_profit)}</td>
+          </tr>
+        `).join('')}</tbody>
+      </table>
+    </div>` : '<p style="text-align:center;padding:20px;">لا توجد بيانات</p>'}
+    <div class="print-footer"><p>تقرير الأصناف - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير الأصناف - ' + (branchName || 'جميع الفروع'), content);
+};
+
+/**
+ * طباعة تقرير التوصيل
+ */
+export const printDeliveryReport = (data, branchName, dateRange) => {
+  const content = `
+    <div class="print-header">
+      <h1>تقرير شركات التوصيل</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    <div class="print-section">
+      <div class="summary-grid">
+        <div class="summary-box positive"><div class="label">إجمالي المبيعات</div><div class="value">${formatPrice(data.total_sales || data.total_credit || 0)}</div></div>
+        <div class="summary-box negative"><div class="label">العمولات</div><div class="value">${formatPrice(data.total_commission || 0)}</div></div>
+        <div class="summary-box info"><div class="label">المستحق</div><div class="value">${formatPrice(data.net_receivable || 0)}</div></div>
+        <div class="summary-box"><div class="label">الطلبات</div><div class="value">${data.total_orders || 0}</div></div>
+      </div>
+    </div>
+    ${data.by_delivery_app && Object.keys(data.by_delivery_app).length > 0 ? `
+    <div class="print-section">
+      <div class="section-title">حسب شركة التوصيل</div>
+      <table><thead><tr><th>الشركة</th><th>الطلبات</th><th>المبيعات</th><th>العمولة</th><th>الصافي</th></tr></thead>
+      <tbody>${Object.entries(data.by_delivery_app || {}).map(([app, info]) => `
+        <tr><td>${app}</td><td>${info.count}</td><td>${formatPrice(info.total)}</td><td class="text-negative">-${formatPrice(info.commission)}</td><td class="text-positive">${formatPrice(info.net_amount)}</td></tr>
+      `).join('')}</tbody></table>
+    </div>` : ''}
+    <div class="print-footer"><p>تقرير التوصيل - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير شركات التوصيل - ' + (branchName || 'جميع الفروع'), content);
+};
+
+/**
+ * طباعة تقرير الإلغاءات
+ */
+export const printCancellationsReport = (data, branchName, dateRange) => {
+  const content = `
+    <div class="print-header">
+      <h1>تقرير الإلغاءات</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    <div class="print-section">
+      <div class="summary-grid">
+        <div class="summary-box negative"><div class="label">عدد الإلغاءات</div><div class="value">${data.total_cancelled || 0}</div></div>
+        <div class="summary-box negative"><div class="label">قيمة الإلغاءات</div><div class="value">${formatPrice(data.total_value || 0)}</div></div>
+        <div class="summary-box warning"><div class="label">نسبة الإلغاء</div><div class="value">${(data.cancellation_rate || 0).toFixed(1)}%</div></div>
+      </div>
+    </div>
+    ${data.by_reason && Object.keys(data.by_reason).length > 0 ? `
+    <div class="print-section">
+      <div class="section-title">حسب السبب</div>
+      <table><thead><tr><th>السبب</th><th>العدد</th><th>القيمة</th></tr></thead>
+      <tbody>${Object.entries(data.by_reason || {}).map(([reason, info]) => `
+        <tr><td>${reason}</td><td>${info.count || 0}</td><td class="text-negative">${formatPrice(info.value || 0)}</td></tr>
+      `).join('')}</tbody></table>
+    </div>` : ''}
+    <div class="print-footer"><p>تقرير الإلغاءات - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير الإلغاءات - ' + (branchName || 'جميع الفروع'), content);
+};
+
+/**
+ * طباعة تقرير الخصومات
+ */
+export const printDiscountsReport = (data, branchName, dateRange) => {
+  const content = `
+    <div class="print-header">
+      <h1>تقرير الخصومات</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    <div class="print-section">
+      <div class="summary-grid">
+        <div class="summary-box warning"><div class="label">إجمالي الخصومات</div><div class="value">${formatPrice(data.total_discounts || 0)}</div></div>
+        <div class="summary-box info"><div class="label">الطلبات المخصومة</div><div class="value">${data.discounted_orders || 0}</div></div>
+        <div class="summary-box"><div class="label">متوسط الخصم</div><div class="value">${formatPrice(data.average_discount || 0)}</div></div>
+        <div class="summary-box"><div class="label">نسبة من المبيعات</div><div class="value">${(data.discount_percentage || 0).toFixed(1)}%</div></div>
+      </div>
+    </div>
+    <div class="print-footer"><p>تقرير الخصومات - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير الخصومات - ' + (branchName || 'جميع الفروع'), content);
+};
+
+/**
+ * طباعة تقرير الإرجاعات
+ */
+export const printRefundsReport = (data, branchName, dateRange) => {
+  const content = `
+    <div class="print-header">
+      <h1>تقرير الإرجاعات</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    <div class="print-section">
+      <div class="summary-grid">
+        <div class="summary-box negative"><div class="label">عدد الإرجاعات</div><div class="value">${data.total_count || 0}</div></div>
+        <div class="summary-box negative"><div class="label">المبلغ المرتجع</div><div class="value">${formatPrice(data.total_amount || 0)}</div></div>
+        <div class="summary-box info"><div class="label">الطلبات المتأثرة</div><div class="value">${data.orders_affected || 0}</div></div>
+      </div>
+    </div>
+    ${data.refunds && data.refunds.length > 0 ? `
+    <div class="print-section">
+      <div class="section-title">تفاصيل الإرجاعات</div>
+      <table><thead><tr><th>التاريخ</th><th>رقم الطلب</th><th>المبلغ</th><th>السبب</th></tr></thead>
+      <tbody>${data.refunds.slice(0, 20).map(r => `
+        <tr><td>${new Date(r.created_at).toLocaleDateString('ar-IQ')}</td><td>${r.order_id?.slice(-6) || '-'}</td><td class="text-negative">${formatPrice(r.refund_amount || 0)}</td><td>${r.reason || '-'}</td></tr>
+      `).join('')}</tbody></table>
+    </div>` : ''}
+    <div class="print-footer"><p>تقرير الإرجاعات - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير الإرجاعات - ' + (branchName || 'جميع الفروع'), content);
+};
+
+/**
+ * طباعة تقرير الآجل
+ */
+export const printCreditReport = (data, branchName, dateRange) => {
+  const content = `
+    <div class="print-header">
+      <h1>تقرير الحسابات الآجلة</h1>
+      <div class="branch-name">${branchName || 'جميع الفروع'}</div>
+      <div class="report-date">الفترة: ${dateRange.start} إلى ${dateRange.end} | طباعة: ${new Date().toLocaleString('ar-IQ')}</div>
+    </div>
+    <div class="print-section">
+      <div class="summary-grid">
+        <div class="summary-box warning"><div class="label">إجمالي الآجل</div><div class="value">${formatPrice(data.total_credit || 0)}</div></div>
+        <div class="summary-box positive"><div class="label">المدفوع</div><div class="value">${formatPrice(data.total_paid || 0)}</div></div>
+        <div class="summary-box negative"><div class="label">المتبقي</div><div class="value">${formatPrice(data.total_remaining || 0)}</div></div>
+        <div class="summary-box info"><div class="label">عدد الحسابات</div><div class="value">${data.accounts_count || 0}</div></div>
+      </div>
+    </div>
+    ${data.accounts && data.accounts.length > 0 ? `
+    <div class="print-section">
+      <div class="section-title">تفاصيل الحسابات</div>
+      <table><thead><tr><th>العميل</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th></tr></thead>
+      <tbody>${data.accounts.map(acc => `
+        <tr><td>${acc.customer_name || acc.name}</td><td>${formatPrice(acc.total || 0)}</td><td>${formatPrice(acc.paid || 0)}</td><td class="text-negative">${formatPrice(acc.remaining || 0)}</td></tr>
+      `).join('')}</tbody></table>
+    </div>` : ''}
+    <div class="print-footer"><p>تقرير الآجل - نظام Maestro EGP | ${new Date().toLocaleString('ar-IQ')}</p></div>
+  `;
+  openPrintWindow('تقرير الآجل - ' + (branchName || 'جميع الفروع'), content);
+};
+
 export default {
   openPrintWindow,
   printComprehensiveReport,
   printSalesReport,
-  printProfitLossReport
+  printProfitLossReport,
+  printPurchasesReport,
+  printExpensesReport,
+  printProductsReport,
+  printDeliveryReport,
+  printCancellationsReport,
+  printDiscountsReport,
+  printRefundsReport,
+  printCreditReport
 };
