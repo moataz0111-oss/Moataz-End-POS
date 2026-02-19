@@ -1771,6 +1771,29 @@ export default function Dashboard() {
             ) : cashSummary ? (
               /* نموذج إغلاق الصندوق */
               <div className="p-4 space-y-6">
+                {/* معلومات الفرع والوردية */}
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Building2 className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg">{cashSummary.branch_name || t('الفرع')}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {t('الكاشير')}: {cashSummary.cashier_name || user?.full_name || user?.username}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-xs text-muted-foreground">{t('بداية الوردية')}</p>
+                      <p className="text-sm font-medium">
+                        {cashSummary.started_at ? new Date(cashSummary.started_at).toLocaleString('ar-IQ') : '-'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* ملخص المبيعات */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="p-3 bg-green-500/10 rounded-lg text-center">
