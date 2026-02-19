@@ -15178,6 +15178,10 @@ app.include_router(payroll_router, prefix="/api")
 from routes.shifts_routes import router as shifts_router
 app.include_router(shifts_router, prefix="/api")
 
+# Owner wallet routes
+from routes.owner_wallet import router as owner_wallet_router
+app.include_router(owner_wallet_router, prefix="/api")
+
 # Include router and middleware
 app.include_router(api_router)
 
