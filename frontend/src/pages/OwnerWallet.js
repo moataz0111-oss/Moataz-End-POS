@@ -524,7 +524,9 @@ export default function OwnerWallet() {
                             </div>
                             <div>
                               <p className="font-medium text-emerald-700 dark:text-emerald-400">{formatPrice(deposit.amount)}</p>
-                              <p className="text-xs text-muted-foreground">{sourceLabels[deposit.source]} • {deposit.date}</p>
+                              <p className="text-xs text-muted-foreground">{sourceLabels[deposit.source]} • {deposit.date?.split('-').reverse().join('/')}</p>
+                              {deposit.description && <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">📝 {deposit.description}</p>}
+                              {deposit.branch_name && <p className="text-xs text-purple-600 dark:text-purple-400">🏪 {deposit.branch_name}</p>}
                             </div>
                           </div>
                           <Button variant="ghost" size="icon" onClick={() => handleDeleteDeposit(deposit.id)}>
@@ -563,7 +565,8 @@ export default function OwnerWallet() {
                             <div>
                               <p className="font-medium text-rose-700 dark:text-rose-400">{formatPrice(withdrawal.amount)}</p>
                               <p className="text-xs text-muted-foreground">{withdrawal.beneficiary} • {categoryLabels[withdrawal.category]}</p>
-                              <p className="text-xs text-muted-foreground">{withdrawal.date}</p>
+                              <p className="text-xs text-muted-foreground">{withdrawal.date?.split('-').reverse().join('/')}</p>
+                              {withdrawal.description && <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">📝 {withdrawal.description}</p>}
                             </div>
                           </div>
                           <Button variant="ghost" size="icon" onClick={() => handleDeleteWithdrawal(withdrawal.id)}>
