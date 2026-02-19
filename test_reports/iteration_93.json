@@ -42,7 +42,7 @@
       "verified": [
         "API accepts branch_id as Query parameter",
         "Returns shift summary with correct branch filtering",
-        "Tested with branch_id=b45125b7-b7d3-48c6-9386-a95fcf773132"
+        "Tested with branch_id=resto-finance-40"
       ]
     },
     "branch_card_percentage_display": {
