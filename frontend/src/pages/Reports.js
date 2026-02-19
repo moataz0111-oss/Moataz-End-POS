@@ -10,6 +10,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { Badge } from '../components/ui/badge';
 import BranchSelector from '../components/BranchSelector';
 import {
   ArrowRight,
@@ -30,7 +31,18 @@ import {
   Search,
   Target,
   Printer,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Wallet,
+  Receipt,
+  Ban,
+  Undo2,
+  Users,
+  Building2,
+  Calculator,
+  Banknote,
+  ArrowUpRight,
+  ArrowDownRight,
+  Activity
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -46,11 +58,107 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select';
-import { printComprehensiveReport, printSalesReport, printProfitLossReport } from '../utils/printReport';
+import { printComprehensiveReport, printSalesReport, printProfitLossReport, printAllReports } from '../utils/printReport';
 
 const API = API_URL;
 
-// مكون التقرير الشامل
+// مكون الرسم البياني الدائري البسيط
+const SimplePieChart = ({ data, colors, size = 120 }) => {
+  if (!data || data.length === 0) return null;
+  
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  if (total === 0) return null;
+  
+  let currentAngle = 0;
+  const segments = data.map((item, index) => {
+    const percentage = (item.value / total) * 100;
+    const angle = (item.value / total) * 360;
+    const startAngle = currentAngle;
+    currentAngle += angle;
+    
+    const x1 = 50 + 40 * Math.cos((startAngle - 90) * Math.PI / 180);
+    const y1 = 50 + 40 * Math.sin((startAngle - 90) * Math.PI / 180);
+    const x2 = 50 + 40 * Math.cos((startAngle + angle - 90) * Math.PI / 180);
+    const y2 = 50 + 40 * Math.sin((startAngle + angle - 90) * Math.PI / 180);
+    const largeArc = angle > 180 ? 1 : 0;
+    
+    return {
+      ...item,
+      percentage,
+      path: `M 50 50 L ${x1} ${y1} A 40 40 0 ${largeArc} 1 ${x2} ${y2} Z`,
+      color: colors[index % colors.length]
+    };
+  });
+
+  return (
+    <div className="flex items-center gap-4">
+      <svg width={size} height={size} viewBox="0 0 100 100">
+        {segments.map((seg, i) => (
+          <path key={i} d={seg.path} fill={seg.color} stroke="white" strokeWidth="1" />
+        ))}
+        <circle cx="50" cy="50" r="20" fill="white" />
+      </svg>
+      <div className="space-y-1 text-xs">
+        {segments.map((seg, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: seg.color }}></div>
+            <span>{seg.label}: {seg.percentage.toFixed(0)}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// مكون شريط التقدم
+const ProgressBar = ({ value, max, color = 'bg-primary', label }) => {
+  const percentage = max > 0 ? Math.min((value / max) * 100, 100) : 0;
+  return (
+    <div className="space-y-1">
+      <div className="flex justify-between text-xs">
+        <span>{label}</span>
+        <span className="font-medium">{percentage.toFixed(0)}%</span>
+      </div>
+      <div className="h-2 bg-muted rounded-full overflow-hidden">
+        <div className={`h-full ${color} transition-all duration-500`} style={{ width: `${percentage}%` }}></div>
+      </div>
+    </div>
+  );
+};
+
+// مكون بطاقة الإحصائية المحسنة
+const StatBox = ({ icon: Icon, label, value, subValue, trend, color = 'primary' }) => {
+  const colorClasses = {
+    primary: 'bg-primary/10 text-primary border-primary/20',
+    green: 'bg-emerald-500/10 text-emerald-600 border-emerald-200',
+    red: 'bg-red-500/10 text-red-600 border-red-200',
+    orange: 'bg-amber-500/10 text-amber-600 border-amber-200',
+    blue: 'bg-blue-500/10 text-blue-600 border-blue-200',
+    purple: 'bg-violet-500/10 text-violet-600 border-violet-200',
+    gray: 'bg-slate-500/10 text-slate-600 border-slate-200'
+  };
+  
+  return (
+    <div className={`rounded-xl border p-4 ${colorClasses[color]}`}>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs font-medium opacity-80">{label}</p>
+          <p className="text-xl font-bold mt-1">{value}</p>
+          {subValue && <p className="text-xs opacity-70 mt-0.5">{subValue}</p>}
+        </div>
+        <Icon className="h-5 w-5 opacity-60" />
+      </div>
+      {trend !== undefined && (
+        <div className={`flex items-center gap-1 mt-2 text-xs ${trend >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+          {trend >= 0 ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+          <span>{Math.abs(trend).toFixed(1)}%</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// مكون التقرير الشامل المحسن
 const ComprehensiveReportTab = ({ 
   salesReport, 
   purchasesReport,
