@@ -3167,6 +3167,7 @@ const translationMap = {
   'قيمة المواد المسحوبة من المخازن': { en: 'Value of materials withdrawn from warehouses', ku: 'بەهای مادەکانی دەرکراو لە کۆگاکان' },
   'الرسوم الشهرية الثابتة': { en: 'Fixed monthly fees', ku: 'کرێی جێگیری مانگانە' },
   'المصدر': { en: 'Source', ku: 'سەرچاوە' },
+  'التحكم بالميزات': { en: 'Feature Control', ku: 'کۆنترۆڵی تایبەتمەندییەکان' },
 };
 
 // الحصول على اللغة الحالية
