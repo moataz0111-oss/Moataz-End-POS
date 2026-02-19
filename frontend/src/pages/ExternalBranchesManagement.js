@@ -343,10 +343,10 @@ export default function ExternalBranchesManagement() {
                 <CardContent className="py-12 text-center">
                   <Store className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
                   <h3 className="text-lg font-semibold mb-2">{t('لا توجد فروع مباعة')}</h3>
-                  <p className="text-muted-foreground mb-4">{t('قم بتسجيل فرع مباع للبدء في تتبع العوائد')}</p>
-                  <Button onClick={() => setRegisterDialogOpen(true)} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    {t('تسجيل فرع مباع')}
+                  <p className="text-muted-foreground mb-4">{t('لإضافة فرع مباع، قم بتعديل الفرع من الإعدادات وتفعيل خيار "فرع مباع"')}</p>
+                  <Button onClick={() => navigate('/settings?tab=branches')} className="gap-2">
+                    <Edit className="h-4 w-4" />
+                    {t('الذهاب للإعدادات')}
                   </Button>
                 </CardContent>
               </Card>
