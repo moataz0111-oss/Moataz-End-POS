@@ -664,10 +664,13 @@ export default function OwnerWallet() {
                           <div>
                             <p className="font-medium">{formatPrice(transaction.amount)}</p>
                             <p className="text-xs text-muted-foreground">{transaction.display_type}</p>
+                            {transaction.description && <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">📝 {transaction.description}</p>}
+                            {transaction.branch_name && <p className="text-xs text-purple-600 dark:text-purple-400">🏪 {t('الفرع')}: {transaction.branch_name}</p>}
+                            {transaction.source && <p className="text-xs text-green-600 dark:text-green-400">💰 {t('المصدر')}: {sourceLabels[transaction.source] || transaction.source}</p>}
                           </div>
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(transaction.created_at).toLocaleDateString('ar-IQ')}
+                          {new Date(transaction.created_at).toLocaleDateString('en-GB').replace(/\//g, '/')}
                         </span>
                       </div>
                     ))}
