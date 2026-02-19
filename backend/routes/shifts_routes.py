@@ -257,7 +257,10 @@ async def get_shifts(branch_id: Optional[str] = None, date: Optional[str] = None
 
 # ==================== CASH REGISTER ====================
 @router.get("/cash-register/summary")
-async def get_cash_register_summary(current_user: dict = Depends(get_current_user)):
+async def get_cash_register_summary(
+    branch_id: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
     """جلب ملخص الصندوق الحالي للكاشير - قبل إغلاقه"""
     db = get_database()
     tenant_id = get_user_tenant_id(current_user)
@@ -266,9 +269,10 @@ async def get_cash_register_summary(current_user: dict = Depends(get_current_use
     if tenant_id:
         shift_query["tenant_id"] = tenant_id
     
-    user_branch_id = current_user.get("branch_id")
-    if user_branch_id:
-        shift_query["branch_id"] = user_branch_id
+    # استخدام branch_id المرسل من الواجهة أو الافتراضي للمستخدم
+    target_branch_id = branch_id or current_user.get("branch_id")
+    if target_branch_id:
+        shift_query["branch_id"] = target_branch_id
     
     shift = await db.shifts.find_one(shift_query, {"_id": 0})
     
