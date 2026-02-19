@@ -729,19 +729,20 @@ export default function Reports() {
     }
   };
 
-  // طباعة تقرير المبيعات
-  const handlePrintSalesReport = () => {
-    if (salesReport) {
-      printSalesReport(salesReport, getSelectedBranchName(), { start: startDate, end: endDate });
-    }
-  };
+  // دوال الطباعة لجميع التقارير
+  const dateRangeObj = { start: startDate, end: endDate };
+  const branchNameForPrint = getSelectedBranchName();
 
-  // طباعة تقرير الأرباح والخسائر
-  const handlePrintProfitLossReport = () => {
-    if (profitLossReport) {
-      printProfitLossReport(profitLossReport, getSelectedBranchName(), { start: startDate, end: endDate });
-    }
-  };
+  const handlePrintSalesReport = () => salesReport && printSalesReport(salesReport, branchNameForPrint, dateRangeObj);
+  const handlePrintProfitLossReport = () => profitLossReport && printProfitLossReport(profitLossReport, branchNameForPrint, dateRangeObj);
+  const handlePrintPurchasesReport = () => purchasesReport && printPurchasesReport(purchasesReport, branchNameForPrint, dateRangeObj);
+  const handlePrintExpensesReport = () => expensesReport && printExpensesReport(expensesReport, branchNameForPrint, dateRangeObj);
+  const handlePrintProductsReport = () => productsReport && printProductsReport(productsReport, branchNameForPrint, dateRangeObj);
+  const handlePrintDeliveryReport = () => deliveryCreditsReport && printDeliveryReport(deliveryCreditsReport, branchNameForPrint, dateRangeObj);
+  const handlePrintCancellationsReport = () => cancellationsReport && printCancellationsReport(cancellationsReport, branchNameForPrint, dateRangeObj);
+  const handlePrintDiscountsReport = () => discountsReport && printDiscountsReport(discountsReport, branchNameForPrint, dateRangeObj);
+  const handlePrintRefundsReport = () => refundsReport && printRefundsReport(refundsReport, branchNameForPrint, dateRangeObj);
+  const handlePrintCreditReport = () => creditReport && printCreditReport(creditReport, branchNameForPrint, dateRangeObj);
 
   const StatCard = ({ title, value, subtitle, icon: Icon, color = 'primary', trend }) => (
     <Card className="border-border/50 bg-card">
