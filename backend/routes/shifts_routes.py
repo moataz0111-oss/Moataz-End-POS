@@ -34,7 +34,7 @@ class ShiftResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str
     cashier_id: str
-    cashier_name: str
+    cashier_name: str = ""
     branch_id: str
     opening_cash: float
     closing_cash: Optional[float] = None
