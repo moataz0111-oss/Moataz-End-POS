@@ -483,6 +483,231 @@ const ComprehensiveReportTab = ({
   );
 };
 
+// مكون التقرير الذكي
+const SmartReportTab = ({ t, formatPrice, selectedBranchId, branches, getBranchIdForApi }) => {
+  const [loading, setLoading] = useState(false);
+  const [period, setPeriod] = useState('today');
+  const [smartBranchId, setSmartBranchId] = useState(selectedBranchId || 'all');
+  const [data, setData] = useState({
+    summary: { total_sales: 0, total_orders: 0, average_order: 0 },
+    topProducts: [],
+    salesByHour: [],
+    orderTypes: [],
+    insights: []
+  });
+
+  const fetchSmartReport = async () => {
+    setLoading(true);
+    try {
+      const branchParam = smartBranchId && smartBranchId !== 'all' ? `&branch_id=${smartBranchId}` : '';
+      const [salesRes, productsRes, hourlyRes] = await Promise.all([
+        axios.get(`${API}/smart-reports/sales?period=${period}${branchParam}`),
+        axios.get(`${API}/smart-reports/products?period=${period}${branchParam}`),
+        axios.get(`${API}/smart-reports/hourly?${branchParam.slice(1)}`)
+      ]);
+
+      const salesData = salesRes.data || {};
+      const productsData = productsRes.data || {};
+      const hourlyData = hourlyRes.data || {};
+
+      const salesByHour = Object.entries(hourlyData.hourly || {}).map(([hour, d]) => ({
+        hour: `${hour}:00`,
+        sales: d.sales || 0
+      }));
+
+      setData({
+        summary: {
+          total_sales: salesData.total_sales || 0,
+          total_orders: salesData.total_orders || 0,
+          average_order: salesData.average_order_value || 0,
+          growth_sales: 0,
+          growth_orders: 0
+        },
+        topProducts: (productsData.top_products || []).slice(0, 5).map(p => ({
+          name: p.name,
+          quantity: p.quantity,
+          revenue: p.revenue
+        })),
+        salesByHour: salesByHour.length > 0 ? salesByHour : [],
+        orderTypes: [
+          { type: t('داخلي'), count: salesData.by_type?.dine_in || 0 },
+          { type: t('سفري'), count: salesData.by_type?.takeaway || 0 },
+          { type: t('توصيل'), count: salesData.by_type?.delivery || 0 }
+        ],
+        insights: []
+      });
+    } catch (error) {
+      console.error('Smart report error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSmartReport();
+  }, [period, smartBranchId]);
+
+  const maxSales = Math.max(...(data.salesByHour?.map(h => h.sales) || [1]));
+  const totalOrders = data.orderTypes.reduce((sum, t) => sum + t.count, 0);
+
+  return (
+    <div className="space-y-6">
+      {/* العنوان والفلاتر */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-gradient-to-l from-emerald-500/5 to-transparent p-4 rounded-xl">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="h-6 w-6 text-emerald-500" />
+          <h2 className="text-xl font-bold">{t('التقرير الذكي')}</h2>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* اختيار الفرع */}
+          <Select value={smartBranchId} onValueChange={setSmartBranchId}>
+            <SelectTrigger className="w-40">
+              <Building2 className="h-4 w-4 ml-2" />
+              <SelectValue placeholder={t('الفرع')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t('جميع الفروع')}</SelectItem>
+              {branches?.map(branch => (
+                <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {/* اختيار الفترة */}
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-36">
+              <Clock className="h-4 w-4 ml-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">{t('اليوم')}</SelectItem>
+              <SelectItem value="yesterday">{t('أمس')}</SelectItem>
+              <SelectItem value="week">{t('هذا الأسبوع')}</SelectItem>
+              <SelectItem value="month">{t('هذا الشهر')}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={fetchSmartReport} disabled={loading} variant="outline" size="sm">
+            {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          </Button>
+        </div>
+      </div>
+
+      {/* الملخص */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-0">
+          <CardContent className="p-5">
+            <p className="text-sm opacity-90">{t('إجمالي المبيعات')}</p>
+            <p className="text-3xl font-bold mt-1">{formatPrice(data.summary.total_sales)}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
+          <CardContent className="p-5">
+            <p className="text-sm opacity-90">{t('عدد الطلبات')}</p>
+            <p className="text-3xl font-bold mt-1">{data.summary.total_orders}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-gradient-to-br from-violet-500 to-violet-600 text-white border-0">
+          <CardContent className="p-5">
+            <p className="text-sm opacity-90">{t('متوسط الطلب')}</p>
+            <p className="text-3xl font-bold mt-1">{formatPrice(data.summary.average_order)}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* المخططات */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* مخطط المبيعات بالساعة */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              {t('المبيعات حسب الساعة')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.salesByHour.length > 0 ? (
+              <div className="space-y-2">
+                {data.salesByHour.slice(0, 8).map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <span className="text-xs w-12 text-muted-foreground">{item.hour}</span>
+                    <div className="flex-1 h-6 bg-muted/30 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-l from-emerald-500 to-emerald-400 rounded-full transition-all"
+                        style={{ width: `${(item.sales / maxSales) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-medium w-20 text-left">{formatPrice(item.sales)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <BarChart3 className="h-10 w-10 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">{t('لا توجد بيانات')}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* توزيع الطلبات */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <PieChart className="h-4 w-4 text-primary" />
+              {t('توزيع الطلبات')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {data.orderTypes.map((item, idx) => {
+                const percentage = totalOrders > 0 ? ((item.count / totalOrders) * 100).toFixed(0) : 0;
+                const colors = ['bg-indigo-500', 'bg-emerald-500', 'bg-amber-500'];
+                return (
+                  <div key={idx}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>{item.type}</span>
+                      <span className="font-medium">{item.count} ({percentage}%)</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div className={`h-full ${colors[idx]} transition-all`} style={{ width: `${percentage}%` }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* الأصناف الأكثر مبيعاً */}
+      {data.topProducts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Package className="h-4 w-4 text-primary" />
+              {t('الأصناف الأكثر مبيعاً')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              {data.topProducts.map((product, idx) => (
+                <div key={idx} className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
+                  <span className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs font-bold">
+                    {idx + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">{product.quantity} × {formatPrice(product.revenue / (product.quantity || 1))}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
+
 export default function Reports() {
   const { user, hasRole } = useAuth();
   const { selectedBranchId, branches, getBranchIdForApi, canSelectAllBranches } = useBranch();
