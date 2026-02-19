@@ -5604,10 +5604,14 @@ async def export_employee_salary_slip_pdf(
 # with the complete functionality including shift management
 
 @api_router.get("/cash-register/summary")
-async def get_cash_register_summary(current_user: dict = Depends(get_current_user)):
+async def get_cash_register_summary(
+    branch_id: Optional[str] = Query(None, description="معرف الفرع"),
+    current_user: dict = Depends(get_current_user)
+):
     """جلب ملخص الصندوق للوردية الحالية"""
     tenant_id = get_user_tenant_id(current_user)
-    branch_id = current_user.get("branch_id")
+    # استخدم branch_id المرسل أو الفرع المرتبط بالمستخدم
+    effective_branch_id = branch_id or current_user.get("branch_id")
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     
     # التحقق من وجود وردية مفتوحة
@@ -5616,8 +5620,8 @@ async def get_cash_register_summary(current_user: dict = Depends(get_current_use
     }
     if tenant_id:
         shift_query["tenant_id"] = tenant_id
-    if branch_id:
-        shift_query["branch_id"] = branch_id
+    if effective_branch_id:
+        shift_query["branch_id"] = effective_branch_id
     
     open_shift = await db.shifts.find_one(shift_query, {"_id": 0})
     
