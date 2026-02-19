@@ -7434,7 +7434,7 @@ async def super_admin_login(request: SuperAdminLoginRequest):
         "user": {
             "id": user["id"],
             "email": user["email"],
-            "full_name": user["full_name"],
+            "full_name": user.get("full_name", user.get("username", "")),
             "role": user["role"]
         }
     }
