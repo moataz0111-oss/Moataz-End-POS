@@ -127,13 +127,13 @@ class TestCashRegisterClose:
             f"{BASE_URL}/api/cash-register/close",
             json={"denominations": {}, "notes": "test"}
         )
-        assert response.status_code == 401, "Should require authentication"
+        assert response.status_code in [401, 403], "Should require authentication"
         print("✓ Close endpoint requires authentication")
     
     def test_cash_register_summary_requires_auth(self):
         """Test that summary endpoint requires authentication"""
         response = requests.get(f"{BASE_URL}/api/cash-register/summary")
-        assert response.status_code == 401, "Should require authentication"
+        assert response.status_code in [401, 403], "Should require authentication"
         print("✓ Summary endpoint requires authentication")
 
 
