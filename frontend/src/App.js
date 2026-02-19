@@ -58,6 +58,7 @@ const InventoryReports = lazy(() => import("./pages/InventoryReports"));
 const SystemContact = lazy(() => import("./pages/SystemContact"));
 const BreakEvenReport = lazy(() => import("./pages/BreakEvenReport"));
 const OwnerWallet = lazy(() => import("./pages/OwnerWallet"));
+const ExternalBranchesManagement = lazy(() => import("./pages/ExternalBranchesManagement"));
 
 // Components
 import IncomingCallPopup from "./components/IncomingCallPopup";
