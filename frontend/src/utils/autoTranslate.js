@@ -3042,6 +3042,15 @@ const translationMap = {
   'لكل وحدة': { en: 'per unit', ku: 'بۆ هەر یەکە' },
   'التكاليف التشغيلية تُحسب تلقائياً من إعدادات الفرع': { en: 'Operating costs are calculated automatically from branch settings', ku: 'خەرجی کارپێکردن بە ئۆتۆماتیکی لە ڕێکخستنی لق دادەنرێت' },
   'تكلفة التغليف': { en: 'Packaging Cost', ku: 'خەرجی پاکەتکردن' },
+
+  // ===== ترجمات التقرير الشامل الجديد =====
+  'التقرير الشامل': { en: 'Comprehensive Report', ku: 'راپۆرتی گشتگیر' },
+  'تم فتح نافذة الطباعة': { en: 'Print window opened', ku: 'پەنجەرەی چاپکردن کرایەوە' },
+  'فشل في جلب التقرير الشامل': { en: 'Failed to fetch comprehensive report', ku: 'سەرکەوتن نەبوو لە هێنانی راپۆرتی گشتگیر' },
+  'طباعة التقرير': { en: 'Print Report', ku: 'چاپکردنی راپۆرت' },
+  'جميع الفروع': { en: 'All Branches', ku: 'هەموو لقەکان' },
+  'الكاشير': { en: 'Cashier', ku: 'قەسەدار' },
+  'بداية الوردية': { en: 'Shift Start', ku: 'دەستپێکی شیفت' },
 };
 
 // الحصول على اللغة الحالية
