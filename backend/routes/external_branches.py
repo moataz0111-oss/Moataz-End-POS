@@ -1,6 +1,7 @@
 """
 نظام إدارة الفروع الخارجية/المباعة
 External/Sold Branches Management System
+يعتمد على حقل is_sold_branch في جدول الفروع
 """
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel
@@ -11,25 +12,6 @@ import uuid
 router = APIRouter(prefix="/external-branches", tags=["External Branches"])
 
 # ==================== MODELS ====================
-
-class SoldBranchCreate(BaseModel):
-    """نموذج إنشاء فرع مباع"""
-    branch_id: str  # معرف الفرع الموجود
-    buyer_name: str  # اسم المشتري
-    buyer_phone: Optional[str] = None  # هاتف المشتري
-    owner_percentage: float = 0.0  # نسبة المالك الأصلي من المبيعات (0-100)
-    monthly_fee: float = 0.0  # رسوم شهرية ثابتة (اختياري)
-    contract_start_date: Optional[str] = None  # تاريخ بدء العقد
-    notes: Optional[str] = None
-
-class SoldBranchUpdate(BaseModel):
-    """نموذج تحديث فرع مباع"""
-    buyer_name: Optional[str] = None
-    buyer_phone: Optional[str] = None
-    owner_percentage: Optional[float] = None
-    monthly_fee: Optional[float] = None
-    notes: Optional[str] = None
-    is_active: Optional[bool] = None
 
 class SoldBranchResponse(BaseModel):
     """نموذج استجابة الفرع المباع"""
@@ -55,57 +37,6 @@ class SoldBranchResponse(BaseModel):
 from .shared import get_database, get_current_user, get_user_tenant_id, UserRole
 
 # ==================== API ROUTES ====================
-
-@router.post("/register", response_model=SoldBranchResponse)
-async def register_sold_branch(data: SoldBranchCreate, current_user: dict = Depends(get_current_user)):
-    """تسجيل فرع كفرع مباع"""
-    db = get_database()
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
-        raise HTTPException(status_code=403, detail="غير مصرح")
-    
-    tenant_id = get_user_tenant_id(current_user)
-    
-    # التحقق من وجود الفرع
-    branch = await db.branches.find_one({"id": data.branch_id, "tenant_id": tenant_id}, {"_id": 0})
-    if not branch:
-        raise HTTPException(status_code=404, detail="الفرع غير موجود")
-    
-    # التحقق من أن الفرع ليس مسجلاً مسبقاً كمباع
-    existing = await db.sold_branches.find_one({"branch_id": data.branch_id, "is_active": True})
-    if existing:
-        raise HTTPException(status_code=400, detail="هذا الفرع مسجل بالفعل كفرع مباع")
-    
-    # إنشاء سجل الفرع المباع
-    sold_branch_doc = {
-        "id": str(uuid.uuid4()),
-        "branch_id": data.branch_id,
-        "branch_name": branch["name"],
-        "buyer_name": data.buyer_name,
-        "buyer_phone": data.buyer_phone,
-        "owner_percentage": data.owner_percentage,
-        "monthly_fee": data.monthly_fee,
-        "contract_start_date": data.contract_start_date or datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "notes": data.notes,
-        "is_active": True,
-        "tenant_id": tenant_id,
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
-    
-    await db.sold_branches.insert_one(sold_branch_doc)
-    
-    # تحديث الفرع ليُعلم أنه مباع
-    await db.branches.update_one(
-        {"id": data.branch_id},
-        {"$set": {
-            "is_sold": True,
-            "sold_branch_id": sold_branch_doc["id"],
-            "buyer_name": data.buyer_name,
-            "owner_percentage": data.owner_percentage
-        }}
-    )
-    
-    del sold_branch_doc["_id"]
-    return sold_branch_doc
 
 @router.get("/", response_model=List[SoldBranchResponse])
 async def get_sold_branches(
@@ -243,19 +174,6 @@ async def get_external_branches_stats(
         "monthly_materials": total_materials,
         "total_monthly_due": total_revenue + total_materials
     }
-            {"$unwind": "$items"},
-            {"$group": {"_id": None, "total": {"$sum": {"$multiply": ["$items.quantity", {"$ifNull": ["$items.cost_per_unit", 0]}]}}}}
-        ]
-        materials_result = await db.inventory_transfers.aggregate(materials_pipeline).to_list(1)
-        total_materials += materials_result[0]["total"] if materials_result else 0
-    
-    return {
-        "sold_branches_count": sold_count,
-        "current_month": f"{now.year}-{now.month:02d}",
-        "monthly_revenue": total_revenue,
-        "monthly_materials": total_materials,
-        "total_monthly_due": total_revenue + total_materials
-    }
 
 @router.get("/reports/monthly")
 async def get_monthly_revenue_report(
@@ -282,9 +200,9 @@ async def get_monthly_revenue_report(
     else:
         end_date = datetime(year, mon + 1, 1, tzinfo=timezone.utc)
     
-    # جلب جميع الفروع المباعة
-    sold_branches = await db.sold_branches.find(
-        {"tenant_id": tenant_id, "is_active": True}, 
+    # جلب جميع الفروع المباعة من جدول الفروع
+    sold_branches = await db.branches.find(
+        {"tenant_id": tenant_id, "is_sold_branch": True, "is_active": True}, 
         {"_id": 0}
     ).to_list(100)
     
@@ -294,11 +212,14 @@ async def get_monthly_revenue_report(
     total_due = 0
     
     for sb in sold_branches:
+        branch_id = sb["id"]
+        owner_percentage = sb.get("owner_percentage", 0)
+        
         # المبيعات
         sales_pipeline = [
             {
                 "$match": {
-                    "branch_id": sb["branch_id"],
+                    "branch_id": branch_id,
                     "status": {"$nin": ["cancelled"]},
                     "created_at": {"$gte": start_date.isoformat(), "$lt": end_date.isoformat()}
                 }
@@ -309,13 +230,13 @@ async def get_monthly_revenue_report(
         branch_sales = sales_result[0]["total"] if sales_result else 0
         
         # العائد من النسبة
-        branch_revenue = branch_sales * (sb["owner_percentage"] / 100)
+        branch_revenue = branch_sales * (owner_percentage / 100)
         
         # المواد المسحوبة
         materials_pipeline = [
             {
                 "$match": {
-                    "to_branch_id": sb["branch_id"],
+                    "to_branch_id": branch_id,
                     "status": "received",
                     "received_at": {"$gte": start_date.isoformat(), "$lt": end_date.isoformat()}
                 }
@@ -329,11 +250,11 @@ async def get_monthly_revenue_report(
         branch_due = branch_revenue + branch_materials + sb.get("monthly_fee", 0)
         
         branches_data.append({
-            "branch_id": sb["branch_id"],
-            "branch_name": sb["branch_name"],
-            "buyer_name": sb["buyer_name"],
+            "branch_id": branch_id,
+            "branch_name": sb["name"],
+            "buyer_name": sb.get("buyer_name", ""),
             "total_sales": branch_sales,
-            "owner_percentage": sb["owner_percentage"],
+            "owner_percentage": owner_percentage,
             "revenue_from_percentage": branch_revenue,
             "materials_withdrawn": branch_materials,
             "monthly_fee": sb.get("monthly_fee", 0),
@@ -355,94 +276,9 @@ async def get_monthly_revenue_report(
         "branches_count": len(branches_data)
     }
 
-@router.get("/{sold_branch_id}", response_model=SoldBranchResponse)
-async def get_sold_branch(sold_branch_id: str, current_user: dict = Depends(get_current_user)):
-    """جلب تفاصيل فرع مباع"""
-    db = get_database()
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
-        raise HTTPException(status_code=403, detail="غير مصرح")
-    
-    tenant_id = get_user_tenant_id(current_user)
-    sold_branch = await db.sold_branches.find_one(
-        {"id": sold_branch_id, "tenant_id": tenant_id}, 
-        {"_id": 0}
-    )
-    
-    if not sold_branch:
-        raise HTTPException(status_code=404, detail="الفرع المباع غير موجود")
-    
-    return sold_branch
-
-@router.put("/{sold_branch_id}")
-async def update_sold_branch(
-    sold_branch_id: str, 
-    data: SoldBranchUpdate, 
-    current_user: dict = Depends(get_current_user)
-):
-    """تحديث بيانات فرع مباع"""
-    db = get_database()
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
-        raise HTTPException(status_code=403, detail="غير مصرح")
-    
-    tenant_id = get_user_tenant_id(current_user)
-    
-    update_data = {k: v for k, v in data.model_dump().items() if v is not None}
-    if not update_data:
-        raise HTTPException(status_code=400, detail="لا توجد بيانات للتحديث")
-    
-    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-    
-    result = await db.sold_branches.update_one(
-        {"id": sold_branch_id, "tenant_id": tenant_id},
-        {"$set": update_data}
-    )
-    
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="الفرع المباع غير موجود")
-    
-    # تحديث الفرع الأصلي أيضاً
-    sold_branch = await db.sold_branches.find_one({"id": sold_branch_id}, {"_id": 0})
-    if sold_branch:
-        await db.branches.update_one(
-            {"id": sold_branch["branch_id"]},
-            {"$set": {
-                "buyer_name": sold_branch.get("buyer_name"),
-                "owner_percentage": sold_branch.get("owner_percentage")
-            }}
-        )
-    
-    return await db.sold_branches.find_one({"id": sold_branch_id}, {"_id": 0})
-
-@router.delete("/{sold_branch_id}")
-async def cancel_sold_branch(sold_branch_id: str, current_user: dict = Depends(get_current_user)):
-    """إلغاء تسجيل فرع كمباع"""
-    db = get_database()
-    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
-        raise HTTPException(status_code=403, detail="غير مصرح")
-    
-    tenant_id = get_user_tenant_id(current_user)
-    
-    sold_branch = await db.sold_branches.find_one({"id": sold_branch_id, "tenant_id": tenant_id})
-    if not sold_branch:
-        raise HTTPException(status_code=404, detail="الفرع المباع غير موجود")
-    
-    # تعطيل السجل
-    await db.sold_branches.update_one(
-        {"id": sold_branch_id},
-        {"$set": {"is_active": False, "cancelled_at": datetime.now(timezone.utc).isoformat()}}
-    )
-    
-    # إزالة علامة المباع من الفرع الأصلي
-    await db.branches.update_one(
-        {"id": sold_branch["branch_id"]},
-        {"$set": {"is_sold": False}, "$unset": {"sold_branch_id": "", "buyer_name": "", "owner_percentage": ""}}
-    )
-    
-    return {"message": "تم إلغاء تسجيل الفرع كمباع"}
-
-@router.get("/{sold_branch_id}/summary")
+@router.get("/{branch_id}/summary")
 async def get_sold_branch_summary(
-    sold_branch_id: str,
+    branch_id: str,
     month: Optional[str] = Query(None, description="الشهر بتنسيق YYYY-MM"),
     current_user: dict = Depends(get_current_user)
 ):
@@ -452,8 +288,10 @@ async def get_sold_branch_summary(
         raise HTTPException(status_code=403, detail="غير مصرح")
     
     tenant_id = get_user_tenant_id(current_user)
-    sold_branch = await db.sold_branches.find_one(
-        {"id": sold_branch_id, "tenant_id": tenant_id}, 
+    
+    # جلب الفرع من جدول الفروع
+    sold_branch = await db.branches.find_one(
+        {"id": branch_id, "tenant_id": tenant_id, "is_sold_branch": True}, 
         {"_id": 0}
     )
     
@@ -477,11 +315,13 @@ async def get_sold_branch_summary(
         else:
             end_date = datetime(now.year, now.month + 1, 1, tzinfo=timezone.utc)
     
+    owner_percentage = sold_branch.get("owner_percentage", 0)
+    
     # حساب المبيعات
     sales_pipeline = [
         {
             "$match": {
-                "branch_id": sold_branch["branch_id"],
+                "branch_id": branch_id,
                 "status": {"$nin": ["cancelled"]},
                 "created_at": {"$gte": start_date.isoformat(), "$lt": end_date.isoformat()}
             }
@@ -493,13 +333,13 @@ async def get_sold_branch_summary(
     orders_count = sales_result[0]["count"] if sales_result else 0
     
     # حساب العائد من النسبة
-    revenue_from_percentage = total_sales * (sold_branch["owner_percentage"] / 100)
+    revenue_from_percentage = total_sales * (owner_percentage / 100)
     
     # حساب المواد المسحوبة
     materials_pipeline = [
         {
             "$match": {
-                "to_branch_id": sold_branch["branch_id"],
+                "to_branch_id": branch_id,
                 "status": "received",
                 "received_at": {"$gte": start_date.isoformat(), "$lt": end_date.isoformat()}
             }
@@ -514,7 +354,7 @@ async def get_sold_branch_summary(
     payments_pipeline = [
         {
             "$match": {
-                "sold_branch_id": sold_branch_id,
+                "branch_id": branch_id,
                 "payment_date": {"$gte": start_date.strftime("%Y-%m-%d"), "$lt": end_date.strftime("%Y-%m-%d")}
             }
         },
@@ -528,14 +368,14 @@ async def get_sold_branch_summary(
     remaining = total_due - paid_amount
     
     return {
-        "branch_id": sold_branch["branch_id"],
-        "branch_name": sold_branch["branch_name"],
-        "buyer_name": sold_branch["buyer_name"],
+        "branch_id": branch_id,
+        "branch_name": sold_branch["name"],
+        "buyer_name": sold_branch.get("buyer_name", ""),
         "period_start": start_date.strftime("%Y-%m-%d"),
         "period_end": end_date.strftime("%Y-%m-%d"),
         "total_sales": total_sales,
         "orders_count": orders_count,
-        "owner_percentage": sold_branch["owner_percentage"],
+        "owner_percentage": owner_percentage,
         "revenue_from_percentage": revenue_from_percentage,
         "monthly_fee": sold_branch.get("monthly_fee", 0),
         "materials_withdrawn": materials_withdrawn,
@@ -544,9 +384,9 @@ async def get_sold_branch_summary(
         "remaining_amount": remaining
     }
 
-@router.post("/{sold_branch_id}/payments")
+@router.post("/{branch_id}/payments")
 async def record_payment(
-    sold_branch_id: str,
+    branch_id: str,
     amount: float = Query(..., description="مبلغ الدفعة"),
     payment_date: Optional[str] = Query(None, description="تاريخ الدفعة"),
     notes: Optional[str] = Query(None, description="ملاحظات"),
@@ -559,16 +399,17 @@ async def record_payment(
     
     tenant_id = get_user_tenant_id(current_user)
     
-    sold_branch = await db.sold_branches.find_one(
-        {"id": sold_branch_id, "tenant_id": tenant_id}
+    # التحقق من وجود الفرع المباع
+    sold_branch = await db.branches.find_one(
+        {"id": branch_id, "tenant_id": tenant_id, "is_sold_branch": True}
     )
     if not sold_branch:
         raise HTTPException(status_code=404, detail="الفرع المباع غير موجود")
     
     payment_doc = {
         "id": str(uuid.uuid4()),
-        "sold_branch_id": sold_branch_id,
-        "branch_id": sold_branch["branch_id"],
+        "branch_id": branch_id,
+        "branch_name": sold_branch["name"],
         "amount": amount,
         "payment_date": payment_date or datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "notes": notes,
@@ -582,9 +423,9 @@ async def record_payment(
     
     return payment_doc
 
-@router.get("/{sold_branch_id}/payments")
+@router.get("/{branch_id}/payments")
 async def get_payments(
-    sold_branch_id: str,
+    branch_id: str,
     current_user: dict = Depends(get_current_user)
 ):
     """جلب سجل المدفوعات للفرع المباع"""
@@ -595,7 +436,7 @@ async def get_payments(
     tenant_id = get_user_tenant_id(current_user)
     
     payments = await db.sold_branch_payments.find(
-        {"sold_branch_id": sold_branch_id, "tenant_id": tenant_id},
+        {"branch_id": branch_id, "tenant_id": tenant_id},
         {"_id": 0}
     ).sort("payment_date", -1).to_list(100)
     
