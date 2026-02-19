@@ -358,7 +358,7 @@ async def get_cash_register_summary(current_user: dict = Depends(get_current_use
         "branch_id": shift["branch_id"],
         "branch_name": branch["name"] if branch else "",
         "cashier_id": current_user["id"],
-        "cashier_name": current_user["full_name"],
+        "cashier_name": current_user.get("full_name", current_user.get("username", "")),
         "started_at": shift["started_at"],
         "opening_cash": shift["opening_cash"],
         "total_sales": total_sales,
