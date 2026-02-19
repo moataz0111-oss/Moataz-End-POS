@@ -215,7 +215,7 @@ async def create_advance(advance: AdvanceCreate, current_user: dict = Depends(ge
         "paid_months": 0,
         "status": "active",
         "tenant_id": get_user_tenant_id(current_user),
-        "approved_by": current_user["full_name"],
+        "approved_by": current_user.get("full_name", current_user.get("username", "")),
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.advances.insert_one(advance_doc)
