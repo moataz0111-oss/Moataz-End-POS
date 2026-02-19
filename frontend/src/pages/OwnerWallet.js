@@ -308,7 +308,10 @@ export default function OwnerWallet() {
                   <p className="text-2xl font-bold mt-1">{formatPrice(summary.safe_balance)}</p>
                   <p className="text-xs mt-1 opacity-80">{t('صافي الأرباح المحولة')}</p>
                 </div>
-                <PiggyBank className="h-10 w-10 opacity-40" />
+                {summary.safe_balance > 0 ? 
+                  <Lock className="h-10 w-10 opacity-40" /> : 
+                  <LockOpen className="h-10 w-10 opacity-40" />
+                }
               </div>
             </CardContent>
           </Card>
