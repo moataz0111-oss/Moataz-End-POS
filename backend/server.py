@@ -6991,7 +6991,7 @@ STAFF_ROLES = {
     "branch_manager": "مدير فرع",
     "supervisor": "مشرف",
     "cashier": "كاشير",
-    "waiter": "جرسون",
+    "captain": "كابتن",
     "kitchen": "مطبخ"
 }
 
