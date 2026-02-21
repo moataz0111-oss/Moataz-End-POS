@@ -283,13 +283,12 @@ export default function Settings() {
   const [staffFilter, setStaffFilter] = useState({ branch_id: '', role: '' });
   
   // مجموعات الصلاحيات
-  const PERMISSION_GROUPS = ['الصفحات الرئيسية', 'التقارير والتحليلات', 'الميزات الخاصة', 'عرض المبيعات', 'الإعدادات'];
+  const PERMISSION_GROUPS = ['الصفحات الرئيسية', 'عمليات نقطة البيع', 'التقارير والتحليلات', 'الميزات الخاصة', 'عرض المبيعات', 'الإعدادات'];
   
   // جميع الصلاحيات المتاحة في النظام
   const ALL_PERMISSIONS = [
     // صلاحيات الصفحات الرئيسية
     { id: 'pos', name: 'نقطة البيع', description: 'الوصول لنقطة البيع', group: 'الصفحات الرئيسية', featureKey: 'showPOS' },
-    { id: 'pos_discount', name: 'إعطاء خصومات', description: 'السماح بإعطاء خصومات', group: 'الصفحات الرئيسية' },
     { id: 'orders', name: 'الطلبات', description: 'عرض الطلبات', group: 'الصفحات الرئيسية', featureKey: 'showOrders' },
     { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات', group: 'الصفحات الرئيسية', featureKey: 'showTables' },
     { id: 'kitchen', name: 'شاشة المطبخ', description: 'عرض طلبات المطبخ', group: 'الصفحات الرئيسية', featureKey: 'showKitchen' },
@@ -308,6 +307,13 @@ export default function Settings() {
     { id: 'branch_orders', name: 'طلبات الفروع', description: 'إدارة طلبات الفروع', group: 'الصفحات الرئيسية', featureKey: 'showBranchOrders' },
     { id: 'recipes', name: 'الوصفات', description: 'إدارة وصفات التصنيع', group: 'الصفحات الرئيسية', featureKey: 'showRecipes' },
     { id: 'customer_menu', name: 'قائمة العملاء', description: 'عرض قائمة الطعام للعملاء', group: 'الصفحات الرئيسية', featureKey: 'showCustomerMenu' },
+    
+    // صلاحيات عمليات نقطة البيع
+    { id: 'pos_discount', name: 'إعطاء خصومات', description: 'السماح بإعطاء خصومات على الطلبات', group: 'عمليات نقطة البيع' },
+    { id: 'pos_cancel', name: 'إلغاء الطلبات', description: 'السماح بإلغاء الطلبات', group: 'عمليات نقطة البيع' },
+    { id: 'pos_refund', name: 'المرتجعات', description: 'السماح بعمل مرتجعات', group: 'عمليات نقطة البيع' },
+    { id: 'pos_transfer_table', name: 'نقل الطاولة', description: 'نقل طلب من طاولة لأخرى', group: 'عمليات نقطة البيع' },
+    { id: 'pos_day_management', name: 'إدارة اليوم', description: 'إدارة يوم المبيعات', group: 'عمليات نقطة البيع' },
     
     // صلاحيات التقارير والتحليلات
     { id: 'reports', name: 'التقارير العامة', description: 'عرض التقارير الأساسية', group: 'التقارير والتحليلات', featureKey: 'showReports' },
