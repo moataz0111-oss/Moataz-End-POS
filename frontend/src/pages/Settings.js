@@ -2239,11 +2239,8 @@ export default function Settings() {
           )}
 
           {/* Branches */}
-                                <SelectItem key={key} value={key}>{name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
+          {hasRole(['admin', 'super_admin']) && settingsPermissions.settingsBranches && (
+            <TabsContent value="branches">
                         <Dialog open={staffDialogOpen} onOpenChange={setStaffDialogOpen}>
                           <DialogTrigger asChild>
                             <Button className="bg-primary text-primary-foreground">
