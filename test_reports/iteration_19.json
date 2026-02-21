@@ -98,7 +98,7 @@
   },
   
   "test_credentials": {
-    "api_url": "https://resto-finance-40.preview.emergentagent.com",
+    "api_url": "https://multi-tenant-pos-12.preview.emergentagent.com",
     "admin_email": "admin@maestroegp.com",
     "admin_password": "admin123"
   },
