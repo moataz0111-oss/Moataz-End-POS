@@ -35,7 +35,8 @@ import {
   CreditCard,
   Banknote,
   TrendingUp as Profit,
-  MinusCircle
+  MinusCircle,
+  Store
 } from 'lucide-react';
 import {
   Select,
