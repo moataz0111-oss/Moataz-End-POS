@@ -1904,6 +1904,55 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
     await db.users.delete_one({"id": user_id})
     return {"message": "تم حذف المستخدم"}
 
+@api_router.get("/tenant/limits")
+async def get_tenant_limits(current_user: dict = Depends(get_current_user)):
+    """جلب حدود العميل الحالي (الفروع والمستخدمين)"""
+    tenant_id = get_user_tenant_id(current_user)
+    
+    if not tenant_id:
+        return {
+            "max_branches": 999,
+            "max_users": 999,
+            "current_branches": 0,
+            "current_users": 0,
+            "branches_remaining": 999,
+            "users_remaining": 999
+        }
+    
+    tenant = await db.tenants.find_one({"id": tenant_id})
+    if not tenant:
+        return {
+            "max_branches": 1,
+            "max_users": 5,
+            "current_branches": 0,
+            "current_users": 0,
+            "branches_remaining": 1,
+            "users_remaining": 5
+        }
+    
+    max_branches = tenant.get("max_branches", 1)
+    max_users = tenant.get("max_users", 5)
+    
+    # حساب العدد الحالي (استثناء الفروع الافتراضية)
+    current_branches = await db.branches.count_documents({
+        "tenant_id": tenant_id, 
+        "is_active": {"$ne": False},
+        "name": {"$nin": ["الفرع الرئيسي", "Main Branch", "الفرع الثاني", "فرع المالك الرئيسي"]}
+    })
+    current_users = await db.users.count_documents({
+        "tenant_id": tenant_id, 
+        "is_active": {"$ne": False}
+    })
+    
+    return {
+        "max_branches": max_branches,
+        "max_users": max_users,
+        "current_branches": current_branches,
+        "current_users": current_users,
+        "branches_remaining": max(0, max_branches - current_branches),
+        "users_remaining": max(0, max_users - current_users)
+    }
+
 @api_router.post("/users", response_model=UserResponse)
 async def create_user(user: UserCreate, current_user: dict = Depends(get_current_user)):
     """إنشاء مستخدم جديد مع tenant_id تلقائياً"""
