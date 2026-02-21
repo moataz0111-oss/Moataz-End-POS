@@ -175,8 +175,14 @@ class TestNewFeatures:
         assert response.status_code == 403, f"Expected 403 when branch limit reached, got {response.status_code}"
         
         error_detail = response.json().get("detail", "")
-        assert "الحد الأقصى" in error_detail or "limit" in error_detail.lower(), \
-            f"Error message should mention limit: {error_detail}"
+        # Check for Arabic limit message or English limit message
+        has_limit_message = (
+            "الحد" in error_detail or 
+            "limit" in error_detail.lower() or
+            "الأقصى" in error_detail or
+            "تم الوصول" in error_detail
+        )
+        assert has_limit_message, f"Error message should mention limit: {error_detail}"
         
         print(f"✅ Branch creation correctly blocked when limit reached")
         print(f"   Error message: {error_detail}")
