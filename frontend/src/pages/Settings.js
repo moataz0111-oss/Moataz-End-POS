@@ -1547,14 +1547,6 @@ export default function Settings() {
                   {t('إعدادات النظام')}
                 </TabsTrigger>
               )}
-              {hasRole(['admin', 'super_admin']) && (
-                <TabsTrigger 
-                  value="dashboard"
-                  className="flex-shrink-0 px-4 py-2.5 text-sm font-medium rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  {t('التحكم بالميزات')}
-                </TabsTrigger>
-              )}
               {hasRole(['admin', 'super_admin', 'manager']) && (
                 <TabsTrigger 
                   value="invoice-settings"
