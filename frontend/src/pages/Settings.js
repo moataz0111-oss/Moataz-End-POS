@@ -2726,14 +2726,34 @@ export default function Settings() {
           {hasRole(['admin', 'super_admin']) && settingsPermissions.settingsBranches && (
             <TabsContent value="branches">
               <Card className="border-border/50 bg-card">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="flex items-center gap-2 text-foreground">
-                    <Store className="h-5 w-5" />{t('إدارة الفروع')}</CardTitle>
-                  <Dialog open={branchDialogOpen} onOpenChange={setBranchDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-primary text-primary-foreground">
-                        <Plus className="h-4 w-4 ml-2" />{t('إضافة فرع')}</Button>
-                    </DialogTrigger>
+                <CardHeader className="flex flex-col gap-4">
+                  {/* تنبيه الحد الأقصى للفروع */}
+                  {tenantLimits && tenantLimits.branches_remaining <= 0 && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-3">
+                      <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-red-500">{t('تم الوصول للحد الأقصى من الفروع')}</p>
+                        <p className="text-xs text-muted-foreground">{t('يرجى مراجعة مسؤول النظام لرفع الحد لتتمكن من إضافة فروع جديدة')}</p>
+                      </div>
+                    </div>
+                  )}
+                  {tenantLimits && tenantLimits.branches_remaining > 0 && tenantLimits.branches_remaining <= 1 && (
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg flex items-center gap-3">
+                      <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                      <p className="text-xs text-amber-600">{t('تبقى لديك')} {tenantLimits.branches_remaining} {t('فرع من الحد الأقصى المسموح')} ({tenantLimits.max_branches})</p>
+                    </div>
+                  )}
+                  <div className="flex flex-row items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-foreground">
+                      <Store className="h-5 w-5" />{t('إدارة الفروع')}</CardTitle>
+                    <Dialog open={branchDialogOpen} onOpenChange={setBranchDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button 
+                          className="bg-primary text-primary-foreground"
+                          disabled={tenantLimits && tenantLimits.branches_remaining <= 0}
+                        >
+                          <Plus className="h-4 w-4 ml-2" />{t('إضافة فرع')}</Button>
+                      </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle className="text-foreground">{t('إضافة فرع جديد')}</DialogTitle>
