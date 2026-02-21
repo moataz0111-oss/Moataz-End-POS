@@ -3024,6 +3024,9 @@ export default function SuperAdmin() {
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { key: 'showSmartReports', label: t('التقارير الذكية'), icon: BrainCircuit },
+                      { key: 'showComprehensiveReport', label: t('التقرير الشامل'), icon: FileText },
+                      { key: 'showOwnerWallet', label: t('خزينة المالك'), icon: Wallet },
+                      { key: 'showExternalBranches', label: t('إدارة الفروع الخارجية'), icon: Building2 },
                       { key: 'showBranchOrders', label: t('طلبات الفروع'), icon: GitBranch },
                       { key: 'showPurchasing', label: t('المشتريات'), icon: ShoppingCart },
                       { key: 'showReviews', label: t('التقييمات'), icon: Star },
