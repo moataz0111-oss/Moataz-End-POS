@@ -282,6 +282,9 @@ export default function Settings() {
   const [staffLoading, setStaffLoading] = useState(false);
   const [staffFilter, setStaffFilter] = useState({ branch_id: '', role: '' });
   
+  // فلتر المستخدمين حسب الدور
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  
   // مجموعات الصلاحيات
   const PERMISSION_GROUPS = ['الصفحات الرئيسية', 'عمليات نقطة البيع', 'التقارير والتحليلات', 'الميزات الخاصة', 'عرض المبيعات', 'الإعدادات'];
   
