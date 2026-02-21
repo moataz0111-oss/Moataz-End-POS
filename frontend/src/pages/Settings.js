@@ -1403,6 +1403,7 @@ export default function Settings() {
       manager: t('مدير'),
       supervisor: t('مشرف'),
       cashier: t('كاشير'),
+      captain: t('كابتن'),
       delivery: t('سائق توصيل')
     };
     return roles[role] || role;
@@ -2127,7 +2128,7 @@ export default function Settings() {
                                     </SelectTrigger>
                                     <SelectContent>
                                       <SelectItem value="cashier">{t('كاشير')}</SelectItem>
-                                      <SelectItem value="waiter">{t('ويتر')}</SelectItem>
+                                      <SelectItem value="captain">{t('كابتن')}</SelectItem>
                                       <SelectItem value="kitchen">{t('مطبخ')}</SelectItem>
                                       <SelectItem value="manager">{t('مدير')}</SelectItem>
                                       <SelectItem value="admin">{t('مدير عام')}</SelectItem>
@@ -2188,7 +2189,7 @@ export default function Settings() {
                                     u.role === 'cashier' ? 'bg-green-500/20 text-green-400' :
                                     'bg-gray-500/20 text-gray-400'
                                   }`}>
-                                    {u.role === 'admin' ? t('مدير عام') : u.role === 'manager' ? t('مدير') : u.role === 'cashier' ? t('كاشير') : u.role === 'waiter' ? t('ويتر') : u.role === 'kitchen' ? t('مطبخ') : u.role}
+                                    {u.role === 'admin' ? t('مدير عام') : u.role === 'manager' ? t('مدير') : u.role === 'cashier' ? t('كاشير') : u.role === 'captain' ? t('كابتن') : u.role === 'kitchen' ? t('مطبخ') : u.role}
                                   </span>
                                 </TableCell>
                                 <TableCell>{branches.find(b => b.id === u.branch_id)?.name || '-'}</TableCell>
