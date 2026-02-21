@@ -1918,6 +1918,18 @@ async def create_user(user: UserCreate, current_user: dict = Depends(get_current
     # الحصول على tenant_id من المستخدم الحالي
     tenant_id = get_user_tenant_id(current_user)
     
+    # التحقق من الحد الأقصى للمستخدمين
+    if tenant_id and current_user["role"] != UserRole.SUPER_ADMIN:
+        tenant = await db.tenants.find_one({"id": tenant_id})
+        if tenant:
+            max_users = tenant.get("max_users", 5)
+            current_users_count = await db.users.count_documents({"tenant_id": tenant_id, "is_active": {"$ne": False}})
+            if current_users_count >= max_users:
+                raise HTTPException(
+                    status_code=403, 
+                    detail=f"تم الوصول للحد الأقصى من المستخدمين ({max_users}). يرجى مراجعة مسؤول النظام لرفع الحد"
+                )
+    
     user_doc = {
         "id": str(uuid.uuid4()),
         "username": user.username,
@@ -1963,10 +1975,28 @@ async def create_branch(branch: BranchCreate, current_user: dict = Depends(get_c
     if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    tenant_id = get_user_tenant_id(current_user)
+    
+    # التحقق من الحد الأقصى للفروع
+    if tenant_id and current_user["role"] != UserRole.SUPER_ADMIN:
+        tenant = await db.tenants.find_one({"id": tenant_id})
+        if tenant:
+            max_branches = tenant.get("max_branches", 1)
+            current_branches_count = await db.branches.count_documents({
+                "tenant_id": tenant_id, 
+                "is_active": {"$ne": False},
+                "name": {"$nin": ["الفرع الرئيسي", "Main Branch", "الفرع الثاني", "فرع المالك الرئيسي"]}
+            })
+            if current_branches_count >= max_branches:
+                raise HTTPException(
+                    status_code=403, 
+                    detail=f"تم الوصول للحد الأقصى من الفروع ({max_branches}). يرجى مراجعة مسؤول النظام لرفع الحد"
+                )
+    
     branch_doc = {
         "id": str(uuid.uuid4()),
         **branch.model_dump(),
-        "tenant_id": get_user_tenant_id(current_user),  # فصل البيانات
+        "tenant_id": tenant_id,  # فصل البيانات
         "is_active": True,
         "created_at": datetime.now(timezone.utc).isoformat()
     }
