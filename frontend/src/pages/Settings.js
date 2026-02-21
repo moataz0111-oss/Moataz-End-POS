@@ -2242,7 +2242,6 @@ export default function Settings() {
           {hasRole(['admin', 'super_admin']) && settingsPermissions.settingsBranches && (
             <TabsContent value="branches">
               <Card className="border-border/50 bg-card">
-              <Card className="border-border/50 bg-card">
                 <CardHeader className="flex flex-col gap-4">
                   {/* تنبيه الحد الأقصى للفروع */}
                   {tenantLimits && tenantLimits.branches_remaining <= 0 && (
