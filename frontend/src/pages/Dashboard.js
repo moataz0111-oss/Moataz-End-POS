@@ -212,6 +212,30 @@ export default function Dashboard() {
     autoOpenShift(); // فتح الوردية تلقائياً
   }, [selectedBranchId]);
 
+  // تحديد الفترة الافتراضية بناءً على صلاحيات المستخدم
+  useEffect(() => {
+    // المدير والأدمن يرى كل الفترات
+    if (['admin', 'manager', 'owner'].includes(user?.role)) {
+      setStatsPeriod('today');
+      return;
+    }
+    
+    // تحديد أول فترة متاحة للمستخدم
+    const periodPermissions = [
+      { key: 'today', permission: 'sales_view_today' },
+      { key: 'week', permission: 'sales_view_week' },
+      { key: 'month', permission: 'sales_view_month' },
+      { key: 'all_time', permission: 'sales_view_all' }
+    ];
+    
+    if (user?.permissions && Array.isArray(user.permissions)) {
+      const availablePeriod = periodPermissions.find(p => user.permissions.includes(p.permission));
+      if (availablePeriod) {
+        setStatsPeriod(availablePeriod.key);
+      }
+    }
+  }, [user]);
+
   // التحقق من الطلبات الجديدة كل 10 ثواني
   useEffect(() => {
     checkNewOrders();
