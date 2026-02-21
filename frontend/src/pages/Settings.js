@@ -2355,31 +2355,6 @@ export default function Settings() {
                               </div>
                               <p className="text-xs text-muted-foreground mt-2">{t('يتم عرض الصلاحيات المفعلة للعميل فقط')}</p>
                             </div>
-                                      const newPerms = checked 
-                                        ? [...(editUserForm.permissions || []), 'owner_wallet']
-                                        : (editUserForm.permissions || []).filter(p => p !== 'owner_wallet');
-                                      setEditUserForm({ ...editUserForm, permissions: newPerms });
-                                    }}
-                                  />
-                                </div>
-                                {/* الفروع الخارجية */}
-                                <div className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
-                                  <div className="flex items-center gap-2">
-                                    <Store className="h-4 w-4 text-blue-500" />
-                                    <span className="text-sm text-foreground">{t('الفروع الخارجية')}</span>
-                                  </div>
-                                  <Switch
-                                    checked={editUserForm.permissions?.includes('external_branches')}
-                                    onCheckedChange={(checked) => {
-                                      const newPerms = checked 
-                                        ? [...(editUserForm.permissions || []), 'external_branches']
-                                        : (editUserForm.permissions || []).filter(p => p !== 'external_branches');
-                                      setEditUserForm({ ...editUserForm, permissions: newPerms });
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            </div>
                             
                             <div className="flex gap-2 pt-4">
                               <Button type="button" variant="outline" onClick={() => setEditUserDialogOpen(false)} className="flex-1">{t('إلغاء')}</Button>
