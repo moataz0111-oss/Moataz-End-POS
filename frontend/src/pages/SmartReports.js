@@ -84,17 +84,23 @@ export default function SmartReports() {
 
   useEffect(() => {
     fetchReportData();
-  }, [period]);
+  }, [period, selectedBranch]);
 
   const fetchReportData = async () => {
     setLoading(true);
     try {
+      // إعداد المعاملات
+      const params = { period };
+      if (selectedBranch && selectedBranch !== 'all') {
+        params.branch_id = selectedBranch;
+      }
+      
       // جلب البيانات من APIs متعددة
       const [salesRes, productsRes, hourlyRes, expensesRes] = await Promise.all([
-        axios.get(`${API}/smart-reports/sales`, { params: { period } }).catch(() => ({ data: {} })),
-        axios.get(`${API}/smart-reports/products`, { params: { period } }).catch(() => ({ data: {} })),
-        axios.get(`${API}/smart-reports/hourly`).catch(() => ({ data: {} })),
-        axios.get(`${API}/expenses`, { params: { period } }).catch(() => ({ data: [] }))
+        axios.get(`${API}/smart-reports/sales`, { params }).catch(() => ({ data: {} })),
+        axios.get(`${API}/smart-reports/products`, { params }).catch(() => ({ data: {} })),
+        axios.get(`${API}/smart-reports/hourly`, { params }).catch(() => ({ data: {} })),
+        axios.get(`${API}/expenses`, { params }).catch(() => ({ data: [] }))
       ]);
       
       const salesData = salesRes.data || {};
