@@ -790,7 +790,7 @@ export default function Dashboard() {
     const defaultPermissionsByRole = {
       'cashier': ['pos', 'tables', 'orders'],
       'supervisor': ['pos', 'tables', 'orders', 'kitchen', 'reports', 'expenses', 'delivery'],
-      'waiter': ['tables', 'orders'],
+      'captain': ['tables', 'orders'],
       'kitchen': ['kitchen', 'orders']
     };
     

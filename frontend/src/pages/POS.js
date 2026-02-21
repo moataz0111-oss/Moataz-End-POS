@@ -1901,7 +1901,7 @@ export default function POS() {
               {user && (
                 <p>
                   <span className="font-medium">{t('الكاشير')}:</span> {user.full_name || user.username} 
-                  {user.role && <span className="text-gray-500"> ({t(user.role === 'admin' ? 'مدير' : user.role === 'cashier' ? 'كاشير' : user.role === 'waiter' ? 'نادل' : user.role)})</span>}
+                  {user.role && <span className="text-gray-500"> ({t(user.role === 'admin' ? 'مدير' : user.role === 'cashier' ? 'كاشير' : user.role === 'captain' ? 'كابتن' : user.role)})</span>}
                 </p>
               )}
             </div>
