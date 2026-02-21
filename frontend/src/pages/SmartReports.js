@@ -360,6 +360,21 @@ export default function SmartReports() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* اختيار الفرع */}
+            <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+              <SelectTrigger className="w-44">
+                <Store className="h-4 w-4 ml-2" />
+                <SelectValue placeholder={t('اختر الفرع')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('جميع الفروع')}</SelectItem>
+                {branches.map(branch => (
+                  <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {/* اختيار الفترة */}
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-36">
                 <Calendar className="h-4 w-4 ml-2" />
