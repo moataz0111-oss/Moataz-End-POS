@@ -53,6 +53,8 @@ export default function SmartReports() {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('today');
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedBranch, setSelectedBranch] = useState('all');
+  const [branches, setBranches] = useState([]);
   const [data, setData] = useState({
     summary: {},
     profitLoss: {},
@@ -66,6 +68,19 @@ export default function SmartReports() {
     comparisons: {},
     insights: []
   });
+
+  // جلب قائمة الفروع
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const res = await axios.get(`${API}/branches`);
+        setBranches(res.data || []);
+      } catch (error) {
+        console.error('Error fetching branches:', error);
+      }
+    };
+    fetchBranches();
+  }, []);
 
   useEffect(() => {
     fetchReportData();
