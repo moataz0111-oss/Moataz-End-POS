@@ -2805,6 +2805,7 @@ export default function Settings() {
                       </form>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -3183,6 +3184,7 @@ export default function Settings() {
                       </form>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {categories.length === 0 ? (
@@ -3528,6 +3530,7 @@ export default function Settings() {
                       </form>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {products.length === 0 ? (
@@ -3895,6 +3898,7 @@ export default function Settings() {
                       </form>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {printers.length === 0 ? (
