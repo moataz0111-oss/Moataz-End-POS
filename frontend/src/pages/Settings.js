@@ -2232,32 +2232,13 @@ export default function Settings() {
                           </TableBody>
                         </Table>
                       </div>
-                    </TabsContent>
-                    
-                    {/* قسم الموظفين */}
-                    <TabsContent value="employees" className="space-y-4">
-                      <div className="flex justify-between items-center flex-wrap gap-4">
-                        <div className="flex gap-2 flex-wrap">
-                          {/* فلترة بالفرع */}
-                          <Select value={staffFilter.branch_id} onValueChange={(val) => setStaffFilter({...staffFilter, branch_id: val === 'all' ? '' : val})}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder={t('جميع الفروع')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">{t('جميع الفروع')}</SelectItem>
-                              {branches.map(branch => (
-                                <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {/* فلترة بالدور */}
-                          <Select value={staffFilter.role} onValueChange={(val) => setStaffFilter({...staffFilter, role: val === 'all' ? '' : val})}>
-                            <SelectTrigger className="w-[150px]">
-                              <SelectValue placeholder={t('جميع الأدوار')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">{t('جميع الأدوار')}</SelectItem>
-                              {Object.entries(staffRoles).map(([key, name]) => (
+                    </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
+
+          {/* Branches */}
                                 <SelectItem key={key} value={key}>{name}</SelectItem>
                               ))}
                             </SelectContent>
