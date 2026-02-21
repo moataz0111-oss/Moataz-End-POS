@@ -2159,6 +2159,64 @@ export default function Settings() {
                       </div>
                       
                       {/* جدول المستخدمين */}
+                      {/* فلتر حسب الدور */}
+                      <div className="flex items-center gap-4 mb-4 p-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Filter className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm text-muted-foreground">{t('فلترة حسب الدور')}:</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            variant={userRoleFilter === 'all' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setUserRoleFilter('all')}
+                            className="h-8"
+                          >
+                            {t('الكل')} ({users.length})
+                          </Button>
+                          <Button
+                            variant={userRoleFilter === 'admin' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setUserRoleFilter('admin')}
+                            className="h-8"
+                          >
+                            {t('مدير عام')} ({users.filter(u => u.role === 'admin').length})
+                          </Button>
+                          <Button
+                            variant={userRoleFilter === 'manager' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setUserRoleFilter('manager')}
+                            className="h-8"
+                          >
+                            {t('مدير')} ({users.filter(u => u.role === 'manager').length})
+                          </Button>
+                          <Button
+                            variant={userRoleFilter === 'cashier' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setUserRoleFilter('cashier')}
+                            className="h-8"
+                          >
+                            {t('كاشير')} ({users.filter(u => u.role === 'cashier').length})
+                          </Button>
+                          <Button
+                            variant={userRoleFilter === 'captain' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setUserRoleFilter('captain')}
+                            className="h-8"
+                          >
+                            {t('كابتن')} ({users.filter(u => u.role === 'captain').length})
+                          </Button>
+                          <Button
+                            variant={userRoleFilter === 'kitchen' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setUserRoleFilter('kitchen')}
+                            className="h-8"
+                          >
+                            {t('مطبخ')} ({users.filter(u => u.role === 'kitchen').length})
+                          </Button>
+                        </div>
+                      </div>
+                      
                       <div className="border border-border rounded-lg overflow-hidden">
                         <Table>
                           <TableHeader>
@@ -2171,7 +2229,7 @@ export default function Settings() {
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {users.map(u => (
+                            {users.filter(u => userRoleFilter === 'all' || u.role === userRoleFilter).map(u => (
                               <TableRow key={u.id}>
                                 <TableCell>
                                   <div className="flex items-center gap-2">
