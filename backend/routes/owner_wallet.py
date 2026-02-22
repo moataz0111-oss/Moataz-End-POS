@@ -240,14 +240,20 @@ async def create_profit_transfer(
     db = get_database()
     tenant_id = get_user_tenant_id(current_user)
     
-    # التحقق من عدم وجود تحويل لنفس الشهر
-    existing = await db.owner_profit_transfers.find_one({
-        "tenant_id": tenant_id,
-        "month": transfer.month
-    })
+    query = {"tenant_id": tenant_id} if tenant_id else {}
     
-    if existing:
-        raise HTTPException(status_code=400, detail="يوجد تحويل أرباح لهذا الشهر مسبقاً")
+    # عدد عمليات الإيداع
+    deposits_count = await db.owner_deposits.count_documents(query)
+    
+    # عدد تحويلات الأرباح الحالية
+    transfers_count = await db.owner_profit_transfers.count_documents(query)
+    
+    # التحقق: عدد التحويلات يجب أن يكون أقل من عدد الإيداعات
+    if transfers_count >= deposits_count:
+        raise HTTPException(
+            status_code=400, 
+            detail="لا يمكن تحويل أرباح جديدة. يجب إضافة عملية إيداع جديدة أولاً"
+        )
     
     new_transfer = {
         "id": str(uuid.uuid4()),
