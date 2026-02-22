@@ -8897,7 +8897,8 @@ async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user
             "owner_wallet_reset": {
                 "deleted_deposits": deposits_result.deleted_count,
                 "deleted_withdrawals": withdrawals_result.deleted_count,
-                "deleted_profit_transfers": profit_transfers_result.deleted_count
+                "deleted_profit_transfers": profit_transfers_result.deleted_count,
+                "deleted_profit_withdrawals": profit_withdrawals_result.deleted_count
             }
         }
     
@@ -8923,6 +8924,7 @@ async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user
     deposits_result = await db.owner_deposits.delete_many({"tenant_id": tenant_id})
     withdrawals_result = await db.owner_withdrawals.delete_many({"tenant_id": tenant_id})
     profit_transfers_result = await db.owner_profit_transfers.delete_many({"tenant_id": tenant_id})
+    profit_withdrawals_result = await db.owner_profit_withdrawals.delete_many({"tenant_id": tenant_id})
     
     return {
         "message": f"تم تصفير مبيعات '{tenant['name']}' بنجاح",
@@ -8931,7 +8933,8 @@ async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user
         "owner_wallet_reset": {
             "deleted_deposits": deposits_result.deleted_count,
             "deleted_withdrawals": withdrawals_result.deleted_count,
-            "deleted_profit_transfers": profit_transfers_result.deleted_count
+            "deleted_profit_transfers": profit_transfers_result.deleted_count,
+            "deleted_profit_withdrawals": profit_withdrawals_result.deleted_count
         }
     }
 
