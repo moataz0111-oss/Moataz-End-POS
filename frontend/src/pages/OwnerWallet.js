@@ -523,7 +523,7 @@ export default function OwnerWallet() {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     <ArrowDownCircle className="h-5 w-5 text-emerald-500" />
-                    {t('الإيداعات')} ({selectedMonth})
+                    {t('الإيداعات')} ({formatMonth(selectedMonth)})
                   </CardTitle>
                   <Badge variant="secondary">{formatPrice(deposits.reduce((s, d) => s + d.amount, 0))}</Badge>
                 </CardHeader>
@@ -543,7 +543,7 @@ export default function OwnerWallet() {
                             </div>
                             <div>
                               <p className="font-medium text-emerald-700 dark:text-emerald-400">{formatPrice(deposit.amount)}</p>
-                              <p className="text-xs text-muted-foreground">{sourceLabels[deposit.source]} • {deposit.date?.split('-').reverse().join('/')}</p>
+                              <p className="text-xs text-muted-foreground">{sourceLabels[deposit.source]} • {formatDate(deposit.date)}</p>
                               {deposit.description && <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">📝 {deposit.description}</p>}
                               {deposit.branch_name && <p className="text-xs text-purple-600 dark:text-purple-400">🏪 {deposit.branch_name}</p>}
                             </div>
@@ -563,7 +563,7 @@ export default function OwnerWallet() {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     <ArrowUpCircle className="h-5 w-5 text-rose-500" />
-                    {t('السحوبات')} ({selectedMonth})
+                    {t('السحوبات')} ({formatMonth(selectedMonth)})
                   </CardTitle>
                   <Badge variant="destructive">{formatPrice(withdrawals.reduce((s, w) => s + w.amount, 0))}</Badge>
                 </CardHeader>
