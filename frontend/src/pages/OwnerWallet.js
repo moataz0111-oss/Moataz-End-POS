@@ -261,7 +261,8 @@ export default function OwnerWallet() {
   const transactionTypeLabels = {
     deposit: t('إيداع'),
     withdrawal: t('سحب'),
-    profit_transfer: t('تحويل ربح')
+    profit_transfer: t('تحويل ربح'),
+    profit_withdrawal: t('سحب أرباح')
   };
 
   if (loading) {
