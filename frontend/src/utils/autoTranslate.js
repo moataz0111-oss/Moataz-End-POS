@@ -3291,6 +3291,15 @@ const translationMap = {
   'فشل في سحب الأرباح': { en: 'Failed to withdraw profits', ku: 'کاشکردنی قازانج سەرنەکەوت' },
   'المبلغ أكبر من الرصيد المتاح في الخزينة': { en: 'Amount exceeds available safe balance', ku: 'بڕەکە لە باڵانسی بەردەست زیاترە' },
   'يرجى إدخال مبلغ صحيح': { en: 'Please enter a valid amount', ku: 'تکایە بڕێکی دروست بنووسە' },
+  // سجل التحويلات والسحب
+  'سجل تحويلات الأرباح والسحب': { en: 'Profit Transfers & Withdrawals History', ku: 'مێژووی گواستنەوە و کاشکردنی قازانج' },
+  'لا توجد تحويلات أو سحوبات أرباح': { en: 'No profit transfers or withdrawals', ku: 'هیچ گواستنەوە یان کاشکردنی قازانج نییە' },
+  'تحويل': { en: 'Transfer', ku: 'گواستنەوە' },
+  'سحب': { en: 'Withdrawal', ku: 'کاشکردن' },
+  // إشعار الحد الأدنى
+  'تنبيه: الخزينة وصلت للحد الأدنى': { en: 'Warning: Safe reached minimum balance', ku: 'ئاگاداری: خەزنە گەیشتووە بە کەمترین باڵانس' },
+  'الرصيد الحالي': { en: 'Current Balance', ku: 'باڵانسی ئێستا' },
+  'الحد الأدنى': { en: 'Minimum', ku: 'کەمترین' },
 };
 
 // الحصول على اللغة الحالية
