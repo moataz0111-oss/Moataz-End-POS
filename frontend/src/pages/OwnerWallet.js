@@ -95,7 +95,6 @@ export default function OwnerWallet() {
   
   // الحد الأدنى للخزينة
   const SAFE_MIN_BALANCE = 50000; // 50,000 IQD
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   
   // نماذج
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
