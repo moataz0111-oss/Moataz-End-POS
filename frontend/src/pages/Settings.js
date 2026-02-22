@@ -286,6 +286,10 @@ export default function Settings() {
   // فلتر المستخدمين حسب الدور
   const [userRoleFilter, setUserRoleFilter] = useState('all');
   
+  // تعديل شركة التوصيل
+  const [editDeliveryApp, setEditDeliveryApp] = useState(null);
+  const [editDeliveryAppDialogOpen, setEditDeliveryAppDialogOpen] = useState(false);
+  
   // مجموعات الصلاحيات
   const PERMISSION_GROUPS = ['الصفحات الرئيسية', 'عمليات نقطة البيع', 'التقارير والتحليلات', 'الميزات الخاصة', 'عرض المبيعات', 'الإعدادات'];
   
