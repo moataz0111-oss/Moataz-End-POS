@@ -176,7 +176,7 @@ export default function ExternalBranchesManagement() {
     try {
       const selectedMonth = selectedDate.slice(0, 7); // استخراج YYYY-MM من التاريخ
       const [summaryRes, paymentsRes] = await Promise.all([
-        axios.get(`${API}/external-branches/${soldBranch.id}/summary?month=${selectedMonth}`),
+        axios.get(`${API}/external-branches/${soldBranch.id}/summary?month=${selectedDate.slice(0, 7)}`),
         axios.get(`${API}/external-branches/${soldBranch.id}/payments`)
       ]);
       
