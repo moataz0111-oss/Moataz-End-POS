@@ -584,7 +584,7 @@ export default function OwnerWallet() {
                             <div>
                               <p className="font-medium text-rose-700 dark:text-rose-400">{formatPrice(withdrawal.amount)}</p>
                               <p className="text-xs text-muted-foreground">{withdrawal.beneficiary} • {categoryLabels[withdrawal.category]}</p>
-                              <p className="text-xs text-muted-foreground">{withdrawal.date?.split('-').reverse().join('/')}</p>
+                              <p className="text-xs text-muted-foreground">{formatDate(withdrawal.date)}</p>
                               {withdrawal.description && <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">📝 {withdrawal.description}</p>}
                             </div>
                           </div>
