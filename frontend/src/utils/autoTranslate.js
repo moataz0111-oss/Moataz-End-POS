@@ -3281,6 +3281,16 @@ const translationMap = {
   'سداد دين': { en: 'Debt Payment', ku: 'دانەوەی قەرز' },
   'دفع مورد': { en: 'Supplier Payment', ku: 'پارەدان بە دابینکەر' },
   'أخرى': { en: 'Other', ku: 'تر' },
+  // سحب الأرباح من الخزينة
+  'سحب الأرباح': { en: 'Withdraw Profits', ku: 'کاشکردنی قازانج' },
+  'سحب أرباح': { en: 'Profit Withdrawal', ku: 'کاشکردنی قازانج' },
+  'سبب السحب': { en: 'Withdrawal Reason', ku: 'هۆکاری کاشکردن' },
+  'اختياري - سبب السحب': { en: 'Optional - Withdrawal reason', ku: 'ئارەزوومەندانە - هۆکاری کاشکردن' },
+  'أدخل المبلغ': { en: 'Enter amount', ku: 'بڕەکە بنووسە' },
+  'تم سحب الأرباح بنجاح': { en: 'Profits withdrawn successfully', ku: 'قازانج بە سەرکەوتوویی کاشکرا' },
+  'فشل في سحب الأرباح': { en: 'Failed to withdraw profits', ku: 'کاشکردنی قازانج سەرنەکەوت' },
+  'المبلغ أكبر من الرصيد المتاح في الخزينة': { en: 'Amount exceeds available safe balance', ku: 'بڕەکە لە باڵانسی بەردەست زیاترە' },
+  'يرجى إدخال مبلغ صحيح': { en: 'Please enter a valid amount', ku: 'تکایە بڕێکی دروست بنووسە' },
 };
 
 // الحصول على اللغة الحالية
