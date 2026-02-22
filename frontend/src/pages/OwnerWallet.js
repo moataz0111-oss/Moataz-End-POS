@@ -116,8 +116,8 @@ export default function OwnerWallet() {
     try {
       const [summaryRes, depositsRes, withdrawalsRes, transfersRes, closingsRes] = await Promise.all([
         axios.get(`${API}/owner-wallet/summary`),
-        axios.get(`${API}/owner-wallet/deposits?month=${selectedMonth}`),
-        axios.get(`${API}/owner-wallet/withdrawals?month=${selectedMonth}`),
+        axios.get(`${API}/owner-wallet/deposits?month=${selectedDate.slice(0, 7)}`),
+        axios.get(`${API}/owner-wallet/withdrawals?month=${selectedDate.slice(0, 7)}`),
         axios.get(`${API}/owner-wallet/profit-transfers`),
         axios.get(`${API}/owner-wallet/monthly-closings`)
       ]);
