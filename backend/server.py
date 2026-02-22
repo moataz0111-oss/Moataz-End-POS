@@ -8837,6 +8837,7 @@ async def reset_all_sales(confirm: bool = False, current_user: dict = Depends(ve
     deposits_result = await db.owner_deposits.delete_many({})
     withdrawals_result = await db.owner_withdrawals.delete_many({})
     profit_transfers_result = await db.owner_profit_transfers.delete_many({})
+    profit_withdrawals_result = await db.owner_profit_withdrawals.delete_many({})
     
     return {
         "message": "تم تصفير جميع المبيعات بنجاح",
@@ -8845,7 +8846,8 @@ async def reset_all_sales(confirm: bool = False, current_user: dict = Depends(ve
         "owner_wallet_reset": {
             "deleted_deposits": deposits_result.deleted_count,
             "deleted_withdrawals": withdrawals_result.deleted_count,
-            "deleted_profit_transfers": profit_transfers_result.deleted_count
+            "deleted_profit_transfers": profit_transfers_result.deleted_count,
+            "deleted_profit_withdrawals": profit_withdrawals_result.deleted_count
         }
     }
 
