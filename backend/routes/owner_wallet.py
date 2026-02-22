@@ -69,13 +69,13 @@ async def get_wallet_summary(current_user: dict = Depends(get_current_user)):
     profit_withdrawals = await db.owner_profit_withdrawals.find(query, {"_id": 0}).to_list(1000)
     total_profit_withdrawn = sum(w.get("amount", 0) for w in profit_withdrawals)
     
-    # الرصيد المتاح (الإيداعات - السحوبات)
-    available_balance = total_deposits - total_withdrawals
+    # الرصيد المتاح = الإيداعات - السحوبات - التحويلات للخزينة
+    available_balance = total_deposits - total_withdrawals - total_profit_transferred
     
     # رصيد الخزينة = الأرباح المحولة - الأرباح المسحوبة
     safe_balance = total_profit_transferred - total_profit_withdrawn
     
-    # آخر 5 معاملات
+    # آخر 10 معاملات
     all_transactions = []
     for d in deposits[-5:]:
         all_transactions.append({**d, "type": "deposit"})
@@ -92,7 +92,7 @@ async def get_wallet_summary(current_user: dict = Depends(get_current_user)):
     return {
         "total_deposits": total_deposits,
         "total_withdrawals": total_withdrawals,
-        "available_balance": available_balance,
+        "available_balance": available_balance,  # الإيداعات - السحوبات - التحويلات
         "safe_balance": safe_balance,  # رصيد الخزينة الشخصية (المحول - المسحوب)
         "total_profit_transferred": total_profit_transferred,
         "total_profit_withdrawn": total_profit_withdrawn,
