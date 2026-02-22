@@ -185,7 +185,7 @@ export default function OwnerWallet() {
       });
       toast.success(t('تم تحويل الأرباح للخزينة بنجاح'));
       setProfitDialogOpen(false);
-      setNewProfitTransfer({ amount: '', month: selectedMonth, description: '' });
+      setNewProfitTransfer({ amount: '', month: selectedDate, description: '' });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || t('فشل في تحويل الأرباح'));
