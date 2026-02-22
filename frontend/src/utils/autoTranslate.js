@@ -3075,6 +3075,7 @@ const translationMap = {
   'السجل': { en: 'History', ku: 'مێژوو' },
   'لا توجد إيداعات': { en: 'No deposits', ku: 'هیچ دانانێک نییە' },
   'لا توجد سحوبات': { en: 'No withdrawals', ku: 'هیچ دەرهێنانێک نییە' },
+  'عملية': { en: 'transaction', ku: 'مامەڵە' },
   'سجل تحويلات الأرباح': { en: 'Profit Transfers History', ku: 'مێژووی گواستنەوەی قازانج' },
   'لا توجد تحويلات أرباح': { en: 'No profit transfers', ku: '' },
   'محول': { en: 'Transferred', ku: 'گواستراوە' },
