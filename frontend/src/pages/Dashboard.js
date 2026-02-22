@@ -722,7 +722,7 @@ export default function Dashboard() {
       <body>
         ${printContent.innerHTML}
         <div class="footer">
-          <p>Maestro EGP - ${new Date().toLocaleString('en-US')}</p>
+          <p>Maestro EGP - ${new Date().toLocaleString('en-GB')}</p>
         </div>
       </body>
       </html>
