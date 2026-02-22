@@ -1405,6 +1405,33 @@ export default function Settings() {
     }
   };
 
+  // تعديل اسم شركة التوصيل
+  const handleEditDeliveryAppName = async () => {
+    if (!editDeliveryApp || !editDeliveryApp.name) {
+      toast.error(t('يرجى إدخال اسم الشركة'));
+      return;
+    }
+    
+    try {
+      await axios.post(`${API}/delivery-app-settings`, {
+        app_id: editDeliveryApp.id,
+        name: editDeliveryApp.name,
+        name_en: editDeliveryApp.name_en || editDeliveryApp.name,
+        commission_type: 'percentage',
+        commission_rate: editDeliveryApp.commission_rate || 0,
+        is_active: editDeliveryApp.is_active !== false,
+        payment_terms: 'weekly'
+      });
+      toast.success(t('تم تحديث بيانات الشركة'));
+      setEditDeliveryAppDialogOpen(false);
+      setEditDeliveryApp(null);
+      fetchData();
+    } catch (error) {
+      toast.error(t('فشل في تحديث بيانات الشركة'));
+    }
+  };
+  };
+
   const getRoleText = (role) => {
     const roles = {
       admin: t('مدير النظام'),
