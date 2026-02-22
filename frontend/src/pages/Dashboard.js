@@ -2226,7 +2226,7 @@ export default function Dashboard() {
                 ) : (
                   <Check className="h-4 w-4" />
                 )}
-                إغلاق اليوم وترحيل
+                {t('إغلاق اليوم وترحيل')}
               </Button>
             )}
           </DialogFooter>
