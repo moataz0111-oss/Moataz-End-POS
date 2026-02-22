@@ -559,7 +559,7 @@ export default function OwnerWallet() {
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-base flex items-center gap-2">
                     <ArrowUpCircle className="h-5 w-5 text-rose-500" />
-                    {t('السحوبات')} ({formatMonth(selectedMonth)})
+                    {t('السحوبات')} ({formatDate(selectedDate)})
                   </CardTitle>
                   <Badge variant="destructive">{formatPrice(withdrawals.reduce((s, w) => s + w.amount, 0))}</Badge>
                 </CardHeader>
