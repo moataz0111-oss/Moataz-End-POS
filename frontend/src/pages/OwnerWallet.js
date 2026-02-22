@@ -121,11 +121,12 @@ export default function OwnerWallet() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [summaryRes, depositsRes, withdrawalsRes, transfersRes, closingsRes] = await Promise.all([
+      const [summaryRes, depositsRes, withdrawalsRes, transfersRes, profitWithdrawalsRes, closingsRes] = await Promise.all([
         axios.get(`${API}/owner-wallet/summary`),
         axios.get(`${API}/owner-wallet/deposits?month=${selectedDate.slice(0, 7)}`),
         axios.get(`${API}/owner-wallet/withdrawals?month=${selectedDate.slice(0, 7)}`),
         axios.get(`${API}/owner-wallet/profit-transfers`),
+        axios.get(`${API}/owner-wallet/profit-withdrawals`),
         axios.get(`${API}/owner-wallet/monthly-closings`)
       ]);
       
@@ -133,6 +134,7 @@ export default function OwnerWallet() {
       setDeposits(depositsRes.data);
       setWithdrawals(withdrawalsRes.data);
       setProfitTransfers(transfersRes.data);
+      setProfitWithdrawals(profitWithdrawalsRes.data);
       setMonthlyClosings(closingsRes.data);
     } catch (error) {
       console.error('Failed to fetch wallet data:', error);
