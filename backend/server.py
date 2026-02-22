@@ -8867,10 +8867,26 @@ async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user
             "last_order_date": None
         }})
         
+        # تصفير خزينة المالك للنظام الرئيسي
+        deposits_result = await db.owner_deposits.delete_many({
+            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+        })
+        withdrawals_result = await db.owner_withdrawals.delete_many({
+            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+        })
+        profit_transfers_result = await db.owner_profit_transfers.delete_many({
+            "$or": [{"tenant_id": {"$exists": False}}, {"tenant_id": None}]
+        })
+        
         return {
             "message": "تم تصفير مبيعات النظام الرئيسي بنجاح",
             "deleted_orders": orders_result.deleted_count,
-            "deleted_shifts": shifts_result.deleted_count
+            "deleted_shifts": shifts_result.deleted_count,
+            "owner_wallet_reset": {
+                "deleted_deposits": deposits_result.deleted_count,
+                "deleted_withdrawals": withdrawals_result.deleted_count,
+                "deleted_profit_transfers": profit_transfers_result.deleted_count
+            }
         }
     
     # للعملاء العاديين
@@ -8891,10 +8907,20 @@ async def reset_tenant_sales(tenant_id: str, confirm: bool = False, current_user
         "last_order_date": None
     }})
     
+    # تصفير خزينة المالك للعميل
+    deposits_result = await db.owner_deposits.delete_many({"tenant_id": tenant_id})
+    withdrawals_result = await db.owner_withdrawals.delete_many({"tenant_id": tenant_id})
+    profit_transfers_result = await db.owner_profit_transfers.delete_many({"tenant_id": tenant_id})
+    
     return {
         "message": f"تم تصفير مبيعات '{tenant['name']}' بنجاح",
         "deleted_orders": orders_result.deleted_count,
-        "deleted_shifts": shifts_result.deleted_count
+        "deleted_shifts": shifts_result.deleted_count,
+        "owner_wallet_reset": {
+            "deleted_deposits": deposits_result.deleted_count,
+            "deleted_withdrawals": withdrawals_result.deleted_count,
+            "deleted_profit_transfers": profit_transfers_result.deleted_count
+        }
     }
 
 @api_router.post("/super-admin/tenants/{tenant_id}/reset-inventory")
