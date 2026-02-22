@@ -3961,7 +3961,7 @@ export default function Settings() {
                               />
                               <Percent className="h-4 w-4 text-muted-foreground" />
                             </div>
-                            <p className="text-sm text-muted-foreground">{t('(حالياً: {app.commission_rate || 0}%)')}</p>
+                            <p className="text-sm text-muted-foreground">({t('حالياً')}: {app.commission_rate || 0}%)</p>
                           </div>
                         </div>
                       ))
