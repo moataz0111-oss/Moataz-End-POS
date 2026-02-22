@@ -257,10 +257,10 @@ export default function ExternalBranchesManagement() {
             
             <div className="flex items-center gap-3">
               <Input
-                type="month"
-                value={selectedDate.slice(0, 7)}
-                onChange={(e) => setSelectedDate(e.target.value + '-01')}
-                className="w-40"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-44"
               />
               <Button onClick={fetchData} variant="outline" size="sm">
                 <RefreshCw className="h-4 w-4" />
