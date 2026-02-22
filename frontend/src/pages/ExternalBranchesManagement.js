@@ -82,7 +82,7 @@ export default function ExternalBranchesManagement() {
   const [loading, setLoading] = useState(true);
   const [soldBranches, setSoldBranches] = useState([]);
   const [availableBranches, setAvailableBranches] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   const [monthlyReport, setMonthlyReport] = useState(null);
   const [dashboardStats, setDashboardStats] = useState(null);
   
