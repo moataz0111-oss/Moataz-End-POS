@@ -8833,10 +8833,20 @@ async def reset_all_sales(confirm: bool = False, current_user: dict = Depends(ve
         "current_order_id": None
     }})
     
+    # تصفير خزينة المالك
+    deposits_result = await db.owner_deposits.delete_many({})
+    withdrawals_result = await db.owner_withdrawals.delete_many({})
+    profit_transfers_result = await db.owner_profit_transfers.delete_many({})
+    
     return {
         "message": "تم تصفير جميع المبيعات بنجاح",
         "deleted_orders": orders_result.deleted_count,
-        "deleted_shifts": shifts_result.deleted_count
+        "deleted_shifts": shifts_result.deleted_count,
+        "owner_wallet_reset": {
+            "deleted_deposits": deposits_result.deleted_count,
+            "deleted_withdrawals": withdrawals_result.deleted_count,
+            "deleted_profit_transfers": profit_transfers_result.deleted_count
+        }
     }
 
 @api_router.post("/super-admin/tenants/{tenant_id}/reset-sales")
