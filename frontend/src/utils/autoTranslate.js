@@ -3069,6 +3069,8 @@ const translationMap = {
   'تحويل أرباح للخزينة الشخصية': { en: 'Transfer profits to personal safe', ku: 'گواستنەوەی قازانج بۆ جانتای کەسی' },
   'هذا المبلغ سيُضاف لخزينتك الشخصية كأرباح صافية بعد سداد جميع الالتزامات': { en: 'This amount will be added to your personal safe as net profit after paying all obligations', ku: '' },
   'المعاملات': { en: 'Transactions', ku: 'مامەڵەکان' },
+  'الإيداعات': { en: 'Deposits', ku: 'دانانەکان' },
+  'السحوبات': { en: 'Withdrawals', ku: 'دەرهێنانەکان' },
   'الخزينة': { en: 'Safe', ku: 'جانتا' },
   'السجل': { en: 'History', ku: 'مێژوو' },
   'لا توجد إيداعات': { en: 'No deposits', ku: 'هیچ دانانێک نییە' },
