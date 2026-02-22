@@ -82,12 +82,19 @@ export default function OwnerWallet() {
     total_withdrawals: 0,
     available_balance: 0,
     safe_balance: 0,
+    total_profit_transferred: 0,
+    total_profit_withdrawn: 0,
     recent_transactions: []
   });
   const [deposits, setDeposits] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
   const [profitTransfers, setProfitTransfers] = useState([]);
+  const [profitWithdrawals, setProfitWithdrawals] = useState([]);
   const [monthlyClosings, setMonthlyClosings] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
+  
+  // الحد الأدنى للخزينة
+  const SAFE_MIN_BALANCE = 50000; // 50,000 IQD
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().slice(0, 10));
   
   // نماذج
