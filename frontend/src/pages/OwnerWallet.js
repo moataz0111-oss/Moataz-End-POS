@@ -707,31 +707,52 @@ export default function OwnerWallet() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">{t('سجل تحويلات الأرباح')}</CardTitle>
+                <CardTitle className="text-base">{t('سجل تحويلات الأرباح والسحب')}</CardTitle>
               </CardHeader>
               <CardContent>
-                {profitTransfers.length === 0 ? (
+                {profitTransfers.length === 0 && profitWithdrawals.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <Target className="h-10 w-10 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">{t('لا توجد تحويلات أرباح')}</p>
+                    <p className="text-sm">{t('لا توجد تحويلات أو سحوبات أرباح')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {profitTransfers.map((transfer) => (
-                      <div key={transfer.id} className="flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
-                            <CheckCircle2 className="h-5 w-5 text-amber-600" />
+                    {/* عرض كل العمليات مرتبة حسب التاريخ */}
+                    {[
+                      ...profitTransfers.map(t => ({...t, opType: 'transfer'})),
+                      ...profitWithdrawals.map(w => ({...w, opType: 'withdrawal'}))
+                    ]
+                      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                      .map((item, idx) => (
+                        <div key={idx} className={`flex items-center justify-between p-4 rounded-lg ${
+                          item.opType === 'transfer' ? 'bg-amber-50 dark:bg-amber-950/30' : 'bg-rose-50 dark:bg-rose-950/30'
+                        }`}>
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              item.opType === 'transfer' ? 'bg-amber-500/20' : 'bg-rose-500/20'
+                            }`}>
+                              {item.opType === 'transfer' ? (
+                                <CheckCircle2 className="h-5 w-5 text-amber-600" />
+                              ) : (
+                                <ArrowUpCircle className="h-5 w-5 text-rose-600" />
+                              )}
+                            </div>
+                            <div>
+                              <p className={`font-bold ${item.opType === 'transfer' ? 'text-amber-700 dark:text-amber-400' : 'text-rose-700 dark:text-rose-400'}`}>
+                                {item.opType === 'withdrawal' ? '-' : '+'}{formatPrice(item.amount)}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {item.opType === 'transfer' ? formatDate(item.month + '-01') : formatDate(item.date)}
+                              </p>
+                              {item.description && <p className="text-xs text-muted-foreground">📝 {item.description}</p>}
+                              {item.reason && <p className="text-xs text-muted-foreground">📝 {item.reason}</p>}
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-bold text-amber-700 dark:text-amber-400">{formatPrice(transfer.amount)}</p>
-                            <p className="text-sm text-muted-foreground">{formatDate(transfer.month + '-01')}</p>
-                            {transfer.description && <p className="text-xs text-muted-foreground">{transfer.description}</p>}
-                          </div>
+                          <Badge className={item.opType === 'transfer' ? 'bg-amber-500' : 'bg-rose-500'}>
+                            {item.opType === 'transfer' ? t('تحويل') : t('سحب')}
+                          </Badge>
                         </div>
-                        <Badge className="bg-amber-500">{t('محول')}</Badge>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </CardContent>
