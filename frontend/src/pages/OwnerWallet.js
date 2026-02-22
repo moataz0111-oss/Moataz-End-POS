@@ -84,6 +84,10 @@ export default function OwnerWallet() {
     safe_balance: 0,
     total_profit_transferred: 0,
     total_profit_withdrawn: 0,
+    deposits_count: 0,
+    transfers_count: 0,
+    remaining_transfers: 0,
+    can_transfer: false,
     recent_transactions: []
   });
   const [deposits, setDeposits] = useState([]);
