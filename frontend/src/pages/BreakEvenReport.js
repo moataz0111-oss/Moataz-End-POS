@@ -243,6 +243,23 @@ export default function BreakEvenReport() {
             </CardContent>
           </Card>
           
+          <Card className="bg-blue-500/10 border-blue-200">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{t('إجمالي التحصيل')}</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {formatPrice(viewMode === 'daily' ? data?.total_daily_profit : data?.total_monthly_profit)}
+                  </p>
+                </div>
+                <Wallet className="h-10 w-10 text-blue-500 opacity-80" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                {t('مجموع المبيعات المحصّلة')} {viewMode === 'daily' ? t('لهذا اليوم') : t('لهذا الشهر')}
+              </p>
+            </CardContent>
+          </Card>
+          
           <Card className={data?.is_break_even_reached ? 'bg-green-500/10' : 'bg-red-500/10'}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
