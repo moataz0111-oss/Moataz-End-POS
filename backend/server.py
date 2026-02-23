@@ -8247,6 +8247,10 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
     # عدد الحسابات التجريبية
     demo_tenants = await db.tenants.count_documents({"$or": [{"is_demo": True}, {"subscription_type": "demo"}]})
     
+    # جلب IDs جميع العملاء الموجودين
+    all_tenants = await db.tenants.find({}, {"id": 1}).to_list(1000)
+    valid_tenant_ids = [t["id"] for t in all_tenants]
+    
     # استبعاد مستخدمي النظام الرئيسي (super_admin و admin و default) والحسابات التجريبية
     # جلب IDs الحسابات التجريبية
     demo_tenant_ids = await db.tenants.find(
@@ -8260,16 +8264,16 @@ async def get_super_admin_stats(current_user: dict = Depends(verify_super_admin)
         "tenant_id": {"$exists": True, "$ne": None, "$ne": "default", "$nin": demo_ids}
     })
     
-    # حساب الطلبات فقط للعملاء الفعليين (استبعاد النظام الرئيسي والتجريبي)
+    # حساب الطلبات فقط للعملاء الموجودين فعلاً (استبعاد الطلبات اليتيمة)
     total_orders = await db.orders.count_documents({
-        "tenant_id": {"$exists": True, "$ne": None, "$ne": "default", "$nin": demo_ids}
+        "tenant_id": {"$in": valid_tenant_ids, "$nin": demo_ids}
     })
     
-    # المبيعات الإجمالية - فقط للعملاء الفعليين (استبعاد النظام الرئيسي والتجريبي)
+    # المبيعات الإجمالية - فقط للعملاء الموجودين فعلاً
     sales_cursor = db.orders.aggregate([
         {"$match": {
             "status": {"$ne": "cancelled"}, 
-            "tenant_id": {"$exists": True, "$ne": None, "$ne": "default", "$nin": demo_ids}
+            "tenant_id": {"$in": valid_tenant_ids, "$nin": demo_ids}
         }},
         {"$group": {"_id": None, "total": {"$sum": "$total"}}}
     ])
