@@ -2276,6 +2276,14 @@ export default function Settings() {
                           >
                             {t('مطبخ')} ({users.filter(u => u.role === 'kitchen').length})
                           </Button>
+                          <Button
+                            variant={userRoleFilter === 'call_center' ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => setUserRoleFilter('call_center')}
+                            className="h-8"
+                          >
+                            {t('كول سنتر')} ({users.filter(u => u.role === 'call_center').length})
+                          </Button>
                         </div>
                       </div>
                       
