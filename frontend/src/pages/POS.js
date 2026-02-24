@@ -1126,10 +1126,10 @@ export default function POS() {
         <div className="p-3 border-b border-border">
           <div className="flex gap-1">
             {[
-              { id: 'dine_in', label: t('داخل'), icon: UtensilsCrossed },
-              { id: 'takeaway', label: t('سفري'), icon: Package },
-              { id: 'delivery', label: t('توصيل'), icon: Truck },
-            ].map(type => (
+              { id: 'dine_in', label: t('داخل'), icon: UtensilsCrossed, hideForCallCenter: true },
+              { id: 'takeaway', label: t('سفري'), icon: Package, hideForCallCenter: true },
+              { id: 'delivery', label: t('توصيل'), icon: Truck, hideForCallCenter: false },
+            ].filter(type => !isCallCenter || !type.hideForCallCenter).map(type => (
               <Button
                 key={type.id}
                 variant={orderType === type.id ? 'default' : 'ghost'}
