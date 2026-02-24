@@ -492,7 +492,14 @@ export default function Settings() {
           settingsPrinters: res.data.settingsPrinters !== false,
           settingsDeliveryCompanies: res.data.settingsDeliveryCompanies !== false,
           settingsCallCenter: res.data.settingsCallCenter !== false,
-          settingsNotifications: res.data.settingsNotifications !== false
+          settingsNotifications: res.data.settingsNotifications !== false,
+          settingsRestaurant: res.data.settingsRestaurant !== false,
+          settingsAppearance: res.data.settingsAppearance !== false,
+          settingsInvoice: res.data.settingsInvoice !== false,
+          settingsSystem: res.data.settingsSystem !== false,
+          settingsInventory: res.data.settingsInventory !== false,
+          settingsPayment: res.data.settingsPayment !== false,
+          settingsKitchenSections: res.data.settingsKitchenSections !== false,
         });
       }
     } catch (error) {
