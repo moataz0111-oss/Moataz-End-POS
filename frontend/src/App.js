@@ -258,6 +258,15 @@ function AppRoutes() {
           </ProtectedRoute>
         } 
       />
+      {/* لوحة كول سنتر */}
+      <Route 
+        path="/call-center" 
+        element={
+          <ProtectedRoute>
+            <CallCenterDashboard />
+          </ProtectedRoute>
+        } 
+      />
       {/* إدارة الموارد البشرية */}
       <Route 
         path="/hr" 
