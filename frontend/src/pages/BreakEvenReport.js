@@ -91,6 +91,7 @@ export default function BreakEvenReport() {
   }, [selectedBranchId, dateFrom, dateTo, selectedMonth, viewMode, hasAccess]);
   
   const fetchData = async () => {
+    if (!hasAccess) return;
     setLoading(true);
     try {
       const branchId = getBranchIdForApi();
