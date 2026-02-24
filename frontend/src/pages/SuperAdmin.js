@@ -2984,6 +2984,7 @@ export default function SuperAdmin() {
                       { key: 'showOwnerWallet', label: t('خزينة المالك'), icon: Wallet },
                       { key: 'showCoupons', label: t('الكوبونات'), icon: Tag },
                       { key: 'showLoyalty', label: t('برنامج الولاء'), icon: Gift },
+                      { key: 'showCallCenter', label: t('لوحة كول سنتر'), icon: Headphones },
                       { key: 'showCallLogs', label: t('سجل المكالمات'), icon: Phone },
                       { key: 'showHR', label: t('الموارد البشرية'), icon: Users },
                       { key: 'showReservations', label: t('الحجوزات'), icon: CalendarDays },
