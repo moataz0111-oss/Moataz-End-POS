@@ -1160,8 +1160,23 @@ export default function Reports() {
                 dateRange={{ start: startDate, end: endDate }}
                 t={t}
                 formatPrice={formatPrice}
-                loading={loading}
+                loading={loadingComprehensive}
                 fetchAllReports={fetchAllReportsForComprehensive}
+                showBreakEvenReport={dashboardSettings.showBreakEvenReport}
+                branches={branches}
+                selectedBranchId={selectedBranchId}
+                onBranchChange={(val) => {
+                  // تغيير الفرع عبر context
+                  if (val === 'all') {
+                    window.dispatchEvent(new CustomEvent('setBranch', { detail: null }));
+                  } else {
+                    window.dispatchEvent(new CustomEvent('setBranch', { detail: val }));
+                  }
+                }}
+                startDate={startDate}
+                endDate={endDate}
+                onStartDateChange={setStartDate}
+                onEndDateChange={setEndDate}
               />
             </TabsContent>
           )}
