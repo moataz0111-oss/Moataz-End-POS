@@ -92,12 +92,15 @@ export default function POS() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   
+  // التحقق إذا كان المستخدم كول سنتر
+  const isCallCenter = user?.role === 'call_center';
+  
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState([]);
-  const [orderType, setOrderType] = useState('dine_in');
+  const [orderType, setOrderType] = useState(isCallCenter ? 'delivery' : 'dine_in'); // كول سنتر يبدأ بالتوصيل
   const [selectedTable, setSelectedTable] = useState(null);
   const [selectedTableSection, setSelectedTableSection] = useState(null); // القسم المختار للطاولات
   const [tables, setTables] = useState([]);
