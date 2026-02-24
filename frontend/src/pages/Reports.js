@@ -238,27 +238,66 @@ const ComprehensiveReportTab = ({
 
   return (
     <div className="space-y-6">
-      {/* العنوان والأزرار */}
-      <div className="flex justify-between items-center bg-gradient-to-l from-primary/5 to-transparent p-4 rounded-xl">
-        <div>
-          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Activity className="h-6 w-6 text-primary" />
-            {t('التقرير الشامل')}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            <Badge variant="outline" className="mr-2">{branchName}</Badge>
-            {dateRange.start} - {dateRange.end}
-          </p>
+      {/* العنوان والأزرار والفلاتر */}
+      <div className="bg-gradient-to-l from-primary/5 to-transparent p-4 rounded-xl space-y-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Activity className="h-6 w-6 text-primary" />
+              {t('التقرير الشامل')}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              <Badge variant="outline" className="mr-2">{branchName}</Badge>
+              {dateRange.start} - {dateRange.end}
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={fetchAllReports} disabled={loading} variant="outline" size="sm" className="gap-2">
+              {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+              {t('تحديث')}
+            </Button>
+            <Button onClick={handlePrint} size="sm" className="gap-2 bg-primary hover:bg-primary/90">
+              <Printer className="h-4 w-4" />
+              {t('طباعة التقرير')}
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={fetchAllReports} disabled={loading} variant="outline" size="sm" className="gap-2">
-            {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            {t('تحديث')}
-          </Button>
-          <Button onClick={handlePrint} size="sm" className="gap-2 bg-primary hover:bg-primary/90">
-            <Printer className="h-4 w-4" />
-            {t('طباعة التقرير')}
-          </Button>
+        
+        {/* فلاتر التاريخ والفرع */}
+        <div className="flex flex-wrap items-end gap-4 pt-2 border-t border-border/30">
+          <div>
+            <Label className="text-xs text-muted-foreground">{t('من تاريخ')}</Label>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => onStartDateChange(e.target.value)}
+              className="mt-1 w-[150px]"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">{t('إلى تاريخ')}</Label>
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => onEndDateChange(e.target.value)}
+              className="mt-1 w-[150px]"
+            />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">{t('الفرع')}</Label>
+            <Select value={selectedBranchId || 'all'} onValueChange={onBranchChange}>
+              <SelectTrigger className="mt-1 w-[180px]">
+                <Building2 className="h-4 w-4 ml-2" />
+                <SelectValue placeholder={t('اختر الفرع')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('جميع الفروع')}</SelectItem>
+                {branches?.map(branch => (
+                  <SelectItem key={branch.id} value={branch.id}>{branch.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
