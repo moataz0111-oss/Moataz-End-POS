@@ -295,27 +295,27 @@ export default function Settings() {
   
   // جميع الصلاحيات المتاحة في النظام
   const ALL_PERMISSIONS = [
-    // صلاحيات الصفحات الرئيسية (الإجراءات السريعة)
-    { id: 'pos', name: 'نقطة البيع', description: 'الوصول لنقطة البيع', group: 'الإجراءات السريعة', featureKey: 'showPOS' },
-    { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات', group: 'الإجراءات السريعة', featureKey: 'showTables' },
-    { id: 'orders', name: 'الطلبات', description: 'عرض الطلبات', group: 'الإجراءات السريعة', featureKey: 'showOrders' },
-    { id: 'kitchen', name: 'شاشة المطبخ', description: 'عرض طلبات المطبخ', group: 'الإجراءات السريعة', featureKey: 'showKitchen' },
-    { id: 'reports', name: 'التقارير', description: 'عرض التقارير', group: 'الإجراءات السريعة', featureKey: 'showReports' },
-    { id: 'reviews', name: 'التقييمات', description: 'عرض تقييمات العملاء', group: 'الإجراءات السريعة', featureKey: 'showReviews' },
-    { id: 'expenses', name: 'المصاريف', description: 'عرض وإضافة المصاريف', group: 'الإجراءات السريعة', featureKey: 'showExpenses' },
-    { id: 'purchasing', name: 'المشتريات', description: 'إدارة طلبات الشراء', group: 'الإجراءات السريعة', featureKey: 'showPurchasing' },
-    { id: 'inventory', name: 'المخزن والتصنيع', description: 'إدارة المخزون والتصنيع', group: 'الإجراءات السريعة', featureKey: 'showInventory' },
-    { id: 'branch_orders', name: 'طلبات الفروع', description: 'إدارة طلبات الفروع', group: 'الإجراءات السريعة', featureKey: 'showBranchOrders' },
-    { id: 'inventory_reports', name: 'تقارير المخزون', description: 'عرض تقارير المخزون', group: 'الإجراءات السريعة', featureKey: 'showInventoryReports' },
-    { id: 'delivery', name: 'التوصيل', description: 'إدارة التوصيل', group: 'الإجراءات السريعة', featureKey: 'showDelivery' },
-    { id: 'owner_wallet', name: 'خزينة المالك', description: 'الوصول لخزينة المالك الشخصية', group: 'الإجراءات السريعة', featureKey: 'showOwnerWallet' },
-    { id: 'coupons', name: 'الكوبونات', description: 'إدارة الكوبونات والعروض', group: 'الإجراءات السريعة', featureKey: 'showCoupons' },
-    { id: 'loyalty', name: 'برنامج الولاء', description: 'إدارة نقاط الولاء', group: 'الإجراءات السريعة', featureKey: 'showLoyalty' },
-    { id: 'call_logs', name: 'سجل المكالمات', description: 'عرض سجل المكالمات', group: 'الإجراءات السريعة', featureKey: 'showCallLogs' },
-    { id: 'hr', name: 'الموارد البشرية', description: 'إدارة الموظفين والرواتب', group: 'الإجراءات السريعة', featureKey: 'showHR' },
-    { id: 'reservations', name: 'الحجوزات', description: 'إدارة حجوزات الطاولات', group: 'الإجراءات السريعة', featureKey: 'showReservations' },
-    { id: 'settings', name: 'الإعدادات', description: 'الوصول للإعدادات', group: 'الإجراءات السريعة', featureKey: 'showSettings' },
-    { id: 'external_branches', name: 'الفروع الخارجية', description: 'إدارة الفروع المباعة/الخارجية', group: 'الإجراءات السريعة', featureKey: 'showExternalBranches' },
+    // صلاحيات الصفحات الرئيسية (جميع أيقونات الإجراءات السريعة)
+    { id: 'pos', name: 'نقطة البيع', description: 'الوصول لنقطة البيع', group: 'الصفحات الرئيسية', featureKey: 'showPOS' },
+    { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات', group: 'الصفحات الرئيسية', featureKey: 'showTables' },
+    { id: 'orders', name: 'الطلبات', description: 'عرض الطلبات', group: 'الصفحات الرئيسية', featureKey: 'showOrders' },
+    { id: 'kitchen', name: 'شاشة المطبخ', description: 'عرض طلبات المطبخ', group: 'الصفحات الرئيسية', featureKey: 'showKitchen' },
+    { id: 'reports', name: 'التقارير', description: 'عرض التقارير', group: 'الصفحات الرئيسية', featureKey: 'showReports' },
+    { id: 'reviews', name: 'التقييمات', description: 'عرض تقييمات العملاء', group: 'الصفحات الرئيسية', featureKey: 'showRatings' },
+    { id: 'expenses', name: 'المصاريف', description: 'عرض وإضافة المصاريف', group: 'الصفحات الرئيسية', featureKey: 'showExpenses' },
+    { id: 'purchasing', name: 'المشتريات', description: 'إدارة طلبات الشراء', group: 'الصفحات الرئيسية', featureKey: 'showPurchasing' },
+    { id: 'inventory', name: 'المخزن والتصنيع', description: 'إدارة المخزون والتصنيع', group: 'الصفحات الرئيسية', featureKey: 'showWarehouse' },
+    { id: 'branch_orders', name: 'طلبات الفروع', description: 'إدارة طلبات الفروع', group: 'الصفحات الرئيسية', featureKey: 'showBranchOrders' },
+    { id: 'inventory_reports', name: 'تقارير المخزون', description: 'عرض تقارير المخزون', group: 'الصفحات الرئيسية', featureKey: 'showInventoryReports' },
+    { id: 'delivery', name: 'التوصيل', description: 'إدارة التوصيل', group: 'الصفحات الرئيسية', featureKey: 'showDelivery' },
+    { id: 'owner_wallet', name: 'خزينة المالك', description: 'الوصول لخزينة المالك الشخصية', group: 'الصفحات الرئيسية', featureKey: 'showOwnerWallet' },
+    { id: 'coupons', name: 'الكوبونات', description: 'إدارة الكوبونات والعروض', group: 'الصفحات الرئيسية', featureKey: 'showCoupons' },
+    { id: 'loyalty', name: 'برنامج الولاء', description: 'إدارة نقاط الولاء', group: 'الصفحات الرئيسية', featureKey: 'showLoyalty' },
+    { id: 'call_logs', name: 'سجل المكالمات', description: 'عرض سجل المكالمات', group: 'الصفحات الرئيسية', featureKey: 'showCallLogs' },
+    { id: 'hr', name: 'الموارد البشرية', description: 'إدارة الموظفين والرواتب', group: 'الصفحات الرئيسية', featureKey: 'showHR' },
+    { id: 'reservations', name: 'الحجوزات', description: 'إدارة حجوزات الطاولات', group: 'الصفحات الرئيسية', featureKey: 'showReservations' },
+    { id: 'settings', name: 'الإعدادات', description: 'الوصول للإعدادات', group: 'الصفحات الرئيسية', featureKey: 'showSettings' },
+    { id: 'external_branches', name: 'الفروع الخارجية', description: 'إدارة الفروع المباعة/الخارجية', group: 'الصفحات الرئيسية', featureKey: 'showExternalBranches' },
     
     // صلاحيات التقارير والتحليلات
     { id: 'comprehensive_report', name: 'التقرير الشامل', description: 'عرض التقرير الشامل المطبوع', group: 'التقارير والتحليلات', featureKey: 'showComprehensiveReport' },
@@ -329,6 +329,10 @@ export default function Settings() {
     { id: 'pos_transfer_table', name: 'نقل الطاولة', description: 'نقل طلب من طاولة لأخرى', group: 'عمليات نقطة البيع' },
     { id: 'pos_day_management', name: 'إدارة اليوم', description: 'إدارة يوم المبيعات', group: 'عمليات نقطة البيع' },
     { id: 'shifts_close', name: 'إغلاق الصندوق', description: 'إغلاق صندوق الوردية', group: 'عمليات نقطة البيع' },
+    
+    // صلاحيات الميزات الخاصة
+    { id: 'receive_calls', name: 'استلام المكالمات', description: 'استقبال المكالمات الواردة من العملاء', group: 'الميزات الخاصة' },
+    { id: 'view_statistics', name: 'عرض الإحصائيات', description: 'عرض إحصائيات المبيعات في الصفحة الرئيسية', group: 'الميزات الخاصة' },
     
     // صلاحيات عرض المبيعات (فلاتر الوقت)
     { id: 'sales_view_today', name: 'عرض اليوم', description: 'عرض مبيعات اليوم فقط', group: 'عرض المبيعات' },
