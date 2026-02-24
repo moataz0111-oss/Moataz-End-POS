@@ -173,13 +173,30 @@ export default function POS() {
     }
   }, [searchParams, tables]);
 
-  // قراءة بيانات المكالمة من URL (للكول سنتر)
+  // قراءة بيانات المكالمة من URL (للكول سنتر والمستخدمين الذين لديهم صلاحية استلام المكالمات)
   useEffect(() => {
     const phone = searchParams.get('phone');
     const name = searchParams.get('name');
     const fromCall = searchParams.get('from_call');
     
+    // التحقق من صلاحية استلام المكالمات
+    const canReceiveCalls = () => {
+      // الكول سنتر يستلم المكالمات افتراضياً
+      if (user?.role === 'call_center') return true;
+      // المدير والأدمن يمكنهم استلام المكالمات
+      if (['admin', 'manager', 'super_admin'].includes(user?.role)) return true;
+      // التحقق من الصلاحية
+      if (user?.permissions?.includes('receive_calls')) return true;
+      return false;
+    };
+    
     if (phone) {
+      // إذا لم يكن لديه صلاحية استلام المكالمات، لا تفعل شيء
+      if (fromCall === 'true' && !canReceiveCalls()) {
+        toast.error(t('ليس لديك صلاحية استلام المكالمات'));
+        return;
+      }
+      
       // تعيين نوع الطلب إلى توصيل
       setOrderType('delivery');
       
@@ -207,7 +224,7 @@ export default function POS() {
         });
       }
     }
-  }, [searchParams]);
+  }, [searchParams, user]);
 
   const fetchData = async () => {
     try {
