@@ -295,26 +295,32 @@ export default function Settings() {
   
   // جميع الصلاحيات المتاحة في النظام
   const ALL_PERMISSIONS = [
-    // صلاحيات الصفحات الرئيسية
-    { id: 'pos', name: 'نقطة البيع', description: 'الوصول لنقطة البيع', group: 'الصفحات الرئيسية', featureKey: 'showPOS' },
-    { id: 'orders', name: 'الطلبات', description: 'عرض الطلبات', group: 'الصفحات الرئيسية', featureKey: 'showOrders' },
-    { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات', group: 'الصفحات الرئيسية', featureKey: 'showTables' },
-    { id: 'kitchen', name: 'شاشة المطبخ', description: 'عرض طلبات المطبخ', group: 'الصفحات الرئيسية', featureKey: 'showKitchen' },
-    { id: 'delivery', name: 'التوصيل', description: 'إدارة التوصيل', group: 'الصفحات الرئيسية', featureKey: 'showDelivery' },
-    { id: 'inventory', name: 'المخزون والمشتريات', description: 'إدارة المخزون والمشتريات', group: 'الصفحات الرئيسية', featureKey: 'showInventory' },
-    { id: 'expenses', name: 'المصاريف', description: 'عرض وإضافة المصاريف', group: 'الصفحات الرئيسية', featureKey: 'showExpenses' },
-    { id: 'shifts_close', name: 'إغلاق الصندوق', description: 'إغلاق صندوق الوردية', group: 'الصفحات الرئيسية' },
-    { id: 'hr', name: 'الموارد البشرية', description: 'إدارة الموظفين والرواتب', group: 'الصفحات الرئيسية', featureKey: 'showHR' },
-    { id: 'reservations', name: 'الحجوزات', description: 'إدارة حجوزات الطاولات', group: 'الصفحات الرئيسية', featureKey: 'showReservations' },
-    { id: 'reviews', name: 'التقييمات', description: 'عرض تقييمات العملاء', group: 'الصفحات الرئيسية', featureKey: 'showReviews' },
-    { id: 'loyalty', name: 'برنامج الولاء', description: 'إدارة نقاط الولاء', group: 'الصفحات الرئيسية', featureKey: 'showLoyalty' },
-    { id: 'coupons', name: 'الكوبونات', description: 'إدارة الكوبونات والعروض', group: 'الصفحات الرئيسية', featureKey: 'showCoupons' },
-    { id: 'call_logs', name: 'سجل المكالمات', description: 'عرض سجل المكالمات', group: 'الصفحات الرئيسية', featureKey: 'showCallLogs' },
-    { id: 'warehouse', name: 'المستودع', description: 'إدارة المستودع الرئيسي', group: 'الصفحات الرئيسية', featureKey: 'showWarehouse' },
-    { id: 'purchasing', name: 'المشتريات', description: 'إدارة طلبات الشراء', group: 'الصفحات الرئيسية', featureKey: 'showPurchasing' },
-    { id: 'branch_orders', name: 'طلبات الفروع', description: 'إدارة طلبات الفروع', group: 'الصفحات الرئيسية', featureKey: 'showBranchOrders' },
-    { id: 'recipes', name: 'الوصفات', description: 'إدارة وصفات التصنيع', group: 'الصفحات الرئيسية', featureKey: 'showRecipes' },
-    { id: 'customer_menu', name: 'قائمة العملاء', description: 'عرض قائمة الطعام للعملاء', group: 'الصفحات الرئيسية', featureKey: 'showCustomerMenu' },
+    // صلاحيات الصفحات الرئيسية (الإجراءات السريعة)
+    { id: 'pos', name: 'نقطة البيع', description: 'الوصول لنقطة البيع', group: 'الإجراءات السريعة', featureKey: 'showPOS' },
+    { id: 'tables', name: 'الطاولات', description: 'إدارة الطاولات', group: 'الإجراءات السريعة', featureKey: 'showTables' },
+    { id: 'orders', name: 'الطلبات', description: 'عرض الطلبات', group: 'الإجراءات السريعة', featureKey: 'showOrders' },
+    { id: 'kitchen', name: 'شاشة المطبخ', description: 'عرض طلبات المطبخ', group: 'الإجراءات السريعة', featureKey: 'showKitchen' },
+    { id: 'reports', name: 'التقارير', description: 'عرض التقارير', group: 'الإجراءات السريعة', featureKey: 'showReports' },
+    { id: 'reviews', name: 'التقييمات', description: 'عرض تقييمات العملاء', group: 'الإجراءات السريعة', featureKey: 'showReviews' },
+    { id: 'expenses', name: 'المصاريف', description: 'عرض وإضافة المصاريف', group: 'الإجراءات السريعة', featureKey: 'showExpenses' },
+    { id: 'purchasing', name: 'المشتريات', description: 'إدارة طلبات الشراء', group: 'الإجراءات السريعة', featureKey: 'showPurchasing' },
+    { id: 'inventory', name: 'المخزن والتصنيع', description: 'إدارة المخزون والتصنيع', group: 'الإجراءات السريعة', featureKey: 'showInventory' },
+    { id: 'branch_orders', name: 'طلبات الفروع', description: 'إدارة طلبات الفروع', group: 'الإجراءات السريعة', featureKey: 'showBranchOrders' },
+    { id: 'inventory_reports', name: 'تقارير المخزون', description: 'عرض تقارير المخزون', group: 'الإجراءات السريعة', featureKey: 'showInventoryReports' },
+    { id: 'delivery', name: 'التوصيل', description: 'إدارة التوصيل', group: 'الإجراءات السريعة', featureKey: 'showDelivery' },
+    { id: 'owner_wallet', name: 'خزينة المالك', description: 'الوصول لخزينة المالك الشخصية', group: 'الإجراءات السريعة', featureKey: 'showOwnerWallet' },
+    { id: 'coupons', name: 'الكوبونات', description: 'إدارة الكوبونات والعروض', group: 'الإجراءات السريعة', featureKey: 'showCoupons' },
+    { id: 'loyalty', name: 'برنامج الولاء', description: 'إدارة نقاط الولاء', group: 'الإجراءات السريعة', featureKey: 'showLoyalty' },
+    { id: 'call_logs', name: 'سجل المكالمات', description: 'عرض سجل المكالمات', group: 'الإجراءات السريعة', featureKey: 'showCallLogs' },
+    { id: 'hr', name: 'الموارد البشرية', description: 'إدارة الموظفين والرواتب', group: 'الإجراءات السريعة', featureKey: 'showHR' },
+    { id: 'reservations', name: 'الحجوزات', description: 'إدارة حجوزات الطاولات', group: 'الإجراءات السريعة', featureKey: 'showReservations' },
+    { id: 'settings', name: 'الإعدادات', description: 'الوصول للإعدادات', group: 'الإجراءات السريعة', featureKey: 'showSettings' },
+    { id: 'external_branches', name: 'الفروع الخارجية', description: 'إدارة الفروع المباعة/الخارجية', group: 'الإجراءات السريعة', featureKey: 'showExternalBranches' },
+    
+    // صلاحيات التقارير والتحليلات
+    { id: 'comprehensive_report', name: 'التقرير الشامل', description: 'عرض التقرير الشامل المطبوع', group: 'التقارير والتحليلات', featureKey: 'showComprehensiveReport' },
+    { id: 'smart_reports', name: 'التقرير الذكي', description: 'عرض التقرير الذكي بالذكاء الاصطناعي', group: 'التقارير والتحليلات', featureKey: 'showSmartReports' },
+    { id: 'break_even_report', name: 'تقرير تحليل الكلف المفصل', description: 'عرض تقرير تحليل التكاليف والأرباح', group: 'التقارير والتحليلات', featureKey: 'showBreakEvenReport' },
     
     // صلاحيات عمليات نقطة البيع
     { id: 'pos_discount', name: 'إعطاء خصومات', description: 'السماح بإعطاء خصومات على الطلبات', group: 'عمليات نقطة البيع' },
@@ -322,16 +328,7 @@ export default function Settings() {
     { id: 'pos_refund', name: 'المرتجعات', description: 'السماح بعمل مرتجعات', group: 'عمليات نقطة البيع' },
     { id: 'pos_transfer_table', name: 'نقل الطاولة', description: 'نقل طلب من طاولة لأخرى', group: 'عمليات نقطة البيع' },
     { id: 'pos_day_management', name: 'إدارة اليوم', description: 'إدارة يوم المبيعات', group: 'عمليات نقطة البيع' },
-    
-    // صلاحيات التقارير والتحليلات
-    { id: 'reports', name: 'التقارير العامة', description: 'عرض التقارير الأساسية', group: 'التقارير والتحليلات', featureKey: 'showReports' },
-    { id: 'smart_reports', name: 'التقرير الذكي', description: 'عرض التقرير الذكي بالذكاء الاصطناعي', group: 'التقارير والتحليلات', featureKey: 'showSmartReports' },
-    { id: 'comprehensive_report', name: 'التقرير الشامل', description: 'عرض التقرير الشامل المطبوع', group: 'التقارير والتحليلات', featureKey: 'showComprehensiveReport' },
-    { id: 'inventory_reports', name: 'تقارير المخزون', description: 'عرض تقارير المخزون', group: 'التقارير والتحليلات', featureKey: 'showInventoryReports' },
-    
-    // صلاحيات الميزات الخاصة
-    { id: 'owner_wallet', name: 'خزينة المالك', description: 'الوصول لخزينة المالك الشخصية', group: 'الميزات الخاصة', featureKey: 'showOwnerWallet' },
-    { id: 'external_branches', name: 'الفروع الخارجية', description: 'إدارة الفروع المباعة/الخارجية', group: 'الميزات الخاصة', featureKey: 'showExternalBranches' },
+    { id: 'shifts_close', name: 'إغلاق الصندوق', description: 'إغلاق صندوق الوردية', group: 'عمليات نقطة البيع' },
     
     // صلاحيات عرض المبيعات (فلاتر الوقت)
     { id: 'sales_view_today', name: 'عرض اليوم', description: 'عرض مبيعات اليوم فقط', group: 'عرض المبيعات' },
@@ -340,19 +337,22 @@ export default function Settings() {
     { id: 'sales_view_all', name: 'عرض الكل', description: 'عرض جميع المبيعات', group: 'عرض المبيعات' },
     
     // صلاحيات الإعدادات
-    { id: 'settings', name: 'الإعدادات', description: 'الوصول للإعدادات', group: 'الإعدادات', featureKey: 'showSettings' },
-    { id: 'settings_appearance', name: 'المظهر', description: 'تغيير مظهر التطبيق', group: 'الإعدادات' },
-    { id: 'settings_dashboard', name: 'الرئيسية', description: 'إعدادات الصفحة الرئيسية', group: 'الإعدادات' },
-    { id: 'settings_customers', name: 'العملاء', description: 'إدارة العملاء', group: 'الإعدادات', featureKey: 'settingsCustomers' },
-    { id: 'settings_categories', name: 'الفئات', description: 'إدارة فئات المنتجات', group: 'الإعدادات', featureKey: 'settingsCategories' },
-    { id: 'settings_products', name: 'المنتجات', description: 'إدارة المنتجات', group: 'الإعدادات', featureKey: 'settingsProducts' },
-    { id: 'settings_branches', name: 'الفروع', description: 'إدارة الفروع', group: 'الإعدادات', featureKey: 'settingsBranches' },
-    { id: 'settings_printers', name: 'الطابعات', description: 'إدارة الطابعات', group: 'الإعدادات', featureKey: 'settingsPrinters' },
-    { id: 'settings_kitchen', name: 'أقسام المطبخ', description: 'إدارة أقسام المطبخ', group: 'الإعدادات' },
-    { id: 'settings_delivery', name: 'شركات التوصيل', description: 'إدارة شركات التوصيل', group: 'الإعدادات', featureKey: 'settingsDeliveryCompanies' },
     { id: 'settings_notifications', name: 'الإشعارات', description: 'إعدادات الإشعارات', group: 'الإعدادات', featureKey: 'settingsNotifications' },
-    { id: 'settings_users', name: 'المستخدمين', description: 'إدارة المستخدمين والصلاحيات', group: 'الإعدادات', featureKey: 'settingsUsers' },
     { id: 'settings_call_center', name: 'كول سنتر', description: 'إعدادات مركز الاتصال', group: 'الإعدادات', featureKey: 'settingsCallCenter' },
+    { id: 'settings_delivery', name: 'شركات التوصيل', description: 'إدارة شركات التوصيل', group: 'الإعدادات', featureKey: 'settingsDeliveryCompanies' },
+    { id: 'settings_printers', name: 'الطابعات', description: 'إدارة الطابعات', group: 'الإعدادات', featureKey: 'settingsPrinters' },
+    { id: 'settings_products', name: 'المنتجات', description: 'إدارة المنتجات', group: 'الإعدادات', featureKey: 'settingsProducts' },
+    { id: 'settings_categories', name: 'الفئات', description: 'إدارة فئات المنتجات', group: 'الإعدادات', featureKey: 'settingsCategories' },
+    { id: 'settings_branches', name: 'الفروع', description: 'إدارة الفروع', group: 'الإعدادات', featureKey: 'settingsBranches' },
+    { id: 'settings_customers', name: 'العملاء', description: 'إدارة العملاء', group: 'الإعدادات', featureKey: 'settingsCustomers' },
+    { id: 'settings_users', name: 'المستخدمين', description: 'إدارة المستخدمين والصلاحيات', group: 'الإعدادات', featureKey: 'settingsUsers' },
+    { id: 'settings_restaurant', name: 'المطعم', description: 'إعدادات المطعم الأساسية', group: 'الإعدادات', featureKey: 'settingsRestaurant' },
+    { id: 'settings_appearance', name: 'المظهر', description: 'تغيير مظهر التطبيق', group: 'الإعدادات', featureKey: 'settingsAppearance' },
+    { id: 'settings_invoice', name: 'إعدادات الفاتورة', description: 'تخصيص شكل الفاتورة', group: 'الإعدادات', featureKey: 'settingsInvoice' },
+    { id: 'settings_system', name: 'إعدادات النظام', description: 'إعدادات النظام العامة', group: 'الإعدادات', featureKey: 'settingsSystem' },
+    { id: 'settings_inventory', name: 'إعدادات المخزون', description: 'إعدادات إدارة المخزون', group: 'الإعدادات', featureKey: 'settingsInventory' },
+    { id: 'settings_payment', name: 'الدفع الإلكتروني', description: 'إعدادات الدفع الإلكتروني', group: 'الإعدادات', featureKey: 'settingsPayment' },
+    { id: 'settings_kitchen', name: 'أقسام المطبخ', description: 'إدارة أقسام المطبخ', group: 'الإعدادات', featureKey: 'settingsKitchenSections' },
   ];
   
   // فلترة الصلاحيات حسب ميزات العميل المفعلة
