@@ -104,7 +104,11 @@ import {
   Banknote,
   ArrowUpDown,
   Languages,
-  AlertCircle
+  AlertCircle,
+  Store,
+  Cog,
+  Boxes,
+  CreditCard
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import ImageCropper from '../components/ImageCropper';
