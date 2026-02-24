@@ -1394,84 +1394,88 @@ export default function Reports() {
                         </p>
                       </div>
 
-                      {/* التكاليف التشغيلية - القسم الجديد */}
-                      <div className="p-4 bg-purple-500/5 rounded-lg border border-purple-500/20">
-                        <h3 className="text-purple-600 font-bold mb-3">{t('التكاليف التشغيلية')}</h3>
-                        
-                        {/* التكاليف الثابتة */}
-                        {profitLossReport.fixed_costs && (
-                          <div className="space-y-2 mb-3">
-                            <p className="text-sm font-medium text-muted-foreground">{t('التكاليف الثابتة')}:</p>
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">{t('الإيجار')}</span>
-                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.rent?.period || 0)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">{t('الكهرباء')}</span>
-                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.electricity?.period || 0)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">{t('الماء')}</span>
-                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.water?.period || 0)}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-muted-foreground">{t('المولدة')}</span>
-                                <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.generator?.period || 0)}</span>
+                      {/* التكاليف التشغيلية - القسم الجديد - يظهر فقط إذا كانت الصلاحية مفعلة */}
+                      {dashboardSettings.showBreakEvenReport !== false && (
+                        <div className="p-4 bg-purple-500/5 rounded-lg border border-purple-500/20">
+                          <h3 className="text-purple-600 font-bold mb-3">{t('التكاليف التشغيلية')}</h3>
+                          
+                          {/* التكاليف الثابتة */}
+                          {profitLossReport.fixed_costs && (
+                            <div className="space-y-2 mb-3">
+                              <p className="text-sm font-medium text-muted-foreground">{t('التكاليف الثابتة')}:</p>
+                              <div className="grid grid-cols-2 gap-2 text-sm">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">{t('الإيجار')}</span>
+                                  <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.rent?.period || 0)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">{t('الكهرباء')}</span>
+                                  <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.electricity?.period || 0)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">{t('الماء')}</span>
+                                  <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.water?.period || 0)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">{t('المولدة')}</span>
+                                  <span className="text-red-600">-{formatPrice(profitLossReport.fixed_costs.generator?.period || 0)}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
-                        
-                        {/* الرواتب */}
-                        {profitLossReport.salaries && (
+                          )}
+                          
+                          {/* الرواتب */}
+                          {profitLossReport.salaries && (
+                            <div className="flex justify-between text-sm mb-2">
+                              <span className="text-muted-foreground">
+                                {t('الرواتب')} ({profitLossReport.salaries.employees_count} {t('موظف')})
+                              </span>
+                              <span className="text-red-600">-{formatPrice(profitLossReport.salaries.total_period || 0)}</span>
+                            </div>
+                          )}
+                          
+                          {/* المصاريف الأخرى */}
                           <div className="flex justify-between text-sm mb-2">
-                            <span className="text-muted-foreground">
-                              {t('الرواتب')} ({profitLossReport.salaries.employees_count} {t('موظف')})
-                            </span>
-                            <span className="text-red-600">-{formatPrice(profitLossReport.salaries.total_period || 0)}</span>
+                            <span className="text-muted-foreground">{t('مصاريف أخرى')}</span>
+                            <span className="text-red-600">-{formatPrice(profitLossReport.operating_expenses?.total || 0)}</span>
                           </div>
-                        )}
-                        
-                        {/* المصاريف الأخرى */}
-                        <div className="flex justify-between text-sm mb-2">
-                          <span className="text-muted-foreground">{t('مصاريف أخرى')}</span>
-                          <span className="text-red-600">-{formatPrice(profitLossReport.operating_expenses?.total || 0)}</span>
-                        </div>
-                        
-                        {/* إجمالي التكاليف التشغيلية */}
-                        <div className="pt-2 border-t border-purple-500/20">
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-purple-600">{t('إجمالي التكاليف التشغيلية')}</span>
-                            <span className="text-lg font-bold text-red-600 tabular-nums">
-                              -{formatPrice(profitLossReport.total_operating_costs?.total || 0)}
-                            </span>
+                          
+                          {/* إجمالي التكاليف التشغيلية */}
+                          <div className="pt-2 border-t border-purple-500/20">
+                            <div className="flex justify-between items-center">
+                              <span className="font-bold text-purple-600">{t('إجمالي التكاليف التشغيلية')}</span>
+                              <span className="text-lg font-bold text-red-600 tabular-nums">
+                                -{formatPrice(profitLossReport.total_operating_costs?.total || 0)}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
 
-                      {/* Net Profit */}
-                      <div className={`p-4 rounded-lg border-2 ${
-                        (profitLossReport.net_profit?.amount || 0) >= 0 
-                          ? 'bg-green-500/10 border-green-500/30' 
-                          : 'bg-red-500/10 border-red-500/30'
-                      }`}>
-                        <div className="flex justify-between items-center">
-                          <span className={`font-bold ${
-                            (profitLossReport.net_profit?.amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {t('صافي الربح')}
-                          </span>
-                          <span className={`text-3xl font-bold tabular-nums ${
-                            (profitLossReport.net_profit?.amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {formatPrice(profitLossReport.net_profit?.amount || 0)}
-                          </span>
+                      {/* Net Profit - يظهر فقط إذا كانت الصلاحية مفعلة */}
+                      {dashboardSettings.showBreakEvenReport !== false && (
+                        <div className={`p-4 rounded-lg border-2 ${
+                          (profitLossReport.net_profit?.amount || 0) >= 0 
+                            ? 'bg-green-500/10 border-green-500/30' 
+                            : 'bg-red-500/10 border-red-500/30'
+                        }`}>
+                          <div className="flex justify-between items-center">
+                            <span className={`font-bold ${
+                              (profitLossReport.net_profit?.amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {t('صافي الربح')}
+                            </span>
+                            <span className={`text-3xl font-bold tabular-nums ${
+                              (profitLossReport.net_profit?.amount || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {formatPrice(profitLossReport.net_profit?.amount || 0)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {t('هامش الربح الصافي')}: {profitLossReport.net_profit?.margin?.toFixed(1)}%
+                          </p>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {t('هامش الربح الصافي')}: {profitLossReport.net_profit?.margin?.toFixed(1)}%
-                        </p>
-                      </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
