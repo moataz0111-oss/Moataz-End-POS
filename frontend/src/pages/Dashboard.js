@@ -815,7 +815,8 @@ export default function Dashboard() {
       'cashier': ['pos', 'tables', 'orders'],
       'supervisor': ['pos', 'tables', 'orders', 'kitchen', 'reports', 'expenses', 'delivery'],
       'captain': ['tables', 'orders'],
-      'kitchen': ['kitchen', 'orders']
+      'kitchen': ['kitchen', 'orders'],
+      'call_center': ['pos', 'delivery', 'call_logs']  // كول سنتر: نقاط البيع (توصيل فقط)، التوصيل، سجل المكالمات
     };
     
     const rolePermissions = defaultPermissionsByRole[user?.role];
