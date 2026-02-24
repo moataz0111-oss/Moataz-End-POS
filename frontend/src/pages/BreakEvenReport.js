@@ -264,9 +264,9 @@ export default function BreakEvenReport() {
             <CardContent className="pt-4 pb-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-muted-foreground">{t('إجمالي التحصيل')}</p>
+                  <p className="text-xs text-muted-foreground">{t('إجمالي المستقطع')}</p>
                   <p className="text-lg font-bold text-blue-600">
-                    {formatPrice(viewMode === 'daily' ? data?.total_daily_profit : data?.total_monthly_profit)}
+                    {formatPrice(data?.total_collected_towards_target || 0)}
                   </p>
                 </div>
                 <Wallet className="h-8 w-8 text-blue-500 opacity-80" />
