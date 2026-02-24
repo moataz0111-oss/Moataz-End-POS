@@ -1470,7 +1470,7 @@ const translationMap = {
   'قيمة المخزون': { en: 'Stock Value', ku: '' },
   'نقص المخزون': { en: 'Low Stock', ku: '' },
   'تنبيه نقص المخزون': { en: 'Low Stock Alert', ku: '' },
-  'نقص': { en: 'Low', ku: '' },
+  'نقص': { en: 'Shortage', ku: 'کەمی' },
   
   // ===== Delivery Page =====
   'متابعة السائقين والطلبات': { en: 'Track Drivers and Orders', ku: '' },
