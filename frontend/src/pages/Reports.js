@@ -187,7 +187,15 @@ const ComprehensiveReportTab = ({
   t,
   formatPrice,
   loading,
-  fetchAllReports
+  fetchAllReports,
+  showBreakEvenReport,
+  branches,
+  selectedBranchId,
+  onBranchChange,
+  startDate,
+  endDate,
+  onStartDateChange,
+  onEndDateChange
 }) => {
   const handlePrint = () => {
     printComprehensiveReport(
