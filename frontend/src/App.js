@@ -34,6 +34,7 @@ const Expenses = lazy(() => import("./pages/Expenses"));
 // DriverPortal تم إزالته ودمجه في DriverApp
 const SuperAdmin = lazy(() => import("./pages/SuperAdmin"));
 const CallLogs = lazy(() => import("./pages/CallLogs"));
+const CallCenterDashboard = lazy(() => import("./pages/CallCenterDashboard"));
 const InstallApp = lazy(() => import("./pages/InstallApp"));
 const HR = lazy(() => import("./pages/HR"));
 const WarehouseTransfers = lazy(() => import("./pages/WarehouseTransfers"));
