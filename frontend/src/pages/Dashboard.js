@@ -370,13 +370,13 @@ export default function Dashboard() {
       const branchId = getBranchIdForApi();
       const params = branchId ? { branch_id: branchId } : {};
       const checkRes = await axios.get(`${API}/shifts/current`, { params });
-      if (!checkRes.data || checkRes.data.message === 'لا توجد وردية مفتوحة') {
+      if (!checkRes.data || checkRes.data.message === t('لا توجد وردية مفتوحة')) {
         // فتح وردية جديدة
         await axios.post(`${API}/shifts/open`, {
           opening_cash: 0,
           branch_id: branchId
         });
-        console.log('تم فتح الوردية تلقائياً');
+        console.log('Auto-opened shift');
       }
     } catch (error) {
       // إذا لم تكن هناك وردية، نفتح واحدة جديدة
