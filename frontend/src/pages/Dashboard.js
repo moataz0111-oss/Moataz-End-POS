@@ -1015,8 +1015,10 @@ export default function Dashboard() {
   }
 
   // التحقق من وضع المعاينة (انتحال الحساب)
-  const isImpersonating = user?.impersonated === true;
-  const originalUserName = user?.original_user_name;
+  // نقرأ من localStorage لأن /auth/me لا يُرجع حقل impersonated
+  const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const isImpersonating = storedUser?.impersonated === true;
+  const originalUserName = storedUser?.original_user_name;
   
   // العودة للحساب الأصلي
   const exitImpersonation = () => {
