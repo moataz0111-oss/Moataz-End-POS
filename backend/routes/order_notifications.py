@@ -57,6 +57,7 @@ async def create_order_notification(notification: OrderNotificationCreate):
     """
     إنشاء إشعار طلب جديد للكاشير والسائق
     يتم استدعاؤها تلقائياً عند حفظ طلب جديد
+    يرسل عبر WebSocket للاستجابة الفورية + يحفظ في قاعدة البيانات للـ Fallback
     """
     now = datetime.now(timezone.utc)
     
@@ -80,6 +81,23 @@ async def create_order_notification(notification: OrderNotificationCreate):
     }
     
     await db.order_notifications.insert_one(cashier_notification)
+    
+    # إرسال عبر WebSocket (إذا كان متاحاً)
+    try:
+        from services.websocket_service import notify_branch_new_order, notify_driver_new_order
+        await notify_branch_new_order(notification.branch_id, {
+            "order_id": notification.order_id,
+            "order_number": notification.order_number,
+            "order_type": notification.order_type,
+            "customer_name": notification.customer_name,
+            "customer_phone": notification.customer_phone,
+            "delivery_address": notification.delivery_address,
+            "total_amount": notification.total_amount,
+            "items_count": notification.items_count,
+            "notes": notification.notes
+        })
+    except Exception as e:
+        print(f"WebSocket notification failed (fallback to polling): {e}")
     
     # إشعار للسائق إذا كان محدداً
     if notification.driver_id and notification.order_type == "delivery":
