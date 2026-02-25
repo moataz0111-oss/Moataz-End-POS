@@ -2334,6 +2334,9 @@ export default function Settings() {
                                     <Button variant="ghost" size="sm" onClick={() => handleEditUser(u)}>
                                       <Edit className="h-4 w-4" />
                                     </Button>
+                                    <Button variant="ghost" size="sm" className="text-blue-500" onClick={() => handlePreviewUser(u)}>
+                                      <Eye className="h-4 w-4" />
+                                    </Button>
                                     <Button variant="ghost" size="sm" className="text-red-500" onClick={() => handleDeleteUser(u.id)}>
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
