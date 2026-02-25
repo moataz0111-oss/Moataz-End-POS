@@ -290,11 +290,11 @@ export default function HR() {
   const printDeductionReceipt = (deduction) => {
     const employee = employees.find(e => e.id === deduction.employee_id);
     const deductionTypeLabels = {
-      'absence': 'غياب',
-      'late': 'تأخير',
-      'early_leave': 'انصراف مبكر',
-      'violation': 'مخالفة',
-      'other': 'أخرى'
+      'absence': t('غياب'),
+      'late': t('تأخير'),
+      'early_leave': t('انصراف مبكر'),
+      'violation': t('مخالفة'),
+      'other': t('أخرى')
     };
     
     const printWindow = window.open('', '_blank', 'width=400,height=600');
