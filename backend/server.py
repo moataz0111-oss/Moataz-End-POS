@@ -1853,6 +1853,48 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         del user["password"]
     return user
 
+# معاينة حساب مستخدم (تسجيل الدخول كمستخدم آخر)
+@api_router.post("/auth/impersonate/{user_id}")
+async def impersonate_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    تسجيل الدخول كمستخدم آخر (للمدراء فقط)
+    يُستخدم لمعاينة التطبيق من منظور المستخدم
+    """
+    # التحقق من الصلاحيات (المدير العام أو المالك فقط)
+    if current_user["role"] not in [UserRole.ADMIN, UserRole.SUPER_ADMIN]:
+        raise HTTPException(status_code=403, detail="غير مصرح - هذه الميزة للمدراء فقط")
+    
+    # التحقق من أن المستخدم ينتمي لنفس الـ tenant
+    query = build_tenant_query(current_user, {"id": user_id})
+    target_user = await db.users.find_one(query, {"_id": 0})
+    
+    if not target_user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    
+    # لا يمكن انتحال حساب مدير عام أو super_admin
+    if target_user.get("role") in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="لا يمكن معاينة حساب مدير عام")
+    
+    # إزالة كلمة المرور
+    if "password" in target_user:
+        del target_user["password"]
+    if "password_hash" in target_user:
+        del target_user["password_hash"]
+    
+    # إضافة علامة أن هذا حساب منتحل
+    target_user["impersonated"] = True
+    target_user["impersonated_by"] = current_user.get("id")
+    target_user["original_user_name"] = current_user.get("full_name") or current_user.get("username")
+    
+    # إنشاء توكن للمستخدم المنتحل
+    token = create_token(target_user["id"], target_user["role"], target_user.get("branch_id"))
+    
+    return {
+        "user": target_user,
+        "token": token,
+        "message": f"تم تسجيل الدخول كـ {target_user.get('full_name') or target_user.get('username')}"
+    }
+
 # ==================== USER ROUTES ====================
 
 @api_router.get("/users", response_model=List[UserResponse])
