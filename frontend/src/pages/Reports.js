@@ -1105,35 +1105,37 @@ export default function Reports() {
         </div>
       </header>
 
-      {/* Filters */}
-      <div className="max-w-7xl mx-auto px-6 py-4 border-b border-border">
-        <div className="flex flex-wrap items-center gap-4">
-          <div>
-            <Label className="text-xs text-muted-foreground">{t('الفرع')}</Label>
-            <div className="mt-1">
-              <BranchSelector />
+      {/* Filters - تظهر فقط عند عدم اختيار التقرير الشامل */}
+      {activeTab !== 'comprehensive' && (
+        <div className="max-w-7xl mx-auto px-6 py-4 border-b border-border">
+          <div className="flex flex-wrap items-center gap-4">
+            <div>
+              <Label className="text-xs text-muted-foreground">{t('الفرع')}</Label>
+              <div className="mt-1">
+                <BranchSelector />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground">{t('من تاريخ')}</Label>
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="mt-1 w-[150px]"
+              />
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground">{t('إلى تاريخ')}</Label>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="mt-1 w-[150px]"
+              />
             </div>
           </div>
-          <div>
-            <Label className="text-xs text-muted-foreground">{t('من تاريخ')}</Label>
-            <Input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="mt-1 w-[150px]"
-            />
-          </div>
-          <div>
-            <Label className="text-xs text-muted-foreground">{t('إلى تاريخ')}</Label>
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="mt-1 w-[150px]"
-            />
-          </div>
         </div>
-      </div>
+      )}
 
       {/* Report Tabs */}
       <main className="max-w-7xl mx-auto px-6 py-6">
