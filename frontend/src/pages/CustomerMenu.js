@@ -266,10 +266,10 @@ export default function CustomerMenu() {
     const themeColor = document.querySelector('meta[name="theme-color"]');
     const appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
     if (themeColor) themeColor.content = '#f97316';
-    if (appleTitle) appleTitle.content = restaurant?.name || 'قائمة الطعام';
+    if (appleTitle) appleTitle.content = restaurant?.name || t('قائمة الطعام');
     
     // تحديث عنوان الصفحة
-    document.title = (restaurant?.name || 'قائمة الطعام') + ' - اطلب الآن';
+    document.title = (restaurant?.name || t('قائمة الطعام')) + ' - ' + t('اطلب الآن');
     
     // حفظ معرف المطعم للـ PWA
     if (tenantId) {
