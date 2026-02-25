@@ -116,7 +116,7 @@
   },
   
   "test_credentials": {
-    "api_url": "https://delivery-hub-mgmt.preview.emergentagent.com",
+    "api_url": "https://impersonate-admin-1.preview.emergentagent.com",
     "owner": {
       "email": "owner@maestroegp.com",
       "password": "owner123",
