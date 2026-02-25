@@ -2325,11 +2325,11 @@ export default function CustomerMenu() {
                   <span className="font-bold text-orange-600">{formatPrice(currentOrder.total)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">طريقة الدفع</span>
-                  <span>{currentOrder.payment_method === 'cash' ? 'نقداً' : 'بطاقة'}</span>
+                  <span className="text-gray-500">{t('طريقة الدفع')}</span>
+                  <span>{currentOrder.payment_method === 'cash' ? t('نقداً') : t('بطاقة')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">العنوان</span>
+                  <span className="text-gray-500">{t('العنوان')}</span>
                   <span className="text-left max-w-[200px]">{currentOrder.delivery_address}</span>
                 </div>
               </div>
