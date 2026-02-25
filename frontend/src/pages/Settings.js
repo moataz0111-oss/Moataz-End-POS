@@ -378,6 +378,8 @@ export default function Settings() {
   // Dialog states
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
+  const [previewUserDialogOpen, setPreviewUserDialogOpen] = useState(false);
+  const [previewUserData, setPreviewUserData] = useState(null);
   const [branchDialogOpen, setBranchDialogOpen] = useState(false);
   const [editBranchDialogOpen, setEditBranchDialogOpen] = useState(false);
   const [printerDialogOpen, setPrinterDialogOpen] = useState(false);
