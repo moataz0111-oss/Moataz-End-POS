@@ -172,7 +172,8 @@ export default function Dashboard() {
     // الميزات الجديدة
     showOwnerWallet: true,
     showExternalBranches: true,
-    showComprehensiveReport: true
+    showComprehensiveReport: true,
+    showBreakEvenReport: true  // افتراضياً مفعل
   });
   
   // حالات السحب والإفلات
