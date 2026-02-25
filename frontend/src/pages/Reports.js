@@ -246,10 +246,6 @@ const ComprehensiveReportTab = ({
               <Activity className="h-6 w-6 text-primary" />
               {t('التقرير الشامل')}
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              <Badge variant="outline" className="mr-2">{branchName}</Badge>
-              {dateRange.start} - {dateRange.end}
-            </p>
           </div>
           <div className="flex gap-2">
             <Button onClick={fetchAllReports} disabled={loading} variant="outline" size="sm" className="gap-2">
@@ -270,7 +266,11 @@ const ComprehensiveReportTab = ({
             <Input
               type="date"
               value={startDate}
-              onChange={(e) => onStartDateChange(e.target.value)}
+              onChange={(e) => {
+                onStartDateChange(e.target.value);
+                // جلب البيانات بعد التغيير
+                setTimeout(() => fetchAllReports(), 100);
+              }}
               className="mt-1 w-[150px]"
             />
           </div>
@@ -279,13 +279,21 @@ const ComprehensiveReportTab = ({
             <Input
               type="date"
               value={endDate}
-              onChange={(e) => onEndDateChange(e.target.value)}
+              onChange={(e) => {
+                onEndDateChange(e.target.value);
+                // جلب البيانات بعد التغيير
+                setTimeout(() => fetchAllReports(), 100);
+              }}
               className="mt-1 w-[150px]"
             />
           </div>
           <div>
             <Label className="text-xs text-muted-foreground">{t('الفرع')}</Label>
-            <Select value={selectedBranchId || 'all'} onValueChange={onBranchChange}>
+            <Select value={selectedBranchId || 'all'} onValueChange={(val) => {
+              onBranchChange(val);
+              // جلب البيانات بعد التغيير
+              setTimeout(() => fetchAllReports(), 100);
+            }}>
               <SelectTrigger className="mt-1 w-[180px]">
                 <Building2 className="h-4 w-4 ml-2" />
                 <SelectValue placeholder={t('اختر الفرع')} />
