@@ -1887,6 +1887,25 @@ async def impersonate_user(user_id: str, current_user: dict = Depends(get_curren
     target_user["impersonated_by"] = current_user.get("id")
     target_user["original_user_name"] = current_user.get("full_name") or current_user.get("username")
     
+    # تسجيل حدث الانتحال في audit log
+    audit_log = {
+        "id": str(uuid.uuid4()),
+        "event_type": "impersonation",
+        "admin_id": current_user.get("id"),
+        "admin_name": current_user.get("full_name") or current_user.get("username"),
+        "admin_email": current_user.get("email"),
+        "admin_role": current_user.get("role"),
+        "target_user_id": target_user.get("id"),
+        "target_user_name": target_user.get("full_name") or target_user.get("username"),
+        "target_user_email": target_user.get("email"),
+        "target_user_role": target_user.get("role"),
+        "tenant_id": current_user.get("tenant_id"),
+        "ip_address": None,  # يمكن إضافته لاحقاً
+        "user_agent": None,  # يمكن إضافته لاحقاً
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.impersonation_logs.insert_one(audit_log)
+    
     # إنشاء توكن للمستخدم المنتحل
     token = create_token(target_user["id"], target_user["role"], target_user.get("branch_id"))
     
