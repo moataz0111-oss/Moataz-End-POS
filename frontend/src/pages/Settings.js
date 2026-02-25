@@ -320,7 +320,7 @@ export default function Settings() {
     // صلاحيات التقارير والتحليلات
     { id: 'comprehensive_report', name: 'التقرير الشامل', description: 'عرض التقرير الشامل المطبوع', group: 'التقارير والتحليلات', featureKey: 'showComprehensiveReport' },
     { id: 'smart_reports', name: 'التقرير الذكي', description: 'عرض التقرير الذكي بالذكاء الاصطناعي', group: 'التقارير والتحليلات', featureKey: 'showSmartReports' },
-    { id: 'break_even_report', name: 'تقرير تحليل الكلف المفصل', description: 'عرض تقرير تحليل التكاليف والأرباح', group: 'التقارير والتحليلات', featureKey: 'showBreakEvenReport' },
+    { id: 'break_even_report', name: 'تقرير تحليل الربح الصافي والتكاليف', description: 'عرض تقرير تحليل الربح الصافي والتكاليف', group: 'التقارير والتحليلات', featureKey: 'showBreakEvenReport' },
     
     // صلاحيات عمليات نقطة البيع
     { id: 'pos_discount', name: 'إعطاء خصومات', description: 'السماح بإعطاء خصومات على الطلبات', group: 'عمليات نقطة البيع' },

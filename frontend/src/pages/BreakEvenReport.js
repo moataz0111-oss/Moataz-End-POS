@@ -167,7 +167,7 @@ export default function BreakEvenReport() {
             <div>
               <h1 className="text-xl font-bold font-cairo text-foreground flex items-center gap-2">
                 <Target className="h-6 w-6 text-primary" />
-                {t('تقرير تحليل التكاليف والأرباح')}
+                {t('تقرير تحليل الربح الصافي والتكاليف')}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {t('تحليل شامل للتكاليف التشغيلية وصافي الأرباح')}

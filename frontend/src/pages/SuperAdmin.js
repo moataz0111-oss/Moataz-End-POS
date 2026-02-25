@@ -3053,7 +3053,7 @@ export default function SuperAdmin() {
                     {[
                       { key: 'showSmartReports', label: t('التقارير الذكية'), icon: BrainCircuit },
                       { key: 'showComprehensiveReport', label: t('التقرير الشامل'), icon: FileText },
-                      { key: 'showBreakEvenReport', label: t('تقرير تحليل التكاليف'), icon: TrendingUp },
+                { key: 'showBreakEvenReport', label: t('تقرير تحليل الربح الصافي والتكاليف'), icon: TrendingUp },
                     ].map(item => (
                       <label key={item.key} className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg hover:bg-gray-700/50 cursor-pointer">
                         <div className="flex items-center gap-2">

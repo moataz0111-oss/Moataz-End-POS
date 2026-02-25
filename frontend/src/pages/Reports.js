@@ -1551,7 +1551,7 @@ export default function Reports() {
                       className="bg-primary text-primary-foreground"
                     >
                       <Target className="h-4 w-4 ml-2" />
-                      {t('تقرير تحليل التكاليف المفصل')}
+                      {t('تقرير تحليل الربح الصافي والتكاليف')}
                     </Button>
                   )}
                   <Button variant="outline" onClick={handlePrintProfitLossReport} className="gap-2">
