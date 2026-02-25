@@ -864,7 +864,7 @@ export default function CustomerMenu() {
     }
   };
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-US').format(price) + ' د.ع';
+    return new Intl.NumberFormat('en-US').format(price) + ' ' + t('د.ع');
   };
   const getSelectedBranchName = () => {
     const branch = branches.find(b => b.id === selectedBranch);
