@@ -449,7 +449,7 @@ export default function BranchOrders() {
                           <h3 className="font-bold">{item.product_name}</h3>
                         </div>
                         <Badge className={item.quantity > 0 ? 'bg-green-500/20 text-green-500' : 'bg-red-500/20 text-red-500'}>
-                          {item.quantity > 0 ? 'متوفر' : 'نفد'}
+                          {item.quantity > 0 ? t('متوفر') : t('نفد')}
                         </Badge>
                       </div>
                       
