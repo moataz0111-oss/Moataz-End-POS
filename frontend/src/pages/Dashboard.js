@@ -972,9 +972,16 @@ export default function Dashboard() {
       color: 'text-primary',
       bg: 'bg-primary/10'
     },
-    { 
+    // إظهار "إجمالي الربح" بدلاً من "صافي الربح" عند تعطيل صلاحية تقرير التحليل
+    dashboardSettings.showBreakEvenReport !== false ? { 
       label: t('صافي الربح'), 
       value: formatPriceCompact(periodStats?.total_profit || 0), 
+      icon: Wallet,
+      color: 'text-purple-500',
+      bg: 'bg-purple-500/10'
+    } : { 
+      label: t('إجمالي الربح'), 
+      value: formatPriceCompact((periodStats?.total_sales || 0) - (periodStats?.total_expenses || 0)), 
       icon: Wallet,
       color: 'text-purple-500',
       bg: 'bg-purple-500/10'
