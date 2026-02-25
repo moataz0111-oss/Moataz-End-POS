@@ -66,11 +66,19 @@
 - ✅ إضافة ترجمات لإشعارات الطلبات الجديدة
 - ✅ التحقق من الترجمات الموجودة (3370+ سطر)
 
-### إعادة هيكلة server.py (جزئي) ✅
+### إعادة هيكلة server.py ✅
 - ✅ إنشاء `/app/backend/services/websocket_service.py` - خدمة WebSocket
 - ✅ إنشاء `/app/backend/routes/auth_routes.py` - مسارات المصادقة
 - ✅ إنشاء `/app/backend/routes/user_routes.py` - مسارات المستخدمين
-- ✅ تحديث `/app/backend/routes/order_notifications.py` - دعم WebSocket
+- ✅ إنشاء `/app/backend/routes/branch_routes.py` - مسارات الفروع
+- ✅ إنشاء `/app/backend/routes/category_routes.py` - مسارات التصنيفات
+- ✅ إنشاء `/app/backend/routes/product_routes.py` - مسارات المنتجات
+- ✅ إنشاء `/app/backend/routes/table_routes.py` - مسارات الطاولات
+- ✅ إنشاء `/app/backend/routes/expense_routes.py` - مسارات المصاريف
+- ✅ إنشاء `/app/backend/routes/shift_routes.py` - مسارات الورديات
+- ✅ إنشاء `/app/backend/routes/customer_routes.py` - مسارات العملاء
+- ✅ تحديث `/app/backend/routes/__init__.py` - تجميع الوحدات
+- ⏳ server.py لا يزال 15,608 سطر (الوحدات الجديدة جاهزة للدمج التدريجي)
 
 ### الملفات الجديدة/المعدلة
 - `/app/backend/services/websocket_service.py` - خدمة WebSocket الجديدة
