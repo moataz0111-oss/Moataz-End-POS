@@ -7,6 +7,7 @@ import { useBranch } from '../context/BranchContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { formatPrice } from '../utils/currency';
 import { playClick, playSuccess } from '../utils/sound';
+import { useOrderNotifications, sendOrderNotification } from '../utils/orderNotifications';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
