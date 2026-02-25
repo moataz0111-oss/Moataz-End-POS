@@ -1846,12 +1846,14 @@ export default function Dashboard() {
                     </div>
                   )}
 
-                  {/* صافي الربح */}
+                  {/* صافي الربح أو إجمالي الربح حسب الصلاحية */}
                   <div className="section p-4 bg-primary/10 rounded-lg">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold">{t('صافي الربح')}:</span>
+                      <span className="text-lg font-bold">
+                        {dashboardSettings.showBreakEvenReport !== false ? t('صافي الربح') : t('إجمالي الربح')}:
+                      </span>
                       <span className={`text-2xl font-bold ${closingResult.net_profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatPrice(closingResult.net_profit)}
+                        {formatPrice(dashboardSettings.showBreakEvenReport !== false ? closingResult.net_profit : (closingResult.total_sales - closingResult.total_expenses))}
                       </span>
                     </div>
                   </div>
