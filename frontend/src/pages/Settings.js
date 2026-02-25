@@ -1129,22 +1129,37 @@ export default function Settings() {
     setEditUserDialogOpen(true);
   };
 
-  // معاينة بيانات المستخدم
-  const handlePreviewUser = (u) => {
-    setPreviewUserData({
-      ...u,
-      branch_name: branches.find(b => b.id === u.branch_id)?.name || '-',
-      role_label: u.role === 'admin' ? t('مدير عام') : 
-                  u.role === 'manager' ? t('مدير') : 
-                  u.role === 'cashier' ? t('كاشير') : 
-                  u.role === 'captain' ? t('كابتن') : 
-                  u.role === 'kitchen' ? t('مطبخ') : 
-                  u.role === 'call_center' ? t('كول سنتر') : u.role,
-      permissions_count: (u.permissions || []).length,
-      created_date: u.created_at ? new Date(u.created_at).toLocaleDateString('ar-IQ') : '-',
-      status: u.is_active !== false ? t('نشط') : t('غير نشط')
-    });
-    setPreviewUserDialogOpen(true);
+  // معاينة حساب المستخدم (تسجيل الدخول كمستخدم آخر)
+  const handlePreviewUser = async (u) => {
+    // لا يمكن معاينة حساب مدير عام
+    if (u.role === 'admin' || u.role === 'super_admin') {
+      toast.error(t('لا يمكن معاينة حساب مدير عام'));
+      return;
+    }
+    
+    try {
+      const res = await axios.post(`${API}/auth/impersonate/${u.id}`);
+      const { user: impersonatedUser, token } = res.data;
+      
+      // حفظ بيانات المستخدم الأصلي للعودة لاحقاً
+      const originalUser = JSON.parse(localStorage.getItem('user') || '{}');
+      const originalToken = localStorage.getItem('token');
+      localStorage.setItem('original_user', JSON.stringify(originalUser));
+      localStorage.setItem('original_token', originalToken);
+      
+      // تسجيل الدخول كالمستخدم الآخر
+      localStorage.setItem('user', JSON.stringify(impersonatedUser));
+      localStorage.setItem('token', token);
+      
+      toast.success(`✅ ${t('تم تسجيل الدخول كـ')} ${impersonatedUser.full_name || impersonatedUser.username}`);
+      
+      // إعادة التوجيه للوحة التحكم
+      window.location.href = '/';
+      
+    } catch (error) {
+      console.error('Impersonate error:', error);
+      toast.error(error.response?.data?.detail || t('فشل في معاينة الحساب'));
+    }
   };
 
   const handleUpdateUser = async (e) => {
