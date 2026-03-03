@@ -306,3 +306,217 @@ async def get_sync_status(current_user: dict = Depends(get_current_user)):
         "offline_orders_today": stats.get("offline_orders", 0) if stats else 0,
         "total_orders_today": stats.get("total_orders", 0) if stats else 0
     }
+
+
+# ==================== TABLE SYNC ====================
+
+class TableUpdate(BaseModel):
+    id: str
+    status: Optional[str] = None
+    current_order_id: Optional[str] = None
+    offline_id: Optional[str] = None
+
+
+@router.post("/tables")
+async def sync_table_update(update: TableUpdate, current_user: dict = Depends(get_current_user)):
+    """
+    مزامنة تحديث طاولة من الـ Offline
+    """
+    try:
+        tenant_id = get_user_tenant_id(current_user)
+        
+        # البحث عن الطاولة
+        table = await db.tables.find_one({
+            "id": update.id,
+            "tenant_id": tenant_id
+        })
+        
+        if not table:
+            raise HTTPException(status_code=404, detail="الطاولة غير موجودة")
+        
+        # تحديث الطاولة
+        update_data = {
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        if update.status:
+            update_data["status"] = update.status
+        if update.current_order_id:
+            update_data["current_order_id"] = update.current_order_id
+        
+        await db.tables.update_one(
+            {"id": update.id, "tenant_id": tenant_id},
+            {"$set": update_data}
+        )
+        
+        return {"success": True, "id": update.id, "message": "تم تحديث الطاولة"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"خطأ في المزامنة: {str(e)}")
+
+
+# ==================== ATTENDANCE SYNC ====================
+
+class OfflineAttendance(BaseModel):
+    id: Optional[str] = None
+    offline_id: Optional[str] = None
+    employee_id: str
+    date: str
+    check_in: Optional[str] = None
+    check_out: Optional[str] = None
+    status: Optional[str] = "present"
+    notes: Optional[str] = None
+    branch_id: Optional[str] = None
+
+
+@router.post("/attendance")
+async def sync_attendance(attendance: OfflineAttendance, current_user: dict = Depends(get_current_user)):
+    """
+    مزامنة سجل حضور من الـ Offline
+    """
+    try:
+        tenant_id = get_user_tenant_id(current_user)
+        
+        # التحقق من عدم وجود سجل مسبق (نفس الموظف ونفس التاريخ)
+        existing = await db.attendance.find_one({
+            "employee_id": attendance.employee_id,
+            "date": attendance.date,
+            "tenant_id": tenant_id
+        })
+        
+        if existing:
+            # تحديث السجل الموجود
+            update_data = {
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            if attendance.check_in:
+                update_data["check_in"] = attendance.check_in
+            if attendance.check_out:
+                update_data["check_out"] = attendance.check_out
+            if attendance.status:
+                update_data["status"] = attendance.status
+            if attendance.notes:
+                update_data["notes"] = attendance.notes
+                
+            await db.attendance.update_one(
+                {"id": existing["id"]},
+                {"$set": update_data}
+            )
+            
+            return {
+                "success": True,
+                "id": existing["id"],
+                "message": "تم تحديث سجل الحضور"
+            }
+        
+        # إنشاء سجل جديد
+        new_attendance = {
+            "id": attendance.id or str(uuid.uuid4()),
+            "offline_id": attendance.offline_id,
+            "employee_id": attendance.employee_id,
+            "date": attendance.date,
+            "check_in": attendance.check_in,
+            "check_out": attendance.check_out,
+            "status": attendance.status or "present",
+            "notes": attendance.notes,
+            "branch_id": attendance.branch_id or current_user.get("branch_id"),
+            "tenant_id": tenant_id,
+            "is_offline": True,
+            "synced_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.attendance.insert_one(new_attendance)
+        
+        return {
+            "success": True,
+            "id": new_attendance["id"],
+            "message": "تم حفظ سجل الحضور"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"خطأ في المزامنة: {str(e)}")
+
+
+# ==================== INVENTORY SYNC ====================
+
+class OfflineInventoryTransaction(BaseModel):
+    id: Optional[str] = None
+    offline_id: Optional[str] = None
+    item_id: str
+    item_name: Optional[str] = None
+    transaction_type: str  # add, remove, adjust
+    quantity: float
+    notes: Optional[str] = None
+    branch_id: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+@router.post("/inventory")
+async def sync_inventory_transaction(
+    transaction: OfflineInventoryTransaction,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    مزامنة حركة مخزون من الـ Offline
+    """
+    try:
+        tenant_id = get_user_tenant_id(current_user)
+        
+        # التحقق من عدم وجود الحركة مسبقاً (بناءً على offline_id)
+        if transaction.offline_id:
+            existing = await db.inventory_transactions.find_one({
+                "offline_id": transaction.offline_id,
+                "tenant_id": tenant_id
+            })
+            if existing:
+                return {
+                    "success": True,
+                    "id": existing.get("id"),
+                    "message": "الحركة موجودة مسبقاً"
+                }
+        
+        # إنشاء سجل الحركة
+        new_transaction = {
+            "id": transaction.id or str(uuid.uuid4()),
+            "offline_id": transaction.offline_id,
+            "item_id": transaction.item_id,
+            "item_name": transaction.item_name,
+            "transaction_type": transaction.transaction_type,
+            "quantity": transaction.quantity,
+            "notes": transaction.notes,
+            "branch_id": transaction.branch_id or current_user.get("branch_id"),
+            "user_id": current_user.get("id"),
+            "user_name": current_user.get("name") or current_user.get("full_name"),
+            "tenant_id": tenant_id,
+            "is_offline": True,
+            "synced_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": transaction.created_at or datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.inventory_transactions.insert_one(new_transaction)
+        
+        # تحديث كمية المخزون
+        quantity_change = transaction.quantity
+        if transaction.transaction_type == "remove":
+            quantity_change = -transaction.quantity
+        
+        await db.inventory.update_one(
+            {"id": transaction.item_id, "tenant_id": tenant_id},
+            {"$inc": {"quantity": quantity_change}}
+        )
+        
+        return {
+            "success": True,
+            "id": new_transaction["id"],
+            "message": "تم حفظ حركة المخزون"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"خطأ في المزامنة: {str(e)}")
