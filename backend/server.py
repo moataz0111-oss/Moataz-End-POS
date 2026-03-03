@@ -8414,9 +8414,10 @@ async def reset_tenant_admin_password(tenant_id: str, new_password: str, current
     if not admin:
         raise HTTPException(status_code=404, detail="مدير المستأجر غير موجود")
     
+    new_hash = hash_password(new_password)
     await db.users.update_one(
         {"id": admin["id"]},
-        {"$set": {"password": hash_password(new_password)}}
+        {"$set": {"password": new_hash, "password_hash": new_hash}}
     )
     
     return {"message": "تم إعادة تعيين كلمة المرور", "email": admin["email"]}
