@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useBranch } from '../context/BranchContext';
+import { useOffline } from '../context/OfflineContext';
+import offlineStorage from '../lib/offlineStorage';
+import db, { STORES } from '../lib/offlineDB';
 import { formatPrice } from '../utils/currency';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -53,7 +56,10 @@ import {
   Home,
   Fingerprint,
   FileSpreadsheet,
-  BarChart3
+  BarChart3,
+  WifiOff,
+  CloudOff,
+  Cloud
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import BiometricDevices from '../components/BiometricDevices';
