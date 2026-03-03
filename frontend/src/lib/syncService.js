@@ -173,16 +173,26 @@ export const autoSync = async (token) => {
  * حالة المزامنة
  */
 export const getSyncStatus = async () => {
-  const unsyncedOrders = await offlineStorage.countUnsyncedOrders();
-  const syncQueue = await offlineStorage.getSyncQueue();
-  const lastSync = await db.getItem(STORES.SETTINGS, 'lastSync');
+  try {
+    const unsyncedOrders = await offlineStorage.countUnsyncedOrders();
+    const syncQueue = await offlineStorage.getSyncQueue();
+    const lastSync = await db.getItem(STORES.SETTINGS, 'lastSync');
 
-  return {
-    isSyncing,
-    pendingOrders: unsyncedOrders,
-    pendingItems: syncQueue.length,
-    lastSync: lastSync?.value || null
-  };
+    return {
+      isSyncing,
+      pendingOrders: unsyncedOrders || 0,
+      pendingItems: syncQueue?.length || 0,
+      lastSync: lastSync?.value || null
+    };
+  } catch (error) {
+    console.error('Error getting sync status:', error);
+    return {
+      isSyncing: false,
+      pendingOrders: 0,
+      pendingItems: 0,
+      lastSync: null
+    };
+  }
 };
 
 /**
