@@ -1,10 +1,21 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL, BACKEND_URL } from '../utils/api';
+import offlineStorage from '../lib/offlineStorage';
+import { getOnlineStatus } from '../hooks/useOnlineStatus';
 
 const AuthContext = createContext(null);
 
 const API = API_URL;
+
+// دالة لتشفير كلمة المرور بسيطة (للتخزين المحلي فقط)
+const hashPassword = async (password) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + 'maestro_salt_2024');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -12,6 +23,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [currentShift, setCurrentShift] = useState(null);
   const [error, setError] = useState(null);
+  const [isOfflineLogin, setIsOfflineLogin] = useState(false);
 
   useEffect(() => {
     if (token) {
