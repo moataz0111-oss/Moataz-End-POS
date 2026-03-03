@@ -15626,7 +15626,7 @@ app.include_router(inventory_router)
 
 # Include sync routes for offline support
 from routes.sync_routes import router as sync_router
-app.include_router(sync_router)
+app.include_router(sync_router, prefix="/api")
 
 # Middleware to prevent caching of API responses
 @app.middleware("http")
