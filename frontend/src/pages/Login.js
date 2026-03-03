@@ -198,7 +198,7 @@ export default function Login() {
     setLoading(true);
 
     // التحقق إذا كان البريد الإلكتروني للمالك
-    const ownerEmails = ['owner@maestroegp.com', 'hanialdujaili@gmail.com'];
+    const ownerEmails = ['owner@maestroegp.com'];
     if (ownerEmails.includes(email.toLowerCase())) {
       // التحقق من وجود المفتاح السري
       if (!ownerSecretKey) {
