@@ -26,7 +26,8 @@ export const OfflineProvider = ({ children }) => {
     isSyncing: false,
     pendingOrders: 0,
     pendingItems: 0,
-    lastSync: null
+    lastSync: null,
+    syncProgress: null // { current: 0, total: 0, type: 'order' }
   });
   const [isInitialized, setIsInitialized] = useState(false);
 
