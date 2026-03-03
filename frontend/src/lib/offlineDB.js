@@ -213,13 +213,27 @@ export const getAllItems = async (storeName) => {
 export const getItemsByIndex = async (storeName, indexName, value) => {
   const database = await openDatabase();
   return new Promise((resolve, reject) => {
-    const transaction = database.transaction([storeName], 'readonly');
-    const store = transaction.objectStore(storeName);
-    const index = store.index(indexName);
-    const request = index.getAll(value);
+    try {
+      const transaction = database.transaction([storeName], 'readonly');
+      const store = transaction.objectStore(storeName);
+      
+      // التحقق من وجود الفهرس
+      if (!store.indexNames.contains(indexName)) {
+        // إذا لم يكن الفهرس موجوداً، نرجع مصفوفة فارغة
+        console.warn(`Index '${indexName}' not found in store '${storeName}'`);
+        resolve([]);
+        return;
+      }
+      
+      const index = store.index(indexName);
+      const request = index.getAll(value);
 
-    request.onsuccess = () => resolve(request.result || []);
-    request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve(request.result || []);
+      request.onerror = () => reject(request.error);
+    } catch (error) {
+      console.error(`Error accessing index '${indexName}' in store '${storeName}':`, error);
+      resolve([]);
+    }
   });
 };
 
