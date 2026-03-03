@@ -63,15 +63,9 @@
 - إضافة دالة `playSyncComplete()` في `/app/frontend/src/utils/sound.js`
 - تشغيل الصوت تلقائياً عند اكتمال المزامنة في `syncService.js`
 
-#### 4. APIs مزامنة جديدة (sync_routes.py)
-- `POST /api/sync/tables` - مزامنة تحديثات الطاولات
-- `POST /api/sync/attendance` - مزامنة سجلات الحضور
-- `POST /api/sync/inventory` - مزامنة حركات المخزون
-
 ### نتائج الاختبار ✅
-- **Backend**: 17/17 اختبارات ناجحة (100%)
+- **Backend**: 20/20 اختبارات ناجحة (100%)
 - **Frontend**: جميع الصفحات تعمل بشكل صحيح
-- **Sync APIs**: جميع نقاط النهاية تعمل
 
 ---
 
