@@ -48,7 +48,22 @@ async def get_sales_report(
     if end_date:
         query.setdefault("created_at", {})["$lte"] = end_date + "T23:59:59"
     
-    orders = await db.orders.find(query, {"_id": 0}).to_list(10000)
+    # تحسين الأداء: استخدام projection لجلب الحقول المطلوبة فقط
+    projection = {
+        "_id": 0,
+        "total": 1,
+        "total_cost": 1,
+        "profit": 1,
+        "payment_method": 1,
+        "payment_status": 1,
+        "order_type": 1,
+        "delivery_app": 1,
+        "delivery_app_name": 1,
+        "delivery_commission": 1,
+        "created_at": 1,
+        "items": 1
+    }
+    orders = await db.orders.find(query, projection).to_list(10000)
     
     delivery_apps = await db.delivery_apps.find({}, {"_id": 0}).to_list(100)
     app_names = {app["id"]: app["name"] for app in delivery_apps}
