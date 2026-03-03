@@ -72,6 +72,7 @@ export default function HR() {
   const { user, hasRole } = useAuth();
   const { selectedBranchId, branches: contextBranches, getBranchIdForApi } = useBranch();
   const { t, isRTL } = useTranslation();
+  const { isOnline, isOffline, syncStatus, updateSyncStatus } = useOffline();
   const [activeTab, setActiveTab] = useState('employees');
   const [employees, setEmployees] = useState([]);
   const [branches, setBranches] = useState([]);
