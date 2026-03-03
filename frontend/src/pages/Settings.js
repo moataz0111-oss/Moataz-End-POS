@@ -5853,7 +5853,7 @@ export default function Settings() {
                                   </div>
                                 </TableCell>
                                 <TableCell className="text-muted-foreground text-sm">
-                                  {new Date(log.timestamp).toLocaleString('ar-EG', {
+                                  {new Date(log.created_at || log.timestamp).toLocaleString('ar-EG', {
                                     year: 'numeric',
                                     month: 'short',
                                     day: 'numeric',
