@@ -88,6 +88,37 @@ export default function Orders() {
 
   const fetchData = async () => {
     try {
+      // === وضع Offline ===
+      if (isOffline) {
+        try {
+          // جلب الطلبات المحلية
+          const localOrders = await offlineStorage.getTodayOrders();
+          
+          // تطبيق الفلاتر
+          let filteredLocalOrders = localOrders;
+          if (statusFilter !== 'all') {
+            filteredLocalOrders = localOrders.filter(o => o.status === statusFilter);
+          }
+          
+          setOrders(filteredLocalOrders);
+          
+          // جلب الفروع المحلية
+          const localBranches = await db.getAllItems(STORES.BRANCHES);
+          if (localBranches.length > 0) {
+            setBranches(localBranches);
+            if (!selectedBranch) {
+              setSelectedBranch(localBranches[0].id);
+            }
+          }
+          
+          setLoading(false);
+          return;
+        } catch (offlineError) {
+          console.error('Error loading offline orders:', offlineError);
+        }
+      }
+      
+      // === وضع Online ===
       const today = new Date().toISOString().split('T')[0];
       const params = { date: today };
       if (selectedBranch) params.branch_id = selectedBranch;
@@ -99,6 +130,17 @@ export default function Orders() {
       ]);
 
       const newOrders = ordersRes.data;
+      
+      // حفظ الطلبات محلياً للاستخدام Offline
+      try {
+        for (const order of newOrders) {
+          await db.addItem(STORES.ORDERS, { ...order, is_synced: true });
+        }
+        // حفظ الفروع محلياً
+        await db.addItems(STORES.BRANCHES, branchesRes.data);
+      } catch (cacheError) {
+        console.log('Could not cache orders:', cacheError);
+      }
       
       // Check for new orders and play notification
       if (!isFirstLoadRef.current && soundEnabled) {
@@ -129,6 +171,24 @@ export default function Orders() {
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error);
+      
+      // إذا فشل الاتصال، حاول جلب من IndexedDB
+      if (!error.response) {
+        try {
+          const localOrders = await offlineStorage.getTodayOrders();
+          if (localOrders.length > 0) {
+            setOrders(localOrders);
+            toast.warning(t('تم تحميل الطلبات المحلية'));
+          }
+          
+          const localBranches = await db.getAllItems(STORES.BRANCHES);
+          if (localBranches.length > 0) {
+            setBranches(localBranches);
+          }
+        } catch (offlineError) {
+          console.error('Error loading offline data:', offlineError);
+        }
+      }
     } finally {
       setLoading(false);
     }
