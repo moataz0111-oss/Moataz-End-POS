@@ -253,6 +253,38 @@ export default function POS() {
       // تحديد الفرع النشط للاستخدام في جميع الطلبات
       const activeBranchId = getBranchIdForApi() || user?.branch_id;
       
+      // === وضع Offline - جلب من IndexedDB ===
+      if (isOffline) {
+        try {
+          const [localCategories, localProducts, localTables] = await Promise.all([
+            db.getAllItems(STORES.CATEGORIES),
+            db.getAllItems(STORES.PRODUCTS),
+            db.getAllItems(STORES.TABLES)
+          ]);
+          
+          if (localCategories.length > 0) setCategories(localCategories);
+          if (localProducts.length > 0) setProducts(localProducts);
+          if (localTables.length > 0) setTables(localTables);
+          
+          if (localCategories.length > 0) {
+            setSelectedCategory(localCategories[0].id);
+          }
+          
+          // جلب الطلبات المحلية
+          const localOrders = await offlineStorage.getTodayOrders();
+          const pendingLocal = localOrders.filter(o => 
+            o.status === 'pending' || o.status === 'preparing' || o.status === 'ready' || !o.is_synced
+          );
+          setPendingOrders(pendingLocal);
+          
+          setLoading(false);
+          return;
+        } catch (offlineError) {
+          console.error('Error loading offline data:', offlineError);
+        }
+      }
+      
+      // === وضع Online ===
       const [catRes, prodRes, appsRes, shiftRes, invoiceRes, restaurantRes, sysInvoiceRes, loginBgRes] = await Promise.all([
         axios.get(`${API}/categories`),
         axios.get(`${API}/products`),
@@ -269,6 +301,14 @@ export default function POS() {
       setDeliveryApps(appsRes.data);
       setInvoiceSettings(invoiceRes.data || {});
       setRestaurantSettings(restaurantRes.data || {});
+      
+      // حفظ البيانات محلياً للاستخدام Offline
+      try {
+        await db.addItems(STORES.CATEGORIES, catRes.data);
+        await db.addItems(STORES.PRODUCTS, prodRes.data);
+      } catch (cacheError) {
+        console.log('Could not cache data locally:', cacheError);
+      }
       
       // دمج شعار صفحة الدخول مع إعدادات الفاتورة للنظام
       const sysInvoice = sysInvoiceRes.data || {};
@@ -299,6 +339,13 @@ export default function POS() {
       const tablesParams = activeBranchId ? { branch_id: activeBranchId } : {};
       const tablesRes = await axios.get(`${API}/tables`, { params: tablesParams });
       setTables(tablesRes.data);
+      
+      // حفظ الطاولات محلياً
+      try {
+        await db.addItems(STORES.TABLES, tablesRes.data);
+      } catch (cacheError) {
+        console.log('Could not cache tables:', cacheError);
+      }
 
       // جلب السائقين حسب الفرع المحدد
       const driversParams = activeBranchId ? { branch_id: activeBranchId } : {};
@@ -313,7 +360,29 @@ export default function POS() {
       await fetchPendingOrders();
     } catch (error) {
       console.error('Failed to fetch data:', error);
-      toast.error(t('فشل في تحميل البيانات'));
+      
+      // إذا فشل الاتصال، حاول جلب من IndexedDB
+      if (!error.response) {
+        try {
+          const [localCategories, localProducts] = await Promise.all([
+            db.getAllItems(STORES.CATEGORIES),
+            db.getAllItems(STORES.PRODUCTS)
+          ]);
+          
+          if (localCategories.length > 0) setCategories(localCategories);
+          if (localProducts.length > 0) setProducts(localProducts);
+          
+          if (localCategories.length > 0) {
+            setSelectedCategory(localCategories[0].id);
+          }
+          
+          toast.warning(t('تم تحميل البيانات المحلية - لا يوجد اتصال'));
+        } catch (offlineError) {
+          toast.error(t('فشل في تحميل البيانات'));
+        }
+      } else {
+        toast.error(t('فشل في تحميل البيانات'));
+      }
     } finally {
       setLoading(false);
     }
