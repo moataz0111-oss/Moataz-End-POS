@@ -2869,6 +2869,55 @@ async def get_employee_ratings(
     
     employees = await db.employees.find(emp_query, {"_id": 0}).to_list(500)
     
+    if not employees:
+        return {"ratings": [], "summary": {}}
+    
+    # === تحسين الأداء: Batch fetch بدلاً من N+1 queries ===
+    employee_ids = [emp["id"] for emp in employees]
+    
+    # جلب جميع سجلات الحضور دفعة واحدة
+    all_attendance = await db.attendance.find({
+        "tenant_id": tenant_id,
+        "employee_id": {"$in": employee_ids},
+        "date": {"$regex": f"^{month}"}
+    }, {"_id": 0}).to_list(15000)
+    
+    # جلب جميع الخصومات دفعة واحدة
+    all_deductions = await db.deductions.find({
+        "tenant_id": tenant_id,
+        "employee_id": {"$in": employee_ids},
+        "month": month
+    }, {"_id": 0}).to_list(5000)
+    
+    # جلب جميع المكافآت دفعة واحدة
+    all_bonuses = await db.bonuses.find({
+        "tenant_id": tenant_id,
+        "employee_id": {"$in": employee_ids},
+        "month": month
+    }, {"_id": 0}).to_list(5000)
+    
+    # تجميع البيانات حسب الموظف
+    attendance_by_emp = {}
+    for record in all_attendance:
+        emp_id = record.get("employee_id")
+        if emp_id not in attendance_by_emp:
+            attendance_by_emp[emp_id] = []
+        attendance_by_emp[emp_id].append(record)
+    
+    deductions_by_emp = {}
+    for record in all_deductions:
+        emp_id = record.get("employee_id")
+        if emp_id not in deductions_by_emp:
+            deductions_by_emp[emp_id] = []
+        deductions_by_emp[emp_id].append(record)
+    
+    bonuses_by_emp = {}
+    for record in all_bonuses:
+        emp_id = record.get("employee_id")
+        if emp_id not in bonuses_by_emp:
+            bonuses_by_emp[emp_id] = []
+        bonuses_by_emp[emp_id].append(record)
+    
     ratings = []
     
     for emp in employees:
@@ -2877,12 +2926,8 @@ async def get_employee_ratings(
         # حساب أيام العمل في الشهر (26 يوم افتراضياً)
         work_days_expected = 26
         
-        # جلب سجلات الحضور للشهر
-        attendance_records = await db.attendance.find({
-            "tenant_id": tenant_id,
-            "employee_id": emp_id,
-            "date": {"$regex": f"^{month}"}
-        }, {"_id": 0}).to_list(100)
+        # جلب سجلات الحضور للشهر (من البيانات المجمعة)
+        attendance_records = attendance_by_emp.get(emp_id, [])
         
         # حساب أيام الحضور
         attendance_days = len(attendance_records)
@@ -2924,23 +2969,13 @@ async def get_employee_ratings(
                 except:
                     pass
         
-        # جلب الخصومات للشهر
-        deductions = await db.deductions.find({
-            "tenant_id": tenant_id,
-            "employee_id": emp_id,
-            "month": month
-        }, {"_id": 0}).to_list(100)
-        
+        # جلب الخصومات للشهر (من البيانات المجمعة)
+        deductions = deductions_by_emp.get(emp_id, [])
         total_deductions = sum(d.get("amount", 0) for d in deductions)
         deduction_count = len(deductions)
         
-        # جلب المكافآت للشهر
-        bonuses = await db.bonuses.find({
-            "tenant_id": tenant_id,
-            "employee_id": emp_id,
-            "month": month
-        }, {"_id": 0}).to_list(100)
-        
+        # جلب المكافآت للشهر (من البيانات المجمعة)
+        bonuses = bonuses_by_emp.get(emp_id, [])
         total_bonuses = sum(b.get("amount", 0) for b in bonuses)
         bonus_count = len(bonuses)
         
