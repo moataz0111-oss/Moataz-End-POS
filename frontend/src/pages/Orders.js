@@ -304,6 +304,19 @@ export default function Orders() {
 
   return (
     <div className="min-h-screen bg-background" dir={isRTL ? 'rtl' : 'ltr'} data-testid="orders-page">
+      {/* Offline Banner */}
+      {isOffline && (
+        <div className="bg-amber-500 text-white px-4 py-2 flex items-center justify-center gap-2 text-sm sticky top-0 z-50">
+          <WifiOff className="h-4 w-4 animate-pulse" />
+          <span className="font-medium">{t('وضع Offline')} - {t('الطلبات المحلية فقط')}</span>
+          {syncStatus.pendingOrders > 0 && (
+            <span className="bg-white text-amber-600 px-2 py-0.5 rounded-full text-xs font-bold mr-2">
+              {syncStatus.pendingOrders} {t('طلب في الانتظار')}
+            </span>
+          )}
+        </div>
+      )}
+      
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b border-border/50 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
