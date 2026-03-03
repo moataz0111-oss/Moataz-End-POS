@@ -72,39 +72,96 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    try {
-      const response = await axios.post(`${API}/auth/login`, { email, password });
-      const { user: userData, token: newToken } = response.data;
-      
-      // التحقق إذا كان المستخدم هو super_admin - تحويله إلى /super-admin
-      if (userData.role === 'super_admin') {
+    const isOnline = getOnlineStatus();
+    
+    // محاولة تسجيل الدخول Online أولاً
+    if (isOnline) {
+      try {
+        const response = await axios.post(`${API}/auth/login`, { email, password });
+        const { user: userData, token: newToken } = response.data;
+        
+        // التحقق إذا كان المستخدم هو super_admin - تحويله إلى /super-admin
+        if (userData.role === 'super_admin') {
+          return { 
+            success: false, 
+            error: 'يرجى استخدام بوابة مالك النظام للدخول',
+            redirectToSuperAdmin: true
+          };
+        }
+        
+        localStorage.setItem('token', newToken);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        setToken(newToken);
+        setUser(userData);
+        setIsOfflineLogin(false);
+        
+        // حفظ بيانات المستخدم للدخول Offline
+        const passwordHash = await hashPassword(password);
+        await offlineStorage.saveUserForOfflineLogin(userData, passwordHash);
+        
+        // تهيئة البيانات المحلية
+        await offlineStorage.initializeOfflineData(newToken);
+        
+        // إرسال حدث تسجيل الدخول لتحديث إعدادات العملة
+        window.dispatchEvent(new CustomEvent('userLoggedIn'));
+        
+        // فتح وردية تلقائياً للكاشير أو المدير
+        if (['cashier', 'manager', 'admin'].includes(userData.role)) {
+          setTimeout(async () => {
+            await autoOpenShift();
+          }, 500);
+        }
+        
+        return { success: true, user: userData };
+      } catch (error) {
+        // إذا فشل الاتصال، جرب Offline Login
+        if (!error.response) {
+          console.log('⚠️ فشل الاتصال - محاولة تسجيل الدخول Offline...');
+          return await offlineLogin(email, password);
+        }
         return { 
           success: false, 
-          error: 'يرجى استخدام بوابة مالك النظام للدخول',
-          redirectToSuperAdmin: true
+          error: error.response?.data?.detail || 'فشل تسجيل الدخول' 
         };
       }
+    } else {
+      // تسجيل دخول Offline
+      return await offlineLogin(email, password);
+    }
+  };
+
+  // تسجيل دخول Offline
+  const offlineLogin = async (email, password) => {
+    try {
+      const passwordHash = await hashPassword(password);
+      const result = await offlineStorage.verifyOfflineUser(email, passwordHash);
       
-      localStorage.setItem('token', newToken);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-      setToken(newToken);
-      setUser(userData);
-      
-      // إرسال حدث تسجيل الدخول لتحديث إعدادات العملة
-      window.dispatchEvent(new CustomEvent('userLoggedIn'));
-      
-      // فتح وردية تلقائياً للكاشير أو المدير
-      if (['cashier', 'manager', 'admin'].includes(userData.role)) {
-        setTimeout(async () => {
-          await autoOpenShift();
-        }, 500);
+      if (result.success) {
+        const userData = result.user;
+        
+        // إنشاء token محلي مؤقت
+        const offlineToken = `offline_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+        
+        localStorage.setItem('token', offlineToken);
+        localStorage.setItem('offline_user', JSON.stringify(userData));
+        setToken(offlineToken);
+        setUser(userData);
+        setIsOfflineLogin(true);
+        
+        console.log('✅ تم تسجيل الدخول Offline بنجاح');
+        
+        return { success: true, user: userData, isOffline: true };
+      } else {
+        return { 
+          success: false, 
+          error: result.error || 'يجب تسجيل الدخول مرة واحدة Online أولاً'
+        };
       }
-      
-      return { success: true, user: userData };
     } catch (error) {
+      console.error('❌ خطأ في تسجيل الدخول Offline:', error);
       return { 
         success: false, 
-        error: error.response?.data?.detail || 'فشل تسجيل الدخول' 
+        error: 'يجب تسجيل الدخول مرة واحدة Online أولاً'
       };
     }
   };
