@@ -59,6 +59,7 @@ const API = API_URL;
 export default function Inventory() {
   const { user, hasRole } = useAuth();
   const { t, isRTL } = useTranslation();
+  const { isOnline, isOffline, syncStatus, updateSyncStatus } = useOffline();
   const navigate = useNavigate();
   
   const [items, setItems] = useState([]);
@@ -93,10 +94,41 @@ export default function Inventory() {
 
   useEffect(() => {
     fetchData();
-  }, [selectedBranch, itemType]);
+  }, [selectedBranch, itemType, isOffline]);
 
   const fetchData = async () => {
     try {
+      // === وضع Offline ===
+      if (isOffline) {
+        try {
+          const [localInventory, localBranches] = await Promise.all([
+            db.getAllItems(STORES.INVENTORY),
+            db.getAllItems(STORES.BRANCHES)
+          ]);
+          
+          // فلترة حسب نوع المادة
+          let filteredItems = localInventory;
+          if (itemType) {
+            filteredItems = localInventory.filter(item => item.item_type === itemType);
+          }
+          
+          setItems(filteredItems || []);
+          setBranches(localBranches || []);
+          setRawMaterials(localInventory.filter(i => i.item_type === 'raw') || []);
+          setFinishedProducts(localInventory.filter(i => i.item_type === 'finished') || []);
+          
+          if (!selectedBranch && localBranches.length > 0) {
+            setSelectedBranch(localBranches[0].id);
+          }
+          
+          setLoading(false);
+          return;
+        } catch (offlineError) {
+          console.error('Error loading offline inventory:', offlineError);
+        }
+      }
+      
+      // === وضع Online ===
       const [itemsRes, branchesRes, finishedRes, rawRes] = await Promise.all([
         axios.get(`${API}/inventory`, { params: { branch_id: selectedBranch, item_type: itemType } }),
         axios.get(`${API}/branches`),
@@ -108,12 +140,41 @@ export default function Inventory() {
       setBranches(branchesRes.data);
       setFinishedProducts(finishedRes.data || []);
       setRawMaterials(rawRes.data || []);
+      
+      // حفظ البيانات محلياً للاستخدام Offline
+      try {
+        await db.addItems(STORES.INVENTORY, itemsRes.data || []);
+        await db.addItems(STORES.BRANCHES, branchesRes.data || []);
+      } catch (cacheError) {
+        console.log('Could not cache inventory:', cacheError);
+      }
 
       if (!selectedBranch && branchesRes.data.length > 0) {
         setSelectedBranch(branchesRes.data[0].id);
       }
     } catch (error) {
       console.error('Failed to fetch inventory:', error);
+      
+      // إذا فشل الاتصال، حاول جلب من IndexedDB
+      if (!error.response) {
+        try {
+          const [localInventory, localBranches] = await Promise.all([
+            db.getAllItems(STORES.INVENTORY),
+            db.getAllItems(STORES.BRANCHES)
+          ]);
+          
+          if (localInventory.length > 0) {
+            setItems(localInventory.filter(i => !itemType || i.item_type === itemType));
+            toast.warning(t('تم تحميل المخزون المحلي'));
+          }
+          if (localBranches.length > 0) {
+            setBranches(localBranches);
+          }
+        } catch (offlineError) {
+          console.error('Error loading offline data:', offlineError);
+        }
+      }
+      
       toast.error(t('فشل في تحميل المخزون'));
     } finally {
       setLoading(false);
