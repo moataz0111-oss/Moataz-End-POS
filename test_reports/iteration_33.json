@@ -115,7 +115,7 @@
   },
   
   "test_credentials": {
-    "api_url": "https://impersonate-admin-1.preview.emergentagent.com",
+    "api_url": "https://disaster-recovery-7.preview.emergentagent.com",
     "super_admin": {
       "email": "owner@maestroegp.com",
       "password": "owner123",
