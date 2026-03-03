@@ -367,6 +367,151 @@ export const cleanupOldData = async () => {
   }
 };
 
+/**
+ * حفظ حركة مخزون Offline
+ */
+export const saveOfflineInventoryTransaction = async (transaction) => {
+  try {
+    const offlineTransaction = {
+      ...transaction,
+      id: transaction.id || generateUUID(),
+      offline_id: generateOfflineId(),
+      is_synced: false,
+      created_at: transaction.created_at || new Date().toISOString()
+    };
+
+    await db.addItem(STORES.INVENTORY, offlineTransaction);
+    await addToSyncQueue('inventory_transaction', 'create', offlineTransaction);
+
+    console.log('✅ تم حفظ حركة المخزون محلياً:', offlineTransaction.offline_id);
+    return offlineTransaction;
+  } catch (error) {
+    console.error('❌ خطأ في حفظ حركة المخزون:', error);
+    throw error;
+  }
+};
+
+/**
+ * حفظ حضور موظف Offline
+ */
+export const saveOfflineAttendance = async (attendance) => {
+  try {
+    const offlineAttendance = {
+      ...attendance,
+      id: attendance.id || generateUUID(),
+      offline_id: generateOfflineId(),
+      is_synced: false,
+      created_at: attendance.created_at || new Date().toISOString()
+    };
+
+    await db.addItem(STORES.EMPLOYEES, offlineAttendance);
+    await addToSyncQueue('attendance', 'create', offlineAttendance);
+
+    console.log('✅ تم حفظ الحضور محلياً:', offlineAttendance.offline_id);
+    return offlineAttendance;
+  } catch (error) {
+    console.error('❌ خطأ في حفظ الحضور:', error);
+    throw error;
+  }
+};
+
+/**
+ * حفظ تحديث طاولة Offline
+ */
+export const saveOfflineTableUpdate = async (tableId, updates) => {
+  try {
+    const table = await db.getItem(STORES.TABLES, tableId);
+    if (!table) throw new Error('الطاولة غير موجودة');
+
+    const updatedTable = {
+      ...table,
+      ...updates,
+      is_synced: false,
+      updated_at: new Date().toISOString()
+    };
+
+    await db.updateItem(STORES.TABLES, updatedTable);
+    await addToSyncQueue('table', 'update', updatedTable);
+
+    return updatedTable;
+  } catch (error) {
+    console.error('❌ خطأ في تحديث الطاولة:', error);
+    throw error;
+  }
+};
+
+/**
+ * الحصول على جميع الطاولات المحلية
+ */
+export const getLocalTables = async () => {
+  try {
+    return await db.getAllItems(STORES.TABLES);
+  } catch (error) {
+    console.error('❌ خطأ في جلب الطاولات:', error);
+    return [];
+  }
+};
+
+/**
+ * الحصول على جميع المنتجات المحلية
+ */
+export const getLocalProducts = async () => {
+  try {
+    return await db.getAllItems(STORES.PRODUCTS);
+  } catch (error) {
+    console.error('❌ خطأ في جلب المنتجات:', error);
+    return [];
+  }
+};
+
+/**
+ * الحصول على جميع التصنيفات المحلية
+ */
+export const getLocalCategories = async () => {
+  try {
+    return await db.getAllItems(STORES.CATEGORIES);
+  } catch (error) {
+    console.error('❌ خطأ في جلب التصنيفات:', error);
+    return [];
+  }
+};
+
+/**
+ * الحصول على جميع الفروع المحلية
+ */
+export const getLocalBranches = async () => {
+  try {
+    return await db.getAllItems(STORES.BRANCHES);
+  } catch (error) {
+    console.error('❌ خطأ في جلب الفروع:', error);
+    return [];
+  }
+};
+
+/**
+ * الحصول على المخزون المحلي
+ */
+export const getLocalInventory = async () => {
+  try {
+    return await db.getAllItems(STORES.INVENTORY);
+  } catch (error) {
+    console.error('❌ خطأ في جلب المخزون:', error);
+    return [];
+  }
+};
+
+/**
+ * الحصول على الموظفين المحليين
+ */
+export const getLocalEmployees = async () => {
+  try {
+    return await db.getAllItems(STORES.EMPLOYEES);
+  } catch (error) {
+    console.error('❌ خطأ في جلب الموظفين:', error);
+    return [];
+  }
+};
+
 export default {
   generateOfflineId,
   generateUUID,
@@ -384,5 +529,14 @@ export default {
   updateSyncQueueItem,
   removeSyncQueueItem,
   markOrderAsSynced,
-  cleanupOldData
+  cleanupOldData,
+  saveOfflineInventoryTransaction,
+  saveOfflineAttendance,
+  saveOfflineTableUpdate,
+  getLocalTables,
+  getLocalProducts,
+  getLocalCategories,
+  getLocalBranches,
+  getLocalInventory,
+  getLocalEmployees
 };
