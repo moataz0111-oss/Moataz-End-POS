@@ -454,17 +454,18 @@ export default function Orders() {
           ) : (
             filteredOrders.map(order => {
               const StatusIcon = getStatusIcon(order.status);
+              const isUnsyncedOrder = order.is_synced === false || order.is_offline === true;
               return (
                 <Card 
                   key={order.id}
-                  className="border-border/50 bg-card overflow-hidden"
+                  className={`border-border/50 bg-card overflow-hidden ${isUnsyncedOrder ? 'border-l-4 border-l-amber-500' : ''}`}
                   data-testid={`order-card-${order.id}`}
                 >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${getStatusColor(order.status)}`}>
-                          <span className="text-lg font-bold">#{order.order_number}</span>
+                          <span className="text-lg font-bold">#{order.order_number || order.offline_id?.slice(-6)}</span>
                         </div>
                         <div>
                           <div className="flex items-center gap-2 mb-1">
@@ -475,9 +476,16 @@ export default function Orders() {
                             <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                               {getOrderTypeText(order.order_type)}
                             </span>
+                            {/* مؤشر الطلب غير المتزامن */}
+                            {isUnsyncedOrder && (
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 flex items-center gap-1">
+                                <CloudOff className="h-3 w-3" />
+                                {t('محلي')}
+                              </span>
+                            )}
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {order.items.length} {t('عناصر')} • {new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                            {order.items?.length || 0} {t('عناصر')} • {new Date(order.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           </p>
                           {order.delivery_app && (
                             <p className="text-xs text-primary mt-1">{t('عبر')}: {order.delivery_app}</p>
