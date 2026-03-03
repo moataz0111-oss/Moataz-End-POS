@@ -869,6 +869,25 @@ export default function Settings() {
     }
   };
 
+  // جلب سجلات انتحال الهوية
+  const fetchImpersonationLogs = async (page = 1) => {
+    try {
+      setLogsLoading(true);
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API}/auth/impersonation-logs?page=${page}&limit=20`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setImpersonationLogs(res.data.logs || []);
+      setLogsTotalPages(res.data.total_pages || 1);
+      setLogsPage(page);
+    } catch (error) {
+      console.error('Failed to fetch impersonation logs:', error);
+      toast.error(t('فشل في تحميل سجلات المراقبة'));
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
   const handleEditStaff = (staff) => {
     setEditStaffForm({
       ...staff,
