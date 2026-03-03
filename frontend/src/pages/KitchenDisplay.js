@@ -6,6 +6,9 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { formatPrice } from '../utils/currency';
 import { useTranslation } from '../hooks/useTranslation';
+import { useOffline } from '../context/OfflineContext';
+import offlineStorage from '../lib/offlineStorage';
+import db, { STORES } from '../lib/offlineDB';
 import { 
   ChefHat, 
   Clock, 
@@ -23,7 +26,8 @@ import {
   Coffee,
   Timer,
   ArrowRight,
-  Home
+  Home,
+  WifiOff
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import { useNavigate } from 'react-router-dom';
