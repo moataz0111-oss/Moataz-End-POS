@@ -215,8 +215,9 @@ const KitchenOrderCard = ({ order, onStatusChange, onItemComplete, t }) => {
 
 // Main Kitchen Display Component
 export default function KitchenDisplay() {
+  const { t, isRTL } = useTranslation();
+  const { isOnline, isOffline } = useOffline();
   const navigate = useNavigate();
-  const { t, lang, isRTL } = useTranslation();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
