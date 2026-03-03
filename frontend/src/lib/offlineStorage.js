@@ -201,15 +201,33 @@ export const getTodayOrders = async () => {
  * الحصول على الطلبات غير المتزامنة
  */
 export const getUnsyncedOrders = async () => {
-  return db.getItemsByIndex(STORES.ORDERS, 'is_synced', false);
+  try {
+    // أولاً جرب البحث بالفهرس
+    const orders = await db.getItemsByIndex(STORES.ORDERS, 'is_synced', false);
+    if (orders && orders.length > 0) {
+      return orders;
+    }
+    
+    // إذا فشل، ابحث في كل الطلبات
+    const allOrders = await db.getAllItems(STORES.ORDERS);
+    return allOrders.filter(order => order.is_synced === false);
+  } catch (error) {
+    console.error('Error getting unsynced orders:', error);
+    return [];
+  }
 };
 
 /**
  * عدد الطلبات غير المتزامنة
  */
 export const countUnsyncedOrders = async () => {
-  const orders = await getUnsyncedOrders();
-  return orders.length;
+  try {
+    const orders = await getUnsyncedOrders();
+    return orders.length;
+  } catch (error) {
+    console.error('Error counting unsynced orders:', error);
+    return 0;
+  }
 };
 
 /**
