@@ -1833,9 +1833,24 @@ async def register(user: UserCreate):
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin):
+    print(f"[DEBUG] Login attempt for: {credentials.email}")
     user = await db.users.find_one({"email": credentials.email}, {"_id": 0})
-    if not user or not verify_password(credentials.password, user.get("password_hash", user.get("password", ""))):
+    print(f"[DEBUG] User found: {user is not None}")
+    
+    if not user:
+        print("[DEBUG] User not found in database")
         raise HTTPException(status_code=401, detail="بيانات الدخول غير صحيحة")
+    
+    stored_hash = user.get("password_hash", user.get("password", ""))
+    print(f"[DEBUG] Hash exists: {bool(stored_hash)}, Hash start: {stored_hash[:20] if stored_hash else 'None'}")
+    
+    password_valid = verify_password(credentials.password, stored_hash)
+    print(f"[DEBUG] Password valid: {password_valid}")
+    
+    if not password_valid:
+        print("[DEBUG] Password verification failed")
+        raise HTTPException(status_code=401, detail="بيانات الدخول غير صحيحة")
+    
     if not user.get("is_active", True):
         raise HTTPException(status_code=401, detail="الحساب معطل")
     
