@@ -5786,6 +5786,117 @@ export default function Settings() {
               </Dialog>
             </TabsContent>
           )}
+          
+          {/* سجلات المراقبة - Audit Logs */}
+          {hasRole(['admin', 'super_admin']) && (
+            <TabsContent value="audit-logs" onFocus={() => fetchImpersonationLogs()}>
+              <Card className="border-border/50 bg-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-foreground">
+                    <Shield className="h-5 w-5" />
+                    {t('سجلات انتحال الهوية')}
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {t('سجل بجميع عمليات الدخول كمستخدم آخر')}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => fetchImpersonationLogs(1)}
+                      disabled={logsLoading}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${logsLoading ? 'animate-spin' : ''}`} />
+                      {t('تحديث')}
+                    </Button>
+                  </div>
+                  
+                  {logsLoading ? (
+                    <div className="text-center py-8">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                      <p className="text-muted-foreground">{t('جاري التحميل...')}</p>
+                    </div>
+                  ) : impersonationLogs.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Shield className="h-12 w-12 mx-auto mb-4 opacity-30" />
+                      <p>{t('لا توجد سجلات حتى الآن')}</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="rounded-lg border overflow-hidden">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-muted/50">
+                              <TableHead className="text-right">{t('المدير')}</TableHead>
+                              <TableHead className="text-right">{t('دخل كـ')}</TableHead>
+                              <TableHead className="text-right">{t('التاريخ والوقت')}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {impersonationLogs.map((log, idx) => (
+                              <TableRow key={log.id || idx} className="hover:bg-muted/30">
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                      <UserCog className="h-4 w-4 text-red-600" />
+                                    </div>
+                                    <span className="font-medium">{log.admin_name}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                      <User className="h-4 w-4 text-blue-600" />
+                                    </div>
+                                    <span>{log.target_user_name}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="text-muted-foreground text-sm">
+                                  {new Date(log.timestamp).toLocaleString('ar-EG', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                      
+                      {/* الترقيم */}
+                      {logsTotalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 mt-4">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={logsPage <= 1}
+                            onClick={() => fetchImpersonationLogs(logsPage - 1)}
+                          >
+                            {t('السابق')}
+                          </Button>
+                          <span className="text-sm text-muted-foreground">
+                            {t('صفحة')} {logsPage} {t('من')} {logsTotalPages}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={logsPage >= logsTotalPages}
+                            onClick={() => fetchImpersonationLogs(logsPage + 1)}
+                          >
+                            {t('التالي')}
+                          </Button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
