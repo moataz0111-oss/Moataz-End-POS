@@ -236,6 +236,7 @@ export const AuthProvider = ({ children }) => {
       hasPermission,
       hasRole,
       isAuthenticated: !!user,
+      isOfflineLogin,
       currentShift,
       refreshShift,
       autoOpenShift
