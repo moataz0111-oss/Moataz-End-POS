@@ -45,14 +45,18 @@ export const initializeOfflineData = async (token) => {
       customersRes,
       branchesRes,
       tablesRes,
-      settingsRes
+      settingsRes,
+      tenantRes,
+      statsRes
     ] = await Promise.all([
       fetch(`${API}/products`, { headers }).then(r => r.json()).catch(() => []),
       fetch(`${API}/categories`, { headers }).then(r => r.json()).catch(() => []),
       fetch(`${API}/customers`, { headers }).then(r => r.json()).catch(() => []),
       fetch(`${API}/branches`, { headers }).then(r => r.json()).catch(() => []),
       fetch(`${API}/tables`, { headers }).then(r => r.json()).catch(() => []),
-      fetch(`${API}/settings/dashboard`, { headers }).then(r => r.json()).catch(() => ({}))
+      fetch(`${API}/settings/dashboard`, { headers }).then(r => r.json()).catch(() => ({})),
+      fetch(`${API}/tenant/info`, { headers }).then(r => r.json()).catch(() => null),
+      fetch(`${API}/dashboard/stats`, { headers }).then(r => r.json()).catch(() => null)
     ]);
 
     // حفظ في IndexedDB
@@ -62,7 +66,11 @@ export const initializeOfflineData = async (token) => {
       db.addItems(STORES.CUSTOMERS, Array.isArray(customersRes) ? customersRes : []),
       db.addItems(STORES.BRANCHES, Array.isArray(branchesRes) ? branchesRes : []),
       db.addItems(STORES.TABLES, Array.isArray(tablesRes) ? tablesRes : []),
-      db.addItem(STORES.SETTINGS, { key: 'dashboard', ...settingsRes })
+      db.addItem(STORES.SETTINGS, { key: 'dashboard', ...settingsRes }),
+      // حفظ بيانات المستأجر (اسم المطعم والشعار)
+      tenantRes ? db.addItem(STORES.SETTINGS, { key: 'tenant', ...tenantRes }) : Promise.resolve(),
+      // حفظ الإحصائيات
+      statsRes ? db.addItem(STORES.SETTINGS, { key: 'stats', ...statsRes }) : Promise.resolve()
     ]);
 
     // حفظ وقت آخر تحديث
