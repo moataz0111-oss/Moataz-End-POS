@@ -87,6 +87,19 @@
                 jsScript.src = 'https://assets.emergent.sh/visual-edits/script.js';
                 document.head.appendChild(jsScript);
             }
+            
+            // تسجيل Service Worker للعمل بدون إنترنت
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw-offline.js')
+                        .then(function(registration) {
+                            console.log('[App] Service Worker registered:', registration.scope);
+                        })
+                        .catch(function(error) {
+                            console.log('[App] Service Worker registration failed:', error);
+                        });
+                });
+            }
         </script>
     </head>
     <body>
