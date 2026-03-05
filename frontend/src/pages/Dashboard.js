@@ -425,6 +425,13 @@ export default function Dashboard() {
       
       const res = await axios.get(`${API}/tenant/info`);
       setTenantInfo(res.data);
+      
+      // حفظ في IndexedDB للاستخدام offline
+      try {
+        await db.addItem(STORES.SETTINGS, { key: 'tenant', ...res.data });
+      } catch (dbErr) {
+        console.log('Could not save tenant info to IndexedDB');
+      }
     } catch (error) {
       // محاولة استخدام البيانات المحلية عند الخطأ
       const localTenant = await getLocalTenantInfo();
