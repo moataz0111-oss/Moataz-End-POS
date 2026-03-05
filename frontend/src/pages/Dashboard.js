@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useBranch } from '../context/BranchContext';
+import { useOffline } from '../context/OfflineContext';
+import { getLocalTenantInfo, getLocalStats, getLocalDashboardSettings, getTodayOrders } from '../lib/offlineStorage';
 import { formatPrice, formatPriceCompact } from '../utils/currency';
 import { useTranslation } from '../hooks/useTranslation';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
